@@ -23,6 +23,7 @@ import InviteModal from '@/components/kairo/InviteModal';
 import AddFriendModal from '@/components/kairo/AddFriendModal';
 import JoinServerModal from '@/components/kairo/JoinServerModal';
 import DiscoverServers from '@/components/kairo/DiscoverServers';
+import CommandPalette from '@/components/kairo/CommandPalette';
 
 // Channel header
 function ChannelHeader({ channel, memberCount, onMembersToggle, showMembers }) {
@@ -108,6 +109,19 @@ export default function KairoPage() {
   
   // Reply state
   const [replyTo, setReplyTo] = useState(null);
+  const [showCommandPalette, setShowCommandPalette] = useState(false);
+
+  // Command palette keyboard shortcut
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setShowCommandPalette(true);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   // Fetch current user
   const { data: currentUser } = useQuery({
@@ -871,6 +885,49 @@ export default function KairoPage() {
             onClose={() => setShowJoinServer(false)}
             onJoin={(code) => joinServerMutation.mutate(code)}
             onDiscover={() => setView('discover')}
+          />
+        )}
+        {showCommandPalette && (
+          <CommandPalette
+            isOpen={showCommandPalette}
+            onClose={() => setShowCommandPalette(false)}
+            servers={memberServers}
+            channels={channels}
+            conversations={conversations}
+            onCommand={(cmd) => {
+              switch (cmd.id) {
+                case 'focus-mode':
+                  updateProfileMutation.mutate({ settings: { ...userProfile?.settings, focus_mode: !userProfile?.settings?.focus_mode } });
+                  break;
+                case 'ghost-mode':
+                  updateProfileMutation.mutate({ settings: { ...userProfile?.settings, ghost_mode: !userProfile?.settings?.ghost_mode } });
+                  break;
+                case 'create-server':
+                  setShowCreateServer(true);
+                  break;
+                case 'join-server':
+                  setShowJoinServer(true);
+                  break;
+                case 'add-friend':
+                  setShowAddFriend(true);
+                  break;
+                case 'settings':
+                  setShowSettings(true);
+                  break;
+                case 'dms':
+                  handleDMsClick();
+                  break;
+                default:
+                  if (cmd.id.startsWith('server-')) {
+                    handleServerSelect(cmd.data);
+                  } else if (cmd.id.startsWith('channel-')) {
+                    handleChannelClick(cmd.data);
+                  } else if (cmd.id.startsWith('dm-')) {
+                    setActiveConversation(cmd.data);
+                    setView('dms');
+                  }
+              }
+            }}
           />
         )}
       </AnimatePresence>
