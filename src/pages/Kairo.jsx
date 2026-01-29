@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { Hash, Users, Pin, Bell, Search, Inbox, HelpCircle, ShoppingBag, Calendar, Wifi, WifiOff, RefreshCw } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { createPageUrl } from '@/utils';
 
 // Core Components
 import LoadingScreen from '@/components/kairo/LoadingScreen';
@@ -92,6 +94,7 @@ function ChannelHeader({ channel, memberCount, onMembersToggle, showMembers }) {
 
 export default function KairoPage() {
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   
   // Loading state
   const [isLoading, setIsLoading] = useState(true);
