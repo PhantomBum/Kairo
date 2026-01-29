@@ -585,7 +585,7 @@ export default function KairoPage() {
       <div className="h-screen flex bg-[#0a0a0b]">
         <Sidebar servers={memberServers} activeServerId={null} onServerSelect={handleServerSelect} onDMsClick={handleDMsClick}
           onDiscoverClick={() => setView('discover')} onCreateServer={() => setShowCreateServer(true)}
-          onSettingsClick={() => setShowSettings(true)} isDMsActive={false} userProfile={userProfile} />
+          onSettingsClick={() => setShowSettings(true)} onFriendsClick={() => setView('friends')} isDMsActive={false} userProfile={userProfile} />
         <ShopPage currentUser={currentUser} userCredits={userCredits} friends={friends} />
       </div>
     );
