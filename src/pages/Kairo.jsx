@@ -573,6 +573,7 @@ export default function KairoPage() {
             await base44.entities.Friendship.create({ user_id: currentUser.id, friend_id: profiles[0].user_id, friend_email: profiles[0].user_email, friend_name: profiles[0].display_name, friend_avatar: profiles[0].avatar_url, status: 'pending', initiated_by: currentUser.id });
             queryClient.invalidateQueries({ queryKey: ['friendships'] });
           }} />}
+          {showJoinServer && <JoinByInviteModal isOpen={showJoinServer} onClose={() => setShowJoinServer(false)} onJoin={(code) => joinServerMutation.mutate(code)} isJoining={joinServerMutation.isPending} />}
           {showSettings && <FullSettingsModal isOpen={showSettings} onClose={() => setShowSettings(false)} profile={userProfile} userSettings={userSettings} onUpdateProfile={(data) => updateProfileMutation.mutate(data)} onUpdateSettings={(data) => updateSettingsMutation.mutate(data)} onLogout={() => base44.auth.logout()} />}
         </AnimatePresence>
       </div>
