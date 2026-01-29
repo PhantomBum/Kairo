@@ -35,26 +35,31 @@ export default function ServerBoostCheckout({ server, currentUser, onClose }) {
   const queryClient = useQueryClient();
   const [selectedTier, setSelectedTier] = useState(boostTiers[1]);
   const [paymentMethod, setPaymentMethod] = useState('card');
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const boostMutation = useMutation({
     mutationFn: async () => {
-      // In production, integrate with Stripe
-      const expiresAt = new Date();
-      expiresAt.setMonth(expiresAt.getMonth() + 1);
+      if (window.self !== window.top) {
+        throw new Error('Checkout only works from a published app');
+      }
 
-      return base44.entities.ServerBoost.create({
-        server_id: server.id,
-        user_id: currentUser.id,
-        user_email: currentUser.email,
-        user_name: currentUser.display_name || currentUser.full_name,
-        boost_level: selectedTier.level,
-        expires_at: expiresAt.toISOString(),
-        payment_id: 'payment_' + Math.random().toString(36).substring(7)
+      setIsProcessing(true);
+      const { data } = await base44.functions.invoke('stripeCheckout', {
+        type: 'server_boost',
+        serverId: server.id,
+        serverName: server.name,
+        userId: currentUser?.id,
+        userEmail: currentUser?.email
       });
+      
+      if (data.url) {
+        window.location.href = data.url;
+      }
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['serverBoosts'] });
-      onClose();
+    onError: (error) => {
+      console.error('Boost error:', error);
+      alert(error.message || 'Failed to start checkout. Please try again.');
+      setIsProcessing(false);
     }
   });
 
@@ -177,11 +182,11 @@ export default function ServerBoostCheckout({ server, currentUser, onClose }) {
           {/* CTA */}
           <Button
             onClick={() => boostMutation.mutate()}
-            disabled={boostMutation.isPending}
-            className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 h-12 text-lg font-semibold"
+            disabled={boostMutation.isPending || isProcessing}
+            className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 h-12 text-lg font-semibold disabled:opacity-50"
           >
             <Zap className="w-5 h-5 mr-2" />
-            {boostMutation.isPending ? 'Processing...' : 'Boost Server'}
+            {isProcessing || boostMutation.isPending ? 'Processing...' : `Boost for $${selectedTier.price}`}
           </Button>
 
           <p className="text-xs text-zinc-500 text-center mt-4">
