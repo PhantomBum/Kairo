@@ -654,7 +654,7 @@ export default function KairoPage() {
           if (profiles.length === 0) throw new Error('User not found');
           await base44.entities.Friendship.create({ user_id: currentUser.id, friend_id: profiles[0].user_id, friend_email: profiles[0].user_email, friend_name: profiles[0].display_name, friend_avatar: profiles[0].avatar_url, status: 'pending', initiated_by: currentUser.id });
         }} />}
-        {showJoinServer && <JoinServerModal isOpen={showJoinServer} onClose={() => setShowJoinServer(false)} onJoin={(code) => joinServerMutation.mutate(code)} onDiscover={() => setView('discover')} />}
+
         {showCommandPalette && <CommandPalette isOpen={showCommandPalette} onClose={() => setShowCommandPalette(false)} servers={memberServers} channels={channels} conversations={conversations} onCommand={handleCommandPaletteCommand} />}
         {showProfileEditor && <ProfileEditor profile={userProfile} inventory={userInventory} onUpdateProfile={(data) => updateProfileMutation.mutate(data)} onClose={() => setShowProfileEditor(false)} />}
         {previewServer && <ServerPreviewModal server={previewServer} isOpen={!!previewServer} onClose={() => setPreviewServer(null)} onJoin={() => joinServerMutation.mutate(previewServer.invite_code)} isJoining={joinServerMutation.isPending} />}
