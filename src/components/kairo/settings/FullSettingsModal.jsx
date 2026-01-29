@@ -895,7 +895,11 @@ export default function FullSettingsModal({ isOpen, onClose, profile, userSettin
             <div className="my-4 h-px bg-zinc-800" />
 
             <button
-              onClick={onLogout}
+              onClick={() => {
+                localStorage.removeItem('kairo_access_key');
+                localStorage.removeItem('kairo_current_user');
+                window.location.href = '/';
+              }}
               className="w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors"
             >
               <LogOut className="w-4 h-4" />
