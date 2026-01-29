@@ -15,9 +15,11 @@ export default function LandingPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Check if user is already authenticated
+    // Check if user is already authenticated and has seen landing
+    const hasSeenLanding = localStorage.getItem('kairo_has_seen_landing');
+    
     base44.auth.isAuthenticated().then(isAuth => {
-      if (isAuth) {
+      if (isAuth && hasSeenLanding === 'true') {
         navigate(createPageUrl('Kairo'));
       } else {
         setIsLoading(false);
@@ -26,6 +28,7 @@ export default function LandingPage() {
   }, [navigate]);
 
   const handleGetStarted = async () => {
+    localStorage.setItem('kairo_has_seen_landing', 'true');
     setStep('auth');
   };
 

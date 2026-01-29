@@ -100,21 +100,8 @@ export default function ServerHub({ servers = [], onJoinServer, onBack }) {
   const [sortBy, setSortBy] = useState('members'); // 'members' | 'recent' | 'name'
   const [viewMode, setViewMode] = useState('featured'); // 'featured' | 'all'
 
-  // Filter servers
-  const filteredServers = servers
-    .filter(s => 
-      s.is_public && 
-      (s.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-       s.description?.toLowerCase().includes(searchQuery.toLowerCase()))
-    )
-    .sort((a, b) => {
-      if (sortBy === 'members') return (b.member_count || 0) - (a.member_count || 0);
-      if (sortBy === 'name') return (a.name || '').localeCompare(b.name || '');
-      return 0;
-    });
-
-  const featuredServers = filteredServers.filter(s => s.member_count > 500);
-  const displayServers = viewMode === 'featured' ? featuredServers : filteredServers;
+  // Empty servers - user will add their official server manually
+  const displayServers = [];
 
   return (
     <div className="flex-1 flex flex-col bg-[#0a0a0b] overflow-hidden">
