@@ -545,9 +545,9 @@ export default function KairoPage() {
   if (view === 'friends') {
     return (
       <div className="h-screen flex bg-[#0a0a0b]">
-        <Sidebar servers={memberServers} activeServerId={null} onServerSelect={handleServerSelect} onDMsClick={handleDMsClick}
-          onDiscoverClick={() => setView('discover')} onCreateServer={() => setShowCreateServer(true)}
-          onSettingsClick={() => setShowSettings(true)} onFriendsClick={() => setView('friends')} isDMsActive={false} userProfile={userProfile} />
+        <SidebarNew servers={memberServers} activeServerId={null} onServerSelect={handleServerSelect} onDMsClick={handleDMsClick}
+          onDiscoverClick={() => setView('discover')} onShopClick={() => setView('shop')} onCreateServer={() => setShowCreateServer(true)}
+          onSettingsClick={() => setShowSettings(true)} onFriendsClick={() => setView('friends')} onProfileClick={() => setShowProfileEditor(true)} isDMsActive={false} userProfile={userProfile} />
         <div className="flex flex-col">
           <DMSidebar conversations={conversations} friends={friends} activeConversationId={activeConversation?.id}
             onConversationSelect={(convo) => { setActiveConversation(convo); setView('dms'); }} onConversationClose={() => setActiveConversation(null)}
