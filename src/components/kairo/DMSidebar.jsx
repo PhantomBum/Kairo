@@ -238,13 +238,6 @@ export default function DMSidebar({
       {/* Navigation */}
       <div className="p-2 space-y-0.5">
         <button
-          onClick={onAddFriend}
-          className="w-full flex items-center gap-3 px-3 py-2 rounded-md hover:bg-zinc-800/50 text-zinc-400 hover:text-white transition-colors"
-        >
-          <UserPlus className="w-5 h-5" />
-          <span className="text-sm font-medium">Add Friend</span>
-        </button>
-        <button
           onClick={() => setActiveView('friends')}
           className={cn(
             "w-full flex items-center gap-3 px-3 py-2 rounded-md transition-colors",
@@ -260,6 +253,19 @@ export default function DMSidebar({
               {pendingRequests.length}
             </span>
           )}
+        </button>
+        <button
+          onClick={onAddFriend}
+          className="w-full flex items-center gap-3 px-3 py-2 rounded-md hover:bg-zinc-800/50 text-zinc-400 hover:text-white transition-colors"
+        >
+          <UserPlus className="w-5 h-5" />
+          <span className="text-sm font-medium">Add Friend</span>
+        </button>
+        <button
+          className="w-full flex items-center gap-3 px-3 py-2 rounded-md hover:bg-zinc-800/50 text-zinc-400 hover:text-white transition-colors"
+        >
+          <Link2 className="w-5 h-5" />
+          <span className="text-sm font-medium">Join Server</span>
         </button>
       </div>
 
