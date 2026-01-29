@@ -212,9 +212,11 @@ export function JoinByInviteModal({ isOpen, onClose, onJoin, isJoining }) {
   const [isLoading, setIsLoading] = useState(false);
 
   const extractCode = (input) => {
-    // Handle full URLs or just codes
-    const match = input.match(/(?:kairo\.app\/invite\/)?([A-Z0-9]{6})/i);
-    return match ? match[1].toUpperCase() : input.toUpperCase();
+    // Handle full URLs or just codes - more flexible matching
+    const urlMatch = input.match(/kairo\.app\/invite\/([A-Z0-9]+)/i);
+    if (urlMatch) return urlMatch[1].toUpperCase();
+    // Just return the cleaned input as a code
+    return input.trim().toUpperCase();
   };
 
   const previewServer = async () => {
