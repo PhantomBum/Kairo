@@ -206,6 +206,7 @@ export default function DMSidebar({
   onConversationClose,
   onNewDM,
   onAddFriend,
+  onJoinServer,
   view = 'conversations' // 'conversations' | 'friends' | 'pending'
 }) {
   const [searchQuery, setSearchQuery] = useState('');
