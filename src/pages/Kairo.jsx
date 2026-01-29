@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils';
 
 // Core Components
 import LoadingScreen from '@/components/kairo/LoadingScreen';
-import Sidebar from '@/components/kairo/Sidebar';
+import SidebarNew from '@/components/kairo/SidebarNew';
 import ChannelSidebar from '@/components/kairo/ChannelSidebar';
 import DMSidebar from '@/components/kairo/DMSidebar';
 import MessageList from '@/components/kairo/MessageList';
@@ -23,7 +23,7 @@ import CommandPalette from '@/components/kairo/CommandPalette';
 import ServerPreviewModal from '@/components/kairo/ServerPreviewModal';
 
 // Feature Components
-import DiscoverServers from '@/components/kairo/DiscoverServers';
+import ServerHub from '@/components/kairo/ServerHub';
 import WebRTCVoice from '@/components/kairo/voice/WebRTCVoice';
 import FullSettingsModal from '@/components/kairo/settings/FullSettingsModal';
 import ShopPage from '@/components/kairo/shop/ShopPage';
