@@ -653,9 +653,23 @@ export default function KairoPage() {
   if (view === 'events' && activeServer) {
     return (
       <div className="h-screen flex bg-[#0a0a0b]">
-        <SidebarNew servers={memberServers} activeServerId={activeServer?.id} onServerSelect={handleServerSelect} onDMsClick={handleDMsClick}
-          onDiscoverClick={() => setView('discover')} onCreateServer={() => setShowCreateServer(true)}
-          onSettingsClick={() => setShowSettings(true)} onFriendsClick={() => setView('friends')} onProfileClick={() => setShowProfileEditor(true)} isDMsActive={false} userProfile={userProfile} />
+        <ImprovedSidebar 
+          servers={memberServers} 
+          activeServerId={activeServer?.id} 
+          onServerSelect={handleServerSelect} 
+          onDMsClick={handleDMsClick}
+          onDiscoverClick={() => setView('discover')} 
+          onCreateServer={() => setShowCreateServer(true)}
+          onSettingsClick={() => setShowSettings(true)} 
+          onFriendsClick={() => setView('friends')} 
+          onProfileClick={() => setShowProfileEditor(true)}
+          onUpdateLogsClick={() => setShowUpdateLogs(true)}
+          onNotificationsClick={() => setShowNotifications(true)}
+          isDMsActive={false} 
+          userProfile={userProfile}
+          notifications={notifications}
+          hasNewUpdates={hasNewUpdates}
+        />
         <div className="flex flex-col">
           <ChannelSidebar server={activeServer} categories={categories} channels={channels} activeChannelId={activeChannel?.id}
             onChannelClick={handleChannelClick} onServerSettings={() => {}} onCreateChannel={(categoryId) => { setCreateChannelCategory(categoryId); setShowCreateChannel(true); }}
@@ -798,6 +812,8 @@ export default function KairoPage() {
         {incomingCall && <IncomingCallModal call={incomingCall} caller={incomingCall.caller} onAccept={() => { setActiveCall(incomingCall); setIncomingCall(null); }} onDecline={() => setIncomingCall(null)} />}
         {outgoingCall && <OutgoingCallModal recipient={outgoingCall.recipient} isVideoCall={outgoingCall.isVideo} onCancel={() => setOutgoingCall(null)} />}
         {activeCall && <ActiveCallModal call={activeCall} participants={activeCall.participants} currentUserId={currentUser?.id} onEndCall={() => setActiveCall(null)} onToggleMute={() => setIsMuted(!isMuted)} onToggleDeafen={() => setIsDeafened(!isDeafened)} onToggleVideo={() => setIsVideo(!isVideo)} onToggleScreenShare={() => setIsStreaming(!isStreaming)} isMuted={isMuted} isDeafened={isDeafened} isVideo={isVideo} isScreenSharing={isStreaming} />}
+        {showUpdateLogs && <UpdateLogsModal isOpen={showUpdateLogs} onClose={() => setShowUpdateLogs(false)} />}
+        {showNotifications && <NotificationsPanel isOpen={showNotifications} onClose={() => setShowNotifications(false)} currentUser={currentUser} />}
       </AnimatePresence>
     </div>
   );
