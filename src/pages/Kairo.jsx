@@ -528,10 +528,10 @@ export default function KairoPage() {
   if (view === 'discover') {
     return (
       <div className="h-screen flex bg-[#0a0a0b]">
-        <Sidebar servers={memberServers} activeServerId={null} onServerSelect={handleServerSelect} onDMsClick={handleDMsClick}
-          onDiscoverClick={() => setView('discover')} onCreateServer={() => setShowCreateServer(true)}
-          onSettingsClick={() => setShowSettings(true)} onFriendsClick={() => setView('friends')} isDMsActive={false} userProfile={userProfile} />
-        <DiscoverServers servers={publicServers} onJoinServer={(server) => setPreviewServer(server)} onBack={() => setView('dms')} />
+        <SidebarNew servers={memberServers} activeServerId={null} onServerSelect={handleServerSelect} onDMsClick={handleDMsClick}
+          onDiscoverClick={() => setView('discover')} onShopClick={() => setView('shop')} onCreateServer={() => setShowCreateServer(true)}
+          onSettingsClick={() => setShowSettings(true)} onFriendsClick={() => setView('friends')} onProfileClick={() => setShowProfileEditor(true)} isDMsActive={false} userProfile={userProfile} />
+        <ServerHub servers={publicServers} onJoinServer={(server) => setPreviewServer(server)} onBack={() => setView('dms')} />
         <AnimatePresence>
           {showCreateServer && <CreateServerModal isOpen={showCreateServer} onClose={() => setShowCreateServer(false)} onCreate={(data) => createServerMutation.mutate(data)} />}
           {showSettings && <FullSettingsModal isOpen={showSettings} onClose={() => setShowSettings(false)} profile={userProfile} userSettings={userSettings} onUpdateProfile={(data) => updateProfileMutation.mutate(data)} onUpdateSettings={(data) => updateSettingsMutation.mutate(data)} onLogout={() => base44.auth.logout()} />}
@@ -596,9 +596,9 @@ export default function KairoPage() {
   if (view === 'shop') {
     return (
       <div className="h-screen flex bg-[#0a0a0b]">
-        <Sidebar servers={memberServers} activeServerId={null} onServerSelect={handleServerSelect} onDMsClick={handleDMsClick}
-          onDiscoverClick={() => setView('discover')} onCreateServer={() => setShowCreateServer(true)}
-          onSettingsClick={() => setShowSettings(true)} onFriendsClick={() => setView('friends')} isDMsActive={false} userProfile={userProfile} />
+        <SidebarNew servers={memberServers} activeServerId={null} onServerSelect={handleServerSelect} onDMsClick={handleDMsClick}
+          onDiscoverClick={() => setView('discover')} onShopClick={() => setView('shop')} onCreateServer={() => setShowCreateServer(true)}
+          onSettingsClick={() => setShowSettings(true)} onFriendsClick={() => setView('friends')} onProfileClick={() => setShowProfileEditor(true)} isDMsActive={false} userProfile={userProfile} />
         <ShopPage currentUser={currentUser} userCredits={userCredits} friends={friends} />
       </div>
     );
@@ -608,9 +608,9 @@ export default function KairoPage() {
   if (view === 'events' && activeServer) {
     return (
       <div className="h-screen flex bg-[#0a0a0b]">
-        <Sidebar servers={memberServers} activeServerId={activeServer?.id} onServerSelect={handleServerSelect} onDMsClick={handleDMsClick}
-          onDiscoverClick={() => setView('discover')} onCreateServer={() => setShowCreateServer(true)}
-          onSettingsClick={() => setShowSettings(true)} onFriendsClick={() => setView('friends')} isDMsActive={false} userProfile={userProfile} />
+        <SidebarNew servers={memberServers} activeServerId={activeServer?.id} onServerSelect={handleServerSelect} onDMsClick={handleDMsClick}
+          onDiscoverClick={() => setView('discover')} onShopClick={() => setView('shop')} onCreateServer={() => setShowCreateServer(true)}
+          onSettingsClick={() => setShowSettings(true)} onFriendsClick={() => setView('friends')} onProfileClick={() => setShowProfileEditor(true)} isDMsActive={false} userProfile={userProfile} />
         <div className="flex flex-col">
           <ChannelSidebar server={activeServer} categories={categories} channels={channels} activeChannelId={activeChannel?.id}
             onChannelClick={handleChannelClick} onServerSettings={() => {}} onCreateChannel={(categoryId) => { setCreateChannelCategory(categoryId); setShowCreateChannel(true); }}
@@ -626,8 +626,8 @@ export default function KairoPage() {
 
   return (
     <div className={cn("h-screen flex bg-[#0a0a0b]", userSettings?.kairo_features?.focus_mode && "opacity-80")}>
-      <Sidebar servers={memberServers} activeServerId={activeServer?.id} onServerSelect={handleServerSelect} onDMsClick={handleDMsClick}
-        onDiscoverClick={() => setView('discover')} onCreateServer={() => setShowCreateServer(true)}
+      <SidebarNew servers={memberServers} activeServerId={activeServer?.id} onServerSelect={handleServerSelect} onDMsClick={handleDMsClick}
+        onDiscoverClick={() => setView('discover')} onShopClick={() => setView('shop')} onCreateServer={() => setShowCreateServer(true)}
         onSettingsClick={() => setShowSettings(true)} onProfileClick={() => setShowProfileEditor(true)}
         onFriendsClick={() => setView('friends')} isDMsActive={view === 'dms'} userProfile={userProfile} />
 

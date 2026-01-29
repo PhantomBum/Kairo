@@ -64,6 +64,11 @@ function FeatureCard({ feature, index }) {
 }
 
 export default function HomePage() {
+  // Redirect to Landing page
+  React.useEffect(() => {
+    window.location.href = createPageUrl('Landing');
+  }, []);
+
   return (
     <div className="min-h-screen bg-[#0a0a0b] overflow-hidden">
       {/* Animated background */}
