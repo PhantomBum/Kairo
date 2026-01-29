@@ -43,37 +43,22 @@ function ChannelItem({ channel, isActive, onClick, onContextAction, voiceUsers =
           whileHover={{ x: 2 }}
           onClick={() => onClick(channel)}
           className={cn(
-            "group flex items-center gap-2 px-2 py-1.5 mx-2 rounded-md cursor-pointer transition-colors",
-            isActive ? "bg-zinc-700/50 text-white" : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50"
+            "group flex items-center gap-2 px-2 py-1.5 mx-2 rounded-md cursor-pointer transition-all",
+            isActive ? "bg-zinc-800/70 text-white" : "text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800/40"
           )}
         >
           <Icon className={cn(
-            "w-5 h-5 flex-shrink-0",
-            channel.is_private && "text-zinc-500"
+            "w-[18px] h-[18px] flex-shrink-0",
+            channel.is_private && "text-zinc-600"
           )} />
           
-          <span className="flex-1 truncate text-sm">
+          <span className="flex-1 truncate text-[14px] font-medium">
             {channel.name}
           </span>
 
           {channel.is_private && (
-            <Lock className="w-3 h-3 text-zinc-500" />
+            <Lock className="w-3 h-3 text-zinc-600" />
           )}
-
-          <div className="hidden group-hover:flex items-center gap-1">
-            <button 
-              onClick={(e) => { e.stopPropagation(); onContextAction?.('invite', channel); }}
-              className="p-1 hover:bg-zinc-700 rounded"
-            >
-              <UserPlus className="w-3.5 h-3.5" />
-            </button>
-            <button 
-              onClick={(e) => { e.stopPropagation(); onContextAction?.('settings', channel); }}
-              className="p-1 hover:bg-zinc-700 rounded"
-            >
-              <Settings className="w-3.5 h-3.5" />
-            </button>
-          </div>
         </motion.div>
 
         {/* Voice users in channel */}
@@ -128,25 +113,25 @@ function CategoryItem({ category, channels, activeChannelId, onChannelClick, onC
   const categoryChannels = channels.filter(c => c.category_id === category.id);
 
   return (
-    <div className="mt-4 first:mt-2">
+    <div className="mt-5 first:mt-3">
       <ContextMenu>
         <ContextMenuTrigger>
           <button
             onClick={() => setIsCollapsed(!isCollapsed)}
-            className="flex items-center gap-1 px-2 w-full group"
+            className="flex items-center gap-1.5 px-2 w-full group py-1"
           >
             <ChevronRight className={cn(
-              "w-3 h-3 text-zinc-500 transition-transform",
+              "w-3 h-3 text-zinc-600 transition-transform",
               !isCollapsed && "rotate-90"
             )} />
-            <span className="text-xs font-semibold uppercase tracking-wider text-zinc-500 group-hover:text-zinc-300 truncate">
+            <span className="text-[11px] font-bold uppercase tracking-wide text-zinc-600 group-hover:text-zinc-400 truncate transition-colors">
               {category.name}
             </span>
             <button 
               onClick={(e) => { e.stopPropagation(); onCreateChannel?.(category.id); }}
-              className="ml-auto opacity-0 group-hover:opacity-100 p-1 hover:bg-zinc-800 rounded"
+              className="ml-auto opacity-0 group-hover:opacity-100 p-0.5 hover:bg-zinc-800 rounded"
             >
-              <Plus className="w-3 h-3 text-zinc-400" />
+              <Plus className="w-3.5 h-3.5 text-zinc-600 hover:text-zinc-400" />
             </button>
           </button>
         </ContextMenuTrigger>
@@ -209,13 +194,13 @@ export default function ChannelSidebar({
   const uncategorizedChannels = channels.filter(c => !c.category_id);
 
   return (
-    <div className="w-60 h-full bg-[#121214] flex flex-col">
+    <div className="w-60 h-full bg-[#0f0f11] flex flex-col border-r border-zinc-800/30">
       {/* Server header */}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <button className="h-12 px-4 flex items-center justify-between border-b border-zinc-800/50 hover:bg-zinc-800/30 transition-colors">
-            <h2 className="font-semibold text-white truncate">{server?.name || 'Server'}</h2>
-            <ChevronDown className="w-4 h-4 text-zinc-400" />
+          <button className="h-14 px-4 flex items-center justify-between border-b border-zinc-800/30 hover:bg-zinc-800/20 transition-colors">
+            <h2 className="font-semibold text-white truncate text-[15px]">{server?.name || 'Server'}</h2>
+            <ChevronDown className="w-4 h-4 text-zinc-500" />
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-56 bg-zinc-900 border-zinc-800" align="start">
@@ -244,7 +229,9 @@ export default function ChannelSidebar({
       </DropdownMenu>
 
       {/* Channels list */}
-      <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-zinc-700 scrollbar-track-transparent py-2">
+      <ContextMenu>
+        <ContextMenuTrigger>
+          <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-zinc-700 scrollbar-track-transparent py-2">
         {/* Uncategorized channels */}
         {uncategorizedChannels.map((channel) => (
           <ChannelItem
@@ -268,7 +255,30 @@ export default function ChannelSidebar({
             voiceStates={voiceStates}
           />
         ))}
-      </div>
+          </div>
+        </ContextMenuTrigger>
+        <ContextMenuContent className="w-48 bg-zinc-900 border-zinc-800">
+          <ContextMenuItem 
+            onClick={() => onCreateChannel?.()}
+            className="text-zinc-300 focus:bg-indigo-500/20 focus:text-white"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Create Channel
+          </ContextMenuItem>
+          <ContextMenuItem className="text-zinc-300 focus:bg-indigo-500/20 focus:text-white">
+            <Plus className="w-4 h-4 mr-2" />
+            Create Category
+          </ContextMenuItem>
+          <ContextMenuSeparator className="bg-zinc-800" />
+          <ContextMenuItem 
+            onClick={onInvite}
+            className="text-indigo-400 focus:bg-indigo-500/20 focus:text-indigo-300"
+          >
+            <UserPlus className="w-4 h-4 mr-2" />
+            Invite People
+          </ContextMenuItem>
+        </ContextMenuContent>
+      </ContextMenu>
     </div>
   );
 }

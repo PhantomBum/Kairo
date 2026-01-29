@@ -1,6 +1,15 @@
 import React from 'react';
 
 export default function Layout({ children }) {
+  // Disable browser right-click menu
+  React.useEffect(() => {
+    const handleContextMenu = (e) => {
+      e.preventDefault();
+    };
+    document.addEventListener('contextmenu', handleContextMenu);
+    return () => document.removeEventListener('contextmenu', handleContextMenu);
+  }, []);
+
   return (
     <div className="min-h-screen bg-[#0a0a0b]">
       <style>{`
