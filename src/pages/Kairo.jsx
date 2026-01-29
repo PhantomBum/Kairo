@@ -127,6 +127,12 @@ export default function KairoPage() {
   const [showProfileEditor, setShowProfileEditor] = useState(false);
   const [previewServer, setPreviewServer] = useState(null);
   const [createChannelCategory, setCreateChannelCategory] = useState(null);
+  const [showExportBlueprint, setShowExportBlueprint] = useState(false);
+  const [showImportBlueprint, setShowImportBlueprint] = useState(false);
+  const [showAuditLog, setShowAuditLog] = useState(false);
+  
+  // Connection status
+  const [connectionStatus, setConnectionStatus] = useState('connected');
   
   // Reply state
   const [replyTo, setReplyTo] = useState(null);
