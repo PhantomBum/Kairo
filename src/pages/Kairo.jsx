@@ -539,7 +539,7 @@ export default function KairoPage() {
         <div className="flex flex-col">
           <DMSidebar conversations={conversations} friends={friends} activeConversationId={activeConversation?.id}
             onConversationSelect={(convo) => { setActiveConversation(convo); setView('dms'); }} onConversationClose={() => setActiveConversation(null)}
-            onNewDM={() => {}} onAddFriend={() => setShowAddFriend(true)} />
+            onNewDM={() => {}} onAddFriend={() => setShowAddFriend(true)} onJoinServer={() => setShowJoinServer(true)} />
           <UserStatusBar profile={userProfile} isMuted={isMuted} isDeafened={isDeafened} onToggleMute={() => setIsMuted(!isMuted)} onToggleDeafen={() => setIsDeafened(!isDeafened)}
             onOpenSettings={() => setShowSettings(true)} onStatusChange={(status) => updateProfileMutation.mutate({ status })} />
         </div>
