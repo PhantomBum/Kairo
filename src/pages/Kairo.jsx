@@ -149,31 +149,20 @@ export default function KairoPage() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  // Fetch current user
-  const { data: currentUser } = useQuery({
-    queryKey: ['currentUser'],
-    queryFn: () => base44.auth.me()
-  });
+  // Get current user from localStorage (key-based auth)
+  const [currentUser, setCurrentUser] = React.useState(null);
 
-  // Fetch user profile
-  const { data: userProfile } = useQuery({
-    queryKey: ['userProfile', currentUser?.email],
-    queryFn: async () => {
-      if (!currentUser?.email) return null;
-      const profiles = await base44.entities.UserProfile.filter({ user_email: currentUser.email });
-      if (profiles.length > 0) return profiles[0];
-      const newProfile = await base44.entities.UserProfile.create({
-        user_id: currentUser.id,
-        user_email: currentUser.email,
-        display_name: currentUser.full_name || 'User',
-        username: currentUser.email?.split('@')[0],
-        status: 'online',
-        settings: { theme: 'dark', message_display: 'cozy' }
-      });
-      return newProfile;
-    },
-    enabled: !!currentUser?.email
-  });
+  React.useEffect(() => {
+    const savedUser = localStorage.getItem('kairo_current_user');
+    if (savedUser) {
+      setCurrentUser(JSON.parse(savedUser));
+    } else {
+      navigate(createPageUrl('Landing'));
+    }
+  }, [navigate]);
+
+  // User profile is the current user
+  const userProfile = currentUser;
 
   // Fetch user settings
   const { data: userSettings } = useQuery({

@@ -60,7 +60,7 @@ export const PAGES = {
 }
 
 export const pagesConfig = {
-    mainPage: "Landing",
+    mainPage: "Kairo",
     Pages: PAGES,
     Layout: __Layout,
 };

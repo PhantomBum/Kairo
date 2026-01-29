@@ -1,5 +1,5 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { motion } from 'framer-motion';
 import { 
@@ -64,6 +64,12 @@ function FeatureCard({ feature, index }) {
 }
 
 export default function HomePage() {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    navigate(createPageUrl('Landing'));
+  }, [navigate]);
+
   return (
     <div className="min-h-screen bg-[#0a0a0b] overflow-hidden">
       {/* Animated background */}
