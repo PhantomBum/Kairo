@@ -134,6 +134,7 @@ export default function Sidebar({
   onCreateServer,
   onSettingsClick,
   onProfileClick,
+  onFriendsClick,
   isDMsActive,
   unreadDMs = 0,
   notifications = 0,
