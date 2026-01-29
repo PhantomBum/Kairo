@@ -261,11 +261,6 @@ export default function SidebarNew({
       {!isCollapsed && (
         <div className="p-3 border-t border-zinc-800/50 space-y-1">
           <NavButton 
-            icon={Bell} 
-            label="Notifications" 
-            onClick={() => {}}
-          />
-          <NavButton 
             icon={Settings} 
             label="Settings" 
             onClick={onSettingsClick}
