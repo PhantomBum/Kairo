@@ -221,7 +221,7 @@ export function JoinByInviteModal({ isOpen, onClose, onJoin, isJoining }) {
 
   const previewServer = async () => {
     const code = extractCode(inviteCode);
-    if (!code || code.length < 4) {
+    if (!code || code.length < 2) {
       setError('Please enter a valid invite code');
       return;
     }
@@ -229,13 +229,19 @@ export function JoinByInviteModal({ isOpen, onClose, onJoin, isJoining }) {
     setIsLoading(true);
     setError(null);
 
-    const servers = await base44.entities.Server.filter({ invite_code: code });
-    
-    if (servers.length === 0) {
-      setError('Invalid invite code or server not found');
+    try {
+      const servers = await base44.entities.Server.filter({ invite_code: code });
+      
+      if (servers.length === 0) {
+        setError('Invalid invite code or server not found');
+        setServerPreview(null);
+      } else {
+        setServerPreview(servers[0]);
+        setError(null);
+      }
+    } catch (err) {
+      setError('Failed to lookup server');
       setServerPreview(null);
-    } else {
-      setServerPreview(servers[0]);
     }
     setIsLoading(false);
   };
