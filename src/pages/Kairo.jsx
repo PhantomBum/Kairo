@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { Hash, Users, Pin, Bell, Search, Inbox, HelpCircle, ShoppingBag, Calendar } from 'lucide-react';
+import { Hash, Users, Pin, Bell, Search, Inbox, HelpCircle, ShoppingBag, Calendar, Wifi, WifiOff, RefreshCw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 // Core Components
@@ -19,21 +19,27 @@ import VoiceConnectionBar from '@/components/kairo/VoiceConnectionBar';
 // Modals
 import CreateServerModal from '@/components/kairo/CreateServerModal';
 import CreateChannelModal from '@/components/kairo/CreateChannelModal';
-import InviteModal from '@/components/kairo/InviteModal';
-import AddFriendModal from '@/components/kairo/AddFriendModal';
-import JoinServerModal from '@/components/kairo/JoinServerModal';
 import CommandPalette from '@/components/kairo/CommandPalette';
 import ServerPreviewModal from '@/components/kairo/ServerPreviewModal';
 
 // Feature Components
 import DiscoverServers from '@/components/kairo/DiscoverServers';
-import VoiceChannel from '@/components/kairo/voice/VoiceChannel';
+import WebRTCVoice from '@/components/kairo/voice/WebRTCVoice';
 import FullSettingsModal from '@/components/kairo/settings/FullSettingsModal';
 import ShopPage from '@/components/kairo/shop/ShopPage';
 import EventsPage from '@/components/kairo/events/EventsPage';
 import ProfileEditor from '@/components/kairo/profile/ProfileEditor';
 import TypingIndicator from '@/components/kairo/chat/TypingIndicator';
 import { IncomingCallModal, ActiveCallModal, OutgoingCallModal } from '@/components/kairo/voice/DMCallModal';
+
+// New v2.0 Components
+import FriendSystem from '@/components/kairo/friends/FriendSystem';
+import { CreateInviteModal, JoinByInviteModal } from '@/components/kairo/invites/InviteSystem';
+import { ExportBlueprintModal, ImportBlueprintModal, useApplyBlueprint } from '@/components/kairo/server/ServerBlueprint';
+import { WorkspaceProvider, useWorkspace } from '@/components/kairo/core/WorkspaceProvider';
+import { RealtimeProvider, useRealtime } from '@/components/kairo/core/RealtimeProvider';
+import { AuditLogViewer, AutoModerationSettings } from '@/components/kairo/moderation/ModerationTools';
+import AddFriendModal from '@/components/kairo/AddFriendModal';
 
 // Channel header component
 function ChannelHeader({ channel, memberCount, onMembersToggle, showMembers }) {

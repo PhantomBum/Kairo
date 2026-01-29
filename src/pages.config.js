@@ -47,14 +47,14 @@
  *
  * The mainPage value must match a key in the PAGES object exactly.
  */
-import Kairo from './pages/Kairo';
 import Home from './pages/Home';
+import Kairo from './pages/Kairo';
 import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
-    "Kairo": Kairo,
     "Home": Home,
+    "Kairo": Kairo,
 }
 
 export const pagesConfig = {
