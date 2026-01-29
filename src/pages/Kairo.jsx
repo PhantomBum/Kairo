@@ -9,7 +9,9 @@ import { createPageUrl } from '@/utils';
 
 // Core Components
 import LoadingScreen from '@/components/kairo/LoadingScreen';
-import SidebarNew from '@/components/kairo/SidebarNew';
+import ImprovedSidebar from '@/components/kairo/ImprovedSidebar';
+import UpdateLogsModal from '@/components/kairo/UpdateLogsModal';
+import NotificationsPanel from '@/components/kairo/NotificationsPanel';
 import ChannelSidebar from '@/components/kairo/ChannelSidebar';
 import DMSidebar from '@/components/kairo/DMSidebar';
 import MessageList from '@/components/kairo/MessageList';
@@ -133,6 +135,8 @@ export default function KairoPage() {
   const [showExportBlueprint, setShowExportBlueprint] = useState(false);
   const [showImportBlueprint, setShowImportBlueprint] = useState(false);
   const [showAuditLog, setShowAuditLog] = useState(false);
+  const [showUpdateLogs, setShowUpdateLogs] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
   
   // Connection status
   const [connectionStatus, setConnectionStatus] = useState('connected');
@@ -211,7 +215,7 @@ export default function KairoPage() {
     enabled: !!currentUser?.id
   });
 
-  // Fetch servers user is member of
+  // Fetch servers user is member of - optimized
   const { data: memberServers = [] } = useQuery({
     queryKey: ['memberServers', currentUser?.email],
     queryFn: async () => {
@@ -222,8 +226,30 @@ export default function KairoPage() {
       const servers = await base44.entities.Server.list();
       return servers.filter(s => serverIds.includes(s.id));
     },
-    enabled: !!currentUser?.email
+    enabled: !!currentUser?.email,
+    staleTime: 30000, // 30 seconds
+    cacheTime: 300000 // 5 minutes
   });
+
+  // Fetch notifications
+  const { data: notifications = [] } = useQuery({
+    queryKey: ['notifications', currentUser?.id],
+    queryFn: () => base44.entities.Notification.filter({ user_id: currentUser?.id, is_read: false }),
+    enabled: !!currentUser?.id,
+    refetchInterval: 30000 // Refetch every 30 seconds
+  });
+
+  // Check for new updates
+  const { data: latestUpdate } = useQuery({
+    queryKey: ['latestUpdate'],
+    queryFn: async () => {
+      const updates = await base44.entities.UpdateLog.list('-release_date', 1);
+      return updates[0];
+    },
+    staleTime: 3600000 // 1 hour
+  });
+
+  const hasNewUpdates = latestUpdate && new Date(latestUpdate.release_date) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
 
   // Fetch categories for active server
   const { data: categories = [] } = useQuery({
@@ -388,7 +414,13 @@ export default function KairoPage() {
 
   const updateProfileMutation = useMutation({
     mutationFn: (data) => base44.entities.UserProfile.update(userProfile.id, data),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['userProfile'] })
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['userProfile'] });
+      // Update localStorage
+      const updatedUser = { ...currentUser, ...data };
+      localStorage.setItem('kairo_current_user', JSON.stringify(updatedUser));
+      setCurrentUser(updatedUser);
+    }
   });
 
   const updateSettingsMutation = useMutation({
@@ -520,14 +552,30 @@ export default function KairoPage() {
   if (view === 'discover') {
     return (
       <div className="h-screen flex bg-[#0a0a0b]">
-        <SidebarNew servers={memberServers} activeServerId={null} onServerSelect={handleServerSelect} onDMsClick={handleDMsClick}
-          onDiscoverClick={() => setView('discover')} onCreateServer={() => setShowCreateServer(true)}
-          onSettingsClick={() => setShowSettings(true)} onFriendsClick={() => setView('friends')} onProfileClick={() => setShowProfileEditor(true)} isDMsActive={false} userProfile={userProfile} />
+        <ImprovedSidebar 
+          servers={memberServers} 
+          activeServerId={null} 
+          onServerSelect={handleServerSelect} 
+          onDMsClick={handleDMsClick}
+          onDiscoverClick={() => setView('discover')} 
+          onCreateServer={() => setShowCreateServer(true)}
+          onSettingsClick={() => setShowSettings(true)} 
+          onFriendsClick={() => setView('friends')} 
+          onProfileClick={() => setShowProfileEditor(true)} 
+          onUpdateLogsClick={() => setShowUpdateLogs(true)}
+          onNotificationsClick={() => setShowNotifications(true)}
+          isDMsActive={false} 
+          userProfile={userProfile}
+          notifications={notifications}
+          hasNewUpdates={hasNewUpdates}
+        />
         <ServerHub servers={publicServers} onJoinServer={(server) => setPreviewServer(server)} onBack={() => setView('dms')} />
         <AnimatePresence>
           {showCreateServer && <CreateServerModal isOpen={showCreateServer} onClose={() => setShowCreateServer(false)} onCreate={(data) => createServerMutation.mutate(data)} />}
           {showSettings && <FullSettingsModal isOpen={showSettings} onClose={() => setShowSettings(false)} profile={userProfile} userSettings={userSettings} onUpdateProfile={(data) => updateProfileMutation.mutate(data)} onUpdateSettings={(data) => updateSettingsMutation.mutate(data)} onLogout={() => base44.auth.logout()} />}
           {previewServer && <ServerPreviewModal server={previewServer} isOpen={!!previewServer} onClose={() => setPreviewServer(null)} onJoin={() => joinServerMutation.mutate(previewServer.invite_code)} isJoining={joinServerMutation.isPending} />}
+          {showUpdateLogs && <UpdateLogsModal isOpen={showUpdateLogs} onClose={() => setShowUpdateLogs(false)} />}
+          {showNotifications && <NotificationsPanel isOpen={showNotifications} onClose={() => setShowNotifications(false)} currentUser={currentUser} />}
         </AnimatePresence>
       </div>
     );
@@ -537,9 +585,23 @@ export default function KairoPage() {
   if (view === 'friends') {
     return (
       <div className="h-screen flex bg-[#0a0a0b]">
-        <SidebarNew servers={memberServers} activeServerId={null} onServerSelect={handleServerSelect} onDMsClick={handleDMsClick}
-          onDiscoverClick={() => setView('discover')} onCreateServer={() => setShowCreateServer(true)}
-          onSettingsClick={() => setShowSettings(true)} onFriendsClick={() => setView('friends')} onProfileClick={() => setShowProfileEditor(true)} isDMsActive={false} userProfile={userProfile} />
+        <ImprovedSidebar 
+          servers={memberServers} 
+          activeServerId={null} 
+          onServerSelect={handleServerSelect} 
+          onDMsClick={handleDMsClick}
+          onDiscoverClick={() => setView('discover')} 
+          onCreateServer={() => setShowCreateServer(true)}
+          onSettingsClick={() => setShowSettings(true)} 
+          onFriendsClick={() => setView('friends')} 
+          onProfileClick={() => setShowProfileEditor(true)}
+          onUpdateLogsClick={() => setShowUpdateLogs(true)}
+          onNotificationsClick={() => setShowNotifications(true)}
+          isDMsActive={false} 
+          userProfile={userProfile}
+          notifications={notifications}
+          hasNewUpdates={hasNewUpdates}
+        />
         <div className="flex flex-col">
           <DMSidebar conversations={conversations} friends={friends} activeConversationId={activeConversation?.id}
             onConversationSelect={(convo) => { setActiveConversation(convo); setView('dms'); }} onConversationClose={() => setActiveConversation(null)}
@@ -550,7 +612,6 @@ export default function KairoPage() {
         <FriendSystem 
           currentUser={currentUser}
           onStartDM={async (friend) => {
-            // Find or create conversation
             const existing = conversations.find(c => 
               c.participants?.some(p => p.user_id === friend.friend_id)
             );
@@ -579,6 +640,8 @@ export default function KairoPage() {
           }} />}
           {showJoinServer && <JoinByInviteModal isOpen={showJoinServer} onClose={() => setShowJoinServer(false)} onJoin={(code) => joinServerMutation.mutate(code)} isJoining={joinServerMutation.isPending} />}
           {showSettings && <FullSettingsModal isOpen={showSettings} onClose={() => setShowSettings(false)} profile={userProfile} userSettings={userSettings} onUpdateProfile={(data) => updateProfileMutation.mutate(data)} onUpdateSettings={(data) => updateSettingsMutation.mutate(data)} onLogout={() => base44.auth.logout()} />}
+          {showUpdateLogs && <UpdateLogsModal isOpen={showUpdateLogs} onClose={() => setShowUpdateLogs(false)} />}
+          {showNotifications && <NotificationsPanel isOpen={showNotifications} onClose={() => setShowNotifications(false)} currentUser={currentUser} />}
         </AnimatePresence>
       </div>
     );
@@ -608,10 +671,24 @@ export default function KairoPage() {
 
   return (
     <div className={cn("h-screen flex bg-[#0a0a0b]", userSettings?.kairo_features?.focus_mode && "opacity-80")}>
-      <SidebarNew servers={memberServers} activeServerId={activeServer?.id} onServerSelect={handleServerSelect} onDMsClick={handleDMsClick}
-        onDiscoverClick={() => setView('discover')} onCreateServer={() => setShowCreateServer(true)}
-        onSettingsClick={() => setShowSettings(true)} onProfileClick={() => setShowProfileEditor(true)}
-        onFriendsClick={() => setView('friends')} isDMsActive={view === 'dms'} userProfile={userProfile} />
+      <ImprovedSidebar 
+        servers={memberServers} 
+        activeServerId={activeServer?.id} 
+        onServerSelect={handleServerSelect} 
+        onDMsClick={handleDMsClick}
+        onDiscoverClick={() => setView('discover')} 
+        onCreateServer={() => setShowCreateServer(true)}
+        onSettingsClick={() => setShowSettings(true)} 
+        onProfileClick={() => setShowProfileEditor(true)}
+        onFriendsClick={() => setView('friends')}
+        onUpdateLogsClick={() => setShowUpdateLogs(true)}
+        onNotificationsClick={() => setShowNotifications(true)}
+        isDMsActive={view === 'dms'} 
+        userProfile={userProfile}
+        unreadDMs={conversations.filter(c => c.unread_count > 0).length}
+        notifications={notifications}
+        hasNewUpdates={hasNewUpdates}
+      />
 
       {view === 'dms' ? (
         <div className="flex flex-col">
