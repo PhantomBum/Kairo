@@ -97,7 +97,7 @@ export default function KairoPage() {
   const [isLoading, setIsLoading] = useState(true);
   
   // Navigation state
-  const [view, setView] = useState('dms'); // 'dms' | 'server' | 'discover' | 'shop' | 'events'
+  const [view, setView] = useState('dms'); // 'dms' | 'server' | 'discover' | 'shop' | 'events' | 'friends'
   const [activeServer, setActiveServer] = useState(null);
   const [activeChannel, setActiveChannel] = useState(null);
   const [activeConversation, setActiveConversation] = useState(null);
