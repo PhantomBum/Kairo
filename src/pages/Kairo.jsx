@@ -646,7 +646,9 @@ export default function KairoPage() {
         {showCreateServer && <CreateServerModal isOpen={showCreateServer} onClose={() => setShowCreateServer(false)} onCreate={(data) => createServerMutation.mutate(data)} />}
         {showCreateChannel && <CreateChannelModal isOpen={showCreateChannel} onClose={() => setShowCreateChannel(false)} onCreate={(data) => createChannelMutation.mutate(data)} categories={categories} defaultCategoryId={createChannelCategory} />}
         {showSettings && <FullSettingsModal isOpen={showSettings} onClose={() => setShowSettings(false)} profile={userProfile} userSettings={userSettings} onUpdateProfile={(data) => updateProfileMutation.mutate(data)} onUpdateSettings={(data) => updateSettingsMutation.mutate(data)} onLogout={() => base44.auth.logout()} />}
-        {showInvite && <InviteModal isOpen={showInvite} onClose={() => setShowInvite(false)} server={activeServer} />}
+        {showInvite && <CreateInviteModal isOpen={showInvite} onClose={() => setShowInvite(false)} server={activeServer} />}
+        {showJoinServer && <JoinByInviteModal isOpen={showJoinServer} onClose={() => setShowJoinServer(false)} onJoin={(code) => joinServerMutation.mutate(code)} isJoining={joinServerMutation.isPending} />}
+        {showExportBlueprint && activeServer && <ExportBlueprintModal server={activeServer} isOpen={showExportBlueprint} onClose={() => setShowExportBlueprint(false)} />}
         {showAddFriend && <AddFriendModal isOpen={showAddFriend} onClose={() => setShowAddFriend(false)} onSendRequest={async (username) => {
           const profiles = await base44.entities.UserProfile.filter({ username });
           if (profiles.length === 0) throw new Error('User not found');
