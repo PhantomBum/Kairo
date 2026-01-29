@@ -529,6 +529,56 @@ export default function KairoPage() {
     );
   }
 
+  // Friends view (v2.0)
+  if (view === 'friends') {
+    return (
+      <div className="h-screen flex bg-[#0a0a0b]">
+        <Sidebar servers={memberServers} activeServerId={null} onServerSelect={handleServerSelect} onDMsClick={handleDMsClick}
+          onDiscoverClick={() => setView('discover')} onCreateServer={() => setShowCreateServer(true)}
+          onSettingsClick={() => setShowSettings(true)} isDMsActive={false} userProfile={userProfile} />
+        <div className="flex flex-col">
+          <DMSidebar conversations={conversations} friends={friends} activeConversationId={activeConversation?.id}
+            onConversationSelect={(convo) => { setActiveConversation(convo); setView('dms'); }} onConversationClose={() => setActiveConversation(null)}
+            onNewDM={() => {}} onAddFriend={() => setShowAddFriend(true)} />
+          <UserStatusBar profile={userProfile} isMuted={isMuted} isDeafened={isDeafened} onToggleMute={() => setIsMuted(!isMuted)} onToggleDeafen={() => setIsDeafened(!isDeafened)}
+            onOpenSettings={() => setShowSettings(true)} onStatusChange={(status) => updateProfileMutation.mutate({ status })} />
+        </div>
+        <FriendSystem 
+          currentUser={currentUser}
+          onStartDM={async (friend) => {
+            // Find or create conversation
+            const existing = conversations.find(c => 
+              c.participants?.some(p => p.user_id === friend.friend_id)
+            );
+            if (existing) {
+              setActiveConversation(existing);
+            } else {
+              const newConvo = await base44.entities.Conversation.create({
+                type: 'dm',
+                participants: [
+                  { user_id: currentUser.id, user_email: currentUser.email, user_name: userProfile?.display_name },
+                  { user_id: friend.friend_id, user_email: friend.friend_email, user_name: friend.friend_name, avatar: friend.friend_avatar }
+                ]
+              });
+              setActiveConversation(newConvo);
+            }
+            setView('dms');
+          }}
+          onAddFriend={() => setShowAddFriend(true)}
+        />
+        <AnimatePresence>
+          {showAddFriend && <AddFriendModal isOpen={showAddFriend} onClose={() => setShowAddFriend(false)} onSendRequest={async (username) => {
+            const profiles = await base44.entities.UserProfile.filter({ username });
+            if (profiles.length === 0) throw new Error('User not found');
+            await base44.entities.Friendship.create({ user_id: currentUser.id, friend_id: profiles[0].user_id, friend_email: profiles[0].user_email, friend_name: profiles[0].display_name, friend_avatar: profiles[0].avatar_url, status: 'pending', initiated_by: currentUser.id });
+            queryClient.invalidateQueries({ queryKey: ['friendships'] });
+          }} />}
+          {showSettings && <FullSettingsModal isOpen={showSettings} onClose={() => setShowSettings(false)} profile={userProfile} userSettings={userSettings} onUpdateProfile={(data) => updateProfileMutation.mutate(data)} onUpdateSettings={(data) => updateSettingsMutation.mutate(data)} onLogout={() => base44.auth.logout()} />}
+        </AnimatePresence>
+      </div>
+    );
+  }
+
   // Shop view
   if (view === 'shop') {
     return (
