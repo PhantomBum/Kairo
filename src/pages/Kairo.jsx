@@ -589,10 +589,24 @@ export default function KairoPage() {
       <div className="flex-1 flex flex-col min-w-0">
         {view === 'server' && activeChannel ? (
           activeChannel.type === 'voice' || activeChannel.type === 'stage' ? (
-            <VoiceChannel channel={activeChannel} server={activeServer} voiceUsers={voiceStates.filter(v => v.channel_id === activeChannel.id)}
-              currentUserId={currentUser?.id} onLeave={handleVoiceDisconnect} onToggleMute={() => setIsMuted(!isMuted)} onToggleDeafen={() => setIsDeafened(!isDeafened)}
-              onToggleVideo={() => setIsVideo(!isVideo)} onToggleStream={() => setIsStreaming(!isStreaming)} onToggleListenOnly={() => setIsListeningOnly(!isListeningOnly)}
-              onOpenSettings={() => setShowSettings(true)} isMuted={isMuted} isDeafened={isDeafened} isVideo={isVideo} isStreaming={isStreaming} isListeningOnly={isListeningOnly} />
+            <WebRTCVoice 
+              channelId={activeChannel.id}
+              serverId={activeServer?.id}
+              channelName={activeChannel.name}
+              serverName={activeServer?.name}
+              participants={voiceStates.filter(v => v.channel_id === activeChannel.id)}
+              currentUserId={currentUser?.id}
+              onLeave={handleVoiceDisconnect}
+              onUpdateState={(state) => {
+                const existing = voiceStates.find(v => v.user_id === currentUser?.id && v.channel_id === activeChannel.id);
+                if (existing) {
+                  base44.entities.VoiceState.update(existing.id, state);
+                }
+                if (state.is_self_muted !== undefined) setIsMuted(state.is_self_muted);
+                if (state.is_self_deafened !== undefined) setIsDeafened(state.is_self_deafened);
+              }}
+              isListenOnly={isListeningOnly}
+            />
           ) : (
             <>
               <ChannelHeader channel={activeChannel} memberCount={members.length} onMembersToggle={() => setShowMembers(!showMembers)} showMembers={showMembers} />
