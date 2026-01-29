@@ -196,6 +196,12 @@ export default function Sidebar({
         label="Notifications" 
         badge={notifications > 0 ? (notifications > 9 ? '9+' : notifications) : null}
       />
+
+      <ActionButton 
+        icon={Users} 
+        label="Friends" 
+        onClick={onFriendsClick}
+      />
       
       <ActionButton 
         icon={Settings} 
