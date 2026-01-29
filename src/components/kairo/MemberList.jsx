@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Crown, Shield, ShieldCheck, MoreHorizontal, UserPlus, MessageCircle, Ban } from 'lucide-react';
+import { Crown, Shield, ShieldCheck, MoreHorizontal, UserPlus, MessageCircle, Ban, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
   ContextMenu,
@@ -134,6 +134,34 @@ function MemberItem({ member, isOwner, highestRole, onMessage, onProfile }) {
                 <div className="mt-3 pt-3 border-t border-zinc-800">
                   <h4 className="text-xs font-semibold text-zinc-400 uppercase mb-1">About Me</h4>
                   <p className="text-sm text-zinc-300">{member.bio}</p>
+                </div>
+              )}
+
+              {/* Rich Presence */}
+              {member.rich_presence?.name && (
+                <div className="mt-3 pt-3 border-t border-zinc-800">
+                  <h4 className="text-xs font-semibold text-zinc-400 uppercase mb-2">Activity</h4>
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 bg-zinc-800 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <Sparkles className="w-6 h-6 text-zinc-500" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm text-white font-medium truncate">
+                        {member.rich_presence.type === 'playing' && 'Playing '}
+                        {member.rich_presence.type === 'listening' && 'Listening to '}
+                        {member.rich_presence.type === 'watching' && 'Watching '}
+                        {member.rich_presence.type === 'streaming' && 'Streaming '}
+                        {member.rich_presence.type === 'competing' && 'Competing in '}
+                        <span className="font-bold">{member.rich_presence.name}</span>
+                      </p>
+                      {member.rich_presence.details && (
+                        <p className="text-xs text-zinc-400 truncate">{member.rich_presence.details}</p>
+                      )}
+                      {member.rich_presence.state && (
+                        <p className="text-xs text-zinc-400 truncate">{member.rich_presence.state}</p>
+                      )}
+                    </div>
+                  </div>
                 </div>
               )}
 

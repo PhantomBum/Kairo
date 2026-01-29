@@ -168,8 +168,40 @@ export default function ProfileEditor({ profile, inventory = [], onUpdateProfile
     username: profile?.username || '',
     bio: profile?.bio || '',
     pronouns: profile?.pronouns || '',
-    accent_color: profile?.accent_color || '#6366f1'
+    accent_color: profile?.accent_color || '#6366f1',
+    avatar_url: profile?.avatar_url || '',
+    banner_url: profile?.banner_url || ''
   });
+
+  const [richPresence, setRichPresence] = useState(profile?.rich_presence || {
+    type: 'playing',
+    name: '',
+    details: '',
+    state: ''
+  });
+
+  const [avatarFile, setAvatarFile] = useState(null);
+  const [bannerFile, setBannerFile] = useState(null);
+  const [uploading, setUploading] = useState(false);
+
+  const handleFileUpload = async (file, type) => {
+    if (!file) return;
+    setUploading(true);
+    try {
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      if (type === 'avatar') {
+        setFormData({ ...formData, avatar_url: file_url });
+        setAvatarFile(null);
+      } else {
+        setFormData({ ...formData, banner_url: file_url });
+        setBannerFile(null);
+      }
+    } catch (error) {
+      console.error('Upload failed:', error);
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const [equipped, setEquipped] = useState({
     profile_decoration: inventory.find(i => i.item_type === 'profile_decoration' && i.is_equipped),
@@ -200,7 +232,10 @@ export default function ProfileEditor({ profile, inventory = [], onUpdateProfile
   };
 
   const handleSave = () => {
-    onUpdateProfile?.(formData);
+    onUpdateProfile?.({ 
+      ...formData, 
+      rich_presence: richPresence.name ? richPresence : null 
+    });
     onClose?.();
   };
 
@@ -239,6 +274,7 @@ export default function ProfileEditor({ profile, inventory = [], onUpdateProfile
             <Tabs defaultValue="profile" className="space-y-6">
               <TabsList className="bg-zinc-800/50">
                 <TabsTrigger value="profile">Profile</TabsTrigger>
+                <TabsTrigger value="presence">Rich Presence</TabsTrigger>
                 <TabsTrigger value="decorations">Decorations</TabsTrigger>
                 <TabsTrigger value="effects">Effects</TabsTrigger>
                 <TabsTrigger value="themes">Themes</TabsTrigger>
@@ -249,21 +285,53 @@ export default function ProfileEditor({ profile, inventory = [], onUpdateProfile
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label className="text-zinc-400">Avatar</Label>
-                    <div className="h-32 rounded-xl bg-zinc-800/50 border-2 border-dashed border-zinc-700 flex items-center justify-center cursor-pointer hover:border-indigo-500 transition-colors">
-                      <div className="text-center">
-                        <Upload className="w-8 h-8 text-zinc-500 mx-auto mb-2" />
-                        <span className="text-sm text-zinc-500">Upload avatar</span>
-                      </div>
-                    </div>
+                    <label className="block h-32 rounded-xl bg-zinc-800/50 border-2 border-dashed border-zinc-700 cursor-pointer hover:border-indigo-500 transition-colors overflow-hidden">
+                      <input
+                        type="file"
+                        accept="image/*,.gif"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) handleFileUpload(file, 'avatar');
+                        }}
+                        className="hidden"
+                      />
+                      {formData.avatar_url ? (
+                        <img src={formData.avatar_url} alt="" className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="flex items-center justify-center h-full">
+                          <div className="text-center">
+                            <Upload className="w-8 h-8 text-zinc-500 mx-auto mb-2" />
+                            <span className="text-sm text-zinc-500">Upload avatar</span>
+                            <p className="text-xs text-zinc-600 mt-1">JPG, PNG, GIF</p>
+                          </div>
+                        </div>
+                      )}
+                    </label>
                   </div>
                   <div className="space-y-2">
                     <Label className="text-zinc-400">Banner</Label>
-                    <div className="h-32 rounded-xl bg-zinc-800/50 border-2 border-dashed border-zinc-700 flex items-center justify-center cursor-pointer hover:border-indigo-500 transition-colors">
-                      <div className="text-center">
-                        <Image className="w-8 h-8 text-zinc-500 mx-auto mb-2" />
-                        <span className="text-sm text-zinc-500">Upload banner</span>
-                      </div>
-                    </div>
+                    <label className="block h-32 rounded-xl bg-zinc-800/50 border-2 border-dashed border-zinc-700 cursor-pointer hover:border-indigo-500 transition-colors overflow-hidden">
+                      <input
+                        type="file"
+                        accept="image/*,.gif"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) handleFileUpload(file, 'banner');
+                        }}
+                        className="hidden"
+                      />
+                      {formData.banner_url ? (
+                        <img src={formData.banner_url} alt="" className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="flex items-center justify-center h-full">
+                          <div className="text-center">
+                            <Image className="w-8 h-8 text-zinc-500 mx-auto mb-2" />
+                            <span className="text-sm text-zinc-500">Upload banner</span>
+                            <p className="text-xs text-zinc-600 mt-1">JPG, PNG, GIF</p>
+                          </div>
+                        </div>
+                      )}
+                    </label>
                   </div>
                 </div>
 
@@ -324,6 +392,95 @@ export default function ProfileEditor({ profile, inventory = [], onUpdateProfile
                       />
                     ))}
                   </div>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="presence" className="space-y-6">
+                <div className="space-y-4">
+                  <div>
+                    <h3 className="text-lg font-semibold text-white mb-4">Rich Presence</h3>
+                    <p className="text-sm text-zinc-400 mb-4">Show what you're doing on your profile</p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-zinc-400">Activity Type</Label>
+                    <select
+                      value={richPresence.type}
+                      onChange={(e) => setRichPresence({ ...richPresence, type: e.target.value })}
+                      className="w-full px-3 py-2 bg-zinc-900 border border-zinc-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    >
+                      <option value="playing">Playing</option>
+                      <option value="listening">Listening to</option>
+                      <option value="watching">Watching</option>
+                      <option value="streaming">Streaming</option>
+                      <option value="competing">Competing in</option>
+                    </select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-zinc-400">Activity Name</Label>
+                    <Input
+                      value={richPresence.name}
+                      onChange={(e) => setRichPresence({ ...richPresence, name: e.target.value })}
+                      placeholder="e.g., Minecraft, Spotify, YouTube"
+                      className="bg-zinc-900 border-zinc-800 text-white"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-zinc-400">Details (Optional)</Label>
+                    <Input
+                      value={richPresence.details}
+                      onChange={(e) => setRichPresence({ ...richPresence, details: e.target.value })}
+                      placeholder="e.g., In Main Menu, Episode 5"
+                      className="bg-zinc-900 border-zinc-800 text-white"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-zinc-400">State (Optional)</Label>
+                    <Input
+                      value={richPresence.state}
+                      onChange={(e) => setRichPresence({ ...richPresence, state: e.target.value })}
+                      placeholder="e.g., Level 42, Season 3"
+                      className="bg-zinc-900 border-zinc-800 text-white"
+                    />
+                  </div>
+
+                  {richPresence.name && (
+                    <div className="mt-6 p-4 bg-zinc-800/50 rounded-xl">
+                      <p className="text-xs text-zinc-500 uppercase mb-2">Preview</p>
+                      <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 bg-zinc-700 rounded-lg flex items-center justify-center">
+                          <Sparkles className="w-6 h-6 text-zinc-500" />
+                        </div>
+                        <div>
+                          <p className="text-sm text-white font-medium">
+                            {richPresence.type === 'playing' && 'Playing '}
+                            {richPresence.type === 'listening' && 'Listening to '}
+                            {richPresence.type === 'watching' && 'Watching '}
+                            {richPresence.type === 'streaming' && 'Streaming '}
+                            {richPresence.type === 'competing' && 'Competing in '}
+                            <span className="font-bold">{richPresence.name}</span>
+                          </p>
+                          {richPresence.details && (
+                            <p className="text-xs text-zinc-400">{richPresence.details}</p>
+                          )}
+                          {richPresence.state && (
+                            <p className="text-xs text-zinc-400">{richPresence.state}</p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  <Button
+                    variant="outline"
+                    onClick={() => setRichPresence({ type: 'playing', name: '', details: '', state: '' })}
+                    className="w-full"
+                  >
+                    Clear Rich Presence
+                  </Button>
                 </div>
               </TabsContent>
 
@@ -401,8 +558,12 @@ export default function ProfileEditor({ profile, inventory = [], onUpdateProfile
 
             <div className="flex justify-end gap-3 mt-8 pt-6 border-t border-zinc-800">
               <Button variant="ghost" onClick={onClose}>Cancel</Button>
-              <Button onClick={handleSave} className="bg-indigo-500 hover:bg-indigo-600">
-                Save Changes
+              <Button 
+                onClick={handleSave} 
+                disabled={uploading}
+                className="bg-indigo-500 hover:bg-indigo-600 disabled:opacity-50"
+              >
+                {uploading ? 'Uploading...' : 'Save Changes'}
               </Button>
             </div>
           </div>
