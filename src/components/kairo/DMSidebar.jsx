@@ -263,6 +263,7 @@ export default function DMSidebar({
           <span className="text-sm font-medium">Add Friend</span>
         </button>
         <button
+          onClick={onJoinServer}
           className="w-full flex items-center gap-3 px-3 py-2 rounded-md hover:bg-zinc-800/50 text-zinc-400 hover:text-white transition-colors"
         >
           <Link2 className="w-5 h-5" />
