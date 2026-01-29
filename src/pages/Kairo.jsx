@@ -529,7 +529,7 @@ export default function KairoPage() {
     return (
       <div className="h-screen flex bg-[#0a0a0b]">
         <SidebarNew servers={memberServers} activeServerId={null} onServerSelect={handleServerSelect} onDMsClick={handleDMsClick}
-          onDiscoverClick={() => setView('discover')} onShopClick={() => setView('shop')} onCreateServer={() => setShowCreateServer(true)}
+          onDiscoverClick={() => setView('discover')} onCreateServer={() => setShowCreateServer(true)}
           onSettingsClick={() => setShowSettings(true)} onFriendsClick={() => setView('friends')} onProfileClick={() => setShowProfileEditor(true)} isDMsActive={false} userProfile={userProfile} />
         <ServerHub servers={publicServers} onJoinServer={(server) => setPreviewServer(server)} onBack={() => setView('dms')} />
         <AnimatePresence>
