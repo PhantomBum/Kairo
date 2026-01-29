@@ -2,11 +2,13 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Users, Plus, Search, X, UserPlus, Settings, MessageCircle,
-  MoreHorizontal, UserX, VolumeX, Trash2
+  MoreHorizontal, UserX, VolumeX, Trash2, ShoppingBag, Compass, Link2
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Link } from 'react-router-dom';
+import { createPageUrl } from '@/utils';
 import {
   ContextMenu,
   ContextMenuContent,
