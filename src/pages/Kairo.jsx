@@ -405,17 +405,29 @@ export default function KairoPage() {
   });
 
   const joinServerMutation = useMutation({
-    mutationFn: async (inviteCode) => {
-      const servers = await base44.entities.Server.filter({ invite_code: inviteCode });
-      if (servers.length === 0) throw new Error('Invalid invite code');
+    mutationFn: async (codeOrServerId) => {
+      // Try to find by invite code first
+      let servers = await base44.entities.Server.filter({ invite_code: codeOrServerId });
+      // If not found by invite code, try by server ID (for direct join from discover)
+      if (servers.length === 0) {
+        const serverById = await base44.entities.Server.filter({ id: codeOrServerId });
+        if (serverById.length > 0) servers = serverById;
+      }
+      if (servers.length === 0) throw new Error('Invalid invite code or server not found');
       const server = servers[0];
       const existingMember = await base44.entities.ServerMember.filter({ server_id: server.id, user_email: currentUser.email });
-      if (existingMember.length > 0) return server;
+      if (existingMember.length > 0) return server; // Already a member
       await base44.entities.ServerMember.create({ server_id: server.id, user_id: currentUser.id, user_email: currentUser.email, joined_at: new Date().toISOString() });
       await base44.entities.Server.update(server.id, { member_count: (server.member_count || 0) + 1 });
       return server;
     },
-    onSuccess: (server) => { queryClient.invalidateQueries({ queryKey: ['memberServers'] }); setActiveServer(server); setView('server'); setPreviewServer(null); }
+    onSuccess: (server) => { 
+      queryClient.invalidateQueries({ queryKey: ['memberServers'] }); 
+      setActiveServer(server); 
+      setView('server'); 
+      setPreviewServer(null);
+      setShowJoinServer(false);
+    }
   });
 
   // Typing indicator
