@@ -615,7 +615,8 @@ export default function KairoPage() {
     <div className={cn("h-screen flex bg-[#0a0a0b]", userSettings?.kairo_features?.focus_mode && "opacity-80")}>
       <Sidebar servers={memberServers} activeServerId={activeServer?.id} onServerSelect={handleServerSelect} onDMsClick={handleDMsClick}
         onDiscoverClick={() => setView('discover')} onCreateServer={() => setShowCreateServer(true)}
-        onSettingsClick={() => setShowSettings(true)} onProfileClick={() => setShowProfileEditor(true)} isDMsActive={view === 'dms'} userProfile={userProfile} />
+        onSettingsClick={() => setShowSettings(true)} onProfileClick={() => setShowProfileEditor(true)}
+        onFriendsClick={() => setView('friends')} isDMsActive={view === 'dms'} userProfile={userProfile} />
 
       {view === 'dms' ? (
         <div className="flex flex-col">
