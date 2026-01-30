@@ -20,7 +20,7 @@ export default function Layout({ children }) {
           --card-foreground: 0 0% 98%;
           --popover: 0 0% 7%;
           --popover-foreground: 0 0% 98%;
-          --primary: 239 84% 67%;
+          --primary: 263 70% 58%;
           --primary-foreground: 0 0% 98%;
           --secondary: 0 0% 15%;
           --secondary-foreground: 0 0% 98%;
@@ -32,7 +32,7 @@ export default function Layout({ children }) {
           --destructive-foreground: 0 0% 98%;
           --border: 0 0% 15%;
           --input: 0 0% 15%;
-          --ring: 239 84% 67%;
+          --ring: 263 70% 58%;
         }
 
         * {
@@ -79,7 +79,7 @@ export default function Layout({ children }) {
 
         /* Selection color */
         ::selection {
-          background: rgba(99, 102, 241, 0.3);
+          background: rgba(139, 92, 246, 0.3);
         }
 
         /* Focus ring */
