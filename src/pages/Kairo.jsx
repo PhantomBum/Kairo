@@ -117,6 +117,14 @@ function ChannelHeader({ channel, memberCount, onMembersToggle, showMembers, onS
   );
 }
 
+export default function KairoPage() {
+  return (
+    <ProfileProvider>
+      <KairoPageContent />
+    </ProfileProvider>
+  );
+}
+
 function KairoPageContent() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -1373,14 +1381,5 @@ function KairoPageContent() {
         </AnimatePresence>
       </div>
     </>
-  );
-}
-
-// Main export with ProfileProvider wrapper
-export default function KairoPage() {
-  return (
-    <ProfileProvider>
-      <KairoPageContent />
-    </ProfileProvider>
   );
 }
