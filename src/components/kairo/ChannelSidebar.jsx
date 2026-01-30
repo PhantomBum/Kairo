@@ -234,9 +234,18 @@ export default function ChannelSidebar({
             <Plus className="w-4 h-4 mr-2" />
             Create Channel
           </DropdownMenuItem>
-          <DropdownMenuItem className="text-zinc-300 focus:bg-zinc-800 focus:text-white">
-            <Bell className="w-4 h-4 mr-2" />
-            Notification Settings
+          <DropdownMenuItem className="text-zinc-300 focus:bg-zinc-800 focus:text-white" onClick={() => onCreateChannel?.()}>
+            <FolderPlus className="w-4 h-4 mr-2" />
+            Create Category
+          </DropdownMenuItem>
+          <DropdownMenuSeparator className="bg-zinc-800" />
+          <DropdownMenuItem className="text-zinc-300 focus:bg-zinc-800 focus:text-white" onClick={() => window.dispatchEvent(new CustomEvent('kairo:show-apps'))}>
+            <Code className="w-4 h-4 mr-2" />
+            App Marketplace
+          </DropdownMenuItem>
+          <DropdownMenuItem className="text-zinc-300 focus:bg-zinc-800 focus:text-white" onClick={() => window.dispatchEvent(new CustomEvent('kairo:show-webhooks'))}>
+            <Webhook className="w-4 h-4 mr-2" />
+            Webhooks
           </DropdownMenuItem>
           <DropdownMenuSeparator className="bg-zinc-800" />
           <DropdownMenuItem 

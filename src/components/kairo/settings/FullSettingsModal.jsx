@@ -34,8 +34,70 @@ function AccountSettings({ profile, settings, onUpdate }) {
     display_name: profile?.display_name || '',
     username: profile?.username || '',
     bio: profile?.bio || '',
-    pronouns: profile?.pronouns || ''
+    pronouns: profile?.pronouns || '',
+    accent_color: profile?.accent_color || '#5865f2'
   });
+  const [avatarFile, setAvatarFile] = useState(null);
+  const [bannerFile, setBannerFile] = useState(null);
+  const [isUploading, setIsUploading] = useState(false);
+
+  useEffect(() => {
+    setFormData({
+      display_name: profile?.display_name || '',
+      username: profile?.username || '',
+      bio: profile?.bio || '',
+      pronouns: profile?.pronouns || '',
+      accent_color: profile?.accent_color || '#5865f2'
+    });
+  }, [profile]);
+
+  const handleAvatarChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    setIsUploading(true);
+    try {
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      await onUpdate?.({ avatar_url: file_url });
+    } catch (error) {
+      console.error('Avatar upload failed:', error);
+      alert('Failed to upload avatar');
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handleBannerChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    setIsUploading(true);
+    try {
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      await onUpdate?.({ banner_url: file_url });
+    } catch (error) {
+      console.error('Banner upload failed:', error);
+      alert('Failed to upload banner');
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handleSave = async () => {
+    try {
+      await onUpdate?.(formData);
+      alert('Profile updated successfully!');
+    } catch (error) {
+      console.error('Failed to update profile:', error);
+      alert('Failed to save changes');
+    }
+  };
+
+  const accentColors = [
+    '#ef4444', '#f97316', '#f59e0b', '#eab308', '#84cc16', '#22c55e',
+    '#14b8a6', '#06b6d4', '#0ea5e9', '#3b82f6', '#6366f1', '#8b5cf6',
+    '#a855f7', '#d946ef', '#ec4899', '#f43f5e'
+  ];
 
   return (
     <div className="space-y-6">
@@ -54,9 +116,24 @@ function AccountSettings({ profile, settings, onUpdate }) {
               : 'linear-gradient(135deg, #6366f1, #8b5cf6)'
           }}
         >
-          <Button size="sm" variant="secondary" className="absolute top-2 right-2 bg-black/50 hover:bg-black/70">
-            Change Banner
-          </Button>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleBannerChange}
+            className="hidden"
+            id="banner-upload"
+          />
+          <label htmlFor="banner-upload">
+            <Button 
+              size="sm" 
+              variant="secondary" 
+              className="absolute top-2 right-2 bg-black/50 hover:bg-black/70 cursor-pointer"
+              disabled={isUploading}
+              asChild
+            >
+              <span>{isUploading ? 'Uploading...' : 'Change Banner'}</span>
+            </Button>
+          </label>
         </div>
         <div className="px-4 pb-4 -mt-10">
           <div className="flex items-end gap-4">
@@ -70,9 +147,21 @@ function AccountSettings({ profile, settings, onUpdate }) {
                   </div>
                 )}
               </div>
-              <button className="absolute bottom-0 right-0 w-8 h-8 bg-indigo-500 rounded-full flex items-center justify-center hover:bg-indigo-600">
-                <Upload className="w-4 h-4 text-white" />
-              </button>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleAvatarChange}
+                className="hidden"
+                id="avatar-upload"
+              />
+              <label htmlFor="avatar-upload">
+                <button 
+                  className="absolute bottom-0 right-0 w-8 h-8 bg-indigo-500 rounded-full flex items-center justify-center hover:bg-indigo-600"
+                  disabled={isUploading}
+                >
+                  <Upload className="w-4 h-4 text-white" />
+                </button>
+              </label>
             </div>
             <div className="flex-1 pt-10">
               <h3 className="text-lg font-semibold text-white">{formData.display_name || 'User'}</h3>
@@ -99,6 +188,8 @@ function AccountSettings({ profile, settings, onUpdate }) {
               value={formData.username}
               onChange={(e) => setFormData({ ...formData, username: e.target.value })}
               className="bg-zinc-900 border-zinc-800 text-white"
+              disabled
+              title="Username cannot be changed"
             />
           </div>
         </div>
@@ -121,9 +212,42 @@ function AccountSettings({ profile, settings, onUpdate }) {
             className="bg-zinc-900 border-zinc-800 text-white resize-none"
           />
         </div>
-        <Button onClick={() => onUpdate?.(formData)} className="bg-indigo-500 hover:bg-indigo-600">
-          Save Changes
-        </Button>
+
+        {/* Accent Color Picker */}
+        <div className="space-y-2">
+          <Label className="text-zinc-400">Accent Color</Label>
+          <div className="flex flex-wrap gap-2">
+            {accentColors.map((color) => (
+              <button
+                key={color}
+                onClick={() => setFormData({ ...formData, accent_color: color })}
+                className={cn(
+                  "w-10 h-10 rounded-full transition-all",
+                  formData.accent_color === color && "ring-2 ring-white ring-offset-2 ring-offset-zinc-900"
+                )}
+                style={{ backgroundColor: color }}
+              />
+            ))}
+          </div>
+        </div>
+
+        <div className="flex gap-3">
+          <Button onClick={handleSave} className="flex-1 bg-indigo-500 hover:bg-indigo-600">
+            Save Changes
+          </Button>
+          <Button 
+            variant="outline" 
+            onClick={() => setFormData({
+              display_name: profile?.display_name || '',
+              username: profile?.username || '',
+              bio: profile?.bio || '',
+              pronouns: profile?.pronouns || '',
+              accent_color: profile?.accent_color || '#5865f2'
+            })}
+          >
+            Cancel
+          </Button>
+        </div>
       </div>
 
       {/* Email section */}

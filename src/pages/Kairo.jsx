@@ -456,10 +456,20 @@ export default function KairoPage() {
   });
 
   const updateProfileMutation = useMutation({
-    mutationFn: (data) => base44.entities.UserProfile.update(userProfile.id, data),
-    onSuccess: async () => {
-      queryClient.invalidateQueries({ queryKey: ['userProfile'] });
+    mutationFn: async (data) => {
+      if (!userProfile?.id) throw new Error('No profile to update');
+      return await base44.entities.UserProfile.update(userProfile.id, data);
+    },
+    onSuccess: async (updatedProfile) => {
+      // Force refetch and update cache
+      await queryClient.invalidateQueries({ queryKey: ['userProfile'] });
       await refetchProfile();
+      
+      // Update localStorage immediately
+      const freshProfile = await base44.entities.UserProfile.filter({ user_id: currentUser.id });
+      if (freshProfile.length > 0) {
+        localStorage.setItem('kairo_current_user', JSON.stringify(freshProfile[0]));
+      }
     }
   });
 
@@ -603,19 +613,26 @@ export default function KairoPage() {
     const handleShowWebhooks = () => setShowWebhooks(true);
     const handleShowRoles = () => setShowRoles(true);
     const handleLeaveServerEvent = (e) => handleLeaveServer(e.detail);
+    const handleUpdateStatus = (e) => {
+      if (userProfile?.id) {
+        updateProfileMutation.mutate({ status: e.detail });
+      }
+    };
 
     window.addEventListener('kairo:show-apps', handleShowApps);
     window.addEventListener('kairo:show-webhooks', handleShowWebhooks);
     window.addEventListener('kairo:show-roles', handleShowRoles);
     window.addEventListener('kairo:leave-server', handleLeaveServerEvent);
+    window.addEventListener('kairo:update-status', handleUpdateStatus);
 
     return () => {
       window.removeEventListener('kairo:show-apps', handleShowApps);
       window.removeEventListener('kairo:show-webhooks', handleShowWebhooks);
       window.removeEventListener('kairo:show-roles', handleShowRoles);
       window.removeEventListener('kairo:leave-server', handleLeaveServerEvent);
+      window.removeEventListener('kairo:update-status', handleUpdateStatus);
     };
-  }, [activeServer, currentUser]);
+  }, [activeServer, currentUser, userProfile]);
 
   const handleCommandPaletteCommand = (cmd) => {
     switch (cmd.id) {

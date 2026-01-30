@@ -250,7 +250,7 @@ export default function ImprovedSidebar({
         <StatusPicker 
           currentStatus={userProfile?.status} 
           onStatusChange={(status) => {
-            // Update status via mutation
+            window.dispatchEvent(new CustomEvent('kairo:update-status', { detail: status }));
           }}
           isCollapsed={isCollapsed}
         />
