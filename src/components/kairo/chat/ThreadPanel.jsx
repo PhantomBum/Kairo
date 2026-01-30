@@ -22,8 +22,8 @@ export default function ThreadPanel({
     queryKey: ['threadMessages', thread?.id],
     queryFn: () => base44.entities.Message.filter({ thread_id: thread.id }, 'created_date', 100),
     enabled: !!thread?.id,
-    staleTime: 0,
-    refetchInterval: 300
+    staleTime: 1000,
+    refetchInterval: 3000
   });
 
   const sendMessageMutation = useMutation({

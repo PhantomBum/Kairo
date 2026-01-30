@@ -293,8 +293,8 @@ export default function KairoPage() {
       return allServers.filter(s => serverIds.includes(s.id));
     },
     enabled: !!currentUser?.id,
-    staleTime: 0,
-    refetchInterval: 300
+    staleTime: 5000,
+    refetchInterval: 10000
   });
 
   // Debug logging for servers
@@ -308,7 +308,8 @@ export default function KairoPage() {
     queryKey: ['notifications', currentUser?.id],
     queryFn: () => base44.entities.Notification.filter({ user_id: currentUser?.id, is_read: false }),
     enabled: !!currentUser?.id,
-    refetchInterval: 300
+    staleTime: 10000,
+    refetchInterval: 30000
   });
 
   // Check for new updates
@@ -345,8 +346,8 @@ export default function KairoPage() {
       return msgs;
     },
     enabled: !!activeChannel?.id,
-    staleTime: 0,
-    refetchInterval: 300,
+    staleTime: 1000,
+    refetchInterval: 2000,
     keepPreviousData: true
   });
 
@@ -355,8 +356,8 @@ export default function KairoPage() {
     queryKey: ['threads', activeChannel?.id],
     queryFn: () => base44.entities.Thread.filter({ channel_id: activeChannel.id }),
     enabled: !!activeChannel?.id,
-    staleTime: 0,
-    refetchInterval: 300
+    staleTime: 5000,
+    refetchInterval: 10000
   });
 
   // Fetch pinned messages
@@ -364,8 +365,8 @@ export default function KairoPage() {
     queryKey: ['pinnedMessages', activeChannel?.id],
     queryFn: () => base44.entities.Message.filter({ channel_id: activeChannel.id, is_pinned: true }),
     enabled: !!activeChannel?.id,
-    staleTime: 0,
-    refetchInterval: 300
+    staleTime: 10000,
+    refetchInterval: 30000
   });
 
   // Debug logging for messages
@@ -427,8 +428,8 @@ export default function KairoPage() {
     queryKey: ['dmMessages', activeConversation?.id],
     queryFn: () => base44.entities.DirectMessage.filter({ conversation_id: activeConversation.id }, '-created_date', 100),
     enabled: !!activeConversation?.id,
-    staleTime: 0,
-    refetchInterval: 300
+    staleTime: 1000,
+    refetchInterval: 2000
   });
 
   // Fetch typing indicators
@@ -446,7 +447,8 @@ export default function KairoPage() {
       });
     },
     enabled: !!(activeChannel?.id || activeConversation?.id),
-    refetchInterval: 300
+    staleTime: 1000,
+    refetchInterval: 3000
   });
 
   // Fetch public servers
