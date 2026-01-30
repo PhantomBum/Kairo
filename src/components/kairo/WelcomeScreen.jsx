@@ -2,6 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { MessageCircle, Users, Compass, ShoppingBag, Sparkles, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/button';
 
 export default function WelcomeScreen({ 
   view, 
