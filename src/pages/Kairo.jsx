@@ -733,24 +733,29 @@ function KairoPageContent() {
 
   const joinServerMutation = useMutation({
     mutationFn: async (codeOrServerId) => {
-      const userId = currentUser.user_id || currentUser.id;
+      // Get all possible user identifiers
+      const profileRecordId = currentUser.id; // The UserProfile record ID
+      const profileUserId = currentUser.user_id; // The generated user_id like "user_xxx"
       const userEmail = (currentUser.user_email || currentUser.email || '').toLowerCase();
+      const createdById = currentUser.created_by_id;
+      const createdByEmail = (currentUser.created_by || '').toLowerCase();
 
       // Clean up the code - extract from URL if needed
-      let cleanCode = codeOrServerId?.trim?.() || codeOrServerId;
+      let cleanCode = String(codeOrServerId || '').trim();
       if (cleanCode.includes('kairo.app/invite/')) {
-        cleanCode = cleanCode.split('kairo.app/invite/')[1]?.split(/[?#]/)[0];
+        cleanCode = cleanCode.split('kairo.app/invite/')[1]?.split(/[?#]/)[0] || '';
       }
-      cleanCode = cleanCode?.toUpperCase?.() || cleanCode;
+      cleanCode = cleanCode.toUpperCase();
 
-      console.log('[JOIN SERVER] Attempting to join with code:', cleanCode, 'userId:', userId, 'email:', userEmail);
+      console.log('[JOIN SERVER] Attempting to join with code:', cleanCode);
+      console.log('[JOIN SERVER] User identifiers:', { profileRecordId, profileUserId, userEmail, createdById, createdByEmail });
 
-      // Get all servers and find by invite code
+      // Get all servers and find by invite code (case-insensitive)
       const allServers = await base44.entities.Server.list();
-      let server = allServers.find(s => 
-        s.invite_code?.toUpperCase() === cleanCode || 
-        s.id === codeOrServerId
-      );
+      let server = allServers.find(s => {
+        const serverCode = (s.invite_code || '').toUpperCase();
+        return serverCode === cleanCode || s.id === codeOrServerId;
+      });
 
       if (!server) {
         console.log('[JOIN SERVER] Server not found for code:', cleanCode);
@@ -759,12 +764,20 @@ function KairoPageContent() {
 
       console.log('[JOIN SERVER] Found server:', server.name, server.id);
 
-      // Check if already a member
+      // Check if already a member using ALL possible identifiers
       const allMembers = await base44.entities.ServerMember.filter({ server_id: server.id });
-      const isAlreadyMember = allMembers.some(m => 
-        m.user_id === userId || 
-        (m.user_email && m.user_email.toLowerCase() === userEmail)
-      );
+      const isAlreadyMember = allMembers.some(m => {
+        // Check all user ID variations
+        if (m.user_id === profileRecordId) return true;
+        if (m.user_id === profileUserId) return true;
+        if (createdById && m.user_id === createdById) return true;
+        // Check email variations
+        if (userEmail && m.user_email && m.user_email.toLowerCase() === userEmail) return true;
+        if (createdByEmail && m.user_email && m.user_email.toLowerCase() === createdByEmail) return true;
+        // Check created_by field as fallback
+        if (createdByEmail && m.created_by && m.created_by.toLowerCase() === createdByEmail) return true;
+        return false;
+      });
 
       if (isAlreadyMember) {
         console.log('[JOIN SERVER] Already a member, returning server');
@@ -773,11 +786,12 @@ function KairoPageContent() {
 
       console.log('[JOIN SERVER] Creating new membership');
 
-      // Create membership
+      // Create membership with the most reliable user_id (prefer the generated one)
+      const membershipUserId = profileUserId || profileRecordId;
       await base44.entities.ServerMember.create({ 
         server_id: server.id, 
-        user_id: userId, 
-        user_email: userEmail, 
+        user_id: membershipUserId, 
+        user_email: userEmail || null, 
         joined_at: new Date().toISOString() 
       });
 
