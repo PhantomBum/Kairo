@@ -198,12 +198,14 @@ export default function KairoPage() {
       if (profiles.length > 0) {
         const profile = profiles[0];
         localStorage.setItem('kairo_current_user', JSON.stringify(profile));
+        setCurrentUser(profile); // Update state immediately
         return profile;
       }
       return currentUser;
     },
     enabled: !!currentUser?.id,
-    staleTime: 30000
+    staleTime: 0, // Always fetch fresh data
+    refetchInterval: 10000 // Refetch every 10 seconds
   });
 
   // Fetch user settings
@@ -461,15 +463,19 @@ export default function KairoPage() {
       return await base44.entities.UserProfile.update(userProfile.id, data);
     },
     onSuccess: async (updatedProfile) => {
-      // Force refetch and update cache
-      await queryClient.invalidateQueries({ queryKey: ['userProfile'] });
-      await refetchProfile();
-      
-      // Update localStorage immediately
+      // Force immediate refetch
       const freshProfile = await base44.entities.UserProfile.filter({ user_id: currentUser.id });
       if (freshProfile.length > 0) {
-        localStorage.setItem('kairo_current_user', JSON.stringify(freshProfile[0]));
+        const newProfile = freshProfile[0];
+        localStorage.setItem('kairo_current_user', JSON.stringify(newProfile));
+        setCurrentUser(newProfile);
+        
+        // Update query cache
+        queryClient.setQueryData(['userProfile', currentUser.id], newProfile);
       }
+      
+      // Invalidate to trigger re-render
+      await queryClient.invalidateQueries({ queryKey: ['userProfile'] });
     }
   });
 

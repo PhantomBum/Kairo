@@ -227,8 +227,8 @@ export default function ImprovedSidebar({
             </div>
             {!isCollapsed && (
               <div className="flex-1 text-left min-w-0">
-                <p className="font-semibold text-white truncate">{userProfile?.display_name || 'User'}</p>
-                <p className="text-xs text-zinc-500 truncate">@{userProfile?.username || 'username'}</p>
+                <p className="font-semibold text-white truncate" key={userProfile?.display_name}>{userProfile?.display_name || 'User'}</p>
+                <p className="text-xs text-zinc-500 truncate" key={userProfile?.username}>@{userProfile?.username || 'username'}</p>
               </div>
             )}
           </button>
