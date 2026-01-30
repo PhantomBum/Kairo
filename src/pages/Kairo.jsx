@@ -75,27 +75,32 @@ import CreateGroupDMModal from '@/components/kairo/CreateGroupDMModal';
 // Channel header component
 function ChannelHeader({ channel, memberCount, onMembersToggle, showMembers, onShowPinned, showPinned }) {
   return (
-    <div className="h-14 px-4 flex items-center justify-between border-b border-zinc-800/30 bg-zinc-900/50 backdrop-blur-sm">
-      <div className="flex items-center gap-3">
-        <div className="w-8 h-8 rounded-xl bg-violet-500/20 flex items-center justify-center">
-          <Hash className="w-4 h-4 text-violet-400" />
+    <div className="h-16 px-5 flex items-center justify-between border-b border-zinc-800/20 bg-gradient-to-r from-zinc-900/80 to-zinc-900/60 backdrop-blur-xl">
+      <div className="flex items-center gap-4">
+        <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-violet-500/20 to-indigo-500/20 flex items-center justify-center ring-1 ring-violet-500/20">
+          <Hash className="w-5 h-5 text-violet-400" />
         </div>
         <div>
-          <h2 className="font-semibold text-white text-[15px]">{channel?.name || 'general'}</h2>
+          <div className="flex items-center gap-2">
+            <h2 className="font-bold text-white text-base">{channel?.name || 'general'}</h2>
+            {channel?.is_private && (
+              <span className="px-1.5 py-0.5 bg-zinc-800 text-zinc-500 text-[10px] font-medium rounded-md">PRIVATE</span>
+            )}
+          </div>
           {channel?.topic && (
-            <p className="text-xs text-zinc-500 truncate max-w-[300px]">{channel.topic}</p>
+            <p className="text-xs text-zinc-500 truncate max-w-[300px] mt-0.5">{channel.topic}</p>
           )}
         </div>
       </div>
       <div className="flex items-center gap-1">
-        <button className="p-2 text-zinc-400 hover:text-zinc-200 transition-colors rounded-xl hover:bg-zinc-800/50">
+        <button className="p-2.5 text-zinc-400 hover:text-zinc-200 transition-all rounded-xl hover:bg-zinc-800/50">
           <Bell className="w-[18px] h-[18px]" />
         </button>
         <button
           onClick={onShowPinned}
           className={cn(
-            "p-2 transition-colors rounded-xl",
-            showPinned ? "text-violet-400 bg-violet-500/15" : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50"
+            "p-2.5 transition-all rounded-xl",
+            showPinned ? "text-amber-400 bg-amber-500/10" : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50"
           )}
         >
           <Pin className="w-[18px] h-[18px]" />
@@ -103,7 +108,7 @@ function ChannelHeader({ channel, memberCount, onMembersToggle, showMembers, onS
         <button
           onClick={onMembersToggle}
           className={cn(
-            "p-2 transition-colors rounded-xl",
+            "p-2.5 transition-all rounded-xl",
             showMembers ? "text-violet-400 bg-violet-500/15" : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50"
           )}
         >
@@ -111,7 +116,7 @@ function ChannelHeader({ channel, memberCount, onMembersToggle, showMembers, onS
         </button>
         <button 
           onClick={() => window.dispatchEvent(new CustomEvent('kairo:open-search'))}
-          className="p-2 text-zinc-400 hover:text-zinc-200 transition-colors rounded-xl hover:bg-zinc-800/50"
+          className="p-2.5 text-zinc-400 hover:text-zinc-200 transition-all rounded-xl hover:bg-zinc-800/50"
         >
           <Search className="w-[18px] h-[18px]" />
         </button>
