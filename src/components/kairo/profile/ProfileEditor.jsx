@@ -231,12 +231,19 @@ export default function ProfileEditor({ profile, inventory = [], onUpdateProfile
     queryClient.invalidateQueries({ queryKey: ['userInventory'] });
   };
 
-  const handleSave = () => {
-    onUpdateProfile?.({ 
-      ...formData, 
-      rich_presence: richPresence.name ? richPresence : null 
-    });
-    onClose?.();
+  const [saving, setSaving] = useState(false);
+  
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      await onUpdateProfile?.({ 
+        ...formData, 
+        rich_presence: richPresence.name ? richPresence : null 
+      });
+      onClose?.();
+    } finally {
+      setSaving(false);
+    }
   };
 
   const colors = [
@@ -560,10 +567,10 @@ export default function ProfileEditor({ profile, inventory = [], onUpdateProfile
               <Button variant="ghost" onClick={onClose}>Cancel</Button>
               <Button 
                 onClick={handleSave} 
-                disabled={uploading}
-                className="bg-indigo-500 hover:bg-indigo-600 disabled:opacity-50"
+                disabled={uploading || saving}
+                className="bg-violet-500 hover:bg-violet-600 disabled:opacity-50 rounded-xl"
               >
-                {uploading ? 'Uploading...' : 'Save Changes'}
+                {uploading ? 'Uploading...' : saving ? 'Saving...' : 'Save Changes'}
               </Button>
             </div>
           </div>
