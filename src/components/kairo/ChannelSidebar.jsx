@@ -259,32 +259,32 @@ export default function ChannelSidebar({
       </DropdownMenu>
 
       {/* Channels list */}
-      <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-zinc-700 scrollbar-track-transparent py-2">
-        <ContextMenu>
-          <ContextMenuTrigger className="h-full">
-        {/* Uncategorized channels */}
-        {uncategorizedChannels.map((channel) => (
-          <ChannelItem
-            key={channel.id}
-            channel={channel}
-            isActive={activeChannelId === channel.id}
-            onClick={onChannelClick}
-            voiceUsers={voiceStates?.filter(v => v.channel_id === channel.id) || []}
-          />
-        ))}
+      <ContextMenu>
+        <ContextMenuTrigger className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-zinc-700 scrollbar-track-transparent py-2 block">
+          <div>
+            {/* Uncategorized channels */}
+            {uncategorizedChannels.map((channel) => (
+              <ChannelItem
+                key={channel.id}
+                channel={channel}
+                isActive={activeChannelId === channel.id}
+                onClick={onChannelClick}
+                voiceUsers={voiceStates?.filter(v => v.channel_id === channel.id) || []}
+              />
+            ))}
 
-        {/* Categories with channels */}
-        {categories.map((category) => (
-          <CategoryItem
-            key={category.id}
-            category={category}
-            channels={channels}
-            activeChannelId={activeChannelId}
-            onChannelClick={onChannelClick}
-            onCreateChannel={onCreateChannel}
-            voiceStates={voiceStates}
-          />
-        ))}
+            {/* Categories with channels */}
+            {categories.map((category) => (
+              <CategoryItem
+                key={category.id}
+                category={category}
+                channels={channels}
+                activeChannelId={activeChannelId}
+                onChannelClick={onChannelClick}
+                onCreateChannel={onCreateChannel}
+                voiceStates={voiceStates}
+              />
+            ))}
           </div>
         </ContextMenuTrigger>
         <ContextMenuContent className="w-48 bg-zinc-900 border-zinc-800">
