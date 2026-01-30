@@ -46,22 +46,21 @@ function ChannelItem({ channel, isActive, onClick, voiceUsers = [] }) {
     <ContextMenu>
       <ContextMenuTrigger>
         <div>
-          <motion.button
+          <button
             onClick={() => onClick(channel)}
-            whileTap={{ scale: 0.98 }}
             className={cn(
-              "w-full flex items-center gap-2 px-2 py-1.5 rounded transition-all group text-left relative",
+              "w-full flex items-center gap-1.5 px-2 py-1 rounded text-xs transition-all group text-left",
               isActive 
-                ? "bg-white/10 text-white" 
+                ? "bg-emerald-500/20 text-emerald-400" 
                 : "text-zinc-500 hover:text-zinc-300 hover:bg-white/5"
             )}
           >
             <Icon className={cn(
-              "w-4 h-4 flex-shrink-0",
-              isActive ? "text-zinc-300" : "text-zinc-600"
+              "w-3.5 h-3.5 flex-shrink-0",
+              isActive ? "text-emerald-400" : "text-zinc-600"
             )} />
             
-            <span className="flex-1 truncate text-sm">
+            <span className="flex-1 truncate">
               {channel.name}
             </span>
 
@@ -70,11 +69,11 @@ function ChannelItem({ channel, isActive, onClick, voiceUsers = [] }) {
             )}
             
             {isVoice && voiceUsers.length > 0 && (
-              <span className="px-1.5 py-0.5 bg-emerald-500/20 text-emerald-400 text-[10px] font-bold rounded">
+              <span className="text-[10px] text-emerald-400">
                 {voiceUsers.length}
               </span>
             )}
-          </motion.button>
+          </button>
 
           {/* Voice users in channel */}
           <AnimatePresence>
@@ -83,34 +82,31 @@ function ChannelItem({ channel, isActive, onClick, voiceUsers = [] }) {
                 initial={{ height: 0, opacity: 0 }}
                 animate={{ height: 'auto', opacity: 1 }}
                 exit={{ height: 0, opacity: 0 }}
-                className="ml-10 mt-1 space-y-0.5 pb-1 overflow-hidden"
+                className="ml-5 mt-0.5 space-y-0.5 pb-1 overflow-hidden"
               >
                 {voiceUsers.map((user) => (
-                  <motion.div 
+                  <div 
                     key={user.user_id}
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    className="flex items-center gap-2 px-2 py-1.5 text-xs text-zinc-400 rounded-xl hover:bg-zinc-800/40 transition-colors"
+                    className="flex items-center gap-1.5 px-2 py-1 text-[11px] text-zinc-500"
                   >
-                    <div className="w-6 h-6 rounded-lg bg-zinc-700 overflow-hidden ring-2 ring-emerald-500/30">
+                    <div className="w-4 h-4 rounded bg-zinc-700 overflow-hidden">
                       {user.user_avatar ? (
                         <img src={user.user_avatar} alt="" className="w-full h-full object-cover" />
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center text-[10px] font-medium">
+                        <div className="w-full h-full flex items-center justify-center text-[8px]">
                           {user.user_name?.charAt(0)}
                         </div>
                       )}
                     </div>
-                    <span className="truncate font-medium">{user.user_name}</span>
-                    <div className="ml-auto w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" />
-                  </motion.div>
+                    <span className="truncate">{user.user_name}</span>
+                  </div>
                 ))}
               </motion.div>
             )}
           </AnimatePresence>
         </div>
       </ContextMenuTrigger>
-      <ContextMenuContent className="w-48 bg-[#0a0a0b] border-white/10 rounded-lg p-1">
+      <ContextMenuContent className="w-44 bg-[#1a1a1d] border-white/10 rounded-lg p-1">
         <ContextMenuItem 
           onClick={() => window.dispatchEvent(new CustomEvent('kairo:edit-channel', { detail: channel }))}
           className="text-zinc-300 focus:bg-white/5 focus:text-white rounded px-3 py-2 text-sm"
@@ -143,23 +139,23 @@ function CategoryItem({ category, channels, activeChannelId, onChannelClick, onC
   const categoryChannels = channels.filter(c => c.category_id === category.id);
 
   return (
-    <div className="mt-4 first:mt-2">
+    <div className="mt-3 first:mt-0">
       <button
         onClick={() => setIsCollapsed(!isCollapsed)}
-        className="flex items-center gap-1.5 px-2 w-full group py-1"
+        className="flex items-center gap-1 px-2 w-full group py-1"
       >
         <ChevronRight className={cn(
-          "w-2.5 h-2.5 text-zinc-600 transition-transform",
+          "w-2 h-2 text-zinc-600 transition-transform",
           !isCollapsed && "rotate-90"
         )} />
-        <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-600 group-hover:text-zinc-500 truncate transition-colors">
+        <span className="text-[10px] font-medium uppercase tracking-wider text-zinc-600 group-hover:text-zinc-500 truncate">
           {category.name}
         </span>
         <button 
           onClick={(e) => { e.stopPropagation(); onCreateChannel?.(category.id); }}
           className="ml-auto opacity-0 group-hover:opacity-100 p-0.5 hover:bg-white/5 rounded transition-all"
         >
-          <Plus className="w-3 h-3 text-zinc-600 hover:text-zinc-400" />
+          <Plus className="w-2.5 h-2.5 text-zinc-600" />
         </button>
       </button>
 
@@ -169,8 +165,8 @@ function CategoryItem({ category, channels, activeChannelId, onChannelClick, onC
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="overflow-hidden mt-1 space-y-0.5"
+            transition={{ duration: 0.15 }}
+            className="overflow-hidden mt-0.5 space-y-0.5"
           >
             {categoryChannels.map((channel) => (
               <ChannelItem
@@ -202,101 +198,71 @@ export default function ChannelSidebar({
   const uncategorizedChannels = channels.filter(c => !c.category_id);
 
   return (
-    <div className="w-[280px] md:w-72 h-full bg-[#0a0a0b] flex flex-col border-r border-white/5 relative overflow-hidden">
+    <div className="w-56 h-full bg-[#111113] flex flex-col border-r border-white/5">
       
-      {/* Server Banner - Always show */}
-      <div className="relative h-24 w-full flex-shrink-0">
-        {server?.banner_url ? (
-          <img 
-            src={server.banner_url} 
-            alt="" 
-            className="w-full h-full object-cover"
-          />
-        ) : (
-          <div 
-            className="w-full h-full"
-            style={{ 
-              background: server?.banner_color 
-                ? `linear-gradient(135deg, ${server.banner_color}80, ${server.banner_color}40)`
-                : 'linear-gradient(135deg, #3b82f680, #8b5cf640)'
-            }}
-          />
-        )}
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#0a0a0b]/60 to-[#0a0a0b]" />
-      </div>
-      
-      {/* Server header */}
+      {/* Server header - Kloak style */}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <motion.button 
-            whileHover={{ backgroundColor: 'rgba(255, 255, 255, 0.03)' }}
-            className="relative px-4 py-3 flex items-center justify-between transition-colors -mt-8"
-          >
-            <div className="flex items-center gap-3 flex-1 min-w-0">
-              {server?.icon_url ? (
-                <img src={server.icon_url} alt="" className="w-10 h-10 rounded-xl flex-shrink-0 shadow-lg border border-white/10" />
-              ) : (
-                <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center shadow-lg border border-white/10">
-                  <span className="text-white font-bold text-sm">{server?.name?.charAt(0)}</span>
-                </div>
-              )}
-              <div className="min-w-0">
-                <h2 className="font-semibold text-white truncate text-sm">{server?.name || 'Server'}</h2>
-                <p className="text-[11px] text-zinc-500">{server?.member_count || 0} members</p>
+          <button className="px-3 py-3 flex items-center justify-between hover:bg-white/5 transition-colors border-b border-white/5">
+            <div className="flex items-center gap-2 flex-1 min-w-0">
+              <div className="w-6 h-6 rounded bg-emerald-500 flex items-center justify-center flex-shrink-0">
+                <span className="text-white font-bold text-xs">{server?.name?.charAt(0) || 'K'}</span>
               </div>
+              <span className="font-medium text-white text-sm truncate">{server?.name || 'Server'}</span>
             </div>
-            <ChevronDown className="w-4 h-4 text-zinc-600 flex-shrink-0" />
-          </motion.button>
+            <ChevronDown className="w-3.5 h-3.5 text-zinc-500 flex-shrink-0" />
+          </button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent className="w-56 bg-[#0a0a0b] border-white/10 rounded-lg p-1" align="start">
-          <DropdownMenuItem onClick={onInvite} className="text-zinc-300 focus:bg-white/5 focus:text-white rounded px-3 py-2 text-sm">
-            <UserPlus className="w-4 h-4 mr-2.5 text-zinc-500" />
+        <DropdownMenuContent className="w-52 bg-[#1a1a1d] border-white/10 rounded-lg p-1" align="start">
+          <DropdownMenuItem onClick={onInvite} className="text-zinc-300 focus:bg-white/5 focus:text-white rounded px-3 py-2 text-xs">
+            <UserPlus className="w-3.5 h-3.5 mr-2 text-zinc-500" />
             Invite People
           </DropdownMenuItem>
           <DropdownMenuSeparator className="bg-white/5 my-1" />
-          <DropdownMenuItem onClick={onServerSettings} className="text-zinc-300 focus:bg-white/5 focus:text-white rounded px-3 py-2 text-sm">
-            <Settings className="w-4 h-4 mr-2.5 text-zinc-500" />
+          <DropdownMenuItem onClick={onServerSettings} className="text-zinc-300 focus:bg-white/5 focus:text-white rounded px-3 py-2 text-xs">
+            <Settings className="w-3.5 h-3.5 mr-2 text-zinc-500" />
             Server Settings
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => onCreateChannel?.()} className="text-zinc-300 focus:bg-white/5 focus:text-white rounded px-3 py-2 text-sm">
-            <Plus className="w-4 h-4 mr-2.5 text-zinc-500" />
+          <DropdownMenuItem onClick={() => onCreateChannel?.()} className="text-zinc-300 focus:bg-white/5 focus:text-white rounded px-3 py-2 text-xs">
+            <Plus className="w-3.5 h-3.5 mr-2 text-zinc-500" />
             Create Channel
           </DropdownMenuItem>
           <DropdownMenuSeparator className="bg-white/5 my-1" />
           <DropdownMenuItem 
             onClick={() => window.dispatchEvent(new CustomEvent('kairo:leave-server', { detail: server }))}
-            className="text-red-400 focus:bg-red-500/10 rounded px-3 py-2 text-sm"
+            className="text-red-400 focus:bg-red-500/10 rounded px-3 py-2 text-xs"
           >
             Leave Server
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
 
-      {/* Search */}
-      <div className="relative px-3 pb-3">
-        <button
-          onClick={() => window.dispatchEvent(new CustomEvent('kairo:open-search'))}
-          className="w-full flex items-center gap-2 px-3 py-2 bg-white/5 hover:bg-white/[0.07] rounded text-xs text-zinc-500 hover:text-zinc-400 transition-all"
-        >
-          <Search className="w-3.5 h-3.5" />
-          <span>Search</span>
+      {/* Overview link - Kloak style */}
+      <div className="px-2 py-2">
+        <button className="w-full flex items-center gap-2 px-2 py-1.5 text-zinc-400 hover:text-white hover:bg-white/5 rounded text-xs transition-colors">
+          <div className="w-4 h-4 rounded border border-zinc-600 flex items-center justify-center">
+            <span className="text-[8px]">○</span>
+          </div>
+          <span>Overview</span>
         </button>
       </div>
 
-      {/* Channels list */}
-      <div className="flex-1 overflow-y-auto scrollbar-thin px-2 pb-4 pt-2">
+      {/* Channels list - Kloak style */}
+      <div className="flex-1 overflow-y-auto scrollbar-thin px-2 pb-4">
         {/* Uncategorized channels */}
-        <div className="space-y-1">
-          {uncategorizedChannels.map((channel) => (
-            <ChannelItem
-              key={channel.id}
-              channel={channel}
-              isActive={activeChannelId === channel.id}
-              onClick={onChannelClick}
-              voiceUsers={voiceStates?.filter(v => v.channel_id === channel.id) || []}
-            />
-          ))}
-        </div>
+        {uncategorizedChannels.length > 0 && (
+          <div className="space-y-0.5 mb-2">
+            {uncategorizedChannels.map((channel) => (
+              <ChannelItem
+                key={channel.id}
+                channel={channel}
+                isActive={activeChannelId === channel.id}
+                onClick={onChannelClick}
+                voiceUsers={voiceStates?.filter(v => v.channel_id === channel.id) || []}
+              />
+            ))}
+          </div>
+        )}
 
         {/* Categories with channels */}
         {categories.map((category) => (
