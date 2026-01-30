@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
-import { Hash, Users, Pin, Bell, Search, MessageSquare, Settings, ShoppingBag, Calendar } from 'lucide-react';
+import { Hash, Users, Pin, Bell, Search, MessageSquare, Settings, ShoppingBag, Calendar, Menu } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { createPageUrl } from '@/utils';
 import { Button } from '@/components/ui/button';
@@ -1393,8 +1393,14 @@ function KairoPageContent() {
           )
         ) : view === 'dms' && activeConversation ? (
           <>
-            <div className="h-12 px-4 flex items-center border-b border-zinc-800/50 bg-[#121214]">
-              <div className="flex items-center gap-3">
+            <div className="h-12 px-3 md:px-4 flex items-center border-b border-zinc-800/50 bg-[#121214]">
+              <div className="flex items-center gap-2 md:gap-3">
+                <button 
+                  onClick={() => setShowMobileChannels(true)}
+                  className="md:hidden p-2 text-zinc-400 hover:text-white transition-all rounded-lg hover:bg-white/5"
+                >
+                  <Menu className="w-5 h-5" />
+                </button>
                 <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-sm font-medium">
                   {activeConversation.participants?.[0]?.user_name?.charAt(0) || '?'}
                 </div>
@@ -1408,14 +1414,26 @@ function KairoPageContent() {
             </div>
           </>
         ) : (
-          <WelcomeScreen
-            view={view}
-            onAddFriend={() => setShowAddFriend(true)}
-            onInvite={() => setShowInvite(true)}
-            onDiscover={() => setView('discover')}
-            onShop={() => setShowShop(true)}
-            onCreateServer={() => setShowCreateServer(true)}
-          />
+          <div className="flex flex-col h-full">
+              {/* Mobile header for welcome screen */}
+              <div className="md:hidden h-14 px-3 flex items-center border-b border-white/5 bg-[#050506]/90">
+                <button 
+                  onClick={() => setShowMobileSidebar(true)}
+                  className="p-2 text-zinc-400 hover:text-white transition-all rounded-lg hover:bg-white/5"
+                >
+                  <Menu className="w-5 h-5" />
+                </button>
+                <span className="ml-2 font-medium text-white">Kairo</span>
+              </div>
+              <WelcomeScreen
+                view={view}
+                onAddFriend={() => setShowAddFriend(true)}
+                onInvite={() => setShowInvite(true)}
+                onDiscover={() => setView('discover')}
+                onShop={() => setShowShop(true)}
+                onCreateServer={() => setShowCreateServer(true)}
+              />
+            </div>
         )}
       </div>
 

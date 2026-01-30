@@ -63,7 +63,7 @@ export default function EditMessageModal({ isOpen, onClose, message, onSave }) {
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
             onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-lg bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl overflow-hidden"
+            className="w-full max-w-lg mx-4 bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl overflow-hidden"
           >
             <div className="flex items-center justify-between p-4 border-b border-zinc-800">
               <h3 className="text-lg font-semibold text-white">Edit Message</h3>
