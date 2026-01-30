@@ -111,18 +111,45 @@ function MessageActions({ message, onReply, onEdit, onDelete, onReact, isOwn }) 
           </TooltipProvider>
         )}
 
-        <TooltipProvider delayDuration={0}>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <button className="p-2 hover:bg-zinc-800 rounded-lg text-zinc-400 hover:text-white transition-colors">
-                <MoreHorizontal className="w-4 h-4" />
+        <Popover>
+          <PopoverTrigger asChild>
+            <button className="p-2 hover:bg-zinc-800 rounded-lg text-zinc-400 hover:text-white transition-colors">
+              <MoreHorizontal className="w-4 h-4" />
+            </button>
+          </PopoverTrigger>
+          <PopoverContent className="w-44 p-1 bg-zinc-900/95 backdrop-blur-xl border-zinc-800/80 rounded-xl" align="end">
+            <button 
+              onClick={() => onReact?.(message.id, '👍')}
+              className="w-full flex items-center gap-2 px-3 py-2 text-sm text-zinc-300 hover:bg-zinc-800 rounded-lg transition-colors"
+            >
+              <Smile className="w-4 h-4 text-zinc-500" />
+              Add Reaction
+            </button>
+            <button 
+              onClick={() => navigator.clipboard.writeText(message.content)}
+              className="w-full flex items-center gap-2 px-3 py-2 text-sm text-zinc-300 hover:bg-zinc-800 rounded-lg transition-colors"
+            >
+              <Copy className="w-4 h-4 text-zinc-500" />
+              Copy Text
+            </button>
+            <button 
+              onClick={() => onPin?.(message)}
+              className="w-full flex items-center gap-2 px-3 py-2 text-sm text-zinc-300 hover:bg-zinc-800 rounded-lg transition-colors"
+            >
+              <Pin className="w-4 h-4 text-zinc-500" />
+              {message.is_pinned ? 'Unpin' : 'Pin Message'}
+            </button>
+            {isOwn && (
+              <button 
+                onClick={() => onDelete?.(message.id)}
+                className="w-full flex items-center gap-2 px-3 py-2 text-sm text-rose-400 hover:bg-rose-500/10 rounded-lg transition-colors"
+              >
+                <Trash2 className="w-4 h-4" />
+                Delete
               </button>
-            </TooltipTrigger>
-            <TooltipContent className="bg-zinc-900 border-zinc-800 text-white text-xs">
-              More
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+            )}
+          </PopoverContent>
+        </Popover>
       </div>
     </div>
   );
