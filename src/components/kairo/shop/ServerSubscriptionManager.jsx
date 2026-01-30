@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { Plus, Edit, Trash2, Crown, DollarSign, Users } from 'lucide-react';
+import { Plus, Edit, Trash2, Crown, DollarSign, Users, X, Zap, TrendingUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -169,15 +169,74 @@ function CreateSubscriptionModal({ server, onClose, onCreate }) {
   );
 }
 
+function BoostTierCard({ tier, boosts, onBoost }) {
+  const currentBoosts = boosts.filter(b => b.is_active).length;
+  const isUnlocked = currentBoosts >= tier.required;
+  
+  return (
+    <div className={cn(
+      "bg-zinc-800/30 rounded-xl border-2 p-6 transition-all",
+      isUnlocked ? "border-indigo-500/50 bg-indigo-500/5" : "border-zinc-700"
+    )}>
+      <div className="flex items-start justify-between mb-4">
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <h4 className="text-lg font-bold text-white">Level {tier.level}</h4>
+            {isUnlocked && (
+              <span className="px-2 py-0.5 bg-indigo-500 text-white text-xs font-medium rounded-full">
+                UNLOCKED
+              </span>
+            )}
+          </div>
+          <p className="text-xs text-zinc-500">{tier.required} boost{tier.required !== 1 ? 's' : ''} required</p>
+        </div>
+        <Zap className={cn("w-8 h-8", isUnlocked ? "text-indigo-400" : "text-zinc-600")} />
+      </div>
+      
+      <div className="space-y-2 mb-4">
+        {tier.perks.map((perk, i) => (
+          <div key={i} className="flex items-center gap-2 text-sm text-zinc-400">
+            <span className={isUnlocked ? "text-indigo-400" : "text-zinc-600"}>✓</span>
+            <span>{perk}</span>
+          </div>
+        ))}
+      </div>
+      
+      <div className="w-full bg-zinc-700 rounded-full h-2 overflow-hidden">
+        <div 
+          className="h-full bg-indigo-500 transition-all rounded-full"
+          style={{ width: `${Math.min((currentBoosts / tier.required) * 100, 100)}%` }}
+        />
+      </div>
+      <p className="text-xs text-zinc-500 mt-2 text-center">
+        {currentBoosts} / {tier.required} boosts
+      </p>
+    </div>
+  );
+}
+
 export default function ServerSubscriptionManager({ server, currentUser }) {
   const queryClient = useQueryClient();
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [activeTab, setActiveTab] = useState('subscriptions'); // 'subscriptions' | 'boosts'
 
   const { data: subscriptions = [] } = useQuery({
     queryKey: ['serverSubscriptions', server?.id],
     queryFn: () => base44.entities.ServerSubscription.filter({ server_id: server.id }),
     enabled: !!server?.id
   });
+
+  const { data: boosts = [] } = useQuery({
+    queryKey: ['serverBoosts', server?.id],
+    queryFn: () => base44.entities.ServerBoost.filter({ server_id: server.id }),
+    enabled: !!server?.id
+  });
+
+  const boostTiers = [
+    { level: 1, required: 2, perks: ['Better audio quality', 'Animated server icon', '50 emoji slots'] },
+    { level: 2, required: 7, perks: ['HD video quality', 'Server banner', '100 emoji slots', '50MB upload limit'] },
+    { level: 3, required: 14, perks: ['4K streaming', 'Custom URL', '250 emoji slots', '100MB upload limit'] }
+  ];
 
   const createMutation = useMutation({
     mutationFn: (data) => base44.entities.ServerSubscription.create({
@@ -198,98 +257,184 @@ export default function ServerSubscriptionManager({ server, currentUser }) {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['serverSubscriptions'] })
   });
 
+  const activeBoosts = boosts.filter(b => b.is_active).length;
+  const currentLevel = boostTiers.reduce((level, tier) => 
+    activeBoosts >= tier.required ? tier.level : level, 0
+  );
+
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h3 className="text-lg font-bold text-white">Server Subscriptions</h3>
-          <p className="text-sm text-zinc-500">Create subscription tiers for your members</p>
-        </div>
-        <Button
-          onClick={() => setShowCreateModal(true)}
-          className="bg-indigo-500 hover:bg-indigo-600"
+      <div className="flex items-center gap-4 border-b border-zinc-800 pb-4">
+        <button
+          onClick={() => setActiveTab('subscriptions')}
+          className={cn(
+            "px-4 py-2 text-sm font-medium rounded-lg transition-all",
+            activeTab === 'subscriptions' 
+              ? "bg-indigo-500 text-white" 
+              : "text-zinc-400 hover:text-white hover:bg-zinc-800"
+          )}
         >
-          <Plus className="w-4 h-4 mr-2" />
-          Create Tier
-        </Button>
+          <Crown className="w-4 h-4 inline mr-2" />
+          Subscriptions
+        </button>
+        <button
+          onClick={() => setActiveTab('boosts')}
+          className={cn(
+            "px-4 py-2 text-sm font-medium rounded-lg transition-all",
+            activeTab === 'boosts' 
+              ? "bg-indigo-500 text-white" 
+              : "text-zinc-400 hover:text-white hover:bg-zinc-800"
+          )}
+        >
+          <Zap className="w-4 h-4 inline mr-2" />
+          Server Boosts
+        </button>
       </div>
 
-      {subscriptions.length === 0 ? (
-        <div className="text-center py-12">
-          <Crown className="w-16 h-16 text-zinc-600 mx-auto mb-4" />
-          <h4 className="text-lg font-semibold text-white mb-2">No Subscriptions Yet</h4>
-          <p className="text-zinc-500 mb-4">Create subscription tiers to monetize your server</p>
-          <Button
-            onClick={() => setShowCreateModal(true)}
-            className="bg-indigo-500 hover:bg-indigo-600"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            Create Your First Tier
-          </Button>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {subscriptions.map((sub) => (
-            <motion.div
-              key={sub.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="bg-zinc-800/50 rounded-lg border border-zinc-700 overflow-hidden"
+      {activeTab === 'subscriptions' ? (
+        <>
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-lg font-bold text-white">Server Subscriptions</h3>
+              <p className="text-sm text-zinc-500">Create subscription tiers for your members</p>
+            </div>
+            <Button
+              onClick={() => setShowCreateModal(true)}
+              className="bg-indigo-500 hover:bg-indigo-600"
             >
-              <div 
-                className="h-20 relative"
-                style={{ backgroundColor: sub.color || '#6366f1' }}
+              <Plus className="w-4 h-4 mr-2" />
+              Create Tier
+            </Button>
+          </div>
+
+          {subscriptions.length === 0 ? (
+            <div className="text-center py-12 bg-zinc-800/30 rounded-xl">
+              <Crown className="w-16 h-16 text-zinc-600 mx-auto mb-4" />
+              <h4 className="text-lg font-semibold text-white mb-2">No Subscriptions Yet</h4>
+              <p className="text-zinc-500 mb-4">Create subscription tiers to monetize your server</p>
+              <Button
+                onClick={() => setShowCreateModal(true)}
+                className="bg-indigo-500 hover:bg-indigo-600"
               >
-                <div className="absolute inset-0 bg-gradient-to-br from-transparent to-black/30" />
-                <div className="absolute bottom-3 left-4">
-                  <h4 className="text-lg font-bold text-white">{sub.name}</h4>
-                  <p className="text-white/80 text-xs">Tier {sub.tier}</p>
-                </div>
-              </div>
-
-              <div className="p-4">
-                <div className="flex items-baseline gap-1 mb-3">
-                  <span className="text-2xl font-bold text-white">${sub.price}</span>
-                  <span className="text-zinc-500 text-sm">/month</span>
-                </div>
-
-                {sub.description && (
-                  <p className="text-sm text-zinc-400 mb-3">{sub.description}</p>
-                )}
-
-                {sub.benefits?.length > 0 && (
-                  <div className="space-y-1 mb-3">
-                    {sub.benefits.slice(0, 3).map((benefit, i) => (
-                      <div key={i} className="flex items-start gap-2 text-xs text-zinc-400">
-                        <span className="text-green-400">✓</span>
-                        <span>{benefit}</span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                <div className="flex items-center justify-between pt-3 border-t border-zinc-700">
-                  <div className="flex items-center gap-1 text-xs text-zinc-500">
-                    <Users className="w-3 h-3" />
-                    {sub.subscriber_count || 0} subscribers
-                  </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      if (confirm('Delete this subscription tier?')) {
-                        deleteMutation.mutate(sub.id);
-                      }
-                    }}
-                    className="border-red-500/50 text-red-400 hover:bg-red-500/10"
+                <Plus className="w-4 h-4 mr-2" />
+                Create Your First Tier
+              </Button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {subscriptions.map((sub) => (
+                <motion.div
+                  key={sub.id}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.2 }}
+                  className="bg-zinc-800/50 rounded-lg border border-zinc-700 overflow-hidden"
+                >
+                  <div 
+                    className="h-20 relative"
+                    style={{ backgroundColor: sub.color || '#6366f1' }}
                   >
-                    <Trash2 className="w-3 h-3" />
-                  </Button>
-                </div>
+                    <div className="absolute inset-0 bg-gradient-to-br from-transparent to-black/30" />
+                    <div className="absolute bottom-3 left-4">
+                      <h4 className="text-lg font-bold text-white">{sub.name}</h4>
+                      <p className="text-white/80 text-xs">Tier {sub.tier}</p>
+                    </div>
+                  </div>
+
+                  <div className="p-4">
+                    <div className="flex items-baseline gap-1 mb-3">
+                      <span className="text-2xl font-bold text-white">${sub.price}</span>
+                      <span className="text-zinc-500 text-sm">/month</span>
+                    </div>
+
+                    {sub.description && (
+                      <p className="text-sm text-zinc-400 mb-3">{sub.description}</p>
+                    )}
+
+                    {sub.benefits?.length > 0 && (
+                      <div className="space-y-1 mb-3">
+                        {sub.benefits.slice(0, 3).map((benefit, i) => (
+                          <div key={i} className="flex items-start gap-2 text-xs text-zinc-400">
+                            <span className="text-green-400">✓</span>
+                            <span>{benefit}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    <div className="flex items-center justify-between pt-3 border-t border-zinc-700">
+                      <div className="flex items-center gap-1 text-xs text-zinc-500">
+                        <Users className="w-3 h-3" />
+                        {sub.subscriber_count || 0} subscribers
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          if (confirm('Delete this subscription tier?')) {
+                            deleteMutation.mutate(sub.id);
+                          }
+                        }}
+                        className="border-red-500/50 text-red-400 hover:bg-red-500/10"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                      </Button>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          )}
+        </>
+      ) : (
+        <>
+          <div className="bg-gradient-to-br from-indigo-500/10 to-purple-500/10 rounded-xl p-6 border border-indigo-500/30">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h3 className="text-xl font-bold text-white mb-1">Server Boost Status</h3>
+                <p className="text-sm text-zinc-400">Unlock perks by boosting this server</p>
               </div>
-            </motion.div>
-          ))}
-        </div>
+              <div className="text-right">
+                <div className="text-3xl font-bold text-white">{activeBoosts}</div>
+                <div className="text-xs text-zinc-500">Active Boosts</div>
+              </div>
+            </div>
+            
+            {currentLevel > 0 && (
+              <div className="flex items-center gap-2 px-4 py-2 bg-indigo-500/20 rounded-lg border border-indigo-500/30">
+                <TrendingUp className="w-5 h-5 text-indigo-400" />
+                <span className="text-white font-medium">Level {currentLevel} Unlocked!</span>
+              </div>
+            )}
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {boostTiers.map((tier) => (
+              <BoostTierCard key={tier.level} tier={tier} boosts={boosts} />
+            ))}
+          </div>
+
+          {boosts.length > 0 && (
+            <div>
+              <h4 className="text-sm font-semibold text-white mb-3">Active Boosters</h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                {boosts.filter(b => b.is_active).map((boost) => (
+                  <div key={boost.id} className="flex items-center gap-3 p-3 bg-zinc-800/30 rounded-lg">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
+                      <Zap className="w-5 h-5 text-white" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-white truncate">{boost.user_name}</p>
+                      <p className="text-xs text-zinc-500">
+                        Since {new Date(boost.created_date).toLocaleDateString()}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </>
       )}
 
       {showCreateModal && (
