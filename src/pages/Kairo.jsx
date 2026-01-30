@@ -489,9 +489,10 @@ export default function KairoPage() {
   const createServerMutation = useMutation({
     mutationFn: async ({ name, description, icon_url, banner_url, template, templateChannels }) => {
       const inviteCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+      // Use the same userId that will be used for fetching servers (user_id field or record id)
       const userId = currentUser.user_id || currentUser.id;
       const userEmail = currentUser.user_email || currentUser.email;
-      console.log('[CREATE SERVER] userId:', userId, 'userEmail:', userEmail);
+      console.log('[CREATE SERVER] userId:', userId, 'userEmail:', userEmail, 'currentUser:', currentUser);
 
       const server = await base44.entities.Server.create({
         name, description, icon_url, banner_url, owner_id: userId, template, invite_code: inviteCode, member_count: 1
