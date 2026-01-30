@@ -533,8 +533,29 @@ function KairoPageContent() {
     keepPreviousData: true
   });
 
-  // Fetch typing indicators - disabled for performance
-  const typingUsers = [];
+  // Fetch typing indicators with real-time subscription
+  const { data: typingIndicators = [] } = useQuery({
+    queryKey: ['typing', activeChannel?.id || activeConversation?.id],
+    queryFn: async () => {
+      if (activeChannel?.id) {
+        return base44.entities.TypingIndicator.filter({ channel_id: activeChannel.id });
+      } else if (activeConversation?.id) {
+        return base44.entities.TypingIndicator.filter({ conversation_id: activeConversation.id });
+      }
+      return [];
+    },
+    enabled: !!(activeChannel?.id || activeConversation?.id),
+    refetchInterval: 2000, // Poll every 2 seconds for typing
+    staleTime: 1000
+  });
+
+  // Filter typing users (exclude self and expired)
+  const typingUsers = typingIndicators.filter(t => {
+    if (t.user_id === currentUser?.id) return false;
+    const startedAt = new Date(t.started_at);
+    const now = new Date();
+    return (now - startedAt) < 5000; // Only show if typing started within 5 seconds
+  });
 
   // Fetch public servers
   const { data: publicServers = [] } = useQuery({
@@ -584,7 +605,16 @@ function KairoPageContent() {
           }
         }
       } else {
-        await base44.entities.Channel.create({ server_id: server.id, name: 'general', type: 'text', position: 0 });
+        // Create default channels: Overview and Members (like the image shows)
+        const infoCategory = await base44.entities.Category.create({ server_id: server.id, name: 'Information', position: 0 });
+        await base44.entities.Channel.create({ server_id: server.id, category_id: infoCategory.id, name: 'overview', type: 'text', position: 0 });
+        await base44.entities.Channel.create({ server_id: server.id, category_id: infoCategory.id, name: 'members', type: 'text', position: 1 });
+
+        const textCategory = await base44.entities.Category.create({ server_id: server.id, name: 'Text Channels', position: 1 });
+        await base44.entities.Channel.create({ server_id: server.id, category_id: textCategory.id, name: 'general', type: 'text', position: 0 });
+
+        const voiceCategory = await base44.entities.Category.create({ server_id: server.id, name: 'Voice Channels', position: 2 });
+        await base44.entities.Channel.create({ server_id: server.id, category_id: voiceCategory.id, name: 'General', type: 'voice', position: 0 });
       }
       return server;
     },

@@ -280,10 +280,16 @@ export default function ProfileEditor({ profile, inventory = [], onUpdateProfile
     try {
       const { file_url } = await base44.integrations.Core.UploadFile({ file });
       if (type === 'avatar') {
-        setFormData({ ...formData, avatar_url: file_url });
+        const newData = { ...formData, avatar_url: file_url };
+        setFormData(newData);
+        // Immediately save avatar to prevent losing it
+        await onUpdateProfile?.({ avatar_url: file_url });
         setAvatarFile(null);
       } else {
-        setFormData({ ...formData, banner_url: file_url });
+        const newData = { ...formData, banner_url: file_url };
+        setFormData(newData);
+        // Immediately save banner to prevent losing it
+        await onUpdateProfile?.({ banner_url: file_url });
         setBannerFile(null);
       }
     } catch (error) {
