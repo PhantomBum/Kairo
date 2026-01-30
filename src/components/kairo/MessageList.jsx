@@ -25,6 +25,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import UserBadges from './UserBadges';
+import CrossAppIndicator from './crossapp/CrossAppIndicator';
 
 const commonEmojis = ['👍', '❤️', '😂', '😮', '😢', '🎉', '🔥', '👀'];
 
@@ -188,6 +189,9 @@ function MessageItem({ message, showHeader, onReply, onEdit, onDelete, onReact, 
                     showYoutube={message.author_youtube_show_icon}
                     youtubeUrl={message.author_youtube_url}
                   />
+                  {message.metadata?.platform && (
+                    <CrossAppIndicator platform={message.metadata.platform} size="xs" />
+                  )}
                   <span className="text-xs text-zinc-500">
                     {formatMessageDate(message.created_date)}
                   </span>
