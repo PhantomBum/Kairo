@@ -41,7 +41,6 @@ function ChannelItem({ channel, isActive, onClick, onContextAction, voiceUsers =
     <ContextMenu>
       <ContextMenuTrigger>
         <motion.div
-          whileHover={{ x: 2 }}
           onClick={() => onClick(channel)}
           className={cn(
             "group flex items-center gap-2 px-2 py-1.5 mx-2 rounded-md cursor-pointer transition-all",

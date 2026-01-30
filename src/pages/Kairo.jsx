@@ -1006,9 +1006,9 @@ export default function KairoPage() {
         {showShop && <div className="fixed inset-0 z-50 bg-black/80 flex">
           <div className="flex-1" onClick={() => setShowShop(false)} />
           <motion.div 
-            initial={{ x: '100%' }} 
-            animate={{ x: 0 }}
-            exit={{ x: '100%' }}
+            initial={{ opacity: 0 }} 
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
             className="w-full max-w-4xl bg-zinc-900 border-l border-zinc-800 overflow-y-auto"
           >
             <ShopIntegrated currentUser={currentUser} activeServer={activeServer} />

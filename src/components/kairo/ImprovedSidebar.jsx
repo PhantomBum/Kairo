@@ -128,9 +128,9 @@ function StatusPicker({ currentStatus, onStatusChange, isCollapsed }) {
           <>
             <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />
             <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
               className={cn(
                 "absolute bottom-full mb-2 bg-zinc-900 border border-zinc-800 rounded-lg shadow-xl z-50",
                 isCollapsed ? "left-full ml-2" : "left-0 right-0"
