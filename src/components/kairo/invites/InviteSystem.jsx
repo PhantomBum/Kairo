@@ -228,13 +228,17 @@ export function JoinByInviteModal({ isOpen, onClose, onJoin, isJoining }) {
     setError(null);
 
     try {
-      const servers = await base44.entities.Server.filter({ invite_code: code });
+      // Get all servers and find by invite code (case-insensitive)
+      const allServers = await base44.entities.Server.list();
+      const server = allServers.find(s => 
+        s.invite_code?.toUpperCase() === code.toUpperCase()
+      );
       
-      if (servers.length === 0) {
+      if (!server) {
         setError('Invalid invite code or server not found');
         setServerPreview(null);
       } else {
-        setServerPreview(servers[0]);
+        setServerPreview(server);
         setError(null);
       }
     } catch (err) {

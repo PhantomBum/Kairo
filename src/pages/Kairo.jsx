@@ -710,35 +710,60 @@ export default function KairoPage() {
       const userId = currentUser.user_id || currentUser.id;
       const userEmail = currentUser.user_email || currentUser.email;
 
-      // Try to find by invite code first
-      let servers = await base44.entities.Server.filter({ invite_code: codeOrServerId });
-      // If not found by invite code, try by server ID (for direct join from discover)
-      if (servers.length === 0) {
-        const serverById = await base44.entities.Server.filter({ id: codeOrServerId });
-        if (serverById.length > 0) servers = serverById;
+      // Clean up the code - extract from URL if needed
+      let cleanCode = codeOrServerId?.trim?.() || codeOrServerId;
+      if (cleanCode.includes('kairo.app/invite/')) {
+        cleanCode = cleanCode.split('kairo.app/invite/')[1]?.split(/[?#]/)[0];
       }
-      if (servers.length === 0) throw new Error('Invalid invite code or server not found');
-      const server = servers[0];
+      cleanCode = cleanCode?.toUpperCase?.() || cleanCode;
+
+      // Get all servers and find by invite code
+      const allServers = await base44.entities.Server.list();
+      let server = allServers.find(s => 
+        s.invite_code?.toUpperCase() === cleanCode || 
+        s.id === codeOrServerId
+      );
+
+      if (!server) {
+        throw new Error('Invalid invite code or server not found');
+      }
 
       // Check if already a member
-      const existingMember = await base44.entities.ServerMember.filter({ server_id: server.id, user_id: userId });
-      if (existingMember.length > 0) return server;
+      const allMembers = await base44.entities.ServerMember.filter({ server_id: server.id });
+      const isAlreadyMember = allMembers.some(m => 
+        m.user_id === userId || 
+        m.user_email === userEmail
+      );
+      
+      if (isAlreadyMember) {
+        return server; // Already a member, just return the server
+      }
 
+      // Create membership
       await base44.entities.ServerMember.create({ 
         server_id: server.id, 
         user_id: userId, 
         user_email: userEmail, 
         joined_at: new Date().toISOString() 
       });
-      await base44.entities.Server.update(server.id, { member_count: (server.member_count || 0) + 1 });
+      
+      // Update member count
+      await base44.entities.Server.update(server.id, { 
+        member_count: (server.member_count || 0) + 1 
+      });
+      
       return server;
     },
     onSuccess: (server) => { 
-      queryClient.invalidateQueries({ queryKey: ['memberServers'] }); 
+      queryClient.removeQueries({ queryKey: ['memberServers'] });
       setActiveServer(server); 
       setView('server'); 
       setPreviewServer(null);
       setShowJoinServer(false);
+      // Refetch after delay for consistency
+      setTimeout(() => {
+        queryClient.refetchQueries({ queryKey: ['memberServers'] });
+      }, 300);
     }
   });
 
