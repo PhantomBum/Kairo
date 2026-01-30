@@ -45,6 +45,7 @@ import { CreateInviteModal, JoinByInviteModal } from '@/components/kairo/invites
 import { ExportBlueprintModal, ImportBlueprintModal, useApplyBlueprint } from '@/components/kairo/server/ServerBlueprint';
 import { WorkspaceProvider, useWorkspace } from '@/components/kairo/core/WorkspaceProvider';
 import { RealtimeProvider, useRealtime } from '@/components/kairo/core/RealtimeProvider';
+import { ProfileProvider, useProfiles, useEnrichedMembers } from '@/components/kairo/core/ProfileProvider';
 import { AuditLogViewer, AutoModerationSettings } from '@/components/kairo/moderation/ModerationTools';
 import AddFriendModal from '@/components/kairo/AddFriendModal';
 import AppMarketplace from '@/components/kairo/apps/AppMarketplace';
@@ -186,6 +187,9 @@ export default function KairoPage() {
 
   // Get current user from localStorage (key-based auth)
   const [currentUser, setCurrentUser] = React.useState(null);
+
+  // Profile system
+  const { getProfile, refreshAllProfiles } = useProfiles();
 
   // Core system hooks (after currentUser is declared)
   useCacheOptimization();
@@ -434,13 +438,16 @@ export default function KairoPage() {
   }, [messagesFetching]);
 
   // Fetch server members
-  const { data: members = [] } = useQuery({
+  const { data: rawMembers = [] } = useQuery({
     queryKey: ['members', activeServer?.id],
     queryFn: () => base44.entities.ServerMember.filter({ server_id: activeServer.id }),
     enabled: !!activeServer?.id,
     staleTime: 30000,
     keepPreviousData: true
   });
+
+  // Enrich members with profile data
+  const members = useEnrichedMembers(rawMembers, currentUser?.id);
 
   // Fetch roles
   const { data: roles = [] } = useQuery({
@@ -1256,18 +1263,7 @@ export default function KairoPage() {
                   <TypingIndicator typingUsers={typingUsers} className="px-4" />
                   <MessageInput channelName={activeChannel?.name} replyTo={replyTo} onCancelReply={() => setReplyTo(null)} onSendMessage={(data) => sendMessageMutation.mutate(data)} onTyping={sendTypingIndicator} />
                 </div>
-                {showMembers && <MemberList members={members.map(m => {
-                const memberProfile = m.user_id === currentUser?.id ? userProfile : null;
-                return {
-                  ...m,
-                  user_name: m.nickname || memberProfile?.display_name || m.user_email?.split('@')[0] || 'User',
-                  user_avatar: memberProfile?.avatar_url,
-                  status: memberProfile?.status || 'online',
-                  badges: memberProfile?.badges || [],
-                  youtube_url: memberProfile?.youtube_channel?.url,
-                  youtube_show_icon: memberProfile?.youtube_channel?.show_icon
-                };
-              })} roles={roles} ownerId={activeServer?.owner_id} />}
+                {showMembers && <MemberList members={members} roles={roles} ownerId={activeServer?.owner_id} />}
               </div>
             </>
           )
