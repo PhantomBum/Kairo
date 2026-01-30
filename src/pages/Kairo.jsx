@@ -301,6 +301,7 @@ export default function KairoPage() {
       const profileRecordId = currentUser.id;
       const profileUserId = currentUser.user_id;
       const userEmail = currentUser.user_email || currentUser.email;
+      const createdBy = currentUser.created_by;
 
       // Get ALL servers and memberships - then filter client-side for reliability
       const [allServers, allMemberships] = await Promise.all([
@@ -309,11 +310,16 @@ export default function KairoPage() {
       ]);
 
       // Find memberships for this user (check all possible identifiers)
-      const myMemberships = allMemberships.filter(m => 
-        m.user_id === profileRecordId || 
-        m.user_id === profileUserId ||
-        (userEmail && m.user_email === userEmail)
-      );
+      const myMemberships = allMemberships.filter(m => {
+        // Check user_id matches any of our identifiers
+        if (m.user_id === profileRecordId) return true;
+        if (m.user_id === profileUserId) return true;
+        // Check email match
+        if (userEmail && m.user_email && m.user_email.toLowerCase() === userEmail.toLowerCase()) return true;
+        // Check created_by match (for memberships created by the user)
+        if (createdBy && m.created_by === createdBy) return true;
+        return false;
+      });
 
       // Get server IDs from memberships
       const memberServerIds = new Set(myMemberships.map(m => m.server_id));
@@ -322,7 +328,8 @@ export default function KairoPage() {
       const myServers = allServers.filter(s => 
         memberServerIds.has(s.id) ||
         s.owner_id === profileRecordId ||
-        s.owner_id === profileUserId
+        s.owner_id === profileUserId ||
+        (createdBy && s.created_by === createdBy)
       );
 
       return myServers;
