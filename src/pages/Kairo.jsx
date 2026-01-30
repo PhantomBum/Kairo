@@ -117,7 +117,7 @@ function ChannelHeader({ channel, memberCount, onMembersToggle, showMembers, onS
   );
 }
 
-export default function KairoPage() {
+function KairoPageContent() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   
