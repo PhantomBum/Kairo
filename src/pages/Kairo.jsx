@@ -472,15 +472,19 @@ export default function KairoPage() {
   const createServerMutation = useMutation({
     mutationFn: async ({ name, description, icon_url, banner_url, template, templateChannels }) => {
       const inviteCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+      const userId = currentUser.user_id || currentUser.id;
+      const userEmail = currentUser.user_email || currentUser.email;
+      console.log('[CREATE SERVER] userId:', userId, 'userEmail:', userEmail);
+
       const server = await base44.entities.Server.create({
-        name, description, icon_url, banner_url, owner_id: currentUser.id, template, invite_code: inviteCode, member_count: 1
+        name, description, icon_url, banner_url, owner_id: userId, template, invite_code: inviteCode, member_count: 1
       });
       await base44.entities.Role.create({
         server_id: server.id, name: '@everyone', is_default: true, position: 0,
         permissions: ['view_channels', 'send_messages', 'read_message_history']
       });
       await base44.entities.ServerMember.create({
-        server_id: server.id, user_id: currentUser.id, user_email: currentUser.email, joined_at: new Date().toISOString()
+        server_id: server.id, user_id: userId, user_email: userEmail, joined_at: new Date().toISOString()
       });
       if (templateChannels?.length > 0) {
         for (const catData of templateChannels) {
@@ -500,12 +504,9 @@ export default function KairoPage() {
     },
     onSuccess: async (server) => {
       await queryClient.invalidateQueries({ queryKey: ['memberServers'] });
-      await queryClient.refetchQueries({ queryKey: ['memberServers', currentUser?.id] });
       setShowCreateServer(false);
-      setTimeout(() => {
-        setActiveServer(server);
-        setView('server');
-      }, 100);
+      setActiveServer(server);
+      setView('server');
     }
   });
 
