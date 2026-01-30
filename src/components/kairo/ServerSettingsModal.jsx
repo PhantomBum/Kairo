@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { X, Server, Shield, Code, Webhook, Zap, DollarSign } from 'lucide-react';
+import { X, Server, Shield, Code, Webhook, Zap, DollarSign, BarChart3, Smile, ShieldAlert } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import RoleManager from './roles/RoleManager';
 import WebhookManager from './apps/WebhookManager';
 import AppMarketplace from './apps/AppMarketplace';
 import ServerSubscriptionManager from './shop/ServerSubscriptionManager';
+import ServerAnalyticsDashboard from './server/ServerAnalyticsDashboard';
+import EmojiManager from './server/EmojiManager';
+import AutoModManager from './moderation/AutoModManager';
 
 export default function ServerSettingsModal({ server, currentUser, channels, onClose }) {
   const [activeTab, setActiveTab] = useState('overview');
@@ -37,9 +40,21 @@ export default function ServerSettingsModal({ server, currentUser, channels, onC
                 <Server className="w-4 h-4 mr-2" />
                 Overview
               </TabsTrigger>
+              <TabsTrigger value="analytics" className="w-full justify-start">
+                <BarChart3 className="w-4 h-4 mr-2" />
+                Analytics
+              </TabsTrigger>
               <TabsTrigger value="roles" className="w-full justify-start">
                 <Shield className="w-4 h-4 mr-2" />
                 Roles
+              </TabsTrigger>
+              <TabsTrigger value="emojis" className="w-full justify-start">
+                <Smile className="w-4 h-4 mr-2" />
+                Emojis
+              </TabsTrigger>
+              <TabsTrigger value="automod" className="w-full justify-start">
+                <ShieldAlert className="w-4 h-4 mr-2" />
+                Auto-Mod
               </TabsTrigger>
               <TabsTrigger value="apps" className="w-full justify-start">
                 <Code className="w-4 h-4 mr-2" />
@@ -59,19 +74,31 @@ export default function ServerSettingsModal({ server, currentUser, channels, onC
               </TabsTrigger>
             </TabsList>
 
-            <div className="flex-1 overflow-y-auto p-6">
-              <TabsContent value="overview">
+            <div className="flex-1 overflow-y-auto">
+              <TabsContent value="overview" className="p-6">
                 <div className="space-y-4">
                   <h3 className="text-lg font-bold text-white">Server Overview</h3>
                   <p className="text-zinc-400">Manage your server settings here.</p>
                 </div>
               </TabsContent>
 
-              <TabsContent value="roles">
+              <TabsContent value="analytics" className="p-0">
+                <ServerAnalyticsDashboard server={server} />
+              </TabsContent>
+
+              <TabsContent value="roles" className="p-6">
                 <RoleManager server={server} currentUser={currentUser} />
               </TabsContent>
 
-              <TabsContent value="apps">
+              <TabsContent value="emojis" className="p-0">
+                <EmojiManager server={server} currentUser={currentUser} />
+              </TabsContent>
+
+              <TabsContent value="automod" className="p-0">
+                <AutoModManager server={server} />
+              </TabsContent>
+
+              <TabsContent value="apps" className="p-6">
                 <div className="space-y-6">
                   <div>
                     <h3 className="text-lg font-bold text-white mb-2">Installed Apps</h3>
@@ -83,18 +110,18 @@ export default function ServerSettingsModal({ server, currentUser, channels, onC
                 </div>
               </TabsContent>
 
-              <TabsContent value="webhooks">
+              <TabsContent value="webhooks" className="p-6">
                 <WebhookManager server={server} channels={channels} currentUser={currentUser} />
               </TabsContent>
 
-              <TabsContent value="boost">
+              <TabsContent value="boost" className="p-6">
                 <div className="space-y-4">
                   <h3 className="text-lg font-bold text-white">Server Boosts</h3>
                   <p className="text-zinc-400">View active boosts and boost analytics.</p>
                 </div>
               </TabsContent>
 
-              <TabsContent value="subscriptions">
+              <TabsContent value="subscriptions" className="p-6">
                 <ServerSubscriptionManager server={server} currentUser={currentUser} />
               </TabsContent>
             </div>
