@@ -27,12 +27,28 @@ export default function LandingPage() {
   const [enteredKey, setEnteredKey] = useState('');
   const [displayName, setDisplayName] = useState('');
   const [copied, setCopied] = useState(false);
+  const [stats, setStats] = useState({ users: 0, servers: 0, messages: 0 });
 
   useEffect(() => {
     const savedKey = localStorage.getItem('kairo_access_key');
     if (savedKey) {
       verifyKeyAndRedirect(savedKey);
     }
+    
+    // Fetch real stats
+    const fetchStats = async () => {
+      const [users, servers, messages] = await Promise.all([
+        base44.entities.UserProfile.list(),
+        base44.entities.Server.list(),
+        base44.entities.Message.list()
+      ]);
+      setStats({
+        users: users.length,
+        servers: servers.length,
+        messages: messages.length
+      });
+    };
+    fetchStats();
   }, [navigate]);
 
   const verifyKeyAndRedirect = async (key) => {
@@ -263,18 +279,18 @@ export default function LandingPage() {
               <div className="max-w-4xl mx-auto">
                 <div className="flex items-center justify-center gap-16 text-center">
                   <div>
-                    <div className="text-3xl font-semibold text-white mb-1">10K+</div>
+                    <div className="text-3xl font-semibold text-white mb-1">{stats.users.toLocaleString()}</div>
                     <div className="text-xs text-zinc-600 uppercase tracking-wider">Users</div>
                   </div>
                   <div className="w-px h-12 bg-white/10" />
                   <div>
-                    <div className="text-3xl font-semibold text-white mb-1">500+</div>
+                    <div className="text-3xl font-semibold text-white mb-1">{stats.servers.toLocaleString()}</div>
                     <div className="text-xs text-zinc-600 uppercase tracking-wider">Servers</div>
                   </div>
                   <div className="w-px h-12 bg-white/10" />
                   <div>
-                    <div className="text-3xl font-semibold text-white mb-1">99.9%</div>
-                    <div className="text-xs text-zinc-600 uppercase tracking-wider">Uptime</div>
+                    <div className="text-3xl font-semibold text-white mb-1">{stats.messages.toLocaleString()}</div>
+                    <div className="text-xs text-zinc-600 uppercase tracking-wider">Messages</div>
                   </div>
                 </div>
               </div>
