@@ -759,7 +759,13 @@ function KairoPageContent() {
 
       if (!server) {
         console.log('[JOIN SERVER] Server not found for code:', cleanCode);
-        throw new Error('Invalid invite code or server not found');
+        throw new Error('Invalid invite code - this space does not exist');
+      }
+
+      // Verify server exists and is valid
+      if (!server.id || !server.name) {
+        console.log('[JOIN SERVER] Server is invalid or deleted');
+        throw new Error('This space is no longer available');
       }
 
       console.log('[JOIN SERVER] Found server:', server.name, server.id);

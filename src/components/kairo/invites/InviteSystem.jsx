@@ -235,14 +235,20 @@ export function JoinByInviteModal({ isOpen, onClose, onJoin, isJoining }) {
       );
       
       if (!server) {
-        setError('Invalid invite code or server not found');
+        setError('Invalid invite code - this space does not exist');
         setServerPreview(null);
       } else {
-        setServerPreview(server);
-        setError(null);
+        // Verify server exists and has valid data
+        if (!server.id || !server.name) {
+          setError('This space is no longer available');
+          setServerPreview(null);
+        } else {
+          setServerPreview(server);
+          setError(null);
+        }
       }
     } catch (err) {
-      setError('Failed to lookup server');
+      setError('Failed to lookup space. Please try again.');
       setServerPreview(null);
     }
     setIsLoading(false);
