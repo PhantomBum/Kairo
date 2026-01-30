@@ -302,24 +302,18 @@ export default function KairoPage() {
       const profileUserId = currentUser.user_id;
       const userEmail = currentUser.user_email || currentUser.email;
 
-      console.log('[SERVER FETCH] Looking for:', { profileRecordId, profileUserId, userEmail });
-
       // Get ALL servers and memberships - then filter client-side for reliability
       const [allServers, allMemberships] = await Promise.all([
         base44.entities.Server.list(),
         base44.entities.ServerMember.list()
       ]);
 
-      console.log('[SERVER FETCH] All servers:', allServers.length, 'All memberships:', allMemberships.length);
-
       // Find memberships for this user (check all possible identifiers)
       const myMemberships = allMemberships.filter(m => 
         m.user_id === profileRecordId || 
         m.user_id === profileUserId ||
-        m.user_email === userEmail
+        (userEmail && m.user_email === userEmail)
       );
-
-      console.log('[SERVER FETCH] myMemberships found:', myMemberships.length, myMemberships.map(m => m.server_id));
 
       // Get server IDs from memberships
       const memberServerIds = new Set(myMemberships.map(m => m.server_id));
@@ -331,13 +325,12 @@ export default function KairoPage() {
         s.owner_id === profileUserId
       );
 
-      console.log('[SERVER FETCH] myServers found:', myServers.length, myServers.map(s => s.name));
-
       return myServers;
     },
     enabled: !!currentUser,
     staleTime: 5000,
-    refetchOnMount: true
+    refetchOnMount: true,
+    refetchOnWindowFocus: true
   });
 
   // Refetch servers when currentUser changes
