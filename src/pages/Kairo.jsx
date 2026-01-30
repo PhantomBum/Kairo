@@ -539,8 +539,9 @@ export default function KairoPage() {
         id: 'temp-' + Date.now(),
         ...newMsg,
         channel_id: activeChannel.id,
+        server_id: activeServer.id,
         author_id: currentUser.id,
-        author_name: userProfile?.display_name || currentUser.full_name,
+        author_name: userProfile?.display_name || currentUser.full_name || currentUser.user_email?.split('@')[0] || 'User',
         author_avatar: userProfile?.avatar_url,
         author_badges: userProfile?.badges || [],
         author_youtube_url: userProfile?.youtube_channel?.url,
@@ -548,7 +549,9 @@ export default function KairoPage() {
         created_date: new Date().toISOString(),
         type: newMsg.replyToId ? 'reply' : 'default',
         reply_to_id: newMsg.replyToId,
-        reply_preview: newMsg.replyToId && replyTo ? { author_name: replyTo.author_name, content: replyTo.content?.slice(0, 100) } : null
+        reply_preview: newMsg.replyToId && replyTo ? { author_name: replyTo.author_name, content: replyTo.content?.slice(0, 100) } : null,
+        is_pinned: false,
+        is_deleted: false
       };
       // Messages are fetched in descending order, so prepend the new message
       queryClient.setQueryData(['messages', activeChannel?.id], old => [optimisticMessage, ...(old || [])]);
@@ -557,8 +560,12 @@ export default function KairoPage() {
     onError: (err, newMsg, context) => {
       queryClient.setQueryData(['messages', activeChannel?.id], context.previousMessages);
     },
-    onSuccess: () => { 
-      queryClient.invalidateQueries({ queryKey: ['messages', activeChannel?.id] });
+    onSuccess: (data) => { 
+      // Update cache with real message instead of invalidating
+      queryClient.setQueryData(['messages', activeChannel?.id], old => {
+        const withoutTemp = (old || []).filter(m => !m.id.toString().startsWith('temp-'));
+        return [data, ...withoutTemp];
+      });
       setReplyTo(null); 
     }
   });
@@ -585,9 +592,34 @@ export default function KairoPage() {
       });
       return message;
     },
-    onSuccess: async () => { 
-      await queryClient.invalidateQueries({ queryKey: ['dmMessages', activeConversation?.id] });
-      await queryClient.refetchQueries({ queryKey: ['dmMessages', activeConversation?.id] });
+    onMutate: async (newMsg) => {
+      await queryClient.cancelQueries({ queryKey: ['dmMessages', activeConversation?.id] });
+      const previousMessages = queryClient.getQueryData(['dmMessages', activeConversation?.id]);
+      const optimisticMessage = {
+        id: 'temp-' + Date.now(),
+        ...newMsg,
+        conversation_id: activeConversation.id,
+        author_id: currentUser.id,
+        author_name: userProfile?.display_name || currentUser.full_name || currentUser.user_email?.split('@')[0] || 'User',
+        author_avatar: userProfile?.avatar_url,
+        author_badges: userProfile?.badges || [],
+        author_youtube_url: userProfile?.youtube_channel?.url,
+        author_youtube_show_icon: userProfile?.youtube_channel?.show_icon,
+        created_date: new Date().toISOString(),
+        type: newMsg.replyToId ? 'reply' : 'default',
+        reply_to_id: newMsg.replyToId
+      };
+      queryClient.setQueryData(['dmMessages', activeConversation?.id], old => [optimisticMessage, ...(old || [])]);
+      return { previousMessages };
+    },
+    onError: (err, newMsg, context) => {
+      queryClient.setQueryData(['dmMessages', activeConversation?.id], context.previousMessages);
+    },
+    onSuccess: (data) => { 
+      queryClient.setQueryData(['dmMessages', activeConversation?.id], old => {
+        const withoutTemp = (old || []).filter(m => !m.id.toString().startsWith('temp-'));
+        return [data, ...withoutTemp];
+      });
       queryClient.invalidateQueries({ queryKey: ['conversations'] }); 
       setReplyTo(null); 
     }
