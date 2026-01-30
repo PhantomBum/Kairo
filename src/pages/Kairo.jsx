@@ -438,7 +438,11 @@ export default function KairoPage() {
       const replyPreview = replyToId && replyTo ? { author_name: replyTo.author_name, content: replyTo.content?.slice(0, 100) } : null;
       return base44.entities.Message.create({
         channel_id: activeChannel.id, server_id: activeServer.id, author_id: currentUser.id,
-        author_name: userProfile?.display_name || currentUser.full_name, author_avatar: userProfile?.avatar_url,
+        author_name: userProfile?.display_name || currentUser.full_name || currentUser.user_email?.split('@')[0] || 'User',
+        author_avatar: userProfile?.avatar_url,
+        author_badges: userProfile?.badges || [],
+        author_youtube_url: userProfile?.youtube_channel?.url,
+        author_youtube_show_icon: userProfile?.youtube_channel?.show_icon,
         content, attachments, type: replyToId ? 'reply' : 'default', reply_to_id: replyToId, reply_preview: replyPreview
       });
     },
@@ -450,7 +454,11 @@ export default function KairoPage() {
       await base44.entities.Conversation.update(activeConversation.id, { last_message_at: new Date().toISOString(), last_message_preview: content?.slice(0, 50) });
       return base44.entities.DirectMessage.create({
         conversation_id: activeConversation.id, author_id: currentUser.id,
-        author_name: userProfile?.display_name || currentUser.full_name, author_avatar: userProfile?.avatar_url,
+        author_name: userProfile?.display_name || currentUser.full_name || currentUser.user_email?.split('@')[0] || 'User',
+        author_avatar: userProfile?.avatar_url,
+        author_badges: userProfile?.badges || [],
+        author_youtube_url: userProfile?.youtube_channel?.url,
+        author_youtube_show_icon: userProfile?.youtube_channel?.show_icon,
         content, attachments, type: replyToId ? 'reply' : 'default', reply_to_id: replyToId
       });
     },

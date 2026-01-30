@@ -24,6 +24,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import UserBadges from './UserBadges';
 
 const commonEmojis = ['👍', '❤️', '😂', '😮', '😢', '🎉', '🔥', '👀'];
 
@@ -179,8 +180,14 @@ function MessageItem({ message, showHeader, onReply, onEdit, onDelete, onReact, 
               {showHeader && (
                 <div className="flex items-baseline gap-2 mb-0.5">
                   <span className="font-medium text-white hover:underline cursor-pointer">
-                    {message.author_name}
+                    {message.author_name || 'Unknown User'}
                   </span>
+                  <UserBadges 
+                    badges={message.author_badges} 
+                    size="xs"
+                    showYoutube={message.author_youtube_show_icon}
+                    youtubeUrl={message.author_youtube_url}
+                  />
                   <span className="text-xs text-zinc-500">
                     {formatMessageDate(message.created_date)}
                   </span>

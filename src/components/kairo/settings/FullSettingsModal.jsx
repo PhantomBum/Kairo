@@ -6,7 +6,7 @@ import {
   X, User, Shield, Bell, Palette, Volume2, Keyboard, Database, Server,
   LogOut, ChevronRight, Moon, Ghost, Eye, Upload, Trash2, Globe, Lock,
   MessageCircle, Users, Zap, Monitor, Mic, Headphones, Radio, Sliders,
-  Activity, Clock, Key, Smartphone, Laptop, HardDrive, Download, RefreshCw
+  Activity, Clock, Key, Smartphone, Laptop, HardDrive, Download, RefreshCw, Youtube, Crown
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -35,7 +35,9 @@ function AccountSettings({ profile, settings, onUpdate }) {
     username: profile?.username || '',
     bio: profile?.bio || '',
     pronouns: profile?.pronouns || '',
-    accent_color: profile?.accent_color || '#5865f2'
+    accent_color: profile?.accent_color || '#5865f2',
+    youtube_channel: profile?.youtube_channel || { url: '', show_icon: true },
+    badges: profile?.badges || []
   });
   const [avatarFile, setAvatarFile] = useState(null);
   const [bannerFile, setBannerFile] = useState(null);
@@ -47,7 +49,9 @@ function AccountSettings({ profile, settings, onUpdate }) {
       username: profile?.username || '',
       bio: profile?.bio || '',
       pronouns: profile?.pronouns || '',
-      accent_color: profile?.accent_color || '#5865f2'
+      accent_color: profile?.accent_color || '#5865f2',
+      youtube_channel: profile?.youtube_channel || { url: '', show_icon: true },
+      badges: profile?.badges || []
     });
   }, [profile]);
 
@@ -231,6 +235,51 @@ function AccountSettings({ profile, settings, onUpdate }) {
           </div>
         </div>
 
+        {/* YouTube Connection */}
+        <div className="space-y-2 pt-4 border-t border-zinc-800">
+          <div className="flex items-center gap-2">
+            <Youtube className="w-4 h-4 text-red-500" />
+            <Label className="text-zinc-400">YouTube Channel</Label>
+            {formData.badges?.includes('youtube') && (
+              <div className="flex items-center gap-1 px-2 py-0.5 bg-red-500/10 rounded-full">
+                <Crown className="w-3 h-3 text-red-500" />
+                <span className="text-xs text-red-400">Linked</span>
+              </div>
+            )}
+          </div>
+          <Input
+            value={formData.youtube_channel?.url || ''}
+            onChange={(e) => {
+              const url = e.target.value;
+              const newBadges = url ? [...new Set([...(formData.badges || []), 'youtube'])] : (formData.badges || []).filter(b => b !== 'youtube');
+              setFormData({ 
+                ...formData, 
+                youtube_channel: { ...formData.youtube_channel, url },
+                badges: newBadges
+              });
+            }}
+            placeholder="https://youtube.com/@yourchannel"
+            className="bg-zinc-900 border-zinc-800 text-white"
+          />
+          {formData.youtube_channel?.url && (
+            <div className="flex items-center gap-2 p-3 bg-zinc-800/30 rounded-lg">
+              <input
+                type="checkbox"
+                id="show-youtube-icon"
+                checked={formData.youtube_channel?.show_icon !== false}
+                onChange={(e) => setFormData({
+                  ...formData,
+                  youtube_channel: { ...formData.youtube_channel, show_icon: e.target.checked }
+                })}
+                className="w-4 h-4"
+              />
+              <label htmlFor="show-youtube-icon" className="text-sm text-zinc-400">
+                Show YouTube icon next to my name in chat
+              </label>
+            </div>
+          )}
+        </div>
+
         <div className="flex gap-3">
           <Button onClick={handleSave} className="flex-1 bg-indigo-500 hover:bg-indigo-600">
             Save Changes
@@ -242,13 +291,15 @@ function AccountSettings({ profile, settings, onUpdate }) {
               username: profile?.username || '',
               bio: profile?.bio || '',
               pronouns: profile?.pronouns || '',
-              accent_color: profile?.accent_color || '#5865f2'
+              accent_color: profile?.accent_color || '#5865f2',
+              youtube_channel: profile?.youtube_channel || { url: '', show_icon: true },
+              badges: profile?.badges || []
             })}
           >
             Cancel
           </Button>
         </div>
-      </div>
+        </div>
 
       {/* Email section */}
       <div className="pt-4 border-t border-zinc-800">
