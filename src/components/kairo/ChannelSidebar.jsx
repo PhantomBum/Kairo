@@ -15,6 +15,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Link2 } from 'lucide-react';
 import {
   ContextMenu,
   ContextMenuContent,
@@ -246,6 +247,10 @@ export default function ChannelSidebar({
           <DropdownMenuItem className="text-zinc-300 focus:bg-zinc-800 focus:text-white" onClick={() => window.dispatchEvent(new CustomEvent('kairo:show-webhooks'))}>
             <Webhook className="w-4 h-4 mr-2" />
             Webhooks
+          </DropdownMenuItem>
+          <DropdownMenuItem className="text-zinc-300 focus:bg-zinc-800 focus:text-white" onClick={() => window.dispatchEvent(new CustomEvent('kairo:show-bridges'))}>
+            <Link2 className="w-4 h-4 mr-2" />
+            Cross-App Bridges
           </DropdownMenuItem>
           <DropdownMenuSeparator className="bg-zinc-800" />
           <DropdownMenuItem 

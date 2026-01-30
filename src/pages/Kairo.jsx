@@ -60,6 +60,8 @@ import ConnectionMonitor from '@/components/kairo/core/ConnectionMonitor';
 import { LoadingSpinner, SkeletonMessage, SyncingIndicator } from '@/components/kairo/core/LoadingState';
 import { usePresenceSync, useVoiceStateSync, useMessageSync } from '@/components/kairo/core/PresenceSync';
 import { useCacheOptimization, usePrefetchStrategies } from '@/components/kairo/core/CacheManager';
+import CrossAppIndicator from '@/components/kairo/crossapp/CrossAppIndicator';
+import BridgeManager from '@/components/kairo/crossapp/BridgeManager';
 
 // Channel header component
 function ChannelHeader({ channel, memberCount, onMembersToggle, showMembers }) {
@@ -160,6 +162,7 @@ export default function KairoPage() {
 
   const [showKeyboardShortcuts, setShowKeyboardShortcuts] = useState(false);
   const [showServerSettings, setShowServerSettings] = useState(false);
+  const [showBridgeManager, setShowBridgeManager] = useState(false);
   
   // Connection status
   const [connectionStatus, setConnectionStatus] = useState('connected');
@@ -657,6 +660,7 @@ export default function KairoPage() {
     const handleShowApps = () => setShowAppMarketplace(true);
     const handleShowWebhooks = () => setShowWebhooks(true);
     const handleShowRoles = () => setShowRoles(true);
+    const handleShowBridges = () => setShowBridgeManager(true);
     const handleLeaveServerEvent = (e) => handleLeaveServer(e.detail);
     const handleUpdateStatus = (e) => {
       if (userProfile?.id) {
@@ -667,6 +671,7 @@ export default function KairoPage() {
     window.addEventListener('kairo:show-apps', handleShowApps);
     window.addEventListener('kairo:show-webhooks', handleShowWebhooks);
     window.addEventListener('kairo:show-roles', handleShowRoles);
+    window.addEventListener('kairo:show-bridges', handleShowBridges);
     window.addEventListener('kairo:leave-server', handleLeaveServerEvent);
     window.addEventListener('kairo:update-status', handleUpdateStatus);
 
@@ -674,6 +679,7 @@ export default function KairoPage() {
       window.removeEventListener('kairo:show-apps', handleShowApps);
       window.removeEventListener('kairo:show-webhooks', handleShowWebhooks);
       window.removeEventListener('kairo:show-roles', handleShowRoles);
+      window.removeEventListener('kairo:show-bridges', handleShowBridges);
       window.removeEventListener('kairo:leave-server', handleLeaveServerEvent);
       window.removeEventListener('kairo:update-status', handleUpdateStatus);
     };
@@ -1004,6 +1010,7 @@ export default function KairoPage() {
         {showAppMarketplace && <AppMarketplace server={activeServer} currentUser={currentUser} onClose={() => setShowAppMarketplace(false)} />}
         {showKeyboardShortcuts && <KeyboardShortcutsModal isOpen={showKeyboardShortcuts} onClose={() => setShowKeyboardShortcuts(false)} />}
         {showServerSettings && activeServer && <ServerSettingsModal server={activeServer} currentUser={currentUser} channels={channels} onClose={() => setShowServerSettings(false)} />}
+        {showBridgeManager && activeServer && <BridgeManager server={activeServer} channels={channels} isOpen={showBridgeManager} onClose={() => setShowBridgeManager(false)} />}
         {showShop && <div className="fixed inset-0 z-50 bg-black/80 flex">
           <div className="flex-1" onClick={() => setShowShop(false)} />
           <motion.div 
