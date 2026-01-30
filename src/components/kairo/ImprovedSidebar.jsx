@@ -277,7 +277,7 @@ export default function ImprovedSidebar({
             </motion.button>
           </div>
         )}
-        <div className={cn("space-y-1", isCollapsed && "flex flex-col items-center")}
+        <div className={cn("space-y-1", isCollapsed && "flex flex-col items-center")}>
           {servers.map((server, index) => (
             <ServerItem 
               key={server.id}
