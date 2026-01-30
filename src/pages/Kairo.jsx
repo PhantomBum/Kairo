@@ -943,26 +943,50 @@ function KairoPageContent() {
   };
 
   const handleLeaveServer = async (server) => {
+    // Check if user is the owner
+    const profileUserId = currentUser.user_id || currentUser.id;
+    if (server.owner_id === profileUserId || server.owner_id === currentUser.id) {
+      alert('You cannot leave a server you own. Transfer ownership or delete the server instead.');
+      return;
+    }
+    
     if (!confirm(`Are you sure you want to leave ${server.name}?`)) return;
     
     try {
-      const membership = await base44.entities.ServerMember.filter({ 
-        server_id: server.id, 
-        user_id: currentUser.id 
+      const profileRecordId = currentUser.id;
+      const userEmail = (currentUser.user_email || currentUser.email || '').toLowerCase();
+      
+      // Get all memberships for this server
+      const allMemberships = await base44.entities.ServerMember.filter({ server_id: server.id });
+      
+      // Find our membership using all possible identifiers
+      const membership = allMemberships.find(m => {
+        if (m.user_id === profileRecordId) return true;
+        if (m.user_id === profileUserId) return true;
+        if (userEmail && m.user_email && m.user_email.toLowerCase() === userEmail) return true;
+        return false;
       });
       
-      if (membership.length > 0) {
-        await base44.entities.ServerMember.delete(membership[0].id);
+      if (membership) {
+        await base44.entities.ServerMember.delete(membership.id);
         await base44.entities.Server.update(server.id, { 
           member_count: Math.max((server.member_count || 1) - 1, 0) 
         });
-        queryClient.invalidateQueries({ queryKey: ['memberServers'] });
+        
+        // Clear cache and refetch
+        queryClient.removeQueries({ queryKey: ['memberServers'] });
+        setTimeout(() => {
+          queryClient.refetchQueries({ queryKey: ['memberServers'] });
+        }, 200);
         
         if (activeServer?.id === server.id) {
           setActiveServer(null);
           setActiveChannel(null);
           setView('dms');
         }
+      } else {
+        console.error('Could not find membership to delete');
+        alert('Could not find your membership. Please try again.');
       }
     } catch (error) {
       console.error('Failed to leave server:', error);
