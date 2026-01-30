@@ -72,60 +72,55 @@ import PinnedMessagesPanel from '@/components/kairo/chat/PinnedMessagesPanel';
 import GlobalSearch from '@/components/kairo/search/GlobalSearch';
 import CreateGroupDMModal from '@/components/kairo/CreateGroupDMModal';
 
-// Channel header component
+// Channel header component - Kloak style
 function ChannelHeader({ channel, memberCount, onMembersToggle, showMembers, onShowPinned, showPinned, onMenuToggle }) {
   return (
-    <div className="h-14 px-3 md:px-5 flex items-center justify-between border-b border-white/5 bg-[#050506]/90 backdrop-blur-xl">
-      <div className="flex items-center gap-2 md:gap-3">
+    <div className="h-10 px-3 flex items-center justify-between border-b border-white/5 bg-[#0d0d0f]">
+      <div className="flex items-center gap-2">
         {/* Mobile menu button */}
         <button 
           onClick={onMenuToggle}
-          className="md:hidden p-2 text-zinc-400 hover:text-white transition-all rounded-lg hover:bg-white/5"
+          className="md:hidden p-1.5 text-zinc-500 hover:text-white transition-all rounded hover:bg-white/5"
         >
-          <Hash className="w-5 h-5" />
+          <Hash className="w-4 h-4" />
         </button>
-        <div className="hidden md:flex w-8 h-8 rounded-lg bg-white/5 border border-white/10 items-center justify-center">
-          <Hash className="w-4 h-4 text-zinc-400" />
-        </div>
-        <div>
-          <div className="flex items-center gap-2">
-            <h2 className="font-medium text-white text-sm">{channel?.name || 'general'}</h2>
-            {channel?.is_private && (
-              <span className="hidden sm:inline px-1 py-0.5 bg-white/5 text-zinc-600 text-[9px] font-medium rounded">PRIVATE</span>
-            )}
-          </div>
-          {channel?.topic && (
-            <p className="hidden sm:block text-[11px] text-zinc-600 truncate max-w-[200px] md:max-w-[300px]">{channel.topic}</p>
-          )}
-        </div>
+        <Hash className="hidden md:block w-4 h-4 text-zinc-600" />
+        <span className="font-medium text-white text-sm">{channel?.name || 'general'}</span>
+        {channel?.is_private && (
+          <span className="px-1.5 py-0.5 bg-amber-500/20 text-amber-400 text-[9px] font-medium rounded">Read only</span>
+        )}
+        {channel?.topic && (
+          <span className="hidden md:inline text-xs text-zinc-600 ml-2 truncate max-w-[300px]">{channel.topic}</span>
+        )}
       </div>
-      <div className="flex items-center gap-0.5 md:gap-1">
-        <button className="hidden sm:flex p-2 text-zinc-500 hover:text-white transition-all rounded-lg hover:bg-white/5">
-          <Bell className="w-4 h-4" />
+      <div className="flex items-center gap-1">
+        <button className="p-1.5 text-zinc-500 hover:text-white transition-all rounded hover:bg-white/5">
+          <Bell className="w-3.5 h-3.5" />
         </button>
         <button
           onClick={onShowPinned}
           className={cn(
-            "hidden sm:flex p-2 transition-all rounded-lg",
+            "p-1.5 transition-all rounded",
             showPinned ? "text-white bg-white/10" : "text-zinc-500 hover:text-white hover:bg-white/5"
           )}
         >
-          <Pin className="w-4 h-4" />
+          <Pin className="w-3.5 h-3.5" />
+        </button>
+        <button 
+          onClick={() => window.dispatchEvent(new CustomEvent('kairo:open-search'))}
+          className="p-1.5 text-zinc-500 hover:text-white transition-all rounded hover:bg-white/5"
+        >
+          <Search className="w-3.5 h-3.5" />
         </button>
         <button
           onClick={onMembersToggle}
           className={cn(
-            "p-2 transition-all rounded-lg",
+            "p-1.5 transition-all rounded flex items-center gap-1.5",
             showMembers ? "text-white bg-white/10" : "text-zinc-500 hover:text-white hover:bg-white/5"
           )}
         >
-          <Users className="w-4 h-4" />
-        </button>
-        <button 
-          onClick={() => window.dispatchEvent(new CustomEvent('kairo:open-search'))}
-          className="p-2 text-zinc-500 hover:text-white transition-all rounded-lg hover:bg-white/5"
-        >
-          <Search className="w-4 h-4" />
+          <Users className="w-3.5 h-3.5" />
+          <span className="text-xs">{memberCount}</span>
         </button>
       </div>
     </div>
