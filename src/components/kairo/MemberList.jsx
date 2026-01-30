@@ -2,6 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Crown, Shield, ShieldCheck, MoreHorizontal, UserPlus, MessageCircle, Ban, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import UserBadges from './UserBadges';
 import {
   ContextMenu,
   ContextMenuContent,
@@ -67,6 +68,12 @@ function MemberItem({ member, isOwner, highestRole, onMessage, onProfile }) {
                 >
                   {member.nickname || member.user_name}
                 </span>
+                <UserBadges 
+                  badges={member.badges} 
+                  size="xs"
+                  showYoutube={member.youtube_show_icon}
+                  youtubeUrl={member.youtube_url}
+                />
                 {isOwner && (
                   <Crown className="w-3.5 h-3.5 text-amber-400 flex-shrink-0" />
                 )}
