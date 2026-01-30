@@ -36,6 +36,7 @@ import EventsPage from '@/components/kairo/events/EventsPage';
 import ProfileEditor from '@/components/kairo/profile/ProfileEditor';
 import TypingIndicator from '@/components/kairo/chat/TypingIndicator';
 import { IncomingCallModal, ActiveCallModal, OutgoingCallModal } from '@/components/kairo/voice/DMCallModal';
+import WelcomeScreen from '@/components/kairo/WelcomeScreen';
 
 // New v2.0 Components
 import FriendSystem from '@/components/kairo/friends/FriendSystem';
@@ -181,14 +182,29 @@ export default function KairoPage() {
   React.useEffect(() => {
     const savedUser = localStorage.getItem('kairo_current_user');
     if (savedUser) {
-      setCurrentUser(JSON.parse(savedUser));
+      const user = JSON.parse(savedUser);
+      setCurrentUser(user);
     } else {
       navigate(createPageUrl('Landing'));
     }
   }, [navigate]);
 
-  // User profile is the current user
-  const userProfile = currentUser;
+  // Fetch fresh user profile data
+  const { data: userProfile, refetch: refetchProfile } = useQuery({
+    queryKey: ['userProfile', currentUser?.id],
+    queryFn: async () => {
+      if (!currentUser?.id) return currentUser;
+      const profiles = await base44.entities.UserProfile.filter({ user_id: currentUser.id });
+      if (profiles.length > 0) {
+        const profile = profiles[0];
+        localStorage.setItem('kairo_current_user', JSON.stringify(profile));
+        return profile;
+      }
+      return currentUser;
+    },
+    enabled: !!currentUser?.id,
+    staleTime: 30000
+  });
 
   // Fetch user settings
   const { data: userSettings } = useQuery({
@@ -236,18 +252,23 @@ export default function KairoPage() {
 
   // Fetch servers user is member of - optimized
   const { data: memberServers = [] } = useQuery({
-    queryKey: ['memberServers', currentUser?.email],
+    queryKey: ['memberServers', currentUser?.id],
     queryFn: async () => {
-      if (!currentUser?.email) return [];
-      const memberships = await base44.entities.ServerMember.filter({ user_email: currentUser.email });
-      if (memberships.length === 0) return [];
-      const serverIds = memberships.map(m => m.server_id);
-      const servers = await base44.entities.Server.list();
-      return servers.filter(s => serverIds.includes(s.id));
+      if (!currentUser?.id) return [];
+      try {
+        const memberships = await base44.entities.ServerMember.filter({ user_id: currentUser.id });
+        if (memberships.length === 0) return [];
+        const serverIds = [...new Set(memberships.map(m => m.server_id))];
+        const allServers = await base44.entities.Server.list();
+        return allServers.filter(s => serverIds.includes(s.id));
+      } catch (error) {
+        console.error('Error fetching servers:', error);
+        return [];
+      }
     },
-    enabled: !!currentUser?.email,
-    staleTime: 30000, // 30 seconds
-    cacheTime: 300000 // 5 minutes
+    enabled: !!currentUser?.id,
+    staleTime: 10000,
+    refetchInterval: 30000
   });
 
   // Fetch notifications
@@ -367,10 +388,10 @@ export default function KairoPage() {
 
   // Mutations
   const createServerMutation = useMutation({
-    mutationFn: async ({ name, description, icon_url, template, templateChannels }) => {
+    mutationFn: async ({ name, description, icon_url, banner_url, template, templateChannels }) => {
       const inviteCode = Math.random().toString(36).substring(2, 8).toUpperCase();
       const server = await base44.entities.Server.create({
-        name, description, icon_url, owner_id: currentUser.id, template, invite_code: inviteCode, member_count: 1
+        name, description, icon_url, banner_url, owner_id: currentUser.id, template, invite_code: inviteCode, member_count: 1
       });
       await base44.entities.Role.create({
         server_id: server.id, name: '@everyone', is_default: true, position: 0,
@@ -397,8 +418,11 @@ export default function KairoPage() {
     },
     onSuccess: (server) => {
       queryClient.invalidateQueries({ queryKey: ['memberServers'] });
-      setActiveServer(server);
-      setView('server');
+      setShowCreateServer(false);
+      setTimeout(() => {
+        setActiveServer(server);
+        setView('server');
+      }, 100);
     }
   });
 
@@ -433,12 +457,9 @@ export default function KairoPage() {
 
   const updateProfileMutation = useMutation({
     mutationFn: (data) => base44.entities.UserProfile.update(userProfile.id, data),
-    onSuccess: () => {
+    onSuccess: async () => {
       queryClient.invalidateQueries({ queryKey: ['userProfile'] });
-      // Update localStorage
-      const updatedUser = { ...currentUser, ...data };
-      localStorage.setItem('kairo_current_user', JSON.stringify(updatedUser));
-      setCurrentUser(updatedUser);
+      await refetchProfile();
     }
   });
 
@@ -829,25 +850,14 @@ export default function KairoPage() {
             </div>
           </>
         ) : (
-          <div className="flex-1 flex items-center justify-center bg-[#121214]">
-            <div className="text-center">
-              <div className="w-24 h-24 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-2xl shadow-indigo-500/25">
-                <span className="text-5xl font-bold text-white">K</span>
-              </div>
-              <h2 className="text-2xl font-bold text-white mb-2">Welcome to Kairo</h2>
-              <p className="text-zinc-500 max-w-md">{view === 'dms' ? 'Select a conversation to start chatting, or add a friend to get started.' : 'Select a channel to start chatting, or create a new server to begin.'}</p>
-              <div className="mt-6 flex justify-center gap-3 flex-wrap">
-                {view === 'dms' ? <button onClick={() => setShowAddFriend(true)} className="px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg font-medium transition-colors">Add Friend</button> : 
-                  <button onClick={() => setShowInvite(true)} className="px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg font-medium transition-colors">Invite People</button>}
-                <button onClick={() => setShowShop(true)} className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg font-medium transition-colors flex items-center gap-2">
-                  <ShoppingBag className="w-4 h-4" /> Shop
-                </button>
-                <button onClick={() => setShowKeyboardShortcuts(true)} className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg font-medium transition-colors">
-                  Shortcuts
-                </button>
-              </div>
-            </div>
-          </div>
+          <WelcomeScreen
+            view={view}
+            onAddFriend={() => setShowAddFriend(true)}
+            onInvite={() => setShowInvite(true)}
+            onDiscover={() => setView('discover')}
+            onShop={() => setShowShop(true)}
+            onCreateServer={() => setShowCreateServer(true)}
+          />
         )}
       </div>
 

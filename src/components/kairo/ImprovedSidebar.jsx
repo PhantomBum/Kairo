@@ -257,14 +257,6 @@ export default function ImprovedSidebar({
         <NavButton icon={MessageCircle} label="Direct Messages" onClick={onDMsClick} isActive={isDMsActive} badge={unreadDMs} isCollapsed={isCollapsed} />
         <NavButton icon={Users} label="Friends" onClick={onFriendsClick} isCollapsed={isCollapsed} />
         <NavButton icon={Compass} label="Discover" onClick={onDiscoverClick} isCollapsed={isCollapsed} />
-        <NavButton icon={Bell} label="Notifications" onClick={onNotificationsClick} badge={notifications.length} isCollapsed={isCollapsed} />
-        <NavButton 
-          icon={Sparkles} 
-          label="Update Logs" 
-          onClick={onUpdateLogsClick} 
-          badge={hasNewUpdates ? 1 : 0}
-          isCollapsed={isCollapsed} 
-        />
         <NavButton icon={ShoppingBag} label="Shop" onClick={onShopClick} isCollapsed={isCollapsed} />
       </div>
 
@@ -295,8 +287,16 @@ export default function ImprovedSidebar({
         </button>
       </div>
 
-      {/* Settings */}
-      <div className="p-2 border-t border-zinc-800">
+      {/* Quick Actions */}
+      <div className="p-2 border-t border-zinc-800 space-y-1">
+        <NavButton icon={Bell} label="Notifications" onClick={onNotificationsClick} badge={notifications.length} isCollapsed={isCollapsed} />
+        <NavButton 
+          icon={Sparkles} 
+          label="Updates" 
+          onClick={onUpdateLogsClick} 
+          badge={hasNewUpdates ? 1 : 0}
+          isCollapsed={isCollapsed} 
+        />
         <NavButton icon={Settings} label="Settings" onClick={onSettingsClick} isCollapsed={isCollapsed} />
       </div>
     </div>

@@ -50,8 +50,19 @@ export default function LandingPage() {
     }
   };
 
-  const generateAccessKey = () => {
-    const key = 'KAIRO-' + Math.random().toString(36).substring(2, 10).toUpperCase() + '-' + Date.now().toString(36).toUpperCase();
+  const generateAccessKey = async () => {
+    // Generate a truly unique key
+    const randomPart = Math.random().toString(36).substring(2, 10).toUpperCase();
+    const timePart = Date.now().toString(36).toUpperCase();
+    const key = `KAIRO-${randomPart}-${timePart}`;
+    
+    // Check if key exists (very unlikely but just in case)
+    const existing = await base44.entities.UserProfile.filter({ username: key });
+    if (existing.length > 0) {
+      generateAccessKey(); // Try again
+      return;
+    }
+    
     setGeneratedKey(key);
     setStep('getKey');
   };
@@ -65,19 +76,29 @@ export default function LandingPage() {
   const handleKeySubmit = async () => {
     const keyToUse = generatedKey || enteredKey;
     
-    // Check if key exists
-    const profiles = await base44.entities.UserProfile.filter({ username: keyToUse });
+    if (!keyToUse || keyToUse.trim() === '') {
+      alert('Please enter your access key');
+      return;
+    }
     
-    if (profiles.length > 0) {
-      // Key exists, log in
-      localStorage.setItem('kairo_access_key', keyToUse);
-      localStorage.setItem('kairo_current_user', JSON.stringify(profiles[0]));
-      navigate(createPageUrl('Kairo'));
-    } else if (generatedKey) {
-      // New key, go to profile setup
-      setStep('profile');
-    } else {
-      alert('Invalid access key');
+    try {
+      // Check if key exists
+      const profiles = await base44.entities.UserProfile.filter({ username: keyToUse });
+      
+      if (profiles.length > 0) {
+        // Key exists, log in
+        localStorage.setItem('kairo_access_key', keyToUse);
+        localStorage.setItem('kairo_current_user', JSON.stringify(profiles[0]));
+        navigate(createPageUrl('Kairo'));
+      } else if (generatedKey) {
+        // New key, go to profile setup
+        setStep('profile');
+      } else {
+        alert('Invalid access key. Please check and try again.');
+      }
+    } catch (error) {
+      console.error('Key validation error:', error);
+      alert('Failed to validate key. Please try again.');
     }
   };
 
