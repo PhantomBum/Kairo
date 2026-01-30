@@ -30,6 +30,31 @@ function StatusDot({ status }) {
   return <div className={cn("w-2.5 h-2.5 rounded-full", colors[status] || colors.offline)} />;
 }
 
+function QuickActionButton({ icon: Icon, label, onClick, badge, onMobileClose }) {
+  return (
+    <TooltipProvider delayDuration={100}>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <button
+            onClick={() => { onClick?.(); onMobileClose?.(); }}
+            className="w-10 h-10 rounded-xl bg-white/5 hover:bg-white/10 text-zinc-500 hover:text-white flex items-center justify-center transition-all relative"
+          >
+            <Icon className="w-5 h-5" />
+            {badge > 0 && (
+              <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full text-[9px] font-bold text-white flex items-center justify-center">
+                {badge > 9 ? '9+' : badge}
+              </div>
+            )}
+          </button>
+        </TooltipTrigger>
+        <TooltipContent side="right" className="bg-[#1a1a1d] border-white/10 text-white text-xs">
+          {label}
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+}
+
 export default function ImprovedSidebar({ 
   servers = [], 
   activeServerId, 
@@ -155,6 +180,30 @@ export default function ImprovedSidebar({
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
+      </div>
+
+      {/* Quick Actions */}
+      <div className="py-2 flex flex-col items-center gap-1.5 border-t border-white/5">
+        <QuickActionButton 
+          icon={Sparkles} 
+          label="Update Logs" 
+          onClick={onUpdateLogsClick}
+          badge={hasNewUpdates ? 1 : 0}
+          onMobileClose={onMobileClose}
+        />
+        <QuickActionButton 
+          icon={Bell} 
+          label="Notifications" 
+          onClick={onNotificationsClick}
+          badge={notifications?.length || 0}
+          onMobileClose={onMobileClose}
+        />
+        <QuickActionButton 
+          icon={ShoppingBag} 
+          label="Shop" 
+          onClick={onShopClick}
+          onMobileClose={onMobileClose}
+        />
       </div>
 
       {/* Bottom actions */}
