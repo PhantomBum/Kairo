@@ -1306,7 +1306,16 @@ function KairoPageContent() {
                         messages={[...messages].reverse()} 
                         currentUserId={currentUser?.id} 
                         onReply={(msg) => setReplyTo(msg)} 
-                        onEdit={() => {}} 
+                        onEdit={async (msg, newContent) => {
+                          if (msg?.id && newContent) {
+                            await base44.entities.Message.update(msg.id, { 
+                              content: newContent, 
+                              is_edited: true,
+                              edited_at: new Date().toISOString()
+                            });
+                            queryClient.invalidateQueries({ queryKey: ['messages', activeChannel?.id] });
+                          }
+                        }} 
                         onDelete={handleDeleteMessage} 
                         onReact={handleReact}
                         onThread={handleThreadClick}
