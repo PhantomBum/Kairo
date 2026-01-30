@@ -26,6 +26,7 @@ import {
 } from "@/components/ui/popover";
 import UserBadges from './UserBadges';
 import CrossAppIndicator from './crossapp/CrossAppIndicator';
+import EditMessageModal from './chat/EditMessageModal';
 
 const commonEmojis = ['👍', '❤️', '😂', '🎉', '🔥', '👀', '✅', '💯'];
 
@@ -52,7 +53,7 @@ function DateDivider({ date }) {
   );
 }
 
-function MessageActions({ message, onReply, onEdit, onDelete, onReact, onPin, isOwn }) {
+function MessageActions({ message, onReply, onEditClick, onDelete, onReact, onPin, isOwn }) {
   return (
     <div className="absolute -top-3 right-4 opacity-0 group-hover:opacity-100 transition-all">
       <div className="flex items-center bg-zinc-900/95 backdrop-blur-xl border border-zinc-800/80 rounded-xl shadow-xl p-1 gap-0.5">
@@ -98,12 +99,7 @@ function MessageActions({ message, onReply, onEdit, onDelete, onReact, onPin, is
             <Tooltip>
               <TooltipTrigger asChild>
                 <button 
-                  onClick={() => {
-                    const newContent = prompt('Edit message:', message.content);
-                    if (newContent && newContent !== message.content) {
-                      onEdit?.(message, newContent);
-                    }
-                  }}
+                  onClick={() => onEditClick?.(message)}
                   className="p-2 hover:bg-zinc-800 rounded-lg text-zinc-400 hover:text-white transition-colors"
                 >
                   <Pencil className="w-4 h-4" />
@@ -160,7 +156,7 @@ function MessageActions({ message, onReply, onEdit, onDelete, onReact, onPin, is
   );
 }
 
-function MessageItem({ message, showHeader, onReply, onEdit, onDelete, onReact, onPin, onThread, onForward, currentUserId }) {
+function MessageItem({ message, showHeader, onReply, onEditClick, onDelete, onReact, onPin, onThread, onForward, currentUserId }) {
   const isOwn = message.author_id === currentUserId;
   
   return (
@@ -309,7 +305,7 @@ function MessageItem({ message, showHeader, onReply, onEdit, onDelete, onReact, 
           <MessageActions
             message={message}
             onReply={onReply}
-            onEdit={onEdit}
+            onEditClick={onEditClick}
             onDelete={onDelete}
             onReact={onReact}
             onPin={onPin}
@@ -357,7 +353,7 @@ function MessageItem({ message, showHeader, onReply, onEdit, onDelete, onReact, 
           <>
             <ContextMenuSeparator className="bg-zinc-800/50 my-1" />
             <ContextMenuItem 
-              onClick={() => onEdit?.(message)}
+              onClick={() => onEditClick?.(message)}
               className="text-zinc-300 focus:bg-zinc-800 rounded-lg"
             >
               <Pencil className="w-4 h-4 mr-2 text-zinc-500" />
@@ -391,6 +387,7 @@ export default function MessageList({
 }) {
   const listRef = useRef(null);
   const [autoScroll, setAutoScroll] = useState(true);
+  const [editingMessage, setEditingMessage] = useState(null);
 
   useEffect(() => {
     if (autoScroll && listRef.current) {
@@ -457,7 +454,7 @@ export default function MessageList({
                   showHeader={shouldShowHeader(message, index)}
                   currentUserId={currentUserId}
                   onReply={onReply}
-                  onEdit={onEdit}
+                  onEditClick={setEditingMessage}
                   onDelete={onDelete}
                   onReact={onReact}
                   onPin={onPin}
@@ -467,8 +464,15 @@ export default function MessageList({
               </React.Fragment>
             ))}
           </AnimatePresence>
-        )}
-      </div>
-    </div>
-  );
-}
+          )}
+          </div>
+
+          <EditMessageModal
+          isOpen={!!editingMessage}
+          onClose={() => setEditingMessage(null)}
+          message={editingMessage}
+          onSave={onEdit}
+          />
+          </div>
+          );
+          }
