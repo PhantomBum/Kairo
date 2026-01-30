@@ -2,6 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { MessageCircle, Users, Compass, ShoppingBag, Sparkles, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 export default function WelcomeScreen({ 
   view, 
@@ -14,12 +15,12 @@ export default function WelcomeScreen({
   const isDMs = view === 'dms';
 
   const quickActions = isDMs ? [
-    { icon: Users, label: 'Add Friend', onClick: onAddFriend, color: 'indigo' },
-    { icon: Compass, label: 'Discover Servers', onClick: onDiscover, color: 'purple' },
+    { icon: Users, label: 'Add Friend', onClick: onAddFriend, color: 'violet' },
+    { icon: Compass, label: 'Discover Spaces', onClick: onDiscover, color: 'indigo' },
     { icon: ShoppingBag, label: 'Browse Shop', onClick: onShop, color: 'pink' }
   ] : [
-    { icon: Users, label: 'Invite People', onClick: onInvite, color: 'indigo' },
-    { icon: Zap, label: 'Create Server', onClick: onCreateServer, color: 'purple' },
+    { icon: Users, label: 'Invite People', onClick: onInvite, color: 'violet' },
+    { icon: Zap, label: 'Create Space', onClick: onCreateServer, color: 'indigo' },
     { icon: ShoppingBag, label: 'Browse Shop', onClick: onShop, color: 'pink' }
   ];
 
@@ -51,7 +52,7 @@ export default function WelcomeScreen({
         <p className="text-zinc-400 mb-8 leading-relaxed">
           {isDMs 
             ? 'Connect with friends, start conversations, and build your community. Add a friend to get started.' 
-            : 'Select a channel to start chatting, or create a new server to begin building your community.'}
+            : 'Select a channel to start chatting, or create a new space to begin building your community.'}
         </p>
 
         {/* Quick Actions */}
@@ -66,9 +67,14 @@ export default function WelcomeScreen({
               <Button
                 onClick={action.onClick}
                 variant="outline"
-                className="w-full h-auto py-4 flex flex-col items-center gap-2 bg-zinc-900/50 border-zinc-800 hover:border-zinc-700 hover:bg-zinc-900 transition-all"
+                className="w-full h-auto py-4 flex flex-col items-center gap-2 bg-zinc-900/50 border-zinc-800 hover:border-zinc-700 hover:bg-zinc-900 transition-all rounded-2xl"
               >
-                <div className={`w-10 h-10 rounded-xl bg-gradient-to-br from-${action.color}-500 to-${action.color}-600 flex items-center justify-center`}>
+                <div className={cn(
+                  "w-10 h-10 rounded-xl flex items-center justify-center",
+                  action.color === 'violet' && "bg-gradient-to-br from-violet-500 to-violet-600",
+                  action.color === 'indigo' && "bg-gradient-to-br from-indigo-500 to-indigo-600",
+                  action.color === 'pink' && "bg-gradient-to-br from-pink-500 to-pink-600"
+                )}>
                   <action.icon className="w-5 h-5 text-white" />
                 </div>
                 <span className="text-sm font-medium text-white">{action.label}</span>

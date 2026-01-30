@@ -47,12 +47,12 @@ export default function AddFriendModal({ isOpen, onClose, onSendRequest }) {
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
-        className="relative w-full max-w-md mx-4 bg-[#121214] rounded-xl shadow-2xl overflow-hidden"
+        className="relative w-full max-w-md mx-4 bg-zinc-900 rounded-2xl shadow-2xl overflow-hidden border border-zinc-800/50"
       >
         {/* Header */}
         <div className="p-6 pb-4 text-center">
-          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-indigo-500/20 flex items-center justify-center">
-            <UserPlus className="w-8 h-8 text-indigo-400" />
+          <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-violet-500/20 flex items-center justify-center">
+            <UserPlus className="w-8 h-8 text-violet-400" />
           </div>
           <h2 className="text-xl font-semibold text-white mb-2">Add Friend</h2>
           <p className="text-sm text-zinc-500">
@@ -80,19 +80,19 @@ export default function AddFriendModal({ isOpen, onClose, onSendRequest }) {
                 onKeyDown={(e) => e.key === 'Enter' && handleSend()}
                 placeholder="Enter a username"
                 className={cn(
-                  "w-full h-12 bg-zinc-900 border-zinc-800 text-white placeholder-zinc-600 pr-24",
+                  "w-full h-12 bg-zinc-800/70 border-zinc-700/50 text-white placeholder-zinc-500 pr-24 rounded-xl",
                   status === 'success' && "border-emerald-500 focus:ring-emerald-500",
-                  status === 'error' && "border-red-500 focus:ring-red-500"
+                  status === 'error' && "border-rose-500 focus:ring-rose-500"
                 )}
               />
               <Button
                 onClick={handleSend}
                 disabled={!username.trim() || status === 'sending'}
                 className={cn(
-                  "absolute right-1.5 top-1.5 h-9",
+                  "absolute right-1.5 top-1.5 h-9 rounded-lg",
                   status === 'success' 
                     ? "bg-emerald-500 hover:bg-emerald-600" 
-                    : "bg-indigo-500 hover:bg-indigo-600"
+                    : "bg-violet-500 hover:bg-violet-600"
                 )}
               >
                 {status === 'sending' ? (
@@ -130,7 +130,7 @@ export default function AddFriendModal({ isOpen, onClose, onSendRequest }) {
         </div>
 
         {/* Tip */}
-        <div className="px-6 py-4 bg-zinc-900/50 border-t border-zinc-800">
+        <div className="px-6 py-4 bg-zinc-800/30 border-t border-zinc-800/50">
           <p className="text-xs text-zinc-500 text-center">
             💡 Tip: You can also right-click on a user to add them as a friend
           </p>
