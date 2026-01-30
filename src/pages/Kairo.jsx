@@ -1133,19 +1133,24 @@ export default function KairoPage() {
       ) : view === 'server' && activeChannel ? (
           activeChannel.type === 'voice' || activeChannel.type === 'stage' ? (
             <VoiceChannel
-              channel={activeChannel}
-              participants={voiceStates.filter(v => v.channel_id === activeChannel.id)}
-              currentUserId={currentUser?.id}
-              isMuted={isMuted}
-              isDeafened={isDeafened}
-              isVideo={isVideo}
-              isScreenSharing={isStreaming}
-              onToggleMute={() => setIsMuted(!isMuted)}
-              onToggleDeafen={() => setIsDeafened(!isDeafened)}
-              onToggleVideo={() => setIsVideo(!isVideo)}
-              onToggleScreenShare={() => setIsStreaming(!isStreaming)}
-              onLeave={handleVoiceDisconnect}
-            />
+                  channel={activeChannel}
+                  server={activeServer}
+                  participants={voiceStates.filter(v => v.channel_id === activeChannel.id)}
+                  currentUser={userProfile || currentUser}
+                  onLeave={handleVoiceDisconnect}
+                  onUpdateVoiceState={async (state) => {
+                    setIsMuted(state.is_self_muted ?? isMuted);
+                    setIsDeafened(state.is_self_deafened ?? isDeafened);
+                    setIsVideo(state.is_video ?? isVideo);
+                    setIsStreaming(state.is_streaming ?? isStreaming);
+                    // Update voice state in DB
+                    const existingState = voiceStates.find(v => v.user_id === currentUser.id && v.channel_id === activeChannel.id);
+                    if (existingState) {
+                      await base44.entities.VoiceState.update(existingState.id, state);
+                      queryClient.invalidateQueries({ queryKey: ['voiceStates'] });
+                    }
+                  }}
+                />
           ) : (
             <>
               <ChannelHeader 
