@@ -32,12 +32,12 @@ function MemberItem({ member, isOwner, highestRole, onMessage, onProfile }) {
   return (
     <ContextMenu>
       <ContextMenuTrigger>
-        <HoverCard openDelay={500}>
+        <HoverCard openDelay={400}>
           <HoverCardTrigger asChild>
-            <button className="w-full flex items-center gap-3 px-3 py-2 rounded-xl cursor-pointer hover:bg-zinc-800/50 transition-colors group text-left">
+            <button className="w-full flex items-center gap-3 px-2.5 py-2 rounded-2xl cursor-pointer hover:bg-zinc-800/60 transition-all group text-left">
               {/* Avatar with status */}
               <div className="relative flex-shrink-0">
-                <div className="w-9 h-9 rounded-xl overflow-hidden bg-zinc-700">
+                <div className="w-10 h-10 rounded-2xl overflow-hidden bg-zinc-700 ring-2 ring-transparent group-hover:ring-zinc-700/50 transition-all">
                   {member.avatar_override || member.user_avatar ? (
                     <img 
                       src={member.avatar_override || member.user_avatar} 
@@ -45,39 +45,44 @@ function MemberItem({ member, isOwner, highestRole, onMessage, onProfile }) {
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-violet-500 to-indigo-600 text-white text-sm font-medium">
+                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-violet-500 to-indigo-600 text-white text-sm font-bold">
                       {(member.nickname || member.user_name)?.charAt(0)}
                     </div>
                   )}
                 </div>
                 <div className={cn(
-                  "absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-zinc-900",
+                  "absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-[3px] border-zinc-900",
                   statusColors[member.status] || statusColors.offline
                 )} />
               </div>
 
               {/* Name */}
-              <div className="flex-1 min-w-0 flex items-center gap-1.5">
-                <span 
-                  className="text-[13px] font-medium truncate"
-                  style={{ color: roleColor }}
-                >
-                  {member.nickname || member.user_name}
-                </span>
-                <UserBadges 
-                  badges={member.badges} 
-                  size="xs"
-                  showYoutube={member.youtube_show_icon}
-                  youtubeUrl={member.youtube_url}
-                />
-                {isOwner && (
-                  <Crown className="w-3.5 h-3.5 text-amber-400 flex-shrink-0" />
-                )}
-                {highestRole?.name === 'Admin' && !isOwner && (
-                  <ShieldCheck className="w-3.5 h-3.5 text-violet-400 flex-shrink-0" />
-                )}
-                {highestRole?.name === 'Moderator' && (
-                  <Shield className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" />
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-1.5">
+                  <span 
+                    className="text-sm font-semibold truncate"
+                    style={{ color: roleColor }}
+                  >
+                    {member.nickname || member.user_name}
+                  </span>
+                  <UserBadges 
+                    badges={member.badges} 
+                    size="xs"
+                    showYoutube={member.youtube_show_icon}
+                    youtubeUrl={member.youtube_url}
+                  />
+                  {isOwner && (
+                    <Crown className="w-3.5 h-3.5 text-amber-400 flex-shrink-0" />
+                  )}
+                  {highestRole?.name === 'Admin' && !isOwner && (
+                    <ShieldCheck className="w-3.5 h-3.5 text-violet-400 flex-shrink-0" />
+                  )}
+                  {highestRole?.name === 'Moderator' && (
+                    <Shield className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" />
+                  )}
+                </div>
+                {member.custom_status?.text && (
+                  <p className="text-[11px] text-zinc-500 truncate mt-0.5">{member.custom_status.text}</p>
                 )}
               </div>
             </button>
@@ -237,11 +242,20 @@ export default function MemberList({
   }, [members, roles]);
 
   return (
-    <div className="w-60 h-full bg-zinc-900/30 border-l border-zinc-800/30 overflow-y-auto scrollbar-thin">
-      <div className="p-3">
+    <div className="w-64 h-full bg-gradient-to-b from-zinc-900/50 to-zinc-900/30 border-l border-zinc-800/20 overflow-y-auto scrollbar-thin">
+      {/* Header */}
+      <div className="sticky top-0 z-10 p-4 bg-zinc-900/80 backdrop-blur-xl border-b border-zinc-800/30">
+        <h2 className="text-xs font-bold uppercase tracking-widest text-zinc-500">Members — {members.length}</h2>
+      </div>
+      
+      <div className="p-3 space-y-6">
         {groupedMembers.map((group) => (
-          <div key={group.role.id} className="mb-4">
-            <h3 className="px-3 mb-2 text-[11px] font-semibold uppercase tracking-wider text-zinc-500">
+          <div key={group.role.id}>
+            <h3 className="px-2 mb-2 text-[10px] font-bold uppercase tracking-widest text-zinc-600 flex items-center gap-2">
+              <span 
+                className="w-2 h-2 rounded-full"
+                style={{ backgroundColor: group.role.color || (group.role.id === 'online' ? '#10b981' : '#52525b') }}
+              />
               {group.role.name} — {group.members.length}
             </h3>
             <div className="space-y-0.5">

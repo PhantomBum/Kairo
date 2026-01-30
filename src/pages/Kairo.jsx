@@ -978,6 +978,8 @@ function KairoPageContent() {
       }
     };
     const handleOpenSearch = () => setShowGlobalSearch(true);
+    const handleShowSoundboard = () => setShowSoundboard(true);
+    const handleShowNotes = () => setShowQuickNotes(!showQuickNotes);
     
     const handleDeleteChannel = async (e) => {
       const channel = e.detail;
@@ -1002,6 +1004,8 @@ function KairoPageContent() {
     window.addEventListener('kairo:update-status', handleUpdateStatus);
     window.addEventListener('kairo:open-search', handleOpenSearch);
     window.addEventListener('kairo:delete-channel', handleDeleteChannel);
+    window.addEventListener('kairo:show-soundboard', handleShowSoundboard);
+    window.addEventListener('kairo:show-notes', handleShowNotes);
 
     return () => {
       window.removeEventListener('kairo:show-apps', handleShowApps);
@@ -1012,8 +1016,10 @@ function KairoPageContent() {
       window.removeEventListener('kairo:update-status', handleUpdateStatus);
       window.removeEventListener('kairo:open-search', handleOpenSearch);
       window.removeEventListener('kairo:delete-channel', handleDeleteChannel);
+      window.removeEventListener('kairo:show-soundboard', handleShowSoundboard);
+      window.removeEventListener('kairo:show-notes', handleShowNotes);
     };
-  }, [activeServer, currentUser, userProfile, activeChannel]);
+  }, [activeServer, currentUser, userProfile, activeChannel, showQuickNotes]);
 
   const handleCommandPaletteCommand = (cmd) => {
     switch (cmd.id) {
