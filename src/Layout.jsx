@@ -88,11 +88,16 @@ export default function Layout({ children }) {
           outline-offset: 2px;
         }
 
-        /* Smooth transitions */
+        /* Smooth transitions - optimized */
         * {
-          transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
+          transition-property: color, background-color, border-color, opacity, transform;
           transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-          transition-duration: 150ms;
+          transition-duration: 120ms;
+        }
+
+        /* Smooth scrolling */
+        html {
+          scroll-behavior: smooth;
         }
 
         /* Remove transitions for reduced motion */
@@ -102,6 +107,26 @@ export default function Layout({ children }) {
             animation-iteration-count: 1 !important;
             transition-duration: 0.01ms !important;
           }
+          html {
+            scroll-behavior: auto;
+          }
+        }
+
+        /* Performance optimizations */
+        .scroll-smooth {
+          scroll-behavior: smooth;
+        }
+
+        /* Hardware acceleration for animations */
+        .will-change-transform {
+          will-change: transform;
+        }
+
+        /* Improved text rendering */
+        body {
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+          text-rendering: optimizeLegibility;
         }
       `}</style>
       {children}
