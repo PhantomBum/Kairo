@@ -284,6 +284,6 @@ export default function MessageInput({
           )}
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 }
