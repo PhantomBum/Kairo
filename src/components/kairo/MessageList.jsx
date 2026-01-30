@@ -98,7 +98,12 @@ function MessageActions({ message, onReply, onEdit, onDelete, onReact, onPin, is
             <Tooltip>
               <TooltipTrigger asChild>
                 <button 
-                  onClick={() => onEdit?.(message)}
+                  onClick={() => {
+                    const newContent = prompt('Edit message:', message.content);
+                    if (newContent && newContent !== message.content) {
+                      onEdit?.(message, newContent);
+                    }
+                  }}
                   className="p-2 hover:bg-zinc-800 rounded-lg text-zinc-400 hover:text-white transition-colors"
                 >
                   <Pencil className="w-4 h-4" />
