@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { X, Server, Shield, Code, Webhook, Zap } from 'lucide-react';
+import { X, Server, Shield, Code, Webhook, Zap, DollarSign } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
 import RoleManager from './roles/RoleManager';
 import WebhookManager from './apps/WebhookManager';
 import AppMarketplace from './apps/AppMarketplace';
+import ServerSubscriptionManager from './shop/ServerSubscriptionManager';
 
 export default function ServerSettingsModal({ server, currentUser, channels, onClose }) {
   const [activeTab, setActiveTab] = useState('overview');
@@ -51,6 +53,10 @@ export default function ServerSettingsModal({ server, currentUser, channels, onC
                 <Zap className="w-4 h-4 mr-2" />
                 Server Boosts
               </TabsTrigger>
+              <TabsTrigger value="subscriptions" className="w-full justify-start">
+                <DollarSign className="w-4 h-4 mr-2" />
+                Subscriptions
+              </TabsTrigger>
             </TabsList>
 
             <div className="flex-1 overflow-y-auto p-6">
@@ -86,6 +92,10 @@ export default function ServerSettingsModal({ server, currentUser, channels, onC
                   <h3 className="text-lg font-bold text-white">Server Boosts</h3>
                   <p className="text-zinc-400">View active boosts and boost analytics.</p>
                 </div>
+              </TabsContent>
+
+              <TabsContent value="subscriptions">
+                <ServerSubscriptionManager server={server} currentUser={currentUser} />
               </TabsContent>
             </div>
           </Tabs>
