@@ -293,7 +293,7 @@ export default function KairoPage() {
   });
 
   // Fetch servers user is member of - optimized
-  const { data: memberServers = [], isLoading: serversLoading } = useQuery({
+  const { data: memberServers = [], isLoading: serversLoading, refetch: refetchServers } = useQuery({
     queryKey: ['memberServers', currentUser?.user_id, currentUser?.id, currentUser?.user_email],
     queryFn: async () => {
       if (!currentUser) return [];
@@ -310,6 +310,8 @@ export default function KairoPage() {
         base44.entities.ServerMember.list()
       ]);
 
+      console.log('[SERVER FETCH] All servers:', allServers.length, 'All memberships:', allMemberships.length);
+
       // Find memberships for this user (check all possible identifiers)
       const myMemberships = allMemberships.filter(m => 
         m.user_id === profileRecordId || 
@@ -317,7 +319,7 @@ export default function KairoPage() {
         m.user_email === userEmail
       );
 
-      console.log('[SERVER FETCH] myMemberships found:', myMemberships.length);
+      console.log('[SERVER FETCH] myMemberships found:', myMemberships.length, myMemberships.map(m => m.server_id));
 
       // Get server IDs from memberships
       const memberServerIds = new Set(myMemberships.map(m => m.server_id));
@@ -334,8 +336,8 @@ export default function KairoPage() {
       return myServers;
     },
     enabled: !!currentUser,
-    staleTime: 10000,
-    refetchInterval: false
+    staleTime: 5000,
+    refetchOnMount: true
   });
 
   // Debug logging for servers
