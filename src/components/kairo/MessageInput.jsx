@@ -107,7 +107,7 @@ export default function MessageInput({
   };
 
   return (
-    <div className="px-4 pb-6 pt-2">
+    <div className="px-2 md:px-4 pb-4 md:pb-6 pt-2">
       {/* Reply preview */}
       <AnimatePresence>
         {replyTo && (
@@ -253,14 +253,14 @@ export default function MessageInput({
         />
 
         {/* Actions */}
-        <div className="flex items-center gap-0.5 p-2">
-          {/* GIF picker */}
+        <div className="flex items-center gap-0.5 p-1.5 md:p-2">
+          {/* GIF picker - hidden on mobile */}
           <Popover open={showGifPicker} onOpenChange={setShowGifPicker}>
             <PopoverTrigger asChild>
               <motion.button 
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
-                className="p-2.5 hover:bg-zinc-700/50 rounded-xl transition-colors text-zinc-400 hover:text-zinc-200"
+                className="hidden sm:flex p-2 md:p-2.5 hover:bg-zinc-700/50 rounded-xl transition-colors text-zinc-400 hover:text-zinc-200"
               >
                 <Gift className="w-5 h-5" />
               </motion.button>
@@ -270,13 +270,13 @@ export default function MessageInput({
             </PopoverContent>
           </Popover>
 
-          {/* Sticker picker */}
+          {/* Sticker picker - hidden on mobile */}
           <Popover open={showStickerPicker} onOpenChange={setShowStickerPicker}>
             <PopoverTrigger asChild>
               <motion.button 
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
-                className="p-2.5 hover:bg-zinc-700/50 rounded-xl transition-colors text-zinc-400 hover:text-zinc-200"
+                className="hidden sm:flex p-2 md:p-2.5 hover:bg-zinc-700/50 rounded-xl transition-colors text-zinc-400 hover:text-zinc-200"
               >
                 <Sticker className="w-5 h-5" />
               </motion.button>
@@ -292,7 +292,7 @@ export default function MessageInput({
               <motion.button 
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
-                className="p-2.5 hover:bg-zinc-700/50 rounded-xl transition-colors text-zinc-400 hover:text-zinc-200"
+                className="p-2 md:p-2.5 hover:bg-zinc-700/50 rounded-xl transition-colors text-zinc-400 hover:text-zinc-200"
               >
                 <Smile className="w-5 h-5" />
               </motion.button>
@@ -321,7 +321,7 @@ export default function MessageInput({
             onClick={handleSend}
             disabled={disabled || uploadProgress !== null || (!content.trim() && files.length === 0)}
             className={cn(
-              "p-2.5 rounded-xl transition-all ml-1",
+              "p-2 md:p-2.5 rounded-xl transition-all ml-1",
               (content.trim() || files.length > 0)
                 ? "bg-gradient-to-r from-violet-500 to-indigo-600 text-white shadow-lg shadow-violet-500/30"
                 : "bg-zinc-700/50 text-zinc-500 cursor-not-allowed"

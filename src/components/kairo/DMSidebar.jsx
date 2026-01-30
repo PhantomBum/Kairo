@@ -222,7 +222,7 @@ export default function DMSidebar({
   );
 
   return (
-    <div className="w-64 h-full bg-zinc-900/50 flex flex-col border-r border-zinc-800/30">
+    <div className="w-[280px] md:w-64 h-full bg-zinc-900/50 flex flex-col border-r border-zinc-800/30">
       {/* Header */}
       <div className="p-4">
         <div className="relative">

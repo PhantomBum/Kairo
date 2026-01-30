@@ -214,7 +214,7 @@ export default function ChannelSidebar({
   const uncategorizedChannels = channels.filter(c => !c.category_id);
 
   return (
-    <div className="w-72 h-full bg-gradient-to-b from-zinc-900/70 to-zinc-900/50 flex flex-col border-r border-zinc-800/20 relative overflow-hidden">
+    <div className="w-[280px] md:w-72 h-full bg-gradient-to-b from-zinc-900/70 to-zinc-900/50 flex flex-col border-r border-zinc-800/20 relative overflow-hidden">
       {/* Subtle gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-br from-violet-500/[0.02] to-indigo-500/[0.02] pointer-events-none" />
       

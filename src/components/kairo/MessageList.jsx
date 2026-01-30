@@ -55,7 +55,7 @@ function DateDivider({ date }) {
 
 function MessageActions({ message, onReply, onEditClick, onDelete, onReact, onPin, isOwn }) {
   return (
-    <div className="absolute -top-3 right-4 opacity-0 group-hover:opacity-100 transition-all">
+    <div className="absolute -top-3 right-2 md:right-4 opacity-0 group-hover:opacity-100 transition-all">
       <div className="flex items-center bg-zinc-900/95 backdrop-blur-xl border border-zinc-800/80 rounded-xl shadow-xl p-1 gap-0.5">
         <Popover>
           <PopoverTrigger asChild>
@@ -167,8 +167,8 @@ function MessageItem({ message, showHeader, onReply, onEditClick, onDelete, onRe
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.15 }}
           className={cn(
-            "group relative px-4 py-1.5 hover:bg-zinc-800/30 transition-all rounded-2xl mx-2",
-            showHeader && "mt-5 pt-3",
+            "group relative px-2 md:px-4 py-1.5 hover:bg-zinc-800/30 transition-all rounded-2xl mx-1 md:mx-2",
+            showHeader && "mt-4 md:mt-5 pt-2 md:pt-3",
             message.is_pinned && "bg-amber-500/5 border-l-2 border-amber-500/50"
           )}
         >
@@ -183,24 +183,24 @@ function MessageItem({ message, showHeader, onReply, onEditClick, onDelete, onRe
             </div>
           )}
 
-          <div className="flex gap-3.5">
+          <div className="flex gap-2 md:gap-3.5">
             {/* Avatar */}
             {showHeader ? (
               <motion.div 
                 whileHover={{ scale: 1.05 }}
-                className="w-11 h-11 rounded-2xl bg-gradient-to-br from-violet-500 to-indigo-600 overflow-hidden flex-shrink-0 cursor-pointer shadow-lg ring-2 ring-transparent hover:ring-violet-500/30 transition-all"
+                className="w-9 h-9 md:w-11 md:h-11 rounded-xl md:rounded-2xl bg-gradient-to-br from-violet-500 to-indigo-600 overflow-hidden flex-shrink-0 cursor-pointer shadow-lg ring-2 ring-transparent hover:ring-violet-500/30 transition-all"
               >
                 {message.author_avatar ? (
                   <img src={message.author_avatar} alt="" className="w-full h-full object-cover" />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center text-white font-bold">
+                  <div className="w-full h-full flex items-center justify-center text-white font-bold text-sm md:text-base">
                     {message.author_name?.charAt(0) || '?'}
                   </div>
                 )}
               </motion.div>
             ) : (
-              <div className="w-11 flex-shrink-0 flex items-center justify-center">
-                <span className="text-[10px] text-zinc-600 opacity-0 group-hover:opacity-100 transition-opacity font-medium">
+              <div className="w-9 md:w-11 flex-shrink-0 flex items-center justify-center">
+                <span className="text-[9px] md:text-[10px] text-zinc-600 opacity-0 group-hover:opacity-100 transition-opacity font-medium">
                   {format(new Date(message.created_date), 'h:mm')}
                 </span>
               </div>
@@ -234,7 +234,7 @@ function MessageItem({ message, showHeader, onReply, onEditClick, onDelete, onRe
                 </div>
               )}
               
-              <div className="text-zinc-300 break-words whitespace-pre-wrap text-[15px] leading-relaxed">
+              <div className="text-zinc-300 break-words whitespace-pre-wrap text-[14px] md:text-[15px] leading-relaxed">
                 {message.content}
               </div>
 

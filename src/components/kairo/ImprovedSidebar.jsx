@@ -17,7 +17,12 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-function ServerItem({ server, isActive, onClick, isCollapsed, onLeave }) {
+function ServerItem({ server, isActive, onClick, isCollapsed, onLeave, onMobileClose }) {
+  const handleClick = () => {
+    onClick?.();
+    onMobileClose?.();
+  };
+
   return (
     <ContextMenu>
       <ContextMenuTrigger>
@@ -25,7 +30,7 @@ function ServerItem({ server, isActive, onClick, isCollapsed, onLeave }) {
           <Tooltip>
             <TooltipTrigger asChild>
               <motion.button
-                onClick={onClick}
+                onClick={handleClick}
                 whileHover={{ scale: 1.01 }}
                 whileTap={{ scale: 0.99 }}
                 className={cn(
@@ -104,13 +109,18 @@ function ServerItem({ server, isActive, onClick, isCollapsed, onLeave }) {
   );
 }
 
-function NavButton({ icon: Icon, label, onClick, isActive, badge, isCollapsed, shortcut }) {
+function NavButton({ icon: Icon, label, onClick, isActive, badge, isCollapsed, shortcut, onMobileClose }) {
+  const handleClick = () => {
+    onClick?.();
+    onMobileClose?.();
+  };
+
   return (
     <TooltipProvider delayDuration={isCollapsed ? 100 : 1000}>
       <Tooltip>
         <TooltipTrigger asChild>
           <motion.button
-            onClick={onClick}
+            onClick={handleClick}
             whileHover={{ x: 1 }}
             whileTap={{ scale: 0.99 }}
             className={cn(
@@ -128,7 +138,7 @@ function NavButton({ icon: Icon, label, onClick, isActive, badge, isCollapsed, s
             </div>
             {!isCollapsed && <span className="text-sm font-medium">{label}</span>}
             {!isCollapsed && shortcut && (
-              <span className="ml-auto text-[10px] text-zinc-600 bg-white/5 px-1.5 py-0.5 rounded-md">{shortcut}</span>
+              <span className="ml-auto text-[10px] text-zinc-600 bg-white/5 px-1.5 py-0.5 rounded-md hidden md:inline">{shortcut}</span>
             )}
             {badge > 0 && (
               <motion.div 
@@ -184,7 +194,8 @@ export default function ImprovedSidebar({
   userProfile,
   unreadDMs = 0,
   notifications = [],
-  hasNewUpdates = false
+  hasNewUpdates = false,
+  onMobileClose
 }) {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
@@ -193,7 +204,7 @@ export default function ImprovedSidebar({
       initial={false}
       animate={{ width: isCollapsed ? 80 : 280 }}
       transition={{ duration: 0.2, ease: 'easeOut' }}
-      className="h-full bg-[#050506] flex flex-col border-r border-white/5 relative overflow-hidden"
+      className="h-full bg-[#050506] flex flex-col border-r border-white/5 relative overflow-hidden w-[280px] md:w-auto"
     >
       {/* Subtle grid pattern */}
       <div className="absolute inset-0 pointer-events-none opacity-[0.02]" style={{
@@ -222,7 +233,7 @@ export default function ImprovedSidebar({
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={() => setIsCollapsed(!isCollapsed)}
-          className="text-zinc-600 hover:text-white p-2 rounded-lg hover:bg-white/5 transition-colors"
+          className="hidden md:flex text-zinc-600 hover:text-white p-2 rounded-lg hover:bg-white/5 transition-colors"
         >
           {isCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
         </motion.button>
@@ -274,9 +285,9 @@ export default function ImprovedSidebar({
 
       {/* Navigation */}
       <div className="px-3 py-2 space-y-1">
-        <NavButton icon={MessageCircle} label="Messages" onClick={onDMsClick} isActive={isDMsActive} badge={unreadDMs} isCollapsed={isCollapsed} shortcut="⌘D" />
-        <NavButton icon={Users} label="Friends" onClick={onFriendsClick} isCollapsed={isCollapsed} />
-        <NavButton icon={Compass} label="Discover" onClick={onDiscoverClick} isCollapsed={isCollapsed} />
+        <NavButton icon={MessageCircle} label="Messages" onClick={onDMsClick} isActive={isDMsActive} badge={unreadDMs} isCollapsed={isCollapsed} shortcut="⌘D" onMobileClose={onMobileClose} />
+        <NavButton icon={Users} label="Friends" onClick={onFriendsClick} isCollapsed={isCollapsed} onMobileClose={onMobileClose} />
+        <NavButton icon={Compass} label="Discover" onClick={onDiscoverClick} isCollapsed={isCollapsed} onMobileClose={onMobileClose} />
       </div>
       
       {/* Quick Actions */}
@@ -333,10 +344,11 @@ export default function ImprovedSidebar({
                   onClick={() => onServerSelect(server)}
                   isCollapsed={isCollapsed}
                   onLeave={onLeaveServer}
+                  onMobileClose={onMobileClose}
                 />
               </motion.div>
             ))}
-          </AnimatePresence>
+            </AnimatePresence>
         </div>
         {servers.length === 0 && !isCollapsed && (
           <motion.div 
@@ -363,16 +375,17 @@ export default function ImprovedSidebar({
 
       {/* Bottom Actions */}
       <div className="relative p-3 border-t border-white/5 space-y-1">
-        <NavButton icon={ShoppingBag} label="Shop" onClick={onShopClick} isCollapsed={isCollapsed} />
-        <NavButton icon={Bell} label="Notifications" onClick={onNotificationsClick} badge={notifications.length} isCollapsed={isCollapsed} />
+        <NavButton icon={ShoppingBag} label="Shop" onClick={onShopClick} isCollapsed={isCollapsed} onMobileClose={onMobileClose} />
+        <NavButton icon={Bell} label="Notifications" onClick={onNotificationsClick} badge={notifications.length} isCollapsed={isCollapsed} onMobileClose={onMobileClose} />
         <NavButton 
           icon={Sparkles} 
           label="What's New" 
           onClick={onUpdateLogsClick} 
           badge={hasNewUpdates ? 1 : 0}
-          isCollapsed={isCollapsed} 
+          isCollapsed={isCollapsed}
+          onMobileClose={onMobileClose}
         />
-        <NavButton icon={Settings} label="Settings" onClick={onSettingsClick} isCollapsed={isCollapsed} shortcut="⌘," />
+        <NavButton icon={Settings} label="Settings" onClick={onSettingsClick} isCollapsed={isCollapsed} shortcut="⌘," onMobileClose={onMobileClose} />
       </div>
     </motion.div>
   );
