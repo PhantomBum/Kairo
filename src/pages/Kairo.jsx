@@ -293,36 +293,49 @@ export default function KairoPage() {
   });
 
   // Fetch servers user is member of - optimized
-  // Data shows: ServerMember stores UserProfile record id (like '697bf1c181ba667e2483175a') in user_id
-  // Server.owner_id also uses UserProfile record id or user_id field depending on creation
   const { data: memberServers = [], isLoading: serversLoading } = useQuery({
-    queryKey: ['memberServers', currentUser?.user_id, currentUser?.id],
+    queryKey: ['memberServers', currentUser?.user_id, currentUser?.id, currentUser?.user_email],
     queryFn: async () => {
       if (!currentUser) return [];
       
-      // We need to check BOTH the record id AND the user_id field since different code paths use different values
-      const profileRecordId = currentUser.id; // The UserProfile record id (like '697bf1c181ba667e2483175a')
-      const profileUserId = currentUser.user_id; // The user_id field (like 'user_xxx')
+      const profileRecordId = currentUser.id;
+      const profileUserId = currentUser.user_id;
+      const userEmail = currentUser.user_email || currentUser.email;
       
-      console.log('[SERVER FETCH] profileRecordId:', profileRecordId, 'profileUserId:', profileUserId);
+      console.log('[SERVER FETCH] Looking for:', { profileRecordId, profileUserId, userEmail });
       
-      // Find memberships by BOTH ids (some records use record id, some use user_id)
+      // Find memberships by ALL possible identifiers
       let memberships = [];
+      
+      // By record id
       if (profileRecordId) {
         const m1 = await base44.entities.ServerMember.filter({ user_id: profileRecordId });
         memberships = [...m1];
       }
+      
+      // By user_id field
       if (profileUserId && profileUserId !== profileRecordId) {
         const m2 = await base44.entities.ServerMember.filter({ user_id: profileUserId });
         memberships = [...memberships, ...m2];
       }
       
-      console.log('[SERVER FETCH] total memberships found:', memberships.length);
+      // By email (most reliable since it's always set)
+      if (userEmail) {
+        const m3 = await base44.entities.ServerMember.filter({ user_email: userEmail });
+        // Deduplicate
+        m3.forEach(m => {
+          if (!memberships.find(existing => existing.id === m.id)) {
+            memberships.push(m);
+          }
+        });
+      }
+      
+      console.log('[SERVER FETCH] memberships found:', memberships.length);
       
       // Get servers from memberships
       let serverIds = [...new Set(memberships.map(m => m.server_id))];
       
-      // Also check for servers owned by this user (check both ids)
+      // Also check for servers owned by this user
       let ownedServers = [];
       if (profileRecordId) {
         const o1 = await base44.entities.Server.filter({ owner_id: profileRecordId });
@@ -333,7 +346,7 @@ export default function KairoPage() {
         ownedServers = [...ownedServers, ...o2];
       }
       
-      console.log('[SERVER FETCH] total ownedServers found:', ownedServers.length);
+      console.log('[SERVER FETCH] ownedServers found:', ownedServers.length);
       
       // Combine owned server IDs
       ownedServers.forEach(s => {
