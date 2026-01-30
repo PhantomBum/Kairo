@@ -542,9 +542,13 @@ export default function KairoPage() {
       return server;
     },
     onSuccess: async (server) => {
+      console.log('[CREATE SERVER] Success, refetching servers...');
       // Force immediate refetch of servers
       await queryClient.invalidateQueries({ queryKey: ['memberServers'] });
-      await queryClient.refetchQueries({ queryKey: ['memberServers'] });
+      // Add small delay then refetch to ensure DB is updated
+      setTimeout(async () => {
+        await queryClient.refetchQueries({ queryKey: ['memberServers'] });
+      }, 500);
       setShowCreateServer(false);
       setActiveServer(server);
       setView('server');
