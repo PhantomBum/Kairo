@@ -259,9 +259,9 @@ export default function ChannelSidebar({
       </DropdownMenu>
 
       {/* Channels list */}
-      <ContextMenu>
-        <ContextMenuTrigger>
-          <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-zinc-700 scrollbar-track-transparent py-2">
+      <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-zinc-700 scrollbar-track-transparent py-2">
+        <ContextMenu>
+          <ContextMenuTrigger className="h-full">
         {/* Uncategorized channels */}
         {uncategorizedChannels.map((channel) => (
           <ChannelItem

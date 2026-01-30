@@ -245,6 +245,15 @@ export default function KairoPage() {
     enabled: !!currentUser?.email
   });
 
+  // Auto-add premium badge if user has nitro
+  useEffect(() => {
+    if (userCredits?.has_nitro && userProfile?.id && !userProfile?.badges?.includes('premium')) {
+      updateProfileMutation.mutate({
+        badges: [...new Set([...(userProfile.badges || []), 'premium'])]
+      });
+    }
+  }, [userCredits?.has_nitro, userProfile?.id, userProfile?.badges]);
+
   // Fetch user inventory
   const { data: userInventory = [] } = useQuery({
     queryKey: ['userInventory', currentUser?.id],
@@ -894,7 +903,17 @@ export default function KairoPage() {
                   <TypingIndicator typingUsers={typingUsers} className="px-4" />
                   <MessageInput channelName={activeChannel?.name} replyTo={replyTo} onCancelReply={() => setReplyTo(null)} onSendMessage={(data) => sendMessageMutation.mutate(data)} onTyping={sendTypingIndicator} />
                 </div>
-                {showMembers && <MemberList members={members.map(m => ({ ...m, user_name: m.nickname || m.user_email?.split('@')[0], status: 'online' }))} roles={roles} ownerId={activeServer?.owner_id} />}
+                {showMembers && <MemberList members={members.map(m => {
+                const memberProfile = m.user_id === currentUser?.id ? userProfile : null;
+                return {
+                  ...m,
+                  user_name: m.nickname || m.user_email?.split('@')[0],
+                  status: 'online',
+                  badges: memberProfile?.badges || [],
+                  youtube_url: memberProfile?.youtube_channel?.url,
+                  youtube_show_icon: memberProfile?.youtube_channel?.show_icon
+                };
+              })} roles={roles} ownerId={activeServer?.owner_id} />}
               </div>
             </>
           )
