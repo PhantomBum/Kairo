@@ -34,11 +34,11 @@ function FriendRequestCard({ request, type, onAccept, onDecline }) {
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -10 }}
-      className="flex items-center justify-between p-3 bg-zinc-800/30 rounded-xl hover:bg-zinc-800/50 transition-colors"
+      className="flex items-center justify-between p-4 bg-[#111113] hover:bg-[#161618] transition-colors border-b border-white/5"
     >
       <div className="flex items-center gap-3">
         <div className="relative">
-        <div className="w-10 h-10 rounded-xl overflow-hidden bg-zinc-700">
+        <div className="w-10 h-10 rounded-full overflow-hidden bg-zinc-800">
           {friend.friend_avatar ? (
             <img src={friend.friend_avatar} alt="" className="w-full h-full object-cover" />
           ) : (
@@ -62,7 +62,7 @@ function FriendRequestCard({ request, type, onAccept, onDecline }) {
             <Button
               size="icon"
               onClick={() => onAccept?.(request)}
-              className="w-9 h-9 bg-violet-500 hover:bg-violet-600 rounded-xl"
+              className="w-9 h-9 bg-emerald-600 hover:bg-emerald-700 rounded-lg"
             >
               <Check className="w-4 h-4" />
             </Button>
@@ -70,7 +70,7 @@ function FriendRequestCard({ request, type, onAccept, onDecline }) {
               size="icon"
               variant="ghost"
               onClick={() => onDecline?.(request)}
-              className="w-9 h-9 text-zinc-400 hover:text-red-400 hover:bg-red-500/10"
+              className="w-9 h-9 text-zinc-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg"
             >
               <X className="w-4 h-4" />
             </Button>
@@ -96,11 +96,11 @@ function FriendCard({ friend, onMessage, onRemove, onBlock }) {
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="flex items-center justify-between p-3 bg-zinc-800/30 rounded-xl hover:bg-zinc-800/50 transition-colors group"
+      className="flex items-center justify-between p-4 bg-[#111113] hover:bg-[#161618] transition-colors border-b border-white/5 group"
     >
       <div className="flex items-center gap-3">
         <div className="relative">
-          <div className="w-10 h-10 rounded-xl overflow-hidden bg-zinc-700">
+          <div className="w-10 h-10 rounded-full overflow-hidden bg-zinc-800">
             {friend.friend_avatar ? (
               <img src={friend.friend_avatar} alt="" className="w-full h-full object-cover" />
             ) : (
@@ -110,12 +110,12 @@ function FriendCard({ friend, onMessage, onRemove, onBlock }) {
             )}
           </div>
           <div className={cn(
-            "absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-2 border-zinc-900",
+            "absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-[#111113]",
             statusColors[friend.status] || statusColors.offline
           )} />
         </div>
         <div>
-          <p className="font-medium text-white">{friend.friend_name}</p>
+          <p className="font-medium text-white text-sm">{friend.friend_name}</p>
           <p className="text-xs text-zinc-500 capitalize">{friend.status || 'Offline'}</p>
         </div>
       </div>
@@ -125,7 +125,7 @@ function FriendCard({ friend, onMessage, onRemove, onBlock }) {
           size="icon"
           variant="ghost"
           onClick={() => onMessage?.(friend)}
-          className="w-9 h-9 text-zinc-400 hover:text-white hover:bg-zinc-700 rounded-xl"
+          className="w-8 h-8 text-zinc-400 hover:text-white hover:bg-white/5 rounded-lg"
         >
           <MessageCircle className="w-4 h-4" />
         </Button>
@@ -134,31 +134,31 @@ function FriendCard({ friend, onMessage, onRemove, onBlock }) {
             <Button
               size="icon"
               variant="ghost"
-              className="w-9 h-9 text-zinc-400 hover:text-white hover:bg-zinc-700 rounded-xl"
+              className="w-8 h-8 text-zinc-400 hover:text-white hover:bg-white/5 rounded-lg"
             >
               <MoreHorizontal className="w-4 h-4" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-40 bg-zinc-900/95 backdrop-blur-xl border-zinc-800/50 rounded-xl">
+          <DropdownMenuContent className="w-40 bg-[#0a0a0b] border-white/10 rounded-lg">
             <DropdownMenuItem 
               onClick={() => onMessage?.(friend)}
-              className="text-zinc-300 focus:bg-zinc-800"
+              className="text-zinc-300 focus:bg-white/5 focus:text-white"
             >
               Message
             </DropdownMenuItem>
-            <DropdownMenuItem className="text-zinc-300 focus:bg-zinc-800">
+            <DropdownMenuItem className="text-zinc-300 focus:bg-white/5 focus:text-white">
               View Profile
             </DropdownMenuItem>
-            <DropdownMenuSeparator className="bg-zinc-800" />
+            <DropdownMenuSeparator className="bg-white/5" />
             <DropdownMenuItem 
               onClick={() => onRemove?.(friend)}
-              className="text-red-400 focus:bg-red-500/20"
+              className="text-red-400 focus:bg-red-500/10"
             >
               Remove Friend
             </DropdownMenuItem>
             <DropdownMenuItem 
               onClick={() => onBlock?.(friend)}
-              className="text-red-400 focus:bg-red-500/20"
+              className="text-red-400 focus:bg-red-500/10"
             >
               Block
             </DropdownMenuItem>
@@ -172,7 +172,7 @@ function FriendCard({ friend, onMessage, onRemove, onBlock }) {
 // Main Friend System Component
 export default function FriendSystem({ currentUser, onStartDM, onAddFriend }) {
   const queryClient = useQueryClient();
-  const [view, setView] = useState('all'); // all, pending, blocked
+  const [view, setView] = useState('online'); // online, all, pending, blocked, info
   const [searchQuery, setSearchQuery] = useState('');
 
   // Fetch friends
@@ -265,37 +265,37 @@ export default function FriendSystem({ currentUser, onStartDM, onAddFriend }) {
   const onlineFriends = filteredFriends.filter(f => f.status === 'online');
   const offlineFriends = filteredFriends.filter(f => f.status !== 'online');
 
-  return (
-    <div className="flex-1 flex flex-col bg-zinc-900/30">
-      {/* Header */}
-      <div className="h-14 px-6 flex items-center justify-between border-b border-zinc-800/30">
-        <div className="flex items-center gap-6">
-          <div className="flex items-center gap-2">
-            <Users className="w-5 h-5 text-zinc-400" />
-            <span className="font-semibold text-white">Friends</span>
-          </div>
+  const tabs = [
+    { id: 'online', label: 'Online', count: onlineFriends.length },
+    { id: 'all', label: 'All', count: friends.length },
+    { id: 'pending', label: 'Pending', count: pendingIncoming.length + pendingOutgoing.length },
+    { id: 'blocked', label: 'Blocked' },
+    { id: 'info', label: 'Info' }
+  ];
 
-          <div className="flex gap-2">
-            {[
-              { id: 'all', label: 'All', count: friends.length },
-              { id: 'pending', label: 'Pending', count: pendingIncoming.length + pendingOutgoing.length },
-              { id: 'blocked', label: 'Blocked' }
-            ].map((tab) => (
+  return (
+    <div className="flex-1 flex flex-col bg-[#0a0a0b]">
+      {/* Header - Dark themed like kloak */}
+      <div className="h-12 px-4 flex items-center justify-between border-b border-white/5 bg-[#0a0a0b]">
+        <div className="flex items-center gap-4">
+          <span className="font-semibold text-white text-sm">Friends</span>
+
+          {/* Tab navigation - styled like the image */}
+          <div className="flex items-center gap-1 border-l border-white/10 pl-4 ml-2">
+            {tabs.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setView(tab.id)}
                 className={cn(
-                  "px-4 py-1.5 rounded-md text-sm font-medium transition-colors",
+                  "px-3 py-1 text-xs font-medium transition-colors rounded",
                   view === tab.id
-                    ? "bg-zinc-700 text-white"
-                    : "text-zinc-400 hover:bg-zinc-800 hover:text-white"
+                    ? "text-white bg-white/10"
+                    : "text-zinc-500 hover:text-zinc-300 hover:bg-white/5"
                 )}
               >
                 {tab.label}
-                {tab.count > 0 && (
-                  <span className="ml-1.5 px-1.5 py-0.5 bg-zinc-600 rounded text-xs">
-                    {tab.count}
-                  </span>
+                {tab.count > 0 && view !== tab.id && (
+                  <span className="ml-1 text-zinc-600">({tab.count})</span>
                 )}
               </button>
             ))}
@@ -303,29 +303,32 @@ export default function FriendSystem({ currentUser, onStartDM, onAddFriend }) {
         </div>
 
         <Button
+          size="sm"
           onClick={onAddFriend}
-          className="bg-violet-500 hover:bg-violet-600 rounded-xl"
+          className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs h-7 px-3 rounded"
         >
-          <UserPlus className="w-4 h-4 mr-2" />
+          <UserPlus className="w-3.5 h-3.5 mr-1.5" />
           Add Friend
         </Button>
       </div>
 
-      {/* Search */}
-      <div className="px-6 py-4 border-b border-zinc-800/30">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
-          <Input
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search friends..."
-            className="pl-9 bg-zinc-800/70 border-zinc-700/50 text-white rounded-xl"
-          />
+      {/* Search bar - minimal dark style */}
+      {(view === 'online' || view === 'all') && (
+        <div className="px-4 py-3 border-b border-white/5">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-600" />
+            <Input
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search"
+              className="pl-9 h-8 bg-[#111113] border-white/5 text-white text-sm placeholder:text-zinc-600 rounded focus:border-white/10 focus:ring-0"
+            />
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto p-6">
+      <div className="flex-1 overflow-y-auto">
         <AnimatePresence mode="wait">
           {view === 'pending' ? (
             <motion.div
@@ -333,49 +336,44 @@ export default function FriendSystem({ currentUser, onStartDM, onAddFriend }) {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="space-y-6"
             >
               {pendingIncoming.length > 0 && (
                 <div>
-                  <h3 className="text-xs font-semibold text-zinc-500 uppercase mb-3">
-                    Incoming Requests — {pendingIncoming.length}
-                  </h3>
-                  <div className="space-y-2">
-                    {pendingIncoming.map((request) => (
-                      <FriendRequestCard
-                        key={request.id}
-                        request={request}
-                        type="incoming"
-                        onAccept={(r) => acceptMutation.mutate(r)}
-                        onDecline={(r) => removeMutation.mutate(r)}
-                      />
-                    ))}
+                  <div className="px-4 py-2 text-[10px] font-semibold text-zinc-600 uppercase tracking-wider">
+                    Incoming — {pendingIncoming.length}
                   </div>
+                  {pendingIncoming.map((request) => (
+                    <FriendRequestCard
+                      key={request.id}
+                      request={request}
+                      type="incoming"
+                      onAccept={(r) => acceptMutation.mutate(r)}
+                      onDecline={(r) => removeMutation.mutate(r)}
+                    />
+                  ))}
                 </div>
               )}
 
               {pendingOutgoing.length > 0 && (
                 <div>
-                  <h3 className="text-xs font-semibold text-zinc-500 uppercase mb-3">
-                    Outgoing Requests — {pendingOutgoing.length}
-                  </h3>
-                  <div className="space-y-2">
-                    {pendingOutgoing.map((request) => (
-                      <FriendRequestCard
-                        key={request.id}
-                        request={request}
-                        type="outgoing"
-                        onDecline={(r) => removeMutation.mutate(r)}
-                      />
-                    ))}
+                  <div className="px-4 py-2 text-[10px] font-semibold text-zinc-600 uppercase tracking-wider">
+                    Outgoing — {pendingOutgoing.length}
                   </div>
+                  {pendingOutgoing.map((request) => (
+                    <FriendRequestCard
+                      key={request.id}
+                      request={request}
+                      type="outgoing"
+                      onDecline={(r) => removeMutation.mutate(r)}
+                    />
+                  ))}
                 </div>
               )}
 
               {pendingIncoming.length === 0 && pendingOutgoing.length === 0 && (
-                <div className="text-center py-20 text-zinc-500">
-                  <Clock className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                  <p>No pending friend requests</p>
+                <div className="text-center py-20 text-zinc-600">
+                  <Clock className="w-10 h-10 mx-auto mb-3 opacity-50" />
+                  <p className="text-sm">No pending requests</p>
                 </div>
               )}
             </motion.div>
@@ -385,10 +383,57 @@ export default function FriendSystem({ currentUser, onStartDM, onAddFriend }) {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="text-center py-20 text-zinc-500"
+              className="text-center py-20 text-zinc-600"
             >
-              <Ban className="w-12 h-12 mx-auto mb-4 opacity-50" />
-              <p>You haven't blocked anyone</p>
+              <Ban className="w-10 h-10 mx-auto mb-3 opacity-50" />
+              <p className="text-sm">No blocked users</p>
+            </motion.div>
+          ) : view === 'info' ? (
+            <motion.div
+              key="info"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="p-6"
+            >
+              <div className="max-w-md">
+                <h3 className="text-white font-semibold mb-2">About Friends</h3>
+                <p className="text-zinc-500 text-sm leading-relaxed">
+                  Add friends to message them directly and see when they're online. 
+                  You can add friends by their username.
+                </p>
+              </div>
+            </motion.div>
+          ) : view === 'online' ? (
+            <motion.div
+              key="online"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              {onlineFriends.length > 0 && (
+                <div>
+                  <div className="px-4 py-2 text-[10px] font-semibold text-zinc-600 uppercase tracking-wider">
+                    Online — {onlineFriends.length}
+                  </div>
+                  {onlineFriends.map((friend) => (
+                    <FriendCard
+                      key={friend.id}
+                      friend={friend}
+                      onMessage={onStartDM}
+                      onRemove={(f) => removeMutation.mutate(f)}
+                      onBlock={(f) => blockMutation.mutate(f)}
+                    />
+                  ))}
+                </div>
+              )}
+
+              {onlineFriends.length === 0 && (
+                <div className="text-center py-20 text-zinc-600">
+                  <Users className="w-10 h-10 mx-auto mb-3 opacity-50" />
+                  <p className="text-sm">No friends online</p>
+                </div>
+              )}
             </motion.div>
           ) : (
             <motion.div
@@ -396,52 +441,34 @@ export default function FriendSystem({ currentUser, onStartDM, onAddFriend }) {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="space-y-6"
             >
-              {onlineFriends.length > 0 && (
+              {filteredFriends.length > 0 && (
                 <div>
-                  <h3 className="text-xs font-semibold text-zinc-500 uppercase mb-3">
-                    Online — {onlineFriends.length}
-                  </h3>
-                  <div className="space-y-2">
-                    {onlineFriends.map((friend) => (
-                      <FriendCard
-                        key={friend.id}
-                        friend={friend}
-                        onMessage={onStartDM}
-                        onRemove={(f) => removeMutation.mutate(f)}
-                        onBlock={(f) => blockMutation.mutate(f)}
-                      />
-                    ))}
+                  <div className="px-4 py-2 text-[10px] font-semibold text-zinc-600 uppercase tracking-wider">
+                    All Friends — {filteredFriends.length}
                   </div>
-                </div>
-              )}
-
-              {offlineFriends.length > 0 && (
-                <div>
-                  <h3 className="text-xs font-semibold text-zinc-500 uppercase mb-3">
-                    Offline — {offlineFriends.length}
-                  </h3>
-                  <div className="space-y-2">
-                    {offlineFriends.map((friend) => (
-                      <FriendCard
-                        key={friend.id}
-                        friend={friend}
-                        onMessage={onStartDM}
-                        onRemove={(f) => removeMutation.mutate(f)}
-                        onBlock={(f) => blockMutation.mutate(f)}
-                      />
-                    ))}
-                  </div>
+                  {filteredFriends.map((friend) => (
+                    <FriendCard
+                      key={friend.id}
+                      friend={friend}
+                      onMessage={onStartDM}
+                      onRemove={(f) => removeMutation.mutate(f)}
+                      onBlock={(f) => blockMutation.mutate(f)}
+                    />
+                  ))}
                 </div>
               )}
 
               {friends.length === 0 && (
-                <div className="text-center py-20 text-zinc-500">
-                  <Users className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                  <p className="mb-4">You don't have any friends yet</p>
-                  <Button onClick={onAddFriend} className="bg-violet-500 hover:bg-violet-600 rounded-xl">
-                    <UserPlus className="w-4 h-4 mr-2" />
+                <div className="text-center py-20 text-zinc-600">
+                  <Users className="w-10 h-10 mx-auto mb-3 opacity-50" />
+                  <p className="text-sm mb-4">No friends yet</p>
+                  <Button 
+                    onClick={onAddFriend} 
+                    size="sm"
+                    className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs"
+                  >
+                    <UserPlus className="w-3.5 h-3.5 mr-1.5" />
                     Add Friend
                   </Button>
                 </div>
