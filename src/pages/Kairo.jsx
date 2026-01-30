@@ -213,6 +213,7 @@ export default function KairoPage() {
     const savedUser = localStorage.getItem('kairo_current_user');
     if (savedUser) {
       const user = JSON.parse(savedUser);
+      console.log('[INIT] Loaded user from localStorage:', user);
       setCurrentUser(user);
     } else {
       navigate(createPageUrl('Landing'));
