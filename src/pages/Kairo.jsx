@@ -338,8 +338,8 @@ export default function KairoPage() {
     queryKey: ['messages', activeChannel?.id],
     queryFn: () => base44.entities.Message.filter({ channel_id: activeChannel.id }, '-created_date', 100),
     enabled: !!activeChannel?.id,
-    staleTime: 3000,
-    refetchInterval: 5000,
+    staleTime: 1000,
+    refetchInterval: 3000,
     keepPreviousData: true
   });
 
@@ -394,7 +394,9 @@ export default function KairoPage() {
   const { data: dmMessages = [], isLoading: dmMessagesLoading } = useQuery({
     queryKey: ['dmMessages', activeConversation?.id],
     queryFn: () => base44.entities.DirectMessage.filter({ conversation_id: activeConversation.id }, '-created_date', 100),
-    enabled: !!activeConversation?.id
+    enabled: !!activeConversation?.id,
+    staleTime: 1000,
+    refetchInterval: 3000
   });
 
   // Fetch typing indicators
@@ -470,7 +472,7 @@ export default function KairoPage() {
   const sendMessageMutation = useMutation({
     mutationFn: async ({ content, attachments, replyToId }) => {
       const replyPreview = replyToId && replyTo ? { author_name: replyTo.author_name, content: replyTo.content?.slice(0, 100) } : null;
-      return base44.entities.Message.create({
+      const message = await base44.entities.Message.create({
         channel_id: activeChannel.id, server_id: activeServer.id, author_id: currentUser.id,
         author_name: userProfile?.display_name || currentUser.full_name || currentUser.user_email?.split('@')[0] || 'User',
         author_avatar: userProfile?.avatar_url,
@@ -479,14 +481,26 @@ export default function KairoPage() {
         author_youtube_show_icon: userProfile?.youtube_channel?.show_icon,
         content, attachments, type: replyToId ? 'reply' : 'default', reply_to_id: replyToId, reply_preview: replyPreview
       });
+
+      // Check for cross-app bridge and send to external platform
+      try {
+        await base44.functions.invoke('sendToDiscord', { channel_id: activeChannel.id, content, attachments });
+      } catch (e) {
+        console.log('No cross-app bridge configured');
+      }
+
+      return message;
     },
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['messages', activeChannel?.id] }); setReplyTo(null); }
+    onSuccess: () => { 
+      queryClient.invalidateQueries({ queryKey: ['messages', activeChannel?.id] }); 
+      setReplyTo(null); 
+    }
   });
 
   const sendDMMutation = useMutation({
     mutationFn: async ({ content, attachments, replyToId }) => {
       await base44.entities.Conversation.update(activeConversation.id, { last_message_at: new Date().toISOString(), last_message_preview: content?.slice(0, 50) });
-      return base44.entities.DirectMessage.create({
+      const message = await base44.entities.DirectMessage.create({
         conversation_id: activeConversation.id, author_id: currentUser.id,
         author_name: userProfile?.display_name || currentUser.full_name || currentUser.user_email?.split('@')[0] || 'User',
         author_avatar: userProfile?.avatar_url,
@@ -495,8 +509,13 @@ export default function KairoPage() {
         author_youtube_show_icon: userProfile?.youtube_channel?.show_icon,
         content, attachments, type: replyToId ? 'reply' : 'default', reply_to_id: replyToId
       });
+      return message;
     },
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['dmMessages', activeConversation?.id] }); queryClient.invalidateQueries({ queryKey: ['conversations'] }); setReplyTo(null); }
+    onSuccess: () => { 
+      queryClient.invalidateQueries({ queryKey: ['dmMessages', activeConversation?.id] }); 
+      queryClient.invalidateQueries({ queryKey: ['conversations'] }); 
+      setReplyTo(null); 
+    }
   });
 
   const updateProfileMutation = useMutation({

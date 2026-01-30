@@ -102,9 +102,10 @@ export default function MessageInput({
       <AnimatePresence>
         {replyTo && (
           <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 10 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
             className="flex items-center gap-2 px-4 py-2 mb-2 bg-zinc-800/50 rounded-t-lg border-l-2 border-indigo-500"
           >
             <span className="text-xs text-zinc-500">Replying to</span>
@@ -124,9 +125,10 @@ export default function MessageInput({
       <AnimatePresence>
         {files.length > 0 && (
           <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 10 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
             className="flex flex-wrap gap-2 px-4 py-3 mb-2 bg-zinc-800/30 rounded-t-lg"
           >
             {files.map((file, index) => (

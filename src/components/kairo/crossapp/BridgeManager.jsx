@@ -58,9 +58,10 @@ export default function BridgeManager({ server, channels, isOpen, onClose }) {
     <AnimatePresence>
       <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.95 }}
+          transition={{ duration: 0.2 }}
           className="bg-zinc-900 rounded-lg max-w-3xl w-full max-h-[80vh] overflow-hidden flex flex-col"
         >
           <div className="p-6 border-b border-zinc-800 flex items-center justify-between">
