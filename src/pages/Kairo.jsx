@@ -168,6 +168,7 @@ export default function KairoPage() {
   const [showServerSettings, setShowServerSettings] = useState(false);
   const [showBridgeManager, setShowBridgeManager] = useState(false);
   const [showGlobalSearch, setShowGlobalSearch] = useState(false);
+  const [showNewDM, setShowNewDM] = useState(false);
   
   // Connection status
   const [connectionStatus, setConnectionStatus] = useState('connected');
