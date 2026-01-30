@@ -4,7 +4,7 @@ import {
   Hash, Volume2, ChevronDown, ChevronRight, Plus, Settings,
   Video, Megaphone, MessagesSquare, ImageIcon, Lock, Users,
   MoreHorizontal, Edit, Trash2, Bell, BellOff, Copy, UserPlus,
-  FolderPlus, Code, Webhook
+  FolderPlus, Code, Webhook, Search
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -190,6 +190,7 @@ export default function ChannelSidebar({
   onServerSettings,
   onCreateChannel,
   onInvite,
+  onSearch,
   voiceStates = []
 }) {
   const uncategorizedChannels = channels.filter(c => !c.category_id);
@@ -261,6 +262,16 @@ export default function ChannelSidebar({
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
+
+      {/* Search Bar */}
+      <button
+        onClick={() => window.dispatchEvent(new CustomEvent('kairo:open-search'))}
+        className="mx-2 mb-2 flex items-center gap-2 px-3 py-1.5 bg-zinc-800/50 hover:bg-zinc-800 rounded text-sm text-zinc-500 hover:text-zinc-300 transition-colors"
+      >
+        <Search className="w-4 h-4" />
+        <span>Search</span>
+        <span className="ml-auto text-xs text-zinc-600">Ctrl+F</span>
+      </button>
 
       {/* Channels list */}
       <ContextMenu>
