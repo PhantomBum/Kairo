@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   MessageCircle, Users, Settings, ChevronDown, Plus, 
   Compass, User, Bell, ChevronLeft, ChevronRight,
-  Hash, Volume2, Sparkles
+  Hash, Volume2, Sparkles, ShoppingBag
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { 
@@ -166,6 +166,7 @@ export default function ImprovedSidebar({
   onProfileClick,
   onUpdateLogsClick,
   onNotificationsClick,
+  onShopClick,
   isDMsActive,
   userProfile,
   unreadDMs = 0,

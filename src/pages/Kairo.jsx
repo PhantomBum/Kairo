@@ -25,6 +25,7 @@ import CreateServerModal from '@/components/kairo/CreateServerModal';
 import CreateChannelModal from '@/components/kairo/CreateChannelModal';
 import CommandPalette from '@/components/kairo/CommandPalette';
 import ServerPreviewModal from '@/components/kairo/ServerPreviewModal';
+import ServerSettingsModal from '@/components/kairo/ServerSettingsModal';
 
 // Feature Components
 import ServerHub from '@/components/kairo/ServerHub';
@@ -44,6 +45,16 @@ import { WorkspaceProvider, useWorkspace } from '@/components/kairo/core/Workspa
 import { RealtimeProvider, useRealtime } from '@/components/kairo/core/RealtimeProvider';
 import { AuditLogViewer, AutoModerationSettings } from '@/components/kairo/moderation/ModerationTools';
 import AddFriendModal from '@/components/kairo/AddFriendModal';
+import AppMarketplace from '@/components/kairo/apps/AppMarketplace';
+import WebhookManager from '@/components/kairo/apps/WebhookManager';
+import RoleManager from '@/components/kairo/roles/RoleManager';
+import VoiceChannel from '@/components/kairo/voice/VoiceChannel';
+import ShopIntegrated from '@/components/kairo/shop/ShopIntegrated';
+import CreditsShop from '@/components/kairo/shop/CreditsShop';
+import EnhancedReactions from '@/components/kairo/enhanced/EnhancedReactions';
+import { PollMessage, AnnouncementMessage, SystemPrompt } from '@/components/kairo/enhanced/NewMessageTypes';
+import { KeyboardShortcutsModal, useKeyboardShortcuts } from '@/components/kairo/enhanced/KeyboardShortcuts';
+import InlineEditField from '@/components/kairo/enhanced/InlineEditField';
 
 // Channel header component
 function ChannelHeader({ channel, memberCount, onMembersToggle, showMembers }) {
@@ -137,6 +148,13 @@ export default function KairoPage() {
   const [showAuditLog, setShowAuditLog] = useState(false);
   const [showUpdateLogs, setShowUpdateLogs] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [showAppMarketplace, setShowAppMarketplace] = useState(false);
+  const [showWebhooks, setShowWebhooks] = useState(false);
+  const [showRoles, setShowRoles] = useState(false);
+  const [showShop, setShowShop] = useState(false);
+  const [showCreditsShop, setShowCreditsShop] = useState(false);
+  const [showKeyboardShortcuts, setShowKeyboardShortcuts] = useState(false);
+  const [showServerSettings, setShowServerSettings] = useState(false);
   
   // Connection status
   const [connectionStatus, setConnectionStatus] = useState('connected');
@@ -144,17 +162,18 @@ export default function KairoPage() {
   // Reply state
   const [replyTo, setReplyTo] = useState(null);
 
-  // Command palette keyboard shortcut
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-        e.preventDefault();
-        setShowCommandPalette(true);
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  // Keyboard shortcuts
+  useKeyboardShortcuts({
+    'ctrl+k': () => setShowCommandPalette(true),
+    'ctrl+shift+a': () => {}, // Toggle sidebar - handled in ImprovedSidebar
+    'ctrl+shift+m': () => setShowMembers(!showMembers),
+    'ctrl+/': () => setShowKeyboardShortcuts(true),
+    'escape': () => {
+      setShowCommandPalette(false);
+      setShowSettings(false);
+      setShowKeyboardShortcuts(false);
+    }
+  });
 
   // Get current user from localStorage (key-based auth)
   const [currentUser, setCurrentUser] = React.useState(null);
@@ -529,6 +548,23 @@ export default function KairoPage() {
     queryClient.invalidateQueries({ queryKey: ['messages', activeChannel?.id] });
   };
 
+  // Listen for custom events
+  useEffect(() => {
+    const handleShowApps = () => setShowAppMarketplace(true);
+    const handleShowWebhooks = () => setShowWebhooks(true);
+    const handleShowRoles = () => setShowRoles(true);
+
+    window.addEventListener('kairo:show-apps', handleShowApps);
+    window.addEventListener('kairo:show-webhooks', handleShowWebhooks);
+    window.addEventListener('kairo:show-roles', handleShowRoles);
+
+    return () => {
+      window.removeEventListener('kairo:show-apps', handleShowApps);
+      window.removeEventListener('kairo:show-webhooks', handleShowWebhooks);
+      window.removeEventListener('kairo:show-roles', handleShowRoles);
+    };
+  }, []);
+
   const handleCommandPaletteCommand = (cmd) => {
     switch (cmd.id) {
       case 'focus-mode': updateSettingsMutation.mutate({ kairo_features: { ...userSettings?.kairo_features, focus_mode: !userSettings?.kairo_features?.focus_mode } }); break;
@@ -538,6 +574,8 @@ export default function KairoPage() {
       case 'add-friend': setShowAddFriend(true); break;
       case 'settings': setShowSettings(true); break;
       case 'dms': handleDMsClick(); break;
+      case 'shop': setShowShop(true); break;
+      case 'shortcuts': setShowKeyboardShortcuts(true); break;
       default:
         if (cmd.id.startsWith('server-')) handleServerSelect(cmd.data);
         else if (cmd.id.startsWith('channel-')) handleChannelClick(cmd.data);
@@ -697,6 +735,7 @@ export default function KairoPage() {
         onFriendsClick={() => setView('friends')}
         onUpdateLogsClick={() => setShowUpdateLogs(true)}
         onNotificationsClick={() => setShowNotifications(true)}
+        onShopClick={() => setShowShop(true)}
         isDMsActive={view === 'dms'} 
         userProfile={userProfile}
         unreadDMs={conversations.filter(c => c.unread_count > 0).length}
@@ -724,32 +763,46 @@ export default function KairoPage() {
       )}
 
       <div className="flex-1 flex flex-col min-w-0">
-        {view === 'server' && activeChannel ? (
+        {view === 'shop' ? (
+        <ShopIntegrated currentUser={currentUser} activeServer={activeServer} />
+      ) : view === 'server' && activeChannel ? (
           activeChannel.type === 'voice' || activeChannel.type === 'stage' ? (
-            <WebRTCVoice 
-              channelId={activeChannel.id}
-              serverId={activeServer?.id}
-              channelName={activeChannel.name}
-              serverName={activeServer?.name}
+            <VoiceChannel
+              channel={activeChannel}
               participants={voiceStates.filter(v => v.channel_id === activeChannel.id)}
               currentUserId={currentUser?.id}
+              isMuted={isMuted}
+              isDeafened={isDeafened}
+              isVideo={isVideo}
+              isScreenSharing={isStreaming}
+              onToggleMute={() => setIsMuted(!isMuted)}
+              onToggleDeafen={() => setIsDeafened(!isDeafened)}
+              onToggleVideo={() => setIsVideo(!isVideo)}
+              onToggleScreenShare={() => setIsStreaming(!isStreaming)}
               onLeave={handleVoiceDisconnect}
-              onUpdateState={(state) => {
-                const existing = voiceStates.find(v => v.user_id === currentUser?.id && v.channel_id === activeChannel.id);
-                if (existing) {
-                  base44.entities.VoiceState.update(existing.id, state);
-                }
-                if (state.is_self_muted !== undefined) setIsMuted(state.is_self_muted);
-                if (state.is_self_deafened !== undefined) setIsDeafened(state.is_self_deafened);
-              }}
-              isListenOnly={isListeningOnly}
             />
           ) : (
             <>
               <ChannelHeader channel={activeChannel} memberCount={members.length} onMembersToggle={() => setShowMembers(!showMembers)} showMembers={showMembers} />
               <div className="flex-1 flex min-h-0">
                 <div className="flex-1 flex flex-col bg-[#121214]">
-                  <MessageList messages={[...messages].reverse()} currentUserId={currentUser?.id} onReply={(msg) => setReplyTo(msg)} onEdit={() => {}} onDelete={handleDeleteMessage} onReact={handleReact} isLoading={messagesLoading} />
+                  <MessageList 
+                    messages={[...messages].reverse()} 
+                    currentUserId={currentUser?.id} 
+                    onReply={(msg) => setReplyTo(msg)} 
+                    onEdit={() => {}} 
+                    onDelete={handleDeleteMessage} 
+                    onReact={handleReact} 
+                    isLoading={messagesLoading}
+                    renderReactions={(msg) => (
+                      <EnhancedReactions
+                        reactions={msg.reactions}
+                        currentUserId={currentUser?.id}
+                        onReact={(emoji) => handleReact(msg.id, emoji)}
+                        onRemoveReact={(emoji) => handleReact(msg.id, emoji)}
+                      />
+                    )}
+                  />
                   <TypingIndicator typingUsers={typingUsers} className="px-4" />
                   <MessageInput channelName={activeChannel?.name} replyTo={replyTo} onCancelReply={() => setReplyTo(null)} onSendMessage={(data) => sendMessageMutation.mutate(data)} onTyping={sendTypingIndicator} />
                 </div>
@@ -781,11 +834,14 @@ export default function KairoPage() {
               </div>
               <h2 className="text-2xl font-bold text-white mb-2">Welcome to Kairo</h2>
               <p className="text-zinc-500 max-w-md">{view === 'dms' ? 'Select a conversation to start chatting, or add a friend to get started.' : 'Select a channel to start chatting, or create a new server to begin.'}</p>
-              <div className="mt-6 flex justify-center gap-3">
+              <div className="mt-6 flex justify-center gap-3 flex-wrap">
                 {view === 'dms' ? <button onClick={() => setShowAddFriend(true)} className="px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg font-medium transition-colors">Add Friend</button> : 
                   <button onClick={() => setShowInvite(true)} className="px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg font-medium transition-colors">Invite People</button>}
-                <button onClick={() => setView('shop')} className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg font-medium transition-colors flex items-center gap-2">
+                <button onClick={() => setShowShop(true)} className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg font-medium transition-colors flex items-center gap-2">
                   <ShoppingBag className="w-4 h-4" /> Shop
+                </button>
+                <button onClick={() => setShowKeyboardShortcuts(true)} className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg font-medium transition-colors">
+                  Shortcuts
                 </button>
               </div>
             </div>
@@ -814,7 +870,25 @@ export default function KairoPage() {
         {activeCall && <ActiveCallModal call={activeCall} participants={activeCall.participants} currentUserId={currentUser?.id} onEndCall={() => setActiveCall(null)} onToggleMute={() => setIsMuted(!isMuted)} onToggleDeafen={() => setIsDeafened(!isDeafened)} onToggleVideo={() => setIsVideo(!isVideo)} onToggleScreenShare={() => setIsStreaming(!isStreaming)} isMuted={isMuted} isDeafened={isDeafened} isVideo={isVideo} isScreenSharing={isStreaming} />}
         {showUpdateLogs && <UpdateLogsModal isOpen={showUpdateLogs} onClose={() => setShowUpdateLogs(false)} />}
         {showNotifications && <NotificationsPanel isOpen={showNotifications} onClose={() => setShowNotifications(false)} currentUser={currentUser} />}
-      </AnimatePresence>
+        {showAppMarketplace && <AppMarketplace server={activeServer} currentUser={currentUser} onClose={() => setShowAppMarketplace(false)} />}
+        {showKeyboardShortcuts && <KeyboardShortcutsModal isOpen={showKeyboardShortcuts} onClose={() => setShowKeyboardShortcuts(false)} />}
+        {showCreditsShop && <CreditsShop currentUser={currentUser} onClose={() => setShowCreditsShop(false)} />}
+        {showServerSettings && activeServer && <ServerSettingsModal server={activeServer} currentUser={currentUser} channels={channels} onClose={() => setShowServerSettings(false)} />}
+        {showShop && <div className="fixed inset-0 z-50 bg-black/80 flex">
+          <div className="flex-1" onClick={() => setShowShop(false)} />
+          <motion.div 
+            initial={{ x: '100%' }} 
+            animate={{ x: 0 }}
+            exit={{ x: '100%' }}
+            className="w-full max-w-4xl bg-zinc-900 border-l border-zinc-800 overflow-y-auto"
+          >
+            <ShopIntegrated currentUser={currentUser} activeServer={activeServer} />
+            <div className="p-6 border-t border-zinc-800">
+              <Button onClick={() => setShowShop(false)} variant="outline" className="w-full">Close Shop</Button>
+            </div>
+          </motion.div>
+        </div>}
+        </AnimatePresence>
     </div>
   );
 }
