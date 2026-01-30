@@ -128,6 +128,34 @@ export default function Layout({ children }) {
           -moz-osx-font-smoothing: grayscale;
           text-rendering: optimizeLegibility;
         }
+
+        /* Override Radix UI slide animations - use fade only */
+        [data-state=open] {
+          animation: fadeIn 150ms ease-out !important;
+        }
+        
+        [data-state=closed] {
+          animation: fadeOut 100ms ease-in !important;
+        }
+        
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        
+        @keyframes fadeOut {
+          from { opacity: 1; }
+          to { opacity: 0; }
+        }
+
+        /* Disable all slide-in animations from tailwind */
+        .animate-in {
+          animation: fadeIn 150ms ease-out !important;
+        }
+        
+        .animate-out {
+          animation: fadeOut 100ms ease-in !important;
+        }
       `}</style>
       {children}
     </div>
