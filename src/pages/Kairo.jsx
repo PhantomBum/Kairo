@@ -666,6 +666,9 @@ export default function KairoPage() {
 
   const joinServerMutation = useMutation({
     mutationFn: async (codeOrServerId) => {
+      const userId = currentUser.user_id || currentUser.id;
+      const userEmail = currentUser.user_email || currentUser.email;
+
       // Try to find by invite code first
       let servers = await base44.entities.Server.filter({ invite_code: codeOrServerId });
       // If not found by invite code, try by server ID (for direct join from discover)
@@ -675,9 +678,17 @@ export default function KairoPage() {
       }
       if (servers.length === 0) throw new Error('Invalid invite code or server not found');
       const server = servers[0];
-      const existingMember = await base44.entities.ServerMember.filter({ server_id: server.id, user_email: currentUser.email });
-      if (existingMember.length > 0) return server; // Already a member
-      await base44.entities.ServerMember.create({ server_id: server.id, user_id: currentUser.id, user_email: currentUser.email, joined_at: new Date().toISOString() });
+
+      // Check if already a member
+      const existingMember = await base44.entities.ServerMember.filter({ server_id: server.id, user_id: userId });
+      if (existingMember.length > 0) return server;
+
+      await base44.entities.ServerMember.create({ 
+        server_id: server.id, 
+        user_id: userId, 
+        user_email: userEmail, 
+        joined_at: new Date().toISOString() 
+      });
       await base44.entities.Server.update(server.id, { member_count: (server.member_count || 0) + 1 });
       return server;
     },
