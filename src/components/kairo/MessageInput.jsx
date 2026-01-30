@@ -181,7 +181,7 @@ export default function MessageInput({
   };
 
   return (
-    <div className="px-2 md:px-4 pb-4 md:pb-6 pt-2">
+    <div className="px-4 pb-4 pt-2">
       {/* Reply preview */}
       <AnimatePresence>
         {replyTo && (
@@ -254,35 +254,26 @@ export default function MessageInput({
         )}
       </AnimatePresence>
 
-      {/* Input container */}
-      <motion.div 
-        initial={false}
-        animate={{ 
-          borderColor: content.trim() ? 'rgba(139, 92, 246, 0.3)' : 'rgba(63, 63, 70, 0.3)',
-          backgroundColor: content.trim() ? 'rgba(39, 39, 42, 0.7)' : 'rgba(39, 39, 42, 0.5)'
-        }}
+      {/* Input container - Kloak style */}
+      <div 
         className={cn(
-          "flex items-end gap-2 bg-zinc-800/50 backdrop-blur-sm rounded-2xl border border-zinc-700/30 transition-all shadow-lg",
-          (replyTo || files.length > 0) && "rounded-t-2xl"
+          "flex items-end gap-2 bg-[#1a1a1d] rounded-lg border border-white/10 transition-all",
+          content.trim() && "border-emerald-500/30"
         )}
       >
         {/* Attachment button */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <motion.button 
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="p-3.5 hover:bg-zinc-700/50 rounded-l-2xl transition-colors text-zinc-400 hover:text-zinc-200"
-            >
-              <Plus className="w-5 h-5" />
-            </motion.button>
+            <button className="p-2.5 hover:bg-white/5 rounded-l-lg transition-colors text-zinc-500 hover:text-zinc-300">
+              <Plus className="w-4 h-4" />
+            </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-52 bg-zinc-900/95 backdrop-blur-xl border-zinc-800/80 rounded-2xl p-1.5" align="start">
+          <DropdownMenuContent className="w-44 bg-[#1a1a1d] border-white/10 rounded-lg p-1" align="start">
             <DropdownMenuItem 
               onClick={() => fileInputRef.current?.click()}
-              className="text-zinc-300 focus:bg-zinc-800 rounded-xl px-3 py-2.5"
+              className="text-zinc-300 focus:bg-white/5 rounded px-3 py-2 text-xs"
             >
-              <File className="w-4 h-4 mr-2.5 text-zinc-500" />
+              <File className="w-3.5 h-3.5 mr-2 text-zinc-500" />
               Upload File
             </DropdownMenuItem>
             <DropdownMenuItem 
@@ -290,9 +281,9 @@ export default function MessageInput({
                 fileInputRef.current.accept = 'image/*';
                 fileInputRef.current?.click();
               }}
-              className="text-zinc-300 focus:bg-zinc-800 rounded-xl px-3 py-2.5"
+              className="text-zinc-300 focus:bg-white/5 rounded px-3 py-2 text-xs"
             >
-              <ImageIcon className="w-4 h-4 mr-2.5 text-zinc-500" />
+              <ImageIcon className="w-3.5 h-3.5 mr-2 text-zinc-500" />
               Upload Image
             </DropdownMenuItem>
           </DropdownMenuContent>
@@ -372,33 +363,25 @@ export default function MessageInput({
         </div>
 
         {/* Actions */}
-        <div className="flex items-center gap-0.5 p-1.5 md:p-2">
-          {/* GIF picker - hidden on mobile */}
+        <div className="flex items-center gap-0.5 p-1.5">
+          {/* GIF picker */}
           <Popover open={showGifPicker} onOpenChange={setShowGifPicker}>
             <PopoverTrigger asChild>
-              <motion.button 
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                className="hidden sm:flex p-2 md:p-2.5 hover:bg-zinc-700/50 rounded-xl transition-colors text-zinc-400 hover:text-zinc-200"
-              >
-                <Gift className="w-5 h-5" />
-              </motion.button>
+              <button className="hidden sm:flex p-2 hover:bg-white/5 rounded transition-colors text-zinc-500 hover:text-zinc-300">
+                <Gift className="w-4 h-4" />
+              </button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0 bg-transparent border-none" align="end" sideOffset={8}>
               <GifPicker onSelect={handleGifSelect} onClose={() => setShowGifPicker(false)} />
             </PopoverContent>
           </Popover>
 
-          {/* Sticker picker - hidden on mobile */}
+          {/* Sticker picker */}
           <Popover open={showStickerPicker} onOpenChange={setShowStickerPicker}>
             <PopoverTrigger asChild>
-              <motion.button 
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                className="hidden sm:flex p-2 md:p-2.5 hover:bg-zinc-700/50 rounded-xl transition-colors text-zinc-400 hover:text-zinc-200"
-              >
-                <Sticker className="w-5 h-5" />
-              </motion.button>
+              <button className="hidden sm:flex p-2 hover:bg-white/5 rounded transition-colors text-zinc-500 hover:text-zinc-300">
+                <Sticker className="w-4 h-4" />
+              </button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0 bg-transparent border-none" align="end" sideOffset={8}>
               <StickerPicker onSelect={handleStickerSelect} onClose={() => setShowStickerPicker(false)} />
@@ -408,48 +391,40 @@ export default function MessageInput({
           {/* Emoji picker */}
           <Popover>
             <PopoverTrigger asChild>
-              <motion.button 
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                className="p-2 md:p-2.5 hover:bg-zinc-700/50 rounded-xl transition-colors text-zinc-400 hover:text-zinc-200"
-              >
-                <Smile className="w-5 h-5" />
-              </motion.button>
+              <button className="p-2 hover:bg-white/5 rounded transition-colors text-zinc-500 hover:text-zinc-300">
+                <Smile className="w-4 h-4" />
+              </button>
             </PopoverTrigger>
-            <PopoverContent className="w-auto p-3 bg-zinc-900/95 backdrop-blur-xl border-zinc-800/80 rounded-2xl" align="end">
-              <div className="grid grid-cols-6 gap-1.5">
+            <PopoverContent className="w-auto p-2 bg-[#1a1a1d] border-white/10 rounded-lg" align="end">
+              <div className="grid grid-cols-6 gap-1">
                 {commonEmojis.map((emoji) => (
-                  <motion.button
+                  <button
                     key={emoji}
-                    whileHover={{ scale: 1.15 }}
-                    whileTap={{ scale: 0.9 }}
                     onClick={() => insertEmoji(emoji)}
-                    className="w-10 h-10 flex items-center justify-center hover:bg-zinc-800 rounded-xl text-xl transition-colors"
+                    className="w-8 h-8 flex items-center justify-center hover:bg-white/10 rounded text-lg transition-colors"
                   >
                     {emoji}
-                  </motion.button>
+                  </button>
                 ))}
               </div>
             </PopoverContent>
           </Popover>
 
           {/* Send button */}
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+          <button
             onClick={handleSend}
             disabled={disabled || uploadProgress !== null || (!content.trim() && files.length === 0)}
             className={cn(
-              "p-2 md:p-2.5 rounded-xl transition-all ml-1",
+              "p-2 rounded transition-all ml-1",
               (content.trim() || files.length > 0)
-                ? "bg-gradient-to-r from-violet-500 to-indigo-600 text-white shadow-lg shadow-violet-500/30"
-                : "bg-zinc-700/50 text-zinc-500 cursor-not-allowed"
+                ? "bg-emerald-500 text-white hover:bg-emerald-400"
+                : "bg-white/5 text-zinc-600 cursor-not-allowed"
             )}
           >
-            <ArrowUp className="w-5 h-5" />
-          </motion.button>
+            <ArrowUp className="w-4 h-4" />
+          </button>
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 }
