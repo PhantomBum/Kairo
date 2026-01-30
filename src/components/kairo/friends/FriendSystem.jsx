@@ -34,7 +34,7 @@ function FriendRequestCard({ request, type, onAccept, onDecline }) {
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -10 }}
-      className="flex items-center justify-between p-3 bg-zinc-800/30 rounded-lg hover:bg-zinc-800/50 transition-colors"
+      className="flex items-center justify-between p-3 bg-zinc-800/30 rounded-xl hover:bg-zinc-800/50 transition-colors"
     >
       <div className="flex items-center gap-3">
         <div className="relative">
@@ -62,7 +62,7 @@ function FriendRequestCard({ request, type, onAccept, onDecline }) {
             <Button
               size="icon"
               onClick={() => onAccept?.(request)}
-              className="w-9 h-9 bg-emerald-500 hover:bg-emerald-600"
+              className="w-9 h-9 bg-violet-500 hover:bg-violet-600 rounded-xl"
             >
               <Check className="w-4 h-4" />
             </Button>
@@ -96,7 +96,7 @@ function FriendCard({ friend, onMessage, onRemove, onBlock }) {
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="flex items-center justify-between p-3 bg-zinc-800/30 rounded-lg hover:bg-zinc-800/50 transition-colors group"
+      className="flex items-center justify-between p-3 bg-zinc-800/30 rounded-xl hover:bg-zinc-800/50 transition-colors group"
     >
       <div className="flex items-center gap-3">
         <div className="relative">
@@ -266,9 +266,9 @@ export default function FriendSystem({ currentUser, onStartDM, onAddFriend }) {
   const offlineFriends = filteredFriends.filter(f => f.status !== 'online');
 
   return (
-    <div className="flex-1 flex flex-col bg-[#121214]">
+    <div className="flex-1 flex flex-col bg-zinc-900/30">
       {/* Header */}
-      <div className="h-14 px-6 flex items-center justify-between border-b border-zinc-800/50">
+      <div className="h-14 px-6 flex items-center justify-between border-b border-zinc-800/30">
         <div className="flex items-center gap-6">
           <div className="flex items-center gap-2">
             <Users className="w-5 h-5 text-zinc-400" />
@@ -304,7 +304,7 @@ export default function FriendSystem({ currentUser, onStartDM, onAddFriend }) {
 
         <Button
           onClick={onAddFriend}
-          className="bg-emerald-500 hover:bg-emerald-600"
+          className="bg-violet-500 hover:bg-violet-600 rounded-xl"
         >
           <UserPlus className="w-4 h-4 mr-2" />
           Add Friend
@@ -312,14 +312,14 @@ export default function FriendSystem({ currentUser, onStartDM, onAddFriend }) {
       </div>
 
       {/* Search */}
-      <div className="px-6 py-4 border-b border-zinc-800/50">
+      <div className="px-6 py-4 border-b border-zinc-800/30">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
           <Input
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search friends..."
-            className="pl-9 bg-zinc-900 border-zinc-800 text-white"
+            className="pl-9 bg-zinc-800/70 border-zinc-700/50 text-white rounded-xl"
           />
         </div>
       </div>
@@ -440,7 +440,7 @@ export default function FriendSystem({ currentUser, onStartDM, onAddFriend }) {
                 <div className="text-center py-20 text-zinc-500">
                   <Users className="w-12 h-12 mx-auto mb-4 opacity-50" />
                   <p className="mb-4">You don't have any friends yet</p>
-                  <Button onClick={onAddFriend} className="bg-indigo-500 hover:bg-indigo-600">
+                  <Button onClick={onAddFriend} className="bg-violet-500 hover:bg-violet-600 rounded-xl">
                     <UserPlus className="w-4 h-4 mr-2" />
                     Add Friend
                   </Button>
