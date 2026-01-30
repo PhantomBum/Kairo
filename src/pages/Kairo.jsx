@@ -62,6 +62,9 @@ import { usePresenceSync, useVoiceStateSync, useMessageSync } from '@/components
 import { useCacheOptimization, usePrefetchStrategies } from '@/components/kairo/core/CacheManager';
 import CrossAppIndicator from '@/components/kairo/crossapp/CrossAppIndicator';
 import BridgeManager from '@/components/kairo/crossapp/BridgeManager';
+import ThreadPanel from '@/components/kairo/chat/ThreadPanel';
+import ForwardMessageModal from '@/components/kairo/chat/ForwardMessageModal';
+import PinnedMessagesPanel from '@/components/kairo/chat/PinnedMessagesPanel';
 
 // Channel header component
 function ChannelHeader({ channel, memberCount, onMembersToggle, showMembers, onShowPinned, showPinned }) {
