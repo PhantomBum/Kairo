@@ -63,15 +63,15 @@ export function CreateInviteModal({ server, isOpen, onClose }) {
         <div className="p-6">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-indigo-500/20 rounded-lg flex items-center justify-center">
-                <Link2 className="w-5 h-5 text-indigo-400" />
+              <div className="w-10 h-10 bg-violet-500/20 rounded-xl flex items-center justify-center">
+                <Link2 className="w-5 h-5 text-violet-400" />
               </div>
               <div>
                 <h2 className="text-lg font-semibold text-white">Invite People</h2>
                 <p className="text-sm text-zinc-500">{server.name}</p>
               </div>
             </div>
-            <button onClick={onClose} className="text-zinc-400 hover:text-white">
+            <button onClick={onClose} className="text-zinc-400 hover:text-white p-1 rounded-lg hover:bg-zinc-800">
               <X className="w-5 h-5" />
             </button>
           </div>
@@ -80,14 +80,14 @@ export function CreateInviteModal({ server, isOpen, onClose }) {
           <div className="mb-4">
             <Label className="text-zinc-400 mb-2 block">Invite Link</Label>
             <div className="flex gap-2">
-              <div className="flex-1 flex items-center px-3 bg-zinc-900 border border-zinc-800 rounded-lg">
-                <span className="text-zinc-300 truncate">{inviteLink}</span>
+              <div className="flex-1 flex items-center px-4 py-2.5 bg-zinc-800/70 border border-zinc-700/50 rounded-xl">
+                <span className="text-zinc-300 truncate text-sm">{inviteLink}</span>
               </div>
               <Button
                 onClick={handleCopy}
                 className={cn(
-                  "px-4 transition-colors",
-                  copied ? "bg-emerald-500 hover:bg-emerald-600" : "bg-indigo-500 hover:bg-indigo-600"
+                  "px-4 rounded-xl transition-colors",
+                  copied ? "bg-emerald-500 hover:bg-emerald-600" : "bg-violet-500 hover:bg-violet-600"
                 )}
               >
                 {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
@@ -212,10 +212,8 @@ export function JoinByInviteModal({ isOpen, onClose, onJoin, isJoining }) {
   const [isLoading, setIsLoading] = useState(false);
 
   const extractCode = (input) => {
-    // Handle full URLs or just codes - more flexible matching
     const urlMatch = input.match(/kairo\.app\/invite\/([A-Z0-9]+)/i);
     if (urlMatch) return urlMatch[1].toUpperCase();
-    // Just return the cleaned input as a code
     return input.trim().toUpperCase();
   };
 
@@ -275,20 +273,20 @@ export function JoinByInviteModal({ isOpen, onClose, onJoin, isJoining }) {
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="relative w-full max-w-md mx-4 bg-[#121214] rounded-xl shadow-2xl overflow-hidden"
+        className="relative w-full max-w-md mx-4 bg-zinc-900 rounded-2xl shadow-2xl overflow-hidden border border-zinc-800/50"
       >
         <div className="p-6">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-emerald-500/20 rounded-lg flex items-center justify-center">
+              <div className="w-10 h-10 bg-emerald-500/20 rounded-xl flex items-center justify-center">
                 <ExternalLink className="w-5 h-5 text-emerald-400" />
               </div>
               <div>
-                <h2 className="text-lg font-semibold text-white">Join a Server</h2>
+                <h2 className="text-lg font-semibold text-white">Join a Space</h2>
                 <p className="text-sm text-zinc-500">Enter an invite link or code</p>
               </div>
             </div>
-            <button onClick={onClose} className="text-zinc-400 hover:text-white">
+            <button onClick={onClose} className="text-zinc-400 hover:text-white p-1 rounded-lg hover:bg-zinc-800">
               <X className="w-5 h-5" />
             </button>
           </div>
@@ -304,11 +302,11 @@ export function JoinByInviteModal({ isOpen, onClose, onJoin, isJoining }) {
                   setError(null);
                 }}
                 onKeyDown={handleKeyDown}
-                placeholder="https://kairo.app/invite/ABC123 or ABC123"
-                className="bg-zinc-900 border-zinc-800 text-white"
+                placeholder="ABC123 or kairo.app/invite/ABC123"
+                className="bg-zinc-800/70 border-zinc-700/50 text-white rounded-xl"
               />
               {error && (
-                <p className="text-sm text-red-400 mt-2">{error}</p>
+                <p className="text-sm text-rose-400 mt-2">{error}</p>
               )}
             </div>
 
@@ -317,14 +315,14 @@ export function JoinByInviteModal({ isOpen, onClose, onJoin, isJoining }) {
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="p-4 bg-zinc-800/30 rounded-lg"
+                className="p-4 bg-zinc-800/50 rounded-xl border border-zinc-700/50"
               >
                 <div className="flex items-center gap-3">
                   <div className="w-12 h-12 rounded-xl overflow-hidden bg-zinc-700">
                     {serverPreview.icon_url ? (
                       <img src={serverPreview.icon_url} alt="" className="w-full h-full object-cover" />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-indigo-500 to-purple-600 text-white text-xl font-bold">
+                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-violet-500 to-indigo-600 text-white text-xl font-bold">
                         {serverPreview.name?.charAt(0)}
                       </div>
                     )}
@@ -347,23 +345,23 @@ export function JoinByInviteModal({ isOpen, onClose, onJoin, isJoining }) {
                 <Button
                   onClick={previewServer}
                   disabled={!inviteCode.trim() || isLoading}
-                  className="flex-1 bg-zinc-800 hover:bg-zinc-700"
+                  className="flex-1 bg-zinc-800 hover:bg-zinc-700 rounded-xl"
                 >
-                  {isLoading ? 'Looking up...' : 'Preview Server'}
+                  {isLoading ? 'Looking up...' : 'Preview Space'}
                 </Button>
               ) : (
                 <Button
                   onClick={handleJoin}
                   disabled={isJoining}
-                  className="flex-1 bg-emerald-500 hover:bg-emerald-600"
+                  className="flex-1 bg-violet-500 hover:bg-violet-600 rounded-xl"
                 >
-                  {isJoining ? 'Joining...' : 'Join Server'}
+                  {isJoining ? 'Joining...' : 'Join Space'}
                 </Button>
               )}
             </div>
 
             <p className="text-xs text-zinc-500 text-center">
-              Invites look like: <span className="text-zinc-400">kairo.app/invite/ABC123</span> or just <span className="text-zinc-400">ABC123</span>
+              Invites look like: <span className="text-zinc-400">ABC123</span> or <span className="text-zinc-400">kairo.app/invite/ABC123</span>
             </p>
           </div>
         </div>
