@@ -294,14 +294,15 @@ export default function KairoPage() {
 
   // Fetch servers user is member of - optimized
   const { data: memberServers = [], isLoading: serversLoading, refetch: refetchServers } = useQuery({
-    queryKey: ['memberServers', currentUser?.user_id, currentUser?.id, currentUser?.user_email],
+    queryKey: ['memberServers', currentUser?.user_id, currentUser?.id, currentUser?.user_email, currentUser?.created_by],
     queryFn: async () => {
       if (!currentUser) return [];
 
       const profileRecordId = currentUser.id;
       const profileUserId = currentUser.user_id;
-      const userEmail = currentUser.user_email || currentUser.email;
-      const createdBy = currentUser.created_by;
+      const userEmail = (currentUser.user_email || currentUser.email || '').toLowerCase();
+      const createdById = currentUser.created_by_id;
+      const createdByEmail = currentUser.created_by;
 
       // Get ALL servers and memberships - then filter client-side for reliability
       const [allServers, allMemberships] = await Promise.all([
@@ -314,22 +315,25 @@ export default function KairoPage() {
         // Check user_id matches any of our identifiers
         if (m.user_id === profileRecordId) return true;
         if (m.user_id === profileUserId) return true;
-        // Check email match
-        if (userEmail && m.user_email && m.user_email.toLowerCase() === userEmail.toLowerCase()) return true;
-        // Check created_by match (for memberships created by the user)
-        if (createdBy && m.created_by === createdBy) return true;
+        // Check email match (case-insensitive)
+        if (userEmail && m.user_email && m.user_email.toLowerCase() === userEmail) return true;
+        // Check created_by_id match
+        if (createdById && m.created_by_id === createdById) return true;
+        // Check created_by email match
+        if (createdByEmail && m.created_by === createdByEmail) return true;
         return false;
       });
 
       // Get server IDs from memberships
       const memberServerIds = new Set(myMemberships.map(m => m.server_id));
 
-      // Also include servers where user is owner
+      // Also include servers where user is owner or created by this user
       const myServers = allServers.filter(s => 
         memberServerIds.has(s.id) ||
         s.owner_id === profileRecordId ||
         s.owner_id === profileUserId ||
-        (createdBy && s.created_by === createdBy)
+        (createdById && s.created_by_id === createdById) ||
+        (createdByEmail && s.created_by === createdByEmail)
       );
 
       return myServers;

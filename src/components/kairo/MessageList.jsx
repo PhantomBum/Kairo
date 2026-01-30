@@ -128,7 +128,7 @@ function MessageActions({ message, onReply, onEdit, onDelete, onReact, isOwn }) 
   );
 }
 
-function MessageItem({ message, showHeader, onReply, onEdit, onDelete, onReact, currentUserId }) {
+function MessageItem({ message, showHeader, onReply, onEdit, onDelete, onReact, onPin, onThread, onForward, currentUserId }) {
   const isOwn = message.author_id === currentUserId;
   
   return (
@@ -278,7 +278,10 @@ function MessageItem({ message, showHeader, onReply, onEdit, onDelete, onReact, 
           <Reply className="w-4 h-4 mr-2 text-zinc-500" />
           Reply
         </ContextMenuItem>
-        <ContextMenuItem className="text-zinc-300 focus:bg-zinc-800 rounded-lg">
+        <ContextMenuItem 
+          onClick={() => onThread?.(message)}
+          className="text-zinc-300 focus:bg-zinc-800 rounded-lg"
+        >
           <MessageSquare className="w-4 h-4 mr-2 text-zinc-500" />
           Create Thread
         </ContextMenuItem>
@@ -289,9 +292,19 @@ function MessageItem({ message, showHeader, onReply, onEdit, onDelete, onReact, 
           <Copy className="w-4 h-4 mr-2 text-zinc-500" />
           Copy Text
         </ContextMenuItem>
-        <ContextMenuItem className="text-zinc-300 focus:bg-zinc-800 rounded-lg">
+        <ContextMenuItem 
+          onClick={() => onPin?.(message)}
+          className="text-zinc-300 focus:bg-zinc-800 rounded-lg"
+        >
           <Pin className="w-4 h-4 mr-2 text-zinc-500" />
-          Pin Message
+          {message.is_pinned ? 'Unpin Message' : 'Pin Message'}
+        </ContextMenuItem>
+        <ContextMenuItem 
+          onClick={() => onForward?.(message)}
+          className="text-zinc-300 focus:bg-zinc-800 rounded-lg"
+        >
+          <Forward className="w-4 h-4 mr-2 text-zinc-500" />
+          Forward
         </ContextMenuItem>
         {isOwn && (
           <>
@@ -324,6 +337,9 @@ export default function MessageList({
   onEdit,
   onDelete,
   onReact,
+  onPin,
+  onThread,
+  onForward,
   isLoading
 }) {
   const listRef = useRef(null);
@@ -397,6 +413,9 @@ export default function MessageList({
                   onEdit={onEdit}
                   onDelete={onDelete}
                   onReact={onReact}
+                  onPin={onPin}
+                  onThread={onThread}
+                  onForward={onForward}
                 />
               </React.Fragment>
             ))}
