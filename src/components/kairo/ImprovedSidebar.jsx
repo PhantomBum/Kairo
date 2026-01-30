@@ -10,7 +10,7 @@ import {
   ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger 
 } from '@/components/ui/context-menu';
 
-function ServerItem({ server, isActive, onClick, isCollapsed }) {
+function ServerItem({ server, isActive, onClick, isCollapsed, onLeave }) {
   return (
     <ContextMenu>
       <ContextMenuTrigger>
@@ -58,7 +58,10 @@ function ServerItem({ server, isActive, onClick, isCollapsed }) {
           <Settings className="w-4 h-4 mr-2" />
           Server Settings
         </ContextMenuItem>
-        <ContextMenuItem className="text-red-500 hover:bg-zinc-800">
+        <ContextMenuItem 
+          className="text-red-500 hover:bg-zinc-800"
+          onClick={() => onLeave?.(server)}
+        >
           Leave Server
         </ContextMenuItem>
       </ContextMenuContent>
@@ -167,6 +170,7 @@ export default function ImprovedSidebar({
   onUpdateLogsClick,
   onNotificationsClick,
   onShopClick,
+  onLeaveServer,
   isDMsActive,
   userProfile,
   unreadDMs = 0,
@@ -271,6 +275,7 @@ export default function ImprovedSidebar({
               isActive={activeServerId === server.id}
               onClick={() => onServerSelect(server)}
               isCollapsed={isCollapsed}
+              onLeave={onLeaveServer}
             />
           ))}
         </div>

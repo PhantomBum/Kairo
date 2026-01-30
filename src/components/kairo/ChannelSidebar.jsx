@@ -239,7 +239,10 @@ export default function ChannelSidebar({
             Notification Settings
           </DropdownMenuItem>
           <DropdownMenuSeparator className="bg-zinc-800" />
-          <DropdownMenuItem className="text-red-400 focus:bg-red-500/20 focus:text-red-400">
+          <DropdownMenuItem 
+            onClick={() => window.dispatchEvent(new CustomEvent('kairo:leave-server', { detail: server }))}
+            className="text-red-400 focus:bg-red-500/20 focus:text-red-400"
+          >
             Leave Server
           </DropdownMenuItem>
         </DropdownMenuContent>

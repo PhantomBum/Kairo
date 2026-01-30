@@ -569,22 +569,53 @@ export default function KairoPage() {
     queryClient.invalidateQueries({ queryKey: ['messages', activeChannel?.id] });
   };
 
+  const handleLeaveServer = async (server) => {
+    if (!confirm(`Are you sure you want to leave ${server.name}?`)) return;
+    
+    try {
+      const membership = await base44.entities.ServerMember.filter({ 
+        server_id: server.id, 
+        user_id: currentUser.id 
+      });
+      
+      if (membership.length > 0) {
+        await base44.entities.ServerMember.delete(membership[0].id);
+        await base44.entities.Server.update(server.id, { 
+          member_count: Math.max((server.member_count || 1) - 1, 0) 
+        });
+        queryClient.invalidateQueries({ queryKey: ['memberServers'] });
+        
+        if (activeServer?.id === server.id) {
+          setActiveServer(null);
+          setActiveChannel(null);
+          setView('dms');
+        }
+      }
+    } catch (error) {
+      console.error('Failed to leave server:', error);
+      alert('Failed to leave server. Please try again.');
+    }
+  };
+
   // Listen for custom events
   useEffect(() => {
     const handleShowApps = () => setShowAppMarketplace(true);
     const handleShowWebhooks = () => setShowWebhooks(true);
     const handleShowRoles = () => setShowRoles(true);
+    const handleLeaveServerEvent = (e) => handleLeaveServer(e.detail);
 
     window.addEventListener('kairo:show-apps', handleShowApps);
     window.addEventListener('kairo:show-webhooks', handleShowWebhooks);
     window.addEventListener('kairo:show-roles', handleShowRoles);
+    window.addEventListener('kairo:leave-server', handleLeaveServerEvent);
 
     return () => {
       window.removeEventListener('kairo:show-apps', handleShowApps);
       window.removeEventListener('kairo:show-webhooks', handleShowWebhooks);
       window.removeEventListener('kairo:show-roles', handleShowRoles);
+      window.removeEventListener('kairo:leave-server', handleLeaveServerEvent);
     };
-  }, []);
+  }, [activeServer, currentUser]);
 
   const handleCommandPaletteCommand = (cmd) => {
     switch (cmd.id) {
@@ -623,6 +654,7 @@ export default function KairoPage() {
           onProfileClick={() => setShowProfileEditor(true)} 
           onUpdateLogsClick={() => setShowUpdateLogs(true)}
           onNotificationsClick={() => setShowNotifications(true)}
+          onLeaveServer={handleLeaveServer}
           isDMsActive={false} 
           userProfile={userProfile}
           notifications={notifications}
@@ -657,6 +689,7 @@ export default function KairoPage() {
           onUpdateLogsClick={() => setShowUpdateLogs(true)}
           onNotificationsClick={() => setShowNotifications(true)}
           onShopClick={() => setShowShop(true)}
+          onLeaveServer={handleLeaveServer}
           isDMsActive={false} 
           userProfile={userProfile}
           notifications={notifications}
@@ -759,6 +792,7 @@ export default function KairoPage() {
         onUpdateLogsClick={() => setShowUpdateLogs(true)}
         onNotificationsClick={() => setShowNotifications(true)}
         onShopClick={() => setShowShop(true)}
+        onLeaveServer={handleLeaveServer}
         isDMsActive={view === 'dms'} 
         userProfile={userProfile}
         unreadDMs={conversations.filter(c => c.unread_count > 0).length}
