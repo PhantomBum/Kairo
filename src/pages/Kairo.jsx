@@ -1251,6 +1251,19 @@ export default function KairoPage() {
             }}
           />
         )}
+        {showNewDM && (
+          <CreateGroupDMModal
+            isOpen={showNewDM}
+            onClose={() => setShowNewDM(false)}
+            currentUser={userProfile || currentUser}
+            friends={friends}
+            onCreate={(convo) => {
+              queryClient.invalidateQueries({ queryKey: ['conversations'] });
+              setActiveConversation(convo);
+              setShowNewDM(false);
+            }}
+          />
+        )}
         </AnimatePresence>
       </div>
     </>
