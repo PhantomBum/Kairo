@@ -135,40 +135,44 @@ function MessageItem({ message, showHeader, onReply, onEdit, onDelete, onReact, 
     <ContextMenu>
       <ContextMenuTrigger>
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
+          initial={{ opacity: 0, y: 5 }}
+          animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.15 }}
           className={cn(
-            "group relative px-4 py-1 hover:bg-zinc-800/20 transition-colors rounded-lg mx-2",
-            showHeader && "mt-4 pt-2"
+            "group relative px-4 py-1.5 hover:bg-zinc-800/30 transition-all rounded-2xl mx-2",
+            showHeader && "mt-5 pt-3",
+            message.is_pinned && "bg-amber-500/5 border-l-2 border-amber-500/50"
           )}
         >
           {/* Reply reference */}
           {message.reply_preview && (
-            <div className="flex items-center gap-2 mb-2 pl-12">
-              <div className="w-6 h-6 border-l-2 border-t-2 border-zinc-700 rounded-tl-lg" />
-              <div className="flex items-center gap-2 px-3 py-1.5 bg-zinc-800/50 rounded-lg text-sm">
-                <span className="text-violet-400 font-medium">@{message.reply_preview.author_name}</span>
+            <div className="flex items-center gap-2 mb-2.5 pl-14">
+              <div className="w-5 h-5 border-l-2 border-t-2 border-zinc-700/50 rounded-tl-xl" />
+              <div className="flex items-center gap-2 px-3 py-2 bg-zinc-800/40 rounded-xl text-sm border border-zinc-800/30">
+                <span className="text-violet-400 font-semibold">@{message.reply_preview.author_name}</span>
                 <span className="text-zinc-500 truncate max-w-[200px]">{message.reply_preview.content?.slice(0, 50)}</span>
               </div>
             </div>
           )}
 
-          <div className="flex gap-3">
+          <div className="flex gap-3.5">
             {/* Avatar */}
             {showHeader ? (
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-indigo-600 overflow-hidden flex-shrink-0 cursor-pointer hover:opacity-90 transition-opacity shadow-lg">
+              <motion.div 
+                whileHover={{ scale: 1.05 }}
+                className="w-11 h-11 rounded-2xl bg-gradient-to-br from-violet-500 to-indigo-600 overflow-hidden flex-shrink-0 cursor-pointer shadow-lg ring-2 ring-transparent hover:ring-violet-500/30 transition-all"
+              >
                 {message.author_avatar ? (
                   <img src={message.author_avatar} alt="" className="w-full h-full object-cover" />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center text-white font-medium">
+                  <div className="w-full h-full flex items-center justify-center text-white font-bold">
                     {message.author_name?.charAt(0) || '?'}
                   </div>
                 )}
-              </div>
+              </motion.div>
             ) : (
-              <div className="w-10 flex-shrink-0 flex items-center justify-center">
-                <span className="text-[10px] text-zinc-600 opacity-0 group-hover:opacity-100 transition-opacity">
+              <div className="w-11 flex-shrink-0 flex items-center justify-center">
+                <span className="text-[10px] text-zinc-600 opacity-0 group-hover:opacity-100 transition-opacity font-medium">
                   {format(new Date(message.created_date), 'h:mm')}
                 </span>
               </div>
@@ -177,7 +181,7 @@ function MessageItem({ message, showHeader, onReply, onEdit, onDelete, onReact, 
             {/* Content */}
             <div className="flex-1 min-w-0">
               {showHeader && (
-                <div className="flex items-center gap-2 mb-1">
+                <div className="flex items-center gap-2 mb-1.5">
                   <span className="font-semibold text-white hover:underline cursor-pointer text-[15px]">
                     {message.author_name || 'Unknown'}
                   </span>
@@ -190,11 +194,14 @@ function MessageItem({ message, showHeader, onReply, onEdit, onDelete, onReact, 
                   {message.metadata?.platform && (
                     <CrossAppIndicator platform={message.metadata.platform} size="xs" />
                   )}
-                  <span className="text-xs text-zinc-500">
+                  <span className="text-[11px] text-zinc-500 font-medium">
                     {formatMessageDate(message.created_date)}
                   </span>
                   {message.is_edited && (
-                    <span className="text-xs text-zinc-600">(edited)</span>
+                    <span className="text-[10px] text-zinc-600 bg-zinc-800/50 px-1.5 py-0.5 rounded">(edited)</span>
+                  )}
+                  {message.is_pinned && (
+                    <Pin className="w-3 h-3 text-amber-400" />
                   )}
                 </div>
               )}
@@ -207,21 +214,26 @@ function MessageItem({ message, showHeader, onReply, onEdit, onDelete, onReact, 
               {message.attachments?.length > 0 && (
                 <div className="mt-3 flex flex-wrap gap-2">
                   {message.attachments.map((attachment, i) => (
-                    <div key={i} className="rounded-2xl overflow-hidden max-w-md">
+                    <motion.div 
+                      key={i} 
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      className="rounded-2xl overflow-hidden max-w-md"
+                    >
                       {attachment.content_type?.startsWith('image/') ? (
                         <img 
                           src={attachment.url} 
                           alt={attachment.filename}
-                          className="max-h-80 rounded-2xl border border-zinc-800"
+                          className="max-h-80 rounded-2xl border border-zinc-800/50 shadow-lg hover:shadow-xl transition-shadow cursor-pointer"
                         />
                       ) : (
                         <a 
                           href={attachment.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="flex items-center gap-3 p-3 bg-zinc-800/50 rounded-xl hover:bg-zinc-800 transition-colors border border-zinc-800"
+                          className="flex items-center gap-3 p-3.5 bg-zinc-800/40 rounded-2xl hover:bg-zinc-800/60 transition-all border border-zinc-800/30 group/attachment"
                         >
-                          <div className="w-10 h-10 bg-violet-500/20 rounded-lg flex items-center justify-center">
+                          <div className="w-11 h-11 bg-violet-500/20 rounded-xl flex items-center justify-center group-hover/attachment:bg-violet-500/30 transition-colors">
                             📄
                           </div>
                           <div>
@@ -232,7 +244,7 @@ function MessageItem({ message, showHeader, onReply, onEdit, onDelete, onReact, 
                           </div>
                         </a>
                       )}
-                    </div>
+                    </motion.div>
                   ))}
                 </div>
               )}
@@ -241,19 +253,21 @@ function MessageItem({ message, showHeader, onReply, onEdit, onDelete, onReact, 
               {message.reactions?.length > 0 && (
                 <div className="flex flex-wrap gap-1.5 mt-3">
                   {message.reactions.map((reaction, i) => (
-                    <button
+                    <motion.button
                       key={i}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
                       onClick={() => onReact?.(message.id, reaction.emoji)}
                       className={cn(
-                        "flex items-center gap-1.5 px-2.5 py-1 rounded-full text-sm transition-all",
+                        "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm transition-all",
                         reaction.users?.includes(currentUserId)
-                          ? "bg-violet-500/20 border border-violet-500/40 text-violet-300"
-                          : "bg-zinc-800/70 hover:bg-zinc-800 text-zinc-400"
+                          ? "bg-violet-500/20 border border-violet-500/40 text-violet-300 shadow-lg shadow-violet-500/10"
+                          : "bg-zinc-800/50 hover:bg-zinc-800 text-zinc-400 border border-zinc-700/30"
                       )}
                     >
-                      <span>{reaction.emoji}</span>
-                      <span className="text-xs font-medium">{reaction.count}</span>
-                    </button>
+                      <span className="text-base">{reaction.emoji}</span>
+                      <span className="text-xs font-semibold">{reaction.count}</span>
+                    </motion.button>
                   ))}
                 </div>
               )}
