@@ -38,15 +38,15 @@ function FriendRequestCard({ request, type, onAccept, onDecline }) {
     >
       <div className="flex items-center gap-3">
         <div className="relative">
-          <div className="w-10 h-10 rounded-full overflow-hidden bg-zinc-700">
-            {friend.friend_avatar ? (
-              <img src={friend.friend_avatar} alt="" className="w-full h-full object-cover" />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-indigo-500 to-purple-600 text-white font-medium">
-                {friend.friend_name?.charAt(0) || '?'}
-              </div>
-            )}
-          </div>
+        <div className="w-10 h-10 rounded-xl overflow-hidden bg-zinc-700">
+          {friend.friend_avatar ? (
+            <img src={friend.friend_avatar} alt="" className="w-full h-full object-cover" />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-violet-500 to-indigo-600 text-white font-medium">
+              {friend.friend_name?.charAt(0) || '?'}
+            </div>
+          )}
+        </div>
         </div>
         <div>
           <p className="font-medium text-white">{friend.friend_name}</p>
@@ -100,17 +100,17 @@ function FriendCard({ friend, onMessage, onRemove, onBlock }) {
     >
       <div className="flex items-center gap-3">
         <div className="relative">
-          <div className="w-10 h-10 rounded-full overflow-hidden bg-zinc-700">
+          <div className="w-10 h-10 rounded-xl overflow-hidden bg-zinc-700">
             {friend.friend_avatar ? (
               <img src={friend.friend_avatar} alt="" className="w-full h-full object-cover" />
             ) : (
-              <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-indigo-500 to-purple-600 text-white font-medium">
+              <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-violet-500 to-indigo-600 text-white font-medium">
                 {friend.friend_name?.charAt(0) || '?'}
               </div>
             )}
           </div>
           <div className={cn(
-            "absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-2 border-[#121214]",
+            "absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-2 border-zinc-900",
             statusColors[friend.status] || statusColors.offline
           )} />
         </div>
@@ -125,7 +125,7 @@ function FriendCard({ friend, onMessage, onRemove, onBlock }) {
           size="icon"
           variant="ghost"
           onClick={() => onMessage?.(friend)}
-          className="w-9 h-9 text-zinc-400 hover:text-white hover:bg-zinc-700"
+          className="w-9 h-9 text-zinc-400 hover:text-white hover:bg-zinc-700 rounded-xl"
         >
           <MessageCircle className="w-4 h-4" />
         </Button>
@@ -134,12 +134,12 @@ function FriendCard({ friend, onMessage, onRemove, onBlock }) {
             <Button
               size="icon"
               variant="ghost"
-              className="w-9 h-9 text-zinc-400 hover:text-white hover:bg-zinc-700"
+              className="w-9 h-9 text-zinc-400 hover:text-white hover:bg-zinc-700 rounded-xl"
             >
               <MoreHorizontal className="w-4 h-4" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-40 bg-zinc-900 border-zinc-800">
+          <DropdownMenuContent className="w-40 bg-zinc-900/95 backdrop-blur-xl border-zinc-800/50 rounded-xl">
             <DropdownMenuItem 
               onClick={() => onMessage?.(friend)}
               className="text-zinc-300 focus:bg-zinc-800"
