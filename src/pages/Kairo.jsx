@@ -916,8 +916,22 @@ export default function KairoPage() {
         updateProfileMutation.mutate({ status: e.detail });
       }
     };
-
     const handleOpenSearch = () => setShowGlobalSearch(true);
+    
+    const handleDeleteChannel = async (e) => {
+      const channel = e.detail;
+      if (!channel?.id) return;
+      if (!confirm(`Are you sure you want to delete #${channel.name}?`)) return;
+      try {
+        await base44.entities.Channel.delete(channel.id);
+        queryClient.invalidateQueries({ queryKey: ['channels', activeServer?.id] });
+        if (activeChannel?.id === channel.id) {
+          setActiveChannel(null);
+        }
+      } catch (err) {
+        alert('Failed to delete channel');
+      }
+    };
 
     window.addEventListener('kairo:show-apps', handleShowApps);
     window.addEventListener('kairo:show-webhooks', handleShowWebhooks);
@@ -926,6 +940,7 @@ export default function KairoPage() {
     window.addEventListener('kairo:leave-server', handleLeaveServerEvent);
     window.addEventListener('kairo:update-status', handleUpdateStatus);
     window.addEventListener('kairo:open-search', handleOpenSearch);
+    window.addEventListener('kairo:delete-channel', handleDeleteChannel);
 
     return () => {
       window.removeEventListener('kairo:show-apps', handleShowApps);
@@ -935,8 +950,9 @@ export default function KairoPage() {
       window.removeEventListener('kairo:leave-server', handleLeaveServerEvent);
       window.removeEventListener('kairo:update-status', handleUpdateStatus);
       window.removeEventListener('kairo:open-search', handleOpenSearch);
+      window.removeEventListener('kairo:delete-channel', handleDeleteChannel);
     };
-  }, [activeServer, currentUser, userProfile]);
+  }, [activeServer, currentUser, userProfile, activeChannel]);
 
   const handleCommandPaletteCommand = (cmd) => {
     switch (cmd.id) {
