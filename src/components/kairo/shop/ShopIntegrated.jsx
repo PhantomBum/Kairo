@@ -8,7 +8,6 @@ import { cn } from '@/lib/utils';
 
 function ServerBoostCheckout({ server, currentUser, onClose }) {
   const [isProcessing, setIsProcessing] = useState(false);
-  const [selectedDuration, setSelectedDuration] = useState(1);
 
   const boostOptions = [
     { months: 1, price: 4.99, label: '1 Month', popular: false },
@@ -44,73 +43,72 @@ function ServerBoostCheckout({ server, currentUser, onClose }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm p-4">
       <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.95 }}
-        className="bg-zinc-900 rounded-xl max-w-2xl w-full p-6 border border-zinc-800"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: 20 }}
+        className="bg-zinc-900/50 backdrop-blur-xl rounded-2xl max-w-md w-full p-6 border border-white/5"
       >
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center">
-              <Zap className="w-6 h-6 text-white" />
+            <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center">
+              <Zap className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-white">Boost {server.name}</h2>
-              <p className="text-sm text-zinc-500">Support the server and unlock perks</p>
+              <h2 className="text-lg font-medium text-white">Boost {server.name}</h2>
+              <p className="text-xs text-zinc-500">Support and unlock perks</p>
             </div>
           </div>
-          <button onClick={onClose} className="text-zinc-400 hover:text-white">
-            <X className="w-6 h-6" />
+          <button onClick={onClose} className="p-2 text-zinc-500 hover:text-white rounded-lg hover:bg-white/5 transition-colors">
+            <X className="w-5 h-5" />
           </button>
         </div>
 
-        <div className="space-y-3 mb-6">
+        <div className="space-y-2 mb-6">
           {boostOptions.map((option) => (
             <motion.button
               key={option.months}
-              whileHover={{ scale: 1.02 }}
+              whileHover={{ scale: 1.01 }}
+              whileTap={{ scale: 0.99 }}
               onClick={() => handlePurchase(option)}
               disabled={isProcessing}
               className={cn(
-                "w-full p-4 rounded-lg border-2 transition-all text-left",
+                "w-full p-4 rounded-xl border transition-all text-left",
                 option.popular
-                  ? "bg-gradient-to-br from-pink-500/20 to-purple-500/20 border-pink-500"
-                  : "bg-zinc-800/50 border-zinc-700 hover:border-zinc-600"
+                  ? "bg-white/5 border-white/20"
+                  : "bg-white/[0.02] border-white/5 hover:border-white/10"
               )}
             >
-              {option.popular && (
-                <div className="inline-block px-2 py-0.5 bg-pink-500 text-white text-xs font-bold rounded-full mb-2">
-                  BEST VALUE
-                </div>
-              )}
               <div className="flex items-center justify-between">
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="text-lg font-bold text-white">{option.label}</span>
+                    <span className="text-sm font-medium text-white">{option.label}</span>
+                    {option.popular && (
+                      <span className="px-1.5 py-0.5 bg-white text-black text-[10px] font-medium rounded">BEST</span>
+                    )}
                     {option.savings && (
-                      <span className="text-xs text-green-400">Save {option.savings}</span>
+                      <span className="text-[10px] text-emerald-400">-{option.savings}</span>
                     )}
                   </div>
-                  <p className="text-sm text-zinc-400 mt-1">Boost for {option.months} month{option.months > 1 ? 's' : ''}</p>
+                  <p className="text-xs text-zinc-600 mt-0.5">{option.months} month{option.months > 1 ? 's' : ''} of boost</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-2xl font-bold text-white">${option.price}</p>
-                  <p className="text-xs text-zinc-500">${(option.price / option.months).toFixed(2)}/mo</p>
+                  <p className="text-lg font-semibold text-white">${option.price}</p>
+                  <p className="text-[10px] text-zinc-600">${(option.price / option.months).toFixed(2)}/mo</p>
                 </div>
               </div>
             </motion.button>
           ))}
         </div>
 
-        <div className="bg-zinc-800/50 rounded-lg p-4 space-y-2">
-          <h3 className="font-semibold text-white mb-2">Boost Benefits:</h3>
-          <div className="text-sm text-zinc-400 space-y-1">
-            <p>✓ Support the server financially</p>
-            <p>✓ Special badge next to your name</p>
-            <p>✓ Access to exclusive boost perks</p>
-            <p>✓ Help unlock server-wide improvements</p>
+        <div className="bg-white/[0.02] border border-white/5 rounded-xl p-4">
+          <h3 className="text-xs font-medium text-zinc-400 uppercase tracking-wider mb-3">Benefits</h3>
+          <div className="grid grid-cols-2 gap-2 text-xs text-zinc-500">
+            <p>• Exclusive badge</p>
+            <p>• Boost perks</p>
+            <p>• Support server</p>
+            <p>• Server improvements</p>
           </div>
         </div>
       </motion.div>
@@ -161,68 +159,65 @@ function ServerSubscriptions({ server, currentUser }) {
   if (subscriptions.length === 0) {
     return (
       <div className="p-12 text-center">
-        <Crown className="w-16 h-16 text-zinc-600 mx-auto mb-4" />
-        <h3 className="text-xl font-bold text-white mb-2">No Subscriptions Yet</h3>
-        <p className="text-zinc-500">Server hasn't set up any subscription tiers yet</p>
+        <Crown className="w-12 h-12 text-zinc-700 mx-auto mb-4" />
+        <h3 className="text-lg font-medium text-white mb-2">No Subscriptions</h3>
+        <p className="text-sm text-zinc-600">No subscription tiers available yet</p>
       </div>
     );
   }
 
   return (
-    <div className="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div className="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
       {subscriptions.map((sub) => (
         <motion.div
           key={sub.id}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-zinc-900 rounded-xl border border-zinc-800 overflow-hidden hover:border-indigo-500 transition-all"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="bg-white/[0.02] rounded-2xl border border-white/5 overflow-hidden hover:border-white/10 transition-all"
         >
-          <div 
-            className="h-32 relative"
-            style={{ backgroundColor: sub.color || '#6366f1' }}
-          >
-            <div className="absolute inset-0 bg-gradient-to-br from-transparent to-black/30" />
-            <div className="absolute bottom-4 left-4">
-              <h3 className="text-2xl font-bold text-white">{sub.name}</h3>
-              <p className="text-white/80 text-sm">Tier {sub.tier}</p>
-            </div>
-          </div>
-
-          <div className="p-4">
-            <div className="mb-4">
-              <div className="flex items-baseline gap-1 mb-2">
-                <span className="text-3xl font-bold text-white">${sub.price}</span>
-                <span className="text-zinc-500 text-sm">/month</span>
+          <div className="p-5">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h3 className="text-base font-medium text-white">{sub.name}</h3>
+                <p className="text-[10px] text-zinc-600 uppercase tracking-wider">Tier {sub.tier}</p>
               </div>
-              <p className="text-sm text-zinc-400">{sub.description}</p>
+              <div 
+                className="w-3 h-3 rounded-full"
+                style={{ backgroundColor: sub.color || '#fff' }}
+              />
+            </div>
+
+            <div className="mb-4">
+              <div className="flex items-baseline gap-1">
+                <span className="text-2xl font-semibold text-white">${sub.price}</span>
+                <span className="text-zinc-600 text-xs">/mo</span>
+              </div>
+              {sub.description && (
+                <p className="text-xs text-zinc-500 mt-1">{sub.description}</p>
+              )}
             </div>
 
             {sub.benefits?.length > 0 && (
-              <div className="mb-4 space-y-1">
-                {sub.benefits.slice(0, 4).map((benefit, i) => (
-                  <div key={i} className="flex items-start gap-2 text-sm text-zinc-300">
-                    <span className="text-green-400 mt-0.5">✓</span>
+              <div className="mb-4 space-y-1.5">
+                {sub.benefits.slice(0, 3).map((benefit, i) => (
+                  <div key={i} className="flex items-start gap-2 text-xs text-zinc-400">
+                    <span className="text-emerald-400 mt-0.5">•</span>
                     <span>{benefit}</span>
                   </div>
                 ))}
-                {sub.benefits.length > 4 && (
-                  <p className="text-xs text-zinc-500 ml-5">+{sub.benefits.length - 4} more benefits</p>
+                {sub.benefits.length > 3 && (
+                  <p className="text-[10px] text-zinc-600 ml-4">+{sub.benefits.length - 3} more</p>
                 )}
               </div>
             )}
 
-            <div className="flex items-center justify-between text-xs text-zinc-500 mb-3">
-              <span>{sub.subscriber_count || 0} subscribers</span>
-            </div>
-
-            <Button
+            <button
               onClick={() => handleSubscribe(sub)}
               disabled={isProcessing}
-              className="w-full bg-indigo-500 hover:bg-indigo-600"
+              className="w-full px-4 py-2.5 bg-white text-black text-sm font-medium rounded-lg hover:bg-zinc-200 transition-all disabled:opacity-50"
             >
-              <Crown className="w-4 h-4 mr-2" />
               Subscribe
-            </Button>
+            </button>
           </div>
         </motion.div>
       ))}
@@ -236,28 +231,38 @@ export default function ShopIntegrated({ currentUser, activeServer }) {
 
   if (!activeServer) {
     return (
-      <div className="flex-1 flex items-center justify-center bg-[#0a0a0b]">
+      <div className="flex-1 flex items-center justify-center bg-[#050506]">
         <div className="text-center">
-          <Zap className="w-16 h-16 text-zinc-600 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-white mb-2">No Server Selected</h2>
-          <p className="text-zinc-500">Select a server to view shop options</p>
+          <Zap className="w-10 h-10 text-zinc-700 mx-auto mb-4" />
+          <h2 className="text-lg font-medium text-white mb-1">No Server Selected</h2>
+          <p className="text-sm text-zinc-600">Select a server to view shop</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="flex-1 bg-[#0a0a0b] overflow-y-auto">
+    <div className="flex-1 bg-[#050506] overflow-y-auto">
+      {/* Subtle grid */}
+      <div className="fixed inset-0 pointer-events-none opacity-[0.015]" style={{
+        backgroundImage: `linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px)`,
+        backgroundSize: '60px 60px'
+      }} />
+
       {/* Header */}
-      <div className="sticky top-0 bg-[#0a0a0b]/95 backdrop-blur-xl border-b border-zinc-800 z-10 p-6">
+      <div className="sticky top-0 bg-[#050506]/90 backdrop-blur-xl border-b border-white/5 z-10 p-5">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
-            {activeServer.icon_url && (
-              <img src={activeServer.icon_url} alt="" className="w-12 h-12 rounded-lg" />
+            {activeServer.icon_url ? (
+              <img src={activeServer.icon_url} alt="" className="w-10 h-10 rounded-xl" />
+            ) : (
+              <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white font-medium">
+                {activeServer.name?.charAt(0)}
+              </div>
             )}
             <div>
-              <h1 className="text-2xl font-bold text-white">{activeServer.name} Shop</h1>
-              <p className="text-sm text-zinc-500">Support and subscribe to unlock perks</p>
+              <h1 className="text-base font-medium text-white">{activeServer.name}</h1>
+              <p className="text-xs text-zinc-600">Support & Subscribe</p>
             </div>
           </div>
         </div>
@@ -266,25 +271,25 @@ export default function ShopIntegrated({ currentUser, activeServer }) {
           <button
             onClick={() => setActiveTab('boost')}
             className={cn(
-              "px-6 py-2 rounded-lg font-medium text-sm transition-all",
+              "px-4 py-2 rounded-lg text-sm transition-all",
               activeTab === 'boost'
-                ? "bg-gradient-to-r from-pink-500 to-purple-600 text-white"
-                : "bg-zinc-900 text-zinc-400 hover:bg-zinc-800 hover:text-white"
+                ? "bg-white text-black font-medium"
+                : "bg-white/5 text-zinc-500 hover:text-white border border-white/5"
             )}
           >
-            <Zap className="w-4 h-4 inline mr-2" />
-            Server Boosts
+            <Zap className="w-3.5 h-3.5 inline mr-1.5" />
+            Boosts
           </button>
           <button
             onClick={() => setActiveTab('subscriptions')}
             className={cn(
-              "px-6 py-2 rounded-lg font-medium text-sm transition-all",
+              "px-4 py-2 rounded-lg text-sm transition-all",
               activeTab === 'subscriptions'
-                ? "bg-indigo-500 text-white"
-                : "bg-zinc-900 text-zinc-400 hover:bg-zinc-800 hover:text-white"
+                ? "bg-white text-black font-medium"
+                : "bg-white/5 text-zinc-500 hover:text-white border border-white/5"
             )}
           >
-            <Crown className="w-4 h-4 inline mr-2" />
+            <Crown className="w-3.5 h-3.5 inline mr-1.5" />
             Subscriptions
           </button>
         </div>
@@ -292,41 +297,40 @@ export default function ShopIntegrated({ currentUser, activeServer }) {
 
       {/* Content */}
       {activeTab === 'boost' ? (
-        <div className="p-6 max-w-4xl mx-auto">
-          <div className="text-center mb-8">
-            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center mx-auto mb-4">
-              <Zap className="w-10 h-10 text-white" />
+        <div className="p-6 max-w-2xl mx-auto">
+          <div className="text-center mb-10">
+            <div className="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mx-auto mb-4">
+              <Zap className="w-7 h-7 text-white" />
             </div>
-            <h2 className="text-3xl font-bold text-white mb-2">Boost This Server</h2>
-            <p className="text-zinc-400 max-w-xl mx-auto">
-              Show your support and help unlock server-wide perks. Each boost helps improve the server for everyone!
+            <h2 className="text-xl font-medium text-white mb-2">Boost Server</h2>
+            <p className="text-sm text-zinc-500 max-w-md mx-auto">
+              Support the server and unlock exclusive perks
             </p>
           </div>
 
-          <Button
+          <button
             onClick={() => setShowBoostCheckout(true)}
-            size="lg"
-            className="w-full max-w-md mx-auto block bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-lg py-6"
+            className="w-full max-w-sm mx-auto flex items-center justify-center gap-2 px-6 py-3 bg-white text-black font-medium rounded-lg hover:bg-zinc-200 transition-all"
           >
-            <Zap className="w-5 h-5 mr-2" />
-            Choose Boost Duration
-          </Button>
+            <Zap className="w-4 h-4" />
+            Choose Duration
+          </button>
 
-          <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="bg-zinc-900/50 rounded-lg p-4 text-center border border-zinc-800">
-              <Zap className="w-8 h-8 text-pink-500 mx-auto mb-2" />
-              <h3 className="font-semibold text-white mb-1">Exclusive Badge</h3>
-              <p className="text-sm text-zinc-500">Stand out with a special boost badge</p>
+          <div className="mt-16 grid grid-cols-3 gap-px bg-white/5 rounded-2xl overflow-hidden">
+            <div className="bg-[#050506] p-5 text-center">
+              <Zap className="w-5 h-5 text-zinc-600 mx-auto mb-2" />
+              <h3 className="text-sm font-medium text-white mb-0.5">Badge</h3>
+              <p className="text-[11px] text-zinc-600">Exclusive boost badge</p>
             </div>
-            <div className="bg-zinc-900/50 rounded-lg p-4 text-center border border-zinc-800">
-              <Users className="w-8 h-8 text-purple-500 mx-auto mb-2" />
-              <h3 className="font-semibold text-white mb-1">Support Community</h3>
-              <p className="text-sm text-zinc-500">Help unlock server improvements</p>
+            <div className="bg-[#050506] p-5 text-center">
+              <Users className="w-5 h-5 text-zinc-600 mx-auto mb-2" />
+              <h3 className="text-sm font-medium text-white mb-0.5">Support</h3>
+              <p className="text-[11px] text-zinc-600">Help the community</p>
             </div>
-            <div className="bg-zinc-900/50 rounded-lg p-4 text-center border border-zinc-800">
-              <Crown className="w-8 h-8 text-indigo-500 mx-auto mb-2" />
-              <h3 className="font-semibold text-white mb-1">Special Perks</h3>
-              <p className="text-sm text-zinc-500">Access boost-only features</p>
+            <div className="bg-[#050506] p-5 text-center">
+              <Crown className="w-5 h-5 text-zinc-600 mx-auto mb-2" />
+              <h3 className="text-sm font-medium text-white mb-0.5">Perks</h3>
+              <p className="text-[11px] text-zinc-600">Exclusive features</p>
             </div>
           </div>
         </div>
