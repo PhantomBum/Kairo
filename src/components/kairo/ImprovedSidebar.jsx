@@ -59,7 +59,7 @@ function ServerItem({ server, isActive, onClick, isCollapsed, onLeave, onMobileC
                     {server.unread > 99 ? '99+' : server.unread}
                   </div>
                 )}
-              </motion.button>
+              </button>
             </TooltipTrigger>
             {isCollapsed && (
               <TooltipContent side="right" className="bg-[#111113] border-white/10 text-white text-xs">
