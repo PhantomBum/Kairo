@@ -184,6 +184,7 @@ function CategoryItem({ category, channels, activeChannelId, onChannelClick, onC
   );
 }
 
+// Premium V2 ChannelSidebar
 export default function ChannelSidebar({ 
   server, 
   categories = [], 
