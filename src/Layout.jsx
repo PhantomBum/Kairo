@@ -129,32 +129,56 @@ export default function Layout({ children }) {
           text-rendering: optimizeLegibility;
         }
 
-        /* Override Radix UI slide animations - use fade only */
-        [data-state=open] {
-          animation: fadeIn 150ms ease-out !important;
-        }
-        
-        [data-state=closed] {
-          animation: fadeOut 100ms ease-in !important;
-        }
-        
-        @keyframes fadeIn {
+        /* Override Radix UI slide/zoom animations - fade only */
+        @keyframes simpleFadeIn {
           from { opacity: 0; }
           to { opacity: 1; }
         }
         
-        @keyframes fadeOut {
+        @keyframes simpleFadeOut {
           from { opacity: 1; }
           to { opacity: 0; }
         }
 
-        /* Disable all slide-in animations from tailwind */
+        /* Force all Radix popovers/dropdowns to fade only */
+        [data-radix-popper-content-wrapper] > * {
+          animation: simpleFadeIn 150ms ease-out !important;
+          transform: none !important;
+        }
+        
+        [data-radix-popper-content-wrapper] > *[data-state=closed] {
+          animation: simpleFadeOut 100ms ease-in !important;
+        }
+
+        /* Override tailwind animate classes */
         .animate-in {
-          animation: fadeIn 150ms ease-out !important;
+          animation: simpleFadeIn 150ms ease-out !important;
+          --tw-enter-translate-x: 0 !important;
+          --tw-enter-translate-y: 0 !important;
+          --tw-enter-scale: 1 !important;
         }
         
         .animate-out {
-          animation: fadeOut 100ms ease-in !important;
+          animation: simpleFadeOut 100ms ease-in !important;
+          --tw-exit-translate-x: 0 !important;
+          --tw-exit-translate-y: 0 !important;
+          --tw-exit-scale: 1 !important;
+        }
+        
+        /* Disable slide animations */
+        .slide-in-from-top-2,
+        .slide-in-from-bottom-2,
+        .slide-in-from-left-2,
+        .slide-in-from-right-2 {
+          --tw-enter-translate-x: 0 !important;
+          --tw-enter-translate-y: 0 !important;
+        }
+        
+        /* Disable zoom animations */
+        .zoom-in-95,
+        .zoom-out-95 {
+          --tw-enter-scale: 1 !important;
+          --tw-exit-scale: 1 !important;
         }
       `}</style>
       {children}
