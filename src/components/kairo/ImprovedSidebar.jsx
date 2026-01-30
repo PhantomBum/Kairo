@@ -29,77 +29,58 @@ function ServerItem({ server, isActive, onClick, isCollapsed, onLeave, onMobileC
         <TooltipProvider delayDuration={isCollapsed ? 100 : 1000}>
           <Tooltip>
             <TooltipTrigger asChild>
-              <motion.button
+              <button
                 onClick={handleClick}
-                whileHover={{ scale: 1.01 }}
-                whileTap={{ scale: 0.99 }}
                 className={cn(
-                  "w-full flex items-center gap-3 px-2.5 py-2 rounded-xl transition-all group relative",
+                  "w-full flex items-center gap-2.5 px-2 py-1.5 rounded transition-all group relative",
                   isActive 
-                    ? "bg-white/10 text-white border border-white/20" 
-                    : "text-zinc-500 hover:bg-white/[0.03] hover:text-white border border-transparent hover:border-white/5"
+                    ? "bg-white/10 text-white" 
+                    : "text-zinc-500 hover:bg-white/5 hover:text-white"
                 )}
               >
-                {isActive && (
-                  <motion.div 
-                    layoutId="activeServerIndicator"
-                    className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-8 bg-white rounded-r-full" 
-                  />
-                )}
                 <div className={cn(
-                  "w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-all overflow-hidden",
-                  isActive 
-                    ? "bg-white/10 border border-white/20" 
-                    : "bg-white/[0.02] border border-white/5 group-hover:border-white/10"
+                  "w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden",
+                  isActive ? "bg-white/10" : "bg-white/5"
                 )}>
                   {server.icon_url ? (
                     <img src={server.icon_url} alt="" className="w-full h-full object-cover" />
                   ) : (
-                    <span className="text-sm font-medium text-white">{server.name?.charAt(0)}</span>
+                    <span className="text-xs font-medium text-white">{server.name?.charAt(0)}</span>
                   )}
                 </div>
                 {!isCollapsed && (
                   <div className="flex-1 text-left min-w-0">
-                    <p className="font-medium text-sm truncate">{server.name}</p>
+                    <p className="font-medium text-xs truncate">{server.name}</p>
                     <p className="text-[10px] text-zinc-600">{server.member_count || 0} members</p>
                   </div>
                 )}
                 {!isCollapsed && server.unread > 0 && (
-                  <motion.div 
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    className="min-w-[18px] h-[18px] px-1 bg-white text-black rounded-md text-[10px] font-bold flex items-center justify-center"
-                  >
+                  <div className="min-w-[16px] h-[16px] px-1 bg-red-500 text-white rounded text-[9px] font-bold flex items-center justify-center">
                     {server.unread > 99 ? '99+' : server.unread}
-                  </motion.div>
+                  </div>
                 )}
               </motion.button>
             </TooltipTrigger>
             {isCollapsed && (
-              <TooltipContent side="right" className="bg-zinc-900/95 backdrop-blur-xl border-white/10 text-white">
+              <TooltipContent side="right" className="bg-[#111113] border-white/10 text-white text-xs">
                 <p className="font-medium">{server.name}</p>
-                <p className="text-[10px] text-zinc-500">{server.member_count || 0} members</p>
               </TooltipContent>
             )}
           </Tooltip>
         </TooltipProvider>
       </ContextMenuTrigger>
-      <ContextMenuContent className="w-48 bg-zinc-900/95 backdrop-blur-xl border-white/10 rounded-xl p-1">
-        <ContextMenuItem className="text-zinc-400 focus:bg-white/5 focus:text-white rounded-lg px-3 py-2 text-sm">
-          <Hash className="w-4 h-4 mr-2 text-zinc-600" />
+      <ContextMenuContent className="w-44 bg-[#0a0a0b] border-white/10 rounded-lg p-1">
+        <ContextMenuItem className="text-zinc-400 focus:bg-white/5 focus:text-white rounded px-3 py-2 text-xs">
+          <Hash className="w-3.5 h-3.5 mr-2 text-zinc-600" />
           View Channels
         </ContextMenuItem>
-        <ContextMenuItem className="text-zinc-400 focus:bg-white/5 focus:text-white rounded-lg px-3 py-2 text-sm">
-          <Bell className="w-4 h-4 mr-2 text-zinc-600" />
-          Notifications
-        </ContextMenuItem>
-        <ContextMenuItem className="text-zinc-400 focus:bg-white/5 focus:text-white rounded-lg px-3 py-2 text-sm">
-          <Settings className="w-4 h-4 mr-2 text-zinc-600" />
+        <ContextMenuItem className="text-zinc-400 focus:bg-white/5 focus:text-white rounded px-3 py-2 text-xs">
+          <Settings className="w-3.5 h-3.5 mr-2 text-zinc-600" />
           Settings
         </ContextMenuItem>
         <ContextMenuSeparator className="bg-white/5 my-1" />
         <ContextMenuItem 
-          className="text-red-400 focus:bg-red-500/10 rounded-lg px-3 py-2 text-sm"
+          className="text-red-400 focus:bg-red-500/10 rounded px-3 py-2 text-xs"
           onClick={() => onLeave?.(server)}
         >
           Leave Server
@@ -119,45 +100,30 @@ function NavButton({ icon: Icon, label, onClick, isActive, badge, isCollapsed, s
     <TooltipProvider delayDuration={isCollapsed ? 100 : 1000}>
       <Tooltip>
         <TooltipTrigger asChild>
-          <motion.button
+          <button
             onClick={handleClick}
-            whileHover={{ x: 1 }}
-            whileTap={{ scale: 0.99 }}
             className={cn(
-              "w-full flex items-center gap-3 px-3 py-2 rounded-xl transition-all relative",
+              "w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded transition-all relative",
               isActive 
-                ? "bg-white/10 text-white border border-white/10" 
-                : "text-zinc-500 hover:bg-white/[0.03] hover:text-zinc-300 border border-transparent"
+                ? "bg-white/10 text-white" 
+                : "text-zinc-500 hover:bg-white/5 hover:text-zinc-300"
             )}
           >
-            <div className={cn(
-              "w-7 h-7 rounded-lg flex items-center justify-center transition-all",
-              isActive ? "bg-white/10" : "bg-transparent"
-            )}>
-              <Icon className="w-4 h-4" />
-            </div>
-            {!isCollapsed && <span className="text-sm font-medium">{label}</span>}
-            {!isCollapsed && shortcut && (
-              <span className="ml-auto text-[10px] text-zinc-600 bg-white/5 px-1.5 py-0.5 rounded-md hidden md:inline">{shortcut}</span>
-            )}
+            <Icon className="w-4 h-4 flex-shrink-0" />
+            {!isCollapsed && <span className="text-xs font-medium">{label}</span>}
             {badge > 0 && (
-              <motion.div 
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                className={cn(
-                  "bg-white text-black text-[10px] font-bold rounded-md flex items-center justify-center",
-                  isCollapsed ? "absolute -top-1 -right-1 w-4 h-4" : "ml-auto min-w-[18px] h-[18px] px-1"
-                )}
-              >
+              <div className={cn(
+                "bg-red-500 text-white text-[9px] font-bold rounded flex items-center justify-center",
+                isCollapsed ? "absolute -top-1 -right-1 w-4 h-4" : "ml-auto min-w-[16px] h-[16px] px-1"
+              )}>
                 {badge > 99 ? '99+' : badge}
-              </motion.div>
+              </div>
             )}
-          </motion.button>
+          </button>
         </TooltipTrigger>
         {isCollapsed && (
-          <TooltipContent side="right" className="bg-zinc-900/95 backdrop-blur-xl border-white/10 text-white text-xs">
+          <TooltipContent side="right" className="bg-[#111113] border-white/10 text-white text-xs">
             <span>{label}</span>
-            {shortcut && <span className="ml-2 text-zinc-500">{shortcut}</span>}
           </TooltipContent>
         )}
       </Tooltip>
@@ -202,85 +168,74 @@ export default function ImprovedSidebar({
   return (
     <motion.div 
       initial={false}
-      animate={{ width: isCollapsed ? 80 : 280 }}
+      animate={{ width: isCollapsed ? 72 : 260 }}
       transition={{ duration: 0.2, ease: 'easeOut' }}
-      className="h-full bg-[#050506] flex flex-col border-r border-white/5 relative overflow-hidden w-[280px] md:w-auto"
+      className="h-full bg-[#0a0a0b] flex flex-col border-r border-white/5 relative overflow-hidden w-[260px] md:w-auto"
     >
-      {/* Subtle grid pattern */}
-      <div className="absolute inset-0 pointer-events-none opacity-[0.02]" style={{
-        backgroundImage: `linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px)`,
-        backgroundSize: '40px 40px'
-      }} />
+
       
       {/* Header */}
-      <div className="relative p-4 flex items-center justify-between">
+      <div className="relative px-3 py-3 flex items-center justify-between border-b border-white/5">
         {!isCollapsed && (
           <motion.div 
             initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
-            className="flex items-center gap-3"
+            className="flex items-center gap-2"
           >
-            <div className="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center">
-              <span className="text-white font-bold">K</span>
+            <div className="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center">
+              <span className="text-white font-bold text-xs">K</span>
             </div>
-            <div>
-              <span className="font-medium text-white/90 text-base">Kairo</span>
-              <p className="text-[10px] text-zinc-600">v4.0.0</p>
-            </div>
+            <span className="font-semibold text-white/90 text-sm">Kairo</span>
           </motion.div>
         )}
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={() => setIsCollapsed(!isCollapsed)}
-          className="hidden md:flex text-zinc-600 hover:text-white p-2 rounded-lg hover:bg-white/5 transition-colors"
+          className="hidden md:flex text-zinc-600 hover:text-white p-1.5 rounded hover:bg-white/5 transition-colors"
         >
-          {isCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
+          {isCollapsed ? <ChevronRight className="w-3.5 h-3.5" /> : <ChevronLeft className="w-3.5 h-3.5" />}
         </motion.button>
       </div>
 
       {/* Search */}
       {!isCollapsed && (
-        <div className="relative px-3 mb-3">
-          <motion.button 
-            whileHover={{ scale: 1.005 }}
-            whileTap={{ scale: 0.995 }}
+        <div className="relative px-3 py-2">
+          <button 
             onClick={() => window.dispatchEvent(new CustomEvent('kairo:open-search'))}
-            className="w-full flex items-center gap-2 px-3 py-2 bg-white/[0.02] hover:bg-white/[0.04] rounded-lg text-zinc-500 text-xs transition-all border border-white/5 hover:border-white/10"
+            className="w-full flex items-center gap-2 px-2.5 py-1.5 bg-white/5 hover:bg-white/[0.07] rounded text-zinc-600 text-xs transition-all"
           >
             <Search className="w-3.5 h-3.5" />
-            <span>Search...</span>
-            <span className="ml-auto text-[10px] text-zinc-600 bg-white/5 px-1.5 py-0.5 rounded">⌘K</span>
-          </motion.button>
+            <span>Search</span>
+          </button>
         </div>
       )}
 
       {/* User Profile Card */}
-      <div className="px-3 mb-3">
-        <motion.button
-          whileHover={{ scale: 1.005 }}
+      <div className="px-3 py-2 border-b border-white/5">
+        <button
           onClick={onProfileClick}
-          className="w-full p-2.5 flex items-center gap-3 bg-white/[0.02] hover:bg-white/[0.04] rounded-xl transition-all border border-white/5 hover:border-white/10 group"
+          className="w-full p-2 flex items-center gap-2.5 hover:bg-white/5 rounded transition-all group"
         >
           <div className="relative flex-shrink-0">
-            <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center overflow-hidden border border-white/10 group-hover:border-white/20 transition-all">
+            <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center overflow-hidden">
               {userProfile?.avatar_url ? (
                 <img src={userProfile.avatar_url} alt="" className="w-full h-full object-cover" />
               ) : (
-                <User className="w-5 h-5 text-white" />
+                <User className="w-4 h-4 text-white" />
               )}
             </div>
-            <div className="absolute -bottom-0.5 -right-0.5 p-0.5 bg-[#050506] rounded-full">
+            <div className="absolute -bottom-0.5 -right-0.5 p-0.5 bg-[#0a0a0b] rounded-full">
               <StatusDot status={userProfile?.status} />
             </div>
           </div>
           {!isCollapsed && (
             <div className="flex-1 text-left min-w-0">
-              <p className="font-medium text-white text-sm truncate">{userProfile?.display_name || 'User'}</p>
-              <p className="text-[10px] text-zinc-600 truncate">{userProfile?.custom_status?.text || 'Set a status'}</p>
+              <p className="font-medium text-white text-xs truncate">{userProfile?.display_name || 'User'}</p>
+              <p className="text-[10px] text-zinc-600 truncate">{userProfile?.custom_status?.text || 'Online'}</p>
             </div>
           )}
-        </motion.button>
+        </button>
       </div>
 
       {/* Navigation */}
@@ -290,46 +245,22 @@ export default function ImprovedSidebar({
         <NavButton icon={Compass} label="Discover" onClick={onDiscoverClick} isCollapsed={isCollapsed} onMobileClose={onMobileClose} />
       </div>
       
-      {/* Quick Actions */}
-      {!isCollapsed && (
-        <div className="px-3 py-2 flex gap-1.5">
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={() => window.dispatchEvent(new CustomEvent('kairo:show-soundboard'))}
-            className="flex-1 flex items-center justify-center gap-1.5 px-2.5 py-1.5 bg-white/[0.02] hover:bg-white/[0.05] rounded-lg text-zinc-500 hover:text-white text-[11px] font-medium transition-colors border border-white/5"
-          >
-            <Volume2 className="w-3 h-3" />
-            Sounds
-          </motion.button>
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={() => window.dispatchEvent(new CustomEvent('kairo:show-notes'))}
-            className="flex-1 flex items-center justify-center gap-1.5 px-2.5 py-1.5 bg-white/[0.02] hover:bg-white/[0.05] rounded-lg text-zinc-500 hover:text-white text-[11px] font-medium transition-colors border border-white/5"
-          >
-            <StickyNote className="w-3 h-3" />
-            Notes
-          </motion.button>
-        </div>
-      )}
+
 
       {/* Servers */}
-      <div className="flex-1 overflow-y-auto scrollbar-thin px-3 py-2">
+      <div className="flex-1 overflow-y-auto scrollbar-thin px-2 py-2">
         {!isCollapsed && (
           <div className="flex items-center justify-between mb-2 px-1">
-            <p className="text-[10px] font-medium text-zinc-600 uppercase tracking-wider">Spaces</p>
-            <motion.button 
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
+            <p className="text-[9px] font-semibold text-zinc-600 uppercase tracking-wider">Servers</p>
+            <button 
               onClick={onCreateServer}
-              className="p-1 text-zinc-600 hover:text-white bg-white/5 hover:bg-white/10 rounded-md transition-colors"
+              className="p-0.5 text-zinc-600 hover:text-white hover:bg-white/5 rounded transition-colors"
             >
               <Plus className="w-3 h-3" />
-            </motion.button>
+            </button>
           </div>
         )}
-        <div className="space-y-1">
+        <div className="space-y-0.5">
           <AnimatePresence>
             {servers.map((server, i) => (
               <motion.div
@@ -351,41 +282,21 @@ export default function ImprovedSidebar({
             </AnimatePresence>
         </div>
         {servers.length === 0 && !isCollapsed && (
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="text-center py-8"
-          >
-            <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center">
-              <LayoutGrid className="w-5 h-5 text-zinc-600" />
-            </div>
-            <p className="text-sm text-zinc-400 font-medium mb-1">No spaces</p>
-            <p className="text-[11px] text-zinc-600 mb-3">Create or join one</p>
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
+          <div className="text-center py-6">
+            <p className="text-xs text-zinc-600 mb-3">No servers</p>
+            <button
               onClick={onCreateServer}
-              className="px-4 py-2 bg-white text-black text-xs font-medium rounded-lg"
+              className="px-3 py-1.5 bg-white/10 hover:bg-white/15 text-white text-xs font-medium rounded transition-colors"
             >
-              Create Space
-            </motion.button>
-          </motion.div>
+              Create Server
+            </button>
+          </div>
         )}
       </div>
 
       {/* Bottom Actions */}
-      <div className="relative p-3 border-t border-white/5 space-y-1">
-        <NavButton icon={ShoppingBag} label="Shop" onClick={onShopClick} isCollapsed={isCollapsed} onMobileClose={onMobileClose} />
-        <NavButton icon={Bell} label="Notifications" onClick={onNotificationsClick} badge={notifications.length} isCollapsed={isCollapsed} onMobileClose={onMobileClose} />
-        <NavButton 
-          icon={Sparkles} 
-          label="What's New" 
-          onClick={onUpdateLogsClick} 
-          badge={hasNewUpdates ? 1 : 0}
-          isCollapsed={isCollapsed}
-          onMobileClose={onMobileClose}
-        />
-        <NavButton icon={Settings} label="Settings" onClick={onSettingsClick} isCollapsed={isCollapsed} shortcut="⌘," onMobileClose={onMobileClose} />
+      <div className="relative px-3 py-2 border-t border-white/5 space-y-0.5">
+        <NavButton icon={Settings} label="Settings" onClick={onSettingsClick} isCollapsed={isCollapsed} onMobileClose={onMobileClose} />
       </div>
     </motion.div>
   );
