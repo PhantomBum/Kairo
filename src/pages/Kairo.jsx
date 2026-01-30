@@ -6,6 +6,7 @@ import { base44 } from '@/api/base44Client';
 import { Hash, Users, Pin, Bell, Search, Inbox, HelpCircle, ShoppingBag, Calendar, Wifi, WifiOff, RefreshCw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { createPageUrl } from '@/utils';
+import { Button } from '@/components/ui/button';
 
 // Core Components
 import LoadingScreen from '@/components/kairo/LoadingScreen';
