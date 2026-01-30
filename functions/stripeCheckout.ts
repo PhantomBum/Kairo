@@ -10,11 +10,14 @@ Deno.serve(async (req) => {
     const base44 = createClientFromRequest(req);
     const { type, serverId, serverName, subscriptionId, subscriptionName, duration, userId, userEmail } = await req.json();
 
+    // Get app URL with fallback
+    const appUrl = Deno.env.get('BASE44_APP_URL') || 'https://kairo-8406c21a.base44.app';
+    
     let sessionConfig = {
       payment_method_types: ['card'],
       mode: 'payment',
-      success_url: `${Deno.env.get('BASE44_APP_URL')}?payment=success`,
-      cancel_url: `${Deno.env.get('BASE44_APP_URL')}?payment=cancelled`,
+      success_url: `${appUrl}/Kairo?payment=success`,
+      cancel_url: `${appUrl}/Kairo?payment=cancelled`,
       metadata: {
         base44_app_id: Deno.env.get('BASE44_APP_ID'),
         type,
@@ -24,6 +27,11 @@ Deno.serve(async (req) => {
         userEmail: userEmail || ''
       }
     };
+
+    // Add customer email if provided (required for subscriptions)
+    if (userEmail) {
+      sessionConfig.customer_email = userEmail;
+    }
 
     if (type === 'server_boost') {
       const prices = {
