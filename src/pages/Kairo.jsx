@@ -1199,7 +1199,6 @@ export default function KairoPage() {
                         onForward={(msg) => setForwardingMessage(msg)}
                         onPin={handlePinMessage}
                         isLoading={messagesLoading}
-                        threads={threads}
                       />
                       <AnimatePresence>
                         {activeThread && (

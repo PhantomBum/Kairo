@@ -88,16 +88,25 @@ function ChannelItem({ channel, isActive, onClick, voiceUsers = [] }) {
         </div>
       </ContextMenuTrigger>
       <ContextMenuContent className="w-48 bg-zinc-900/95 backdrop-blur-xl border-zinc-800/80 rounded-xl">
-        <ContextMenuItem className="text-zinc-300 focus:bg-zinc-800 rounded-lg mx-1">
+        <ContextMenuItem 
+          onClick={() => window.dispatchEvent(new CustomEvent('kairo:edit-channel', { detail: channel }))}
+          className="text-zinc-300 focus:bg-zinc-800 rounded-lg mx-1"
+        >
           <Edit className="w-4 h-4 mr-2 text-zinc-500" />
           Edit Channel
         </ContextMenuItem>
-        <ContextMenuItem className="text-zinc-300 focus:bg-zinc-800 rounded-lg mx-1">
+        <ContextMenuItem 
+          onClick={() => navigator.clipboard.writeText(`${window.location.origin}/channel/${channel.id}`)}
+          className="text-zinc-300 focus:bg-zinc-800 rounded-lg mx-1"
+        >
           <Copy className="w-4 h-4 mr-2 text-zinc-500" />
           Copy Link
         </ContextMenuItem>
         <ContextMenuSeparator className="bg-zinc-800/50 my-1" />
-        <ContextMenuItem className="text-rose-400 focus:bg-rose-500/10 rounded-lg mx-1">
+        <ContextMenuItem 
+          onClick={() => window.dispatchEvent(new CustomEvent('kairo:delete-channel', { detail: channel }))}
+          className="text-rose-400 focus:bg-rose-500/10 rounded-lg mx-1"
+        >
           <Trash2 className="w-4 h-4 mr-2" />
           Delete Channel
         </ContextMenuItem>
