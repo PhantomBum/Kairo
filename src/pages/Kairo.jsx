@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
-import { Hash, Users, Pin, Bell, Search, MessageSquare, Settings, ShoppingBag, Calendar, Wifi, WifiOff, RefreshCw } from 'lucide-react';
+import { Hash, Users, Pin, Bell, Search, MessageSquare, Settings, ShoppingBag, Calendar } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { createPageUrl } from '@/utils';
 import { Button } from '@/components/ui/button';
