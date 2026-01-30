@@ -291,17 +291,25 @@ export default function KairoPage() {
 
   // Fetch servers user is member of - optimized
   const { data: memberServers = [], isLoading: serversLoading } = useQuery({
-    queryKey: ['memberServers', currentUser?.id],
+    queryKey: ['memberServers', currentUser?.id, currentUser?.user_id],
     queryFn: async () => {
-      if (!currentUser?.id) return [];
-      const memberships = await base44.entities.ServerMember.filter({ user_id: currentUser.id });
-      if (memberships.length === 0) return [];
+      if (!currentUser?.id && !currentUser?.user_id) return [];
+      // Try both id and user_id since UserProfile uses user_id field
+      const userId = currentUser.user_id || currentUser.id;
+      const memberships = await base44.entities.ServerMember.filter({ user_id: userId });
+      console.log('[SERVER FETCH] userId:', userId, 'memberships:', memberships);
+      if (memberships.length === 0) {
+        // Also check for servers owned by this user
+        const ownedServers = await base44.entities.Server.filter({ owner_id: userId });
+        console.log('[SERVER FETCH] ownedServers:', ownedServers);
+        return ownedServers;
+      }
       const serverIds = [...new Set(memberships.map(m => m.server_id))];
       const allServers = await base44.entities.Server.list();
       return allServers.filter(s => serverIds.includes(s.id));
     },
-    enabled: !!currentUser?.id,
-    staleTime: 300000,
+    enabled: !!(currentUser?.id || currentUser?.user_id),
+    staleTime: 30000,
     refetchInterval: false
   });
 
