@@ -64,7 +64,7 @@ import CrossAppIndicator from '@/components/kairo/crossapp/CrossAppIndicator';
 import BridgeManager from '@/components/kairo/crossapp/BridgeManager';
 
 // Channel header component
-function ChannelHeader({ channel, memberCount, onMembersToggle, showMembers }) {
+function ChannelHeader({ channel, memberCount, onMembersToggle, showMembers, onShowPinned, showPinned }) {
   return (
     <div className="h-12 px-4 flex items-center justify-between border-b border-zinc-800/50 bg-[#121214]">
       <div className="flex items-center gap-2">
@@ -79,12 +79,15 @@ function ChannelHeader({ channel, memberCount, onMembersToggle, showMembers }) {
       </div>
       <div className="flex items-center gap-1">
         <button className="p-2 text-zinc-400 hover:text-zinc-200 transition-colors rounded hover:bg-zinc-800/50">
-          <MessageSquare className="w-5 h-5" />
-        </button>
-        <button className="p-2 text-zinc-400 hover:text-zinc-200 transition-colors rounded hover:bg-zinc-800/50">
           <Bell className="w-5 h-5" />
         </button>
-        <button className="p-2 text-zinc-400 hover:text-zinc-200 transition-colors rounded hover:bg-zinc-800/50">
+        <button
+          onClick={onShowPinned}
+          className={cn(
+            "p-2 transition-colors rounded",
+            showPinned ? "text-white bg-zinc-800/50" : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50"
+          )}
+        >
           <Pin className="w-5 h-5" />
         </button>
         <button
@@ -96,14 +99,6 @@ function ChannelHeader({ channel, memberCount, onMembersToggle, showMembers }) {
         >
           <Users className="w-5 h-5" />
         </button>
-        <div className="relative ml-2">
-          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
-          <input
-            type="text"
-            placeholder="Search"
-            className="w-40 h-7 pl-8 pr-2 bg-zinc-900 border-none rounded text-sm text-white placeholder-zinc-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-          />
-        </div>
         <button className="p-2 text-zinc-400 hover:text-zinc-200 transition-colors rounded hover:bg-zinc-800/50">
           <Settings className="w-5 h-5" />
         </button>
@@ -169,6 +164,11 @@ export default function KairoPage() {
   
   // Reply state
   const [replyTo, setReplyTo] = useState(null);
+
+  // Thread state
+  const [activeThread, setActiveThread] = useState(null);
+  const [forwardingMessage, setForwardingMessage] = useState(null);
+  const [showPinnedPanel, setShowPinnedPanel] = useState(false);
 
   // Syncing state
   const [isSyncing, setIsSyncing] = useState(false);
@@ -282,35 +282,16 @@ export default function KairoPage() {
   const { data: memberServers = [], isLoading: serversLoading } = useQuery({
     queryKey: ['memberServers', currentUser?.id],
     queryFn: async () => {
-      if (!currentUser?.id) {
-        console.log('[SERVERS] No current user');
-        return [];
-      }
-      try {
-        console.log('[SERVERS] Fetching memberships for user:', currentUser.id);
-        const memberships = await base44.entities.ServerMember.filter({ user_id: currentUser.id });
-        console.log('[SERVERS] Found memberships:', memberships.length, memberships);
-        
-        if (memberships.length === 0) return [];
-        
-        const serverIds = [...new Set(memberships.map(m => m.server_id))];
-        console.log('[SERVERS] Fetching servers with IDs:', serverIds);
-        
-        const allServers = await base44.entities.Server.list();
-        console.log('[SERVERS] All servers:', allServers.length);
-        
-        const filteredServers = allServers.filter(s => serverIds.includes(s.id));
-        console.log('[SERVERS] Filtered servers:', filteredServers.length, filteredServers);
-        
-        return filteredServers;
-      } catch (error) {
-        console.error('[SERVERS] Error fetching servers:', error);
-        return [];
-      }
+      if (!currentUser?.id) return [];
+      const memberships = await base44.entities.ServerMember.filter({ user_id: currentUser.id });
+      if (memberships.length === 0) return [];
+      const serverIds = [...new Set(memberships.map(m => m.server_id))];
+      const allServers = await base44.entities.Server.list();
+      return allServers.filter(s => serverIds.includes(s.id));
     },
     enabled: !!currentUser?.id,
     staleTime: 0,
-    refetchInterval: 3000
+    refetchInterval: 1000
   });
 
   // Debug logging for servers
@@ -357,15 +338,31 @@ export default function KairoPage() {
   const { data: messages = [], isLoading: messagesLoading, isFetching: messagesFetching } = useQuery({
     queryKey: ['messages', activeChannel?.id],
     queryFn: async () => {
-      console.log('[MESSAGES] Fetching for channel:', activeChannel.id);
-      const msgs = await base44.entities.Message.filter({ channel_id: activeChannel.id }, '-created_date', 100);
-      console.log('[MESSAGES] Retrieved:', msgs.length, msgs);
+      const msgs = await base44.entities.Message.filter({ channel_id: activeChannel.id, is_deleted: false }, '-created_date', 100);
       return msgs;
     },
     enabled: !!activeChannel?.id,
     staleTime: 0,
-    refetchInterval: 2000,
+    refetchInterval: 800,
     keepPreviousData: true
+  });
+
+  // Fetch threads for active channel
+  const { data: threads = [] } = useQuery({
+    queryKey: ['threads', activeChannel?.id],
+    queryFn: () => base44.entities.Thread.filter({ channel_id: activeChannel.id }),
+    enabled: !!activeChannel?.id,
+    staleTime: 0,
+    refetchInterval: 2000
+  });
+
+  // Fetch pinned messages
+  const { data: pinnedMessages = [] } = useQuery({
+    queryKey: ['pinnedMessages', activeChannel?.id],
+    queryFn: () => base44.entities.Message.filter({ channel_id: activeChannel.id, is_pinned: true }),
+    enabled: !!activeChannel?.id,
+    staleTime: 0,
+    refetchInterval: 5000
   });
 
   // Debug logging for messages
@@ -427,8 +424,8 @@ export default function KairoPage() {
     queryKey: ['dmMessages', activeConversation?.id],
     queryFn: () => base44.entities.DirectMessage.filter({ conversation_id: activeConversation.id }, '-created_date', 100),
     enabled: !!activeConversation?.id,
-    staleTime: 1000,
-    refetchInterval: 3000
+    staleTime: 0,
+    refetchInterval: 800
   });
 
   // Fetch typing indicators
@@ -504,16 +501,7 @@ export default function KairoPage() {
 
   const sendMessageMutation = useMutation({
     mutationFn: async ({ content, attachments, replyToId }) => {
-      if (!activeChannel?.id || !activeServer?.id || !currentUser?.id) {
-        console.error('[SEND MESSAGE] Missing data:', { 
-          channel: activeChannel?.id, 
-          server: activeServer?.id, 
-          user: currentUser?.id 
-        });
-        throw new Error('Missing required data for sending message');
-      }
-      
-      console.log('[SEND MESSAGE] Sending message...', { content, channel: activeChannel.id });
+      if (!activeChannel?.id || !activeServer?.id || !currentUser?.id) throw new Error('Missing required data');
       
       const replyPreview = replyToId && replyTo ? { author_name: replyTo.author_name, content: replyTo.content?.slice(0, 100) } : null;
       const message = await base44.entities.Message.create({
@@ -529,24 +517,37 @@ export default function KairoPage() {
         attachments, 
         type: replyToId ? 'reply' : 'default', 
         reply_to_id: replyToId, 
-        reply_preview: replyPreview
+        reply_preview: replyPreview,
+        is_pinned: false,
+        is_deleted: false
       });
 
-      console.log('[SEND MESSAGE] Message created:', message);
-
-      // Check for cross-app bridge and send to external platform
       try {
         await base44.functions.invoke('sendToDiscord', { channel_id: activeChannel.id, content, attachments });
-      } catch (e) {
-        console.log('No cross-app bridge configured');
-      }
+      } catch (e) {}
 
       return message;
     },
-    onSuccess: async (newMessage) => { 
-      console.log('[SEND MESSAGE] Success, refetching messages...');
-      await queryClient.invalidateQueries({ queryKey: ['messages', activeChannel?.id] });
-      await queryClient.refetchQueries({ queryKey: ['messages', activeChannel?.id] });
+    onMutate: async (newMsg) => {
+      await queryClient.cancelQueries({ queryKey: ['messages', activeChannel?.id] });
+      const previousMessages = queryClient.getQueryData(['messages', activeChannel?.id]);
+      const optimisticMessage = {
+        id: 'temp-' + Date.now(),
+        ...newMsg,
+        channel_id: activeChannel.id,
+        author_id: currentUser.id,
+        author_name: userProfile?.display_name || currentUser.full_name,
+        author_avatar: userProfile?.avatar_url,
+        created_date: new Date().toISOString()
+      };
+      queryClient.setQueryData(['messages', activeChannel?.id], old => [...(old || []), optimisticMessage]);
+      return { previousMessages };
+    },
+    onError: (err, newMsg, context) => {
+      queryClient.setQueryData(['messages', activeChannel?.id], context.previousMessages);
+    },
+    onSuccess: () => { 
+      queryClient.invalidateQueries({ queryKey: ['messages', activeChannel?.id] });
       setReplyTo(null); 
     }
   });
@@ -705,8 +706,31 @@ export default function KairoPage() {
   };
 
   const handleDeleteMessage = async (messageId) => {
-    await base44.entities.Message.delete(messageId);
+    await base44.entities.Message.update(messageId, { is_deleted: true });
     queryClient.invalidateQueries({ queryKey: ['messages', activeChannel?.id] });
+  };
+
+  const handleThreadClick = async (message) => {
+    let thread = threads.find(t => t.parent_message_id === message.id);
+    if (!thread) {
+      thread = await base44.entities.Thread.create({
+        channel_id: activeChannel.id,
+        server_id: activeServer.id,
+        parent_message_id: message.id,
+        name: message.content?.slice(0, 50) || 'Thread',
+        created_by: currentUser.id,
+        message_count: 0,
+        last_message_at: new Date().toISOString()
+      });
+      queryClient.invalidateQueries({ queryKey: ['threads'] });
+    }
+    setActiveThread(thread);
+  };
+
+  const handlePinMessage = async (message) => {
+    await base44.entities.Message.update(message.id, { is_pinned: !message.is_pinned });
+    queryClient.invalidateQueries({ queryKey: ['messages', activeChannel?.id] });
+    queryClient.invalidateQueries({ queryKey: ['pinnedMessages', activeChannel?.id] });
   };
 
   const handleLeaveServer = async (server) => {
@@ -993,7 +1017,14 @@ export default function KairoPage() {
             />
           ) : (
             <>
-              <ChannelHeader channel={activeChannel} memberCount={members.length} onMembersToggle={() => setShowMembers(!showMembers)} showMembers={showMembers} />
+              <ChannelHeader 
+                channel={activeChannel} 
+                memberCount={members.length} 
+                onMembersToggle={() => setShowMembers(!showMembers)} 
+                showMembers={showMembers}
+                onShowPinned={() => setShowPinnedPanel(!showPinnedPanel)}
+                showPinned={showPinnedPanel}
+              />
               <div className="flex-1 flex min-h-0">
                 <div className="flex-1 flex flex-col bg-[#121214]">
                   {messagesLoading ? (
@@ -1004,23 +1035,41 @@ export default function KairoPage() {
                       <SkeletonMessage />
                     </div>
                   ) : (
-                    <MessageList 
-                      messages={[...messages].reverse()} 
-                      currentUserId={currentUser?.id} 
-                      onReply={(msg) => setReplyTo(msg)} 
-                      onEdit={() => {}} 
-                      onDelete={handleDeleteMessage} 
-                      onReact={handleReact} 
-                      isLoading={messagesLoading}
-                      renderReactions={(msg) => (
-                        <EnhancedReactions
-                          reactions={msg.reactions}
-                          currentUserId={currentUser?.id}
-                          onReact={(emoji) => handleReact(msg.id, emoji)}
-                          onRemoveReact={(emoji) => handleReact(msg.id, emoji)}
-                        />
-                      )}
-                    />
+                    <>
+                      <MessageList 
+                        messages={[...messages].reverse()} 
+                        currentUserId={currentUser?.id} 
+                        onReply={(msg) => setReplyTo(msg)} 
+                        onEdit={() => {}} 
+                        onDelete={handleDeleteMessage} 
+                        onReact={handleReact}
+                        onThread={handleThreadClick}
+                        onForward={(msg) => setForwardingMessage(msg)}
+                        onPin={handlePinMessage}
+                        isLoading={messagesLoading}
+                        threads={threads}
+                      />
+                      <AnimatePresence>
+                        {activeThread && (
+                          <ThreadPanel
+                            thread={activeThread}
+                            parentMessage={messages.find(m => m.id === activeThread.parent_message_id)}
+                            currentUser={userProfile || currentUser}
+                            channelName={activeChannel.name}
+                            onClose={() => setActiveThread(null)}
+                          />
+                        )}
+                        {showPinnedPanel && (
+                          <PinnedMessagesPanel
+                            messages={pinnedMessages}
+                            isOpen={showPinnedPanel}
+                            onClose={() => setShowPinnedPanel(false)}
+                            onUnpin={handlePinMessage}
+                            onJumpTo={(msg) => {}}
+                          />
+                        )}
+                      </AnimatePresence>
+                    </>
                   )}
                   <TypingIndicator typingUsers={typingUsers} className="px-4" />
                   <MessageInput channelName={activeChannel?.name} replyTo={replyTo} onCancelReply={() => setReplyTo(null)} onSendMessage={(data) => sendMessageMutation.mutate(data)} onTyping={sendTypingIndicator} />
@@ -1107,6 +1156,16 @@ export default function KairoPage() {
             </div>
           </motion.div>
         </div>}
+        {forwardingMessage && (
+          <ForwardMessageModal
+            message={forwardingMessage}
+            channels={channels}
+            conversations={conversations}
+            currentUser={userProfile || currentUser}
+            isOpen={!!forwardingMessage}
+            onClose={() => setForwardingMessage(null)}
+          />
+        )}
         </AnimatePresence>
       </div>
     </>
