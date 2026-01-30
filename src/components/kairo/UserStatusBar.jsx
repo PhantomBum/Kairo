@@ -66,9 +66,11 @@ export default function UserStatusBar({
               <p className="text-sm font-medium text-white truncate">
                 {profile?.display_name || 'User'}
               </p>
-              <p className="text-xs text-zinc-500 truncate">
-                {profile?.custom_status?.text || currentStatus.label}
-              </p>
+              {profile?.custom_status?.text && (
+                <p className="text-xs text-zinc-500 truncate">
+                  {profile.custom_status.text}
+                </p>
+              )}
             </div>
           </button>
         </PopoverTrigger>
