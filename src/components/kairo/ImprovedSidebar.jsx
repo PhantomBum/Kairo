@@ -3,8 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   MessageCircle, Users, Settings, Plus, 
   Compass, Bell, ChevronLeft,
-  Sparkles, ShoppingBag,
-  Zap, UserPlus
+  Sparkles, ShoppingBag, Gift, Palette, Keyboard, Headphones,
+  Zap, UserPlus, MoreHorizontal
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { 
@@ -16,6 +16,13 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 // Server item removed - now using icon-only list in main component
 
@@ -28,6 +35,54 @@ function StatusDot({ status }) {
     offline: 'bg-zinc-500'
   };
   return <div className={cn("w-2.5 h-2.5 rounded-full", colors[status] || colors.offline)} />;
+}
+
+function MoreMenu({ isCollapsed }) {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        {isCollapsed ? (
+          <motion.button
+            whileHover={{ scale: 1.08 }}
+            whileTap={{ scale: 0.95 }}
+            className="w-10 h-10 rounded-xl flex items-center justify-center bg-white/5 hover:bg-white/10 text-zinc-500 hover:text-white transition-colors"
+          >
+            <MoreHorizontal className="w-5 h-5" />
+          </motion.button>
+        ) : (
+          <motion.button
+            whileHover={{ backgroundColor: 'rgba(255,255,255,0.05)' }}
+            whileTap={{ scale: 0.98 }}
+            className="w-full flex items-center gap-3 px-2 py-2 rounded-lg text-zinc-400 hover:text-white transition-colors"
+          >
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-white/5 flex-shrink-0">
+              <MoreHorizontal className="w-4 h-4" />
+            </div>
+            <span className="text-sm truncate flex-1 text-left">More</span>
+          </motion.button>
+        )}
+      </DropdownMenuTrigger>
+      <DropdownMenuContent side="right" align="end" className="w-48 bg-[#1a1a1d] border-white/10 rounded-lg p-1">
+        <DropdownMenuItem className="text-amber-400 focus:bg-amber-500/10 focus:text-amber-300 rounded px-3 py-2 text-xs cursor-pointer">
+          <Gift className="w-4 h-4 mr-2" />
+          Nitro
+        </DropdownMenuItem>
+        <DropdownMenuSeparator className="bg-white/5 my-1" />
+        <DropdownMenuItem className="text-zinc-300 focus:bg-white/5 focus:text-white rounded px-3 py-2 text-xs cursor-pointer">
+          <Palette className="w-4 h-4 mr-2 text-zinc-500" />
+          Themes
+        </DropdownMenuItem>
+        <DropdownMenuItem className="text-zinc-300 focus:bg-white/5 focus:text-white rounded px-3 py-2 text-xs cursor-pointer" onClick={() => window.dispatchEvent(new CustomEvent('kairo:open-shortcuts'))}>
+          <Keyboard className="w-4 h-4 mr-2 text-zinc-500" />
+          Shortcuts
+        </DropdownMenuItem>
+        <DropdownMenuItem className="text-zinc-300 focus:bg-white/5 focus:text-white rounded px-3 py-2 text-xs cursor-pointer">
+          <Headphones className="w-4 h-4 mr-2 text-zinc-500" />
+          Audio Settings
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
 }
 
 function NavItem({ icon: Icon, label, isActive, badge, onClick, isCollapsed }) {
@@ -322,6 +377,9 @@ export default function ImprovedSidebar({
         <NavItem icon={Bell} label="Notifications" badge={notifications?.length || 0} onClick={() => { onNotificationsClick?.(); onMobileClose?.(); }} isCollapsed={isCollapsed} />
         <NavItem icon={ShoppingBag} label="Shop" onClick={() => { onShopClick?.(); onMobileClose?.(); }} isCollapsed={isCollapsed} />
         <NavItem icon={Settings} label="Settings" onClick={() => { onSettingsClick?.(); onMobileClose?.(); }} isCollapsed={isCollapsed} />
+        
+        {/* More Menu - Nitro & Tools */}
+        <MoreMenu isCollapsed={isCollapsed} />
       </div>
     </motion.div>
   );
