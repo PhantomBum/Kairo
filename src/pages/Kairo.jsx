@@ -38,6 +38,9 @@ import ProfileEditor from '@/components/kairo/profile/ProfileEditor';
 import TypingIndicator from '@/components/kairo/chat/TypingIndicator';
 import { IncomingCallModal, ActiveCallModal, OutgoingCallModal } from '@/components/kairo/voice/DMCallModal';
 import WelcomeScreen from '@/components/kairo/WelcomeScreen';
+import { useConfetti } from '@/components/kairo/effects/ConfettiEffect';
+import Soundboard from '@/components/kairo/soundboard/Soundboard';
+import QuickNotes from '@/components/kairo/widgets/QuickNotes';
 
 // New v2.0 Components
 import FriendSystem from '@/components/kairo/friends/FriendSystem';
@@ -178,6 +181,8 @@ function KairoPageContent() {
   const [showBridgeManager, setShowBridgeManager] = useState(false);
   const [showGlobalSearch, setShowGlobalSearch] = useState(false);
   const [showNewDM, setShowNewDM] = useState(false);
+  const [showSoundboard, setShowSoundboard] = useState(false);
+  const [showQuickNotes, setShowQuickNotes] = useState(false);
   
   // Connection status
   const [connectionStatus, setConnectionStatus] = useState('connected');
@@ -206,6 +211,9 @@ function KairoPageContent() {
   useVoiceStateSync(currentUser?.id, voiceChannel);
   useMessageSync(activeChannel?.id, view === 'server');
 
+  // Confetti hook for celebrations
+  const { fire: fireConfetti, schoolPride } = useConfetti();
+
   // Keyboard shortcuts
   useKeyboardShortcuts({
     'ctrl+k': () => setShowCommandPalette(true),
@@ -213,11 +221,14 @@ function KairoPageContent() {
     'ctrl+shift+a': () => {}, // Toggle sidebar - handled in ImprovedSidebar
     'ctrl+shift+m': () => setShowMembers(!showMembers),
     'ctrl+/': () => setShowKeyboardShortcuts(true),
+    'ctrl+n': () => setShowQuickNotes(!showQuickNotes),
+    'ctrl+shift+s': () => setShowSoundboard(true),
     'escape': () => {
       setShowCommandPalette(false);
       setShowSettings(false);
       setShowKeyboardShortcuts(false);
       setShowGlobalSearch(false);
+      setShowSoundboard(false);
     }
   });
 
@@ -1398,6 +1409,19 @@ function KairoPageContent() {
             }}
           />
         )}
+        {showSoundboard && (
+          <Soundboard
+            isOpen={showSoundboard}
+            onClose={() => setShowSoundboard(false)}
+            onPlaySound={(sound) => {
+              // Trigger confetti for celebration sounds
+              if (sound.id === 'tada' || sound.id === 'applause' || sound.id === 'victory') {
+                fireConfetti('celebrate');
+              }
+            }}
+          />
+        )}
+        <QuickNotes isOpen={showQuickNotes} onClose={() => setShowQuickNotes(false)} />
         </AnimatePresence>
       </div>
     </>
