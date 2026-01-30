@@ -218,14 +218,14 @@ export default function KairoPage() {
       if (profiles.length > 0) {
         const profile = profiles[0];
         localStorage.setItem('kairo_current_user', JSON.stringify(profile));
-        setCurrentUser(profile); // Update state immediately
+        setCurrentUser(profile);
         return profile;
       }
       return currentUser;
     },
     enabled: !!currentUser?.id,
-    staleTime: 0, // Always fetch fresh data
-    refetchInterval: 10000 // Refetch every 10 seconds
+    staleTime: 300000,
+    refetchInterval: false
   });
 
   // Fetch user settings
@@ -293,8 +293,8 @@ export default function KairoPage() {
       return allServers.filter(s => serverIds.includes(s.id));
     },
     enabled: !!currentUser?.id,
-    staleTime: 5000,
-    refetchInterval: 10000
+    staleTime: 300000,
+    refetchInterval: false
   });
 
   // Debug logging for servers
@@ -308,8 +308,8 @@ export default function KairoPage() {
     queryKey: ['notifications', currentUser?.id],
     queryFn: () => base44.entities.Notification.filter({ user_id: currentUser?.id, is_read: false }),
     enabled: !!currentUser?.id,
-    staleTime: 10000,
-    refetchInterval: 30000
+    staleTime: 300000,
+    refetchInterval: false
   });
 
   // Check for new updates
@@ -360,8 +360,8 @@ export default function KairoPage() {
     queryKey: ['threads', activeChannel?.id],
     queryFn: () => base44.entities.Thread.filter({ channel_id: activeChannel.id }),
     enabled: !!activeChannel?.id,
-    staleTime: 5000,
-    refetchInterval: 10000
+    staleTime: 300000,
+    refetchInterval: false
   });
 
   // Fetch pinned messages
@@ -369,8 +369,8 @@ export default function KairoPage() {
     queryKey: ['pinnedMessages', activeChannel?.id],
     queryFn: () => base44.entities.Message.filter({ channel_id: activeChannel.id, is_pinned: true }),
     enabled: !!activeChannel?.id,
-    staleTime: 10000,
-    refetchInterval: 30000
+    staleTime: 300000,
+    refetchInterval: false
   });
 
   // Debug logging for messages
@@ -407,7 +407,9 @@ export default function KairoPage() {
   const { data: voiceStates = [] } = useQuery({
     queryKey: ['voiceStates', activeServer?.id],
     queryFn: () => base44.entities.VoiceState.filter({ server_id: activeServer.id }),
-    enabled: !!activeServer?.id
+    enabled: !!activeServer?.id,
+    staleTime: 60000,
+    refetchInterval: false
   });
 
   // Fetch conversations
@@ -441,24 +443,8 @@ export default function KairoPage() {
     keepPreviousData: true
   });
 
-  // Fetch typing indicators
-  const { data: typingUsers = [] } = useQuery({
-    queryKey: ['typing', activeChannel?.id || activeConversation?.id],
-    queryFn: async () => {
-      const filter = activeChannel?.id 
-        ? { channel_id: activeChannel.id }
-        : { conversation_id: activeConversation?.id };
-      const indicators = await base44.entities.TypingIndicator.filter(filter);
-      const now = new Date();
-      return indicators.filter(i => {
-        const started = new Date(i.started_at);
-        return (now - started) < 5000 && i.user_id !== currentUser?.id;
-      });
-    },
-    enabled: !!(activeChannel?.id || activeConversation?.id),
-    staleTime: 1000,
-    refetchInterval: 3000
-  });
+  // Fetch typing indicators - disabled for performance
+  const typingUsers = [];
 
   // Fetch public servers
   const { data: publicServers = [] } = useQuery({
