@@ -291,7 +291,7 @@ export default function KairoPage() {
     },
     enabled: !!currentUser?.id,
     staleTime: 0,
-    refetchInterval: 1000
+    refetchInterval: 300
   });
 
   // Debug logging for servers
@@ -305,7 +305,7 @@ export default function KairoPage() {
     queryKey: ['notifications', currentUser?.id],
     queryFn: () => base44.entities.Notification.filter({ user_id: currentUser?.id, is_read: false }),
     enabled: !!currentUser?.id,
-    refetchInterval: 30000 // Refetch every 30 seconds
+    refetchInterval: 300
   });
 
   // Check for new updates
@@ -343,7 +343,7 @@ export default function KairoPage() {
     },
     enabled: !!activeChannel?.id,
     staleTime: 0,
-    refetchInterval: 800,
+    refetchInterval: 300,
     keepPreviousData: true
   });
 
@@ -353,7 +353,7 @@ export default function KairoPage() {
     queryFn: () => base44.entities.Thread.filter({ channel_id: activeChannel.id }),
     enabled: !!activeChannel?.id,
     staleTime: 0,
-    refetchInterval: 2000
+    refetchInterval: 300
   });
 
   // Fetch pinned messages
@@ -362,7 +362,7 @@ export default function KairoPage() {
     queryFn: () => base44.entities.Message.filter({ channel_id: activeChannel.id, is_pinned: true }),
     enabled: !!activeChannel?.id,
     staleTime: 0,
-    refetchInterval: 5000
+    refetchInterval: 300
   });
 
   // Debug logging for messages
@@ -425,7 +425,7 @@ export default function KairoPage() {
     queryFn: () => base44.entities.DirectMessage.filter({ conversation_id: activeConversation.id }, '-created_date', 100),
     enabled: !!activeConversation?.id,
     staleTime: 0,
-    refetchInterval: 800
+    refetchInterval: 300
   });
 
   // Fetch typing indicators
@@ -436,7 +436,6 @@ export default function KairoPage() {
         ? { channel_id: activeChannel.id }
         : { conversation_id: activeConversation?.id };
       const indicators = await base44.entities.TypingIndicator.filter(filter);
-      // Filter out old typing indicators (> 5 seconds)
       const now = new Date();
       return indicators.filter(i => {
         const started = new Date(i.started_at);
@@ -444,7 +443,7 @@ export default function KairoPage() {
       });
     },
     enabled: !!(activeChannel?.id || activeConversation?.id),
-    refetchInterval: 2000
+    refetchInterval: 300
   });
 
   // Fetch public servers
