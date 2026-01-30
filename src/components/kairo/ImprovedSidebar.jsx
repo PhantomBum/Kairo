@@ -376,7 +376,6 @@ export default function ImprovedSidebar({
         <NavItem icon={Sparkles} label="Updates" badge={hasNewUpdates ? 1 : 0} onClick={() => { onUpdateLogsClick?.(); onMobileClose?.(); }} isCollapsed={isCollapsed} />
         <NavItem icon={Bell} label="Notifications" badge={notifications?.length || 0} onClick={() => { onNotificationsClick?.(); onMobileClose?.(); }} isCollapsed={isCollapsed} />
         <NavItem icon={ShoppingBag} label="Shop" onClick={() => { onShopClick?.(); onMobileClose?.(); }} isCollapsed={isCollapsed} />
-        <NavItem icon={Settings} label="Settings" onClick={() => { onSettingsClick?.(); onMobileClose?.(); }} isCollapsed={isCollapsed} />
         
         {/* More Menu - Nitro & Tools */}
         <MoreMenu isCollapsed={isCollapsed} />
