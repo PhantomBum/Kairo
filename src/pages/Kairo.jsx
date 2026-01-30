@@ -170,7 +170,10 @@ export default function KairoPage() {
   // Syncing state
   const [isSyncing, setIsSyncing] = useState(false);
 
-  // Core system hooks
+  // Get current user from localStorage (key-based auth)
+  const [currentUser, setCurrentUser] = React.useState(null);
+
+  // Core system hooks (after currentUser is declared)
   useCacheOptimization();
   usePrefetchStrategies(activeServer, activeChannel);
   usePresenceSync(currentUser?.id);
@@ -189,9 +192,6 @@ export default function KairoPage() {
       setShowKeyboardShortcuts(false);
     }
   });
-
-  // Get current user from localStorage (key-based auth)
-  const [currentUser, setCurrentUser] = React.useState(null);
 
   React.useEffect(() => {
     const savedUser = localStorage.getItem('kairo_current_user');
