@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { 
   Mic, MicOff, Headphones, HeadphoneOff, Settings, 
-  Circle, Moon, MinusCircle, Eye, Pencil
+  Circle, Moon, MinusCircle, Eye
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
@@ -20,9 +20,9 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 
 const statusOptions = [
-  { id: 'online', label: 'Online', color: 'bg-emerald-500', icon: Circle },
-  { id: 'idle', label: 'Idle', color: 'bg-amber-500', icon: Moon },
-  { id: 'dnd', label: 'Do Not Disturb', color: 'bg-red-500', icon: MinusCircle },
+  { id: 'online', label: 'Online', color: 'bg-emerald-400', icon: Circle },
+  { id: 'idle', label: 'Away', color: 'bg-amber-400', icon: Moon },
+  { id: 'dnd', label: 'Do Not Disturb', color: 'bg-rose-400', icon: MinusCircle },
   { id: 'invisible', label: 'Invisible', color: 'bg-zinc-500', icon: Eye },
 ];
 
@@ -42,23 +42,23 @@ export default function UserStatusBar({
   const currentStatus = statusOptions.find(s => s.id === profile?.status) || statusOptions[0];
 
   return (
-    <div className="h-[52px] bg-[#0f0f11] px-2 flex items-center gap-2">
+    <div className="h-14 bg-zinc-950 px-3 flex items-center gap-2 border-t border-zinc-800/30">
       {/* User info */}
       <Popover open={showStatusPicker} onOpenChange={setShowStatusPicker}>
         <PopoverTrigger asChild>
-          <button className="flex items-center gap-2 flex-1 p-1 rounded hover:bg-zinc-800/50 transition-colors min-w-0">
+          <button className="flex items-center gap-3 flex-1 p-2 rounded-xl hover:bg-zinc-800/50 transition-colors min-w-0">
             <div className="relative flex-shrink-0">
-              <div className="w-8 h-8 rounded-full overflow-hidden bg-zinc-700">
+              <div className="w-9 h-9 rounded-xl overflow-hidden bg-zinc-700">
                 {profile?.avatar_url ? (
                   <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-indigo-500 to-purple-600 text-white text-sm font-medium">
+                  <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-violet-500 to-indigo-600 text-white text-sm font-medium">
                     {profile?.display_name?.charAt(0) || '?'}
                   </div>
                 )}
               </div>
               <div className={cn(
-                "absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full border-[3px] border-[#0f0f11]",
+                "absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-2 border-zinc-950",
                 currentStatus.color
               )} />
             </div>
@@ -67,7 +67,7 @@ export default function UserStatusBar({
                 {profile?.display_name || 'User'}
               </p>
               {profile?.custom_status?.text && (
-                <p className="text-xs text-zinc-500 truncate">
+                <p className="text-[11px] text-zinc-500 truncate">
                   {profile.custom_status.text}
                 </p>
               )}
@@ -75,7 +75,7 @@ export default function UserStatusBar({
           </button>
         </PopoverTrigger>
         <PopoverContent 
-          className="w-72 p-0 bg-zinc-900 border-zinc-800" 
+          className="w-72 p-0 bg-zinc-900/95 backdrop-blur-xl border-zinc-800/80 rounded-2xl shadow-2xl" 
           align="start"
           side="top"
         >
@@ -89,31 +89,31 @@ export default function UserStatusBar({
                   setShowStatusPicker(false);
                 }}
                 className={cn(
-                  "w-full flex items-center gap-3 px-3 py-2 rounded-md transition-colors",
+                  "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-colors",
                   profile?.status === status.id 
-                    ? "bg-indigo-500/20 text-white" 
+                    ? "bg-violet-500/15 text-white" 
                     : "text-zinc-400 hover:bg-zinc-800 hover:text-white"
                 )}
               >
-                <div className={cn("w-3 h-3 rounded-full", status.color)} />
-                <span className="text-sm">{status.label}</span>
+                <div className={cn("w-2.5 h-2.5 rounded-full", status.color)} />
+                <span className="text-sm font-medium">{status.label}</span>
               </button>
             ))}
           </div>
 
-          <div className="h-px bg-zinc-800" />
+          <div className="h-px bg-zinc-800/50 mx-2" />
 
           {/* Custom status */}
           <div className="p-3">
-            <label className="text-xs font-semibold uppercase text-zinc-500 mb-2 block">
+            <label className="text-[11px] font-semibold uppercase text-zinc-500 mb-2 block tracking-wider">
               Custom Status
             </label>
             <div className="flex gap-2">
               <Input
                 value={customStatus}
                 onChange={(e) => setCustomStatus(e.target.value)}
-                placeholder="What's on your mind?"
-                className="flex-1 h-8 text-sm bg-zinc-800 border-zinc-700 text-white"
+                placeholder="What's happening?"
+                className="flex-1 h-9 text-sm bg-zinc-800/70 border-zinc-700/50 text-white rounded-xl"
               />
               <Button
                 size="sm"
@@ -121,7 +121,7 @@ export default function UserStatusBar({
                   onCustomStatusChange?.({ text: customStatus });
                   setShowStatusPicker(false);
                 }}
-                className="h-8 bg-indigo-500 hover:bg-indigo-600"
+                className="h-9 bg-violet-500 hover:bg-violet-600 rounded-xl"
               >
                 Save
               </Button>
@@ -131,23 +131,23 @@ export default function UserStatusBar({
       </Popover>
 
       {/* Controls */}
-      <div className="flex items-center">
+      <div className="flex items-center gap-1">
         <TooltipProvider delayDuration={0}>
           <Tooltip>
             <TooltipTrigger asChild>
               <button
                 onClick={onToggleMute}
                 className={cn(
-                  "p-2 rounded transition-colors",
+                  "p-2 rounded-xl transition-colors",
                   isMuted 
-                    ? "bg-red-500/20 text-red-400" 
+                    ? "bg-rose-500/20 text-rose-400" 
                     : "text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200"
                 )}
               >
-                {isMuted ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
+                {isMuted ? <MicOff className="w-[18px] h-[18px]" /> : <Mic className="w-[18px] h-[18px]" />}
               </button>
             </TooltipTrigger>
-            <TooltipContent side="top" className="bg-zinc-900 border-zinc-800 text-white">
+            <TooltipContent side="top" className="bg-zinc-900 border-zinc-800 text-white text-xs rounded-lg">
               {isMuted ? 'Unmute' : 'Mute'}
             </TooltipContent>
           </Tooltip>
@@ -159,16 +159,16 @@ export default function UserStatusBar({
               <button
                 onClick={onToggleDeafen}
                 className={cn(
-                  "p-2 rounded transition-colors",
+                  "p-2 rounded-xl transition-colors",
                   isDeafened 
-                    ? "bg-red-500/20 text-red-400" 
+                    ? "bg-rose-500/20 text-rose-400" 
                     : "text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200"
                 )}
               >
-                {isDeafened ? <HeadphoneOff className="w-5 h-5" /> : <Headphones className="w-5 h-5" />}
+                {isDeafened ? <HeadphoneOff className="w-[18px] h-[18px]" /> : <Headphones className="w-[18px] h-[18px]" />}
               </button>
             </TooltipTrigger>
-            <TooltipContent side="top" className="bg-zinc-900 border-zinc-800 text-white">
+            <TooltipContent side="top" className="bg-zinc-900 border-zinc-800 text-white text-xs rounded-lg">
               {isDeafened ? 'Undeafen' : 'Deafen'}
             </TooltipContent>
           </Tooltip>
@@ -179,13 +179,13 @@ export default function UserStatusBar({
             <TooltipTrigger asChild>
               <button
                 onClick={onOpenSettings}
-                className="p-2 rounded text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200 transition-colors"
+                className="p-2 rounded-xl text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200 transition-colors"
               >
-                <Settings className="w-5 h-5" />
+                <Settings className="w-[18px] h-[18px]" />
               </button>
             </TooltipTrigger>
-            <TooltipContent side="top" className="bg-zinc-900 border-zinc-800 text-white">
-              User Settings
+            <TooltipContent side="top" className="bg-zinc-900 border-zinc-800 text-white text-xs rounded-lg">
+              Settings
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>

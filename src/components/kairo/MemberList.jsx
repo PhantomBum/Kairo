@@ -1,6 +1,5 @@
 import React from 'react';
-import { motion } from 'framer-motion';
-import { Crown, Shield, ShieldCheck, MoreHorizontal, UserPlus, MessageCircle, Ban, Sparkles } from 'lucide-react';
+import { Crown, Shield, ShieldCheck, MessageCircle, Ban } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import UserBadges from './UserBadges';
 import {
@@ -20,28 +19,25 @@ import {
 } from "@/components/ui/hover-card";
 
 const statusColors = {
-  online: 'bg-emerald-500',
-  idle: 'bg-amber-500',
-  dnd: 'bg-red-500',
+  online: 'bg-emerald-400',
+  idle: 'bg-amber-400',
+  dnd: 'bg-rose-400',
   invisible: 'bg-zinc-500',
   offline: 'bg-zinc-600'
 };
 
 function MemberItem({ member, isOwner, highestRole, onMessage, onProfile }) {
-  const roleColor = highestRole?.color || '#9ca3af';
+  const roleColor = highestRole?.color || '#a1a1aa';
 
   return (
     <ContextMenu>
       <ContextMenuTrigger>
         <HoverCard openDelay={500}>
           <HoverCardTrigger asChild>
-            <motion.div
-              whileHover={{ x: 2 }}
-              className="flex items-center gap-3 px-2 py-1.5 mx-2 rounded cursor-pointer hover:bg-zinc-800/50 transition-colors group"
-            >
+            <button className="w-full flex items-center gap-3 px-3 py-2 rounded-xl cursor-pointer hover:bg-zinc-800/50 transition-colors group text-left">
               {/* Avatar with status */}
               <div className="relative flex-shrink-0">
-                <div className="w-8 h-8 rounded-full overflow-hidden bg-zinc-700">
+                <div className="w-9 h-9 rounded-xl overflow-hidden bg-zinc-700">
                   {member.avatar_override || member.user_avatar ? (
                     <img 
                       src={member.avatar_override || member.user_avatar} 
@@ -49,13 +45,13 @@ function MemberItem({ member, isOwner, highestRole, onMessage, onProfile }) {
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-indigo-500 to-purple-600 text-white text-sm font-medium">
+                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-violet-500 to-indigo-600 text-white text-sm font-medium">
                       {(member.nickname || member.user_name)?.charAt(0)}
                     </div>
                   )}
                 </div>
                 <div className={cn(
-                  "absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-2 border-[#121214]",
+                  "absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-zinc-900",
                   statusColors[member.status] || statusColors.offline
                 )} />
               </div>
@@ -63,7 +59,7 @@ function MemberItem({ member, isOwner, highestRole, onMessage, onProfile }) {
               {/* Name */}
               <div className="flex-1 min-w-0 flex items-center gap-1.5">
                 <span 
-                  className="text-sm font-medium truncate"
+                  className="text-[13px] font-medium truncate"
                   style={{ color: roleColor }}
                 >
                   {member.nickname || member.user_name}
@@ -78,32 +74,32 @@ function MemberItem({ member, isOwner, highestRole, onMessage, onProfile }) {
                   <Crown className="w-3.5 h-3.5 text-amber-400 flex-shrink-0" />
                 )}
                 {highestRole?.name === 'Admin' && !isOwner && (
-                  <ShieldCheck className="w-3.5 h-3.5 text-indigo-400 flex-shrink-0" />
+                  <ShieldCheck className="w-3.5 h-3.5 text-violet-400 flex-shrink-0" />
                 )}
                 {highestRole?.name === 'Moderator' && (
                   <Shield className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" />
                 )}
               </div>
-            </motion.div>
+            </button>
           </HoverCardTrigger>
           <HoverCardContent 
             side="left" 
-            className="w-80 p-0 bg-zinc-900 border-zinc-800 shadow-xl"
+            className="w-72 p-0 bg-zinc-900/95 backdrop-blur-xl border-zinc-800/80 shadow-2xl rounded-2xl overflow-hidden"
           >
             {/* Banner */}
             <div 
-              className="h-16 rounded-t-lg"
+              className="h-20"
               style={{ 
                 background: member.banner_url 
                   ? `url(${member.banner_url}) center/cover`
-                  : `linear-gradient(135deg, ${roleColor}40, ${roleColor}20)`
+                  : `linear-gradient(135deg, ${roleColor}40, ${roleColor}10)`
               }}
             />
             
             {/* Avatar */}
-            <div className="px-4 -mt-8">
+            <div className="px-4 -mt-10">
               <div className="relative inline-block">
-                <div className="w-16 h-16 rounded-full overflow-hidden border-4 border-zinc-900 bg-zinc-800">
+                <div className="w-20 h-20 rounded-2xl overflow-hidden border-4 border-zinc-900 bg-zinc-800 shadow-xl">
                   {member.avatar_override || member.user_avatar ? (
                     <img 
                       src={member.avatar_override || member.user_avatar} 
@@ -111,78 +107,41 @@ function MemberItem({ member, isOwner, highestRole, onMessage, onProfile }) {
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-indigo-500 to-purple-600 text-white text-xl font-medium">
+                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-violet-500 to-indigo-600 text-white text-2xl font-medium">
                       {(member.nickname || member.user_name)?.charAt(0)}
                     </div>
                   )}
                 </div>
                 <div className={cn(
-                  "absolute bottom-0 right-0 w-5 h-5 rounded-full border-4 border-zinc-900",
+                  "absolute bottom-1 right-1 w-5 h-5 rounded-full border-4 border-zinc-900",
                   statusColors[member.status] || statusColors.offline
                 )} />
               </div>
             </div>
 
             {/* Info */}
-            <div className="p-4 pt-2">
+            <div className="p-4 pt-3">
               <h3 className="font-semibold text-white text-lg">
                 {member.nickname || member.user_name}
               </h3>
-              <p className="text-sm text-zinc-400">{member.user_name}</p>
+              <p className="text-sm text-zinc-500">{member.user_name}</p>
               
-              {member.custom_status?.text && (
-                <p className="text-sm text-zinc-300 mt-2 flex items-center gap-2">
-                  {member.custom_status.emoji && <span>{member.custom_status.emoji}</span>}
-                  {member.custom_status.text}
-                </p>
-              )}
-
               {member.bio && (
-                <div className="mt-3 pt-3 border-t border-zinc-800">
-                  <h4 className="text-xs font-semibold text-zinc-400 uppercase mb-1">About Me</h4>
-                  <p className="text-sm text-zinc-300">{member.bio}</p>
-                </div>
-              )}
-
-              {/* Rich Presence */}
-              {member.rich_presence?.name && (
-                <div className="mt-3 pt-3 border-t border-zinc-800">
-                  <h4 className="text-xs font-semibold text-zinc-400 uppercase mb-2">Activity</h4>
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 bg-zinc-800 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <Sparkles className="w-6 h-6 text-zinc-500" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm text-white font-medium truncate">
-                        {member.rich_presence.type === 'playing' && 'Playing '}
-                        {member.rich_presence.type === 'listening' && 'Listening to '}
-                        {member.rich_presence.type === 'watching' && 'Watching '}
-                        {member.rich_presence.type === 'streaming' && 'Streaming '}
-                        {member.rich_presence.type === 'competing' && 'Competing in '}
-                        <span className="font-bold">{member.rich_presence.name}</span>
-                      </p>
-                      {member.rich_presence.details && (
-                        <p className="text-xs text-zinc-400 truncate">{member.rich_presence.details}</p>
-                      )}
-                      {member.rich_presence.state && (
-                        <p className="text-xs text-zinc-400 truncate">{member.rich_presence.state}</p>
-                      )}
-                    </div>
-                  </div>
+                <div className="mt-3 pt-3 border-t border-zinc-800/50">
+                  <p className="text-sm text-zinc-400 leading-relaxed">{member.bio}</p>
                 </div>
               )}
 
               {/* Roles */}
               {member.roles?.length > 0 && (
-                <div className="mt-3 pt-3 border-t border-zinc-800">
-                  <h4 className="text-xs font-semibold text-zinc-400 uppercase mb-2">Roles</h4>
-                  <div className="flex flex-wrap gap-1">
+                <div className="mt-3 pt-3 border-t border-zinc-800/50">
+                  <div className="flex flex-wrap gap-1.5">
                     {member.roles.map((role) => (
                       <span
                         key={role.id}
-                        className="px-2 py-0.5 rounded text-xs font-medium"
+                        className="px-2 py-0.5 rounded-lg text-xs font-medium"
                         style={{ 
-                          backgroundColor: `${role.color}20`,
+                          backgroundColor: `${role.color}15`,
                           color: role.color
                         }}
                       >
@@ -196,36 +155,36 @@ function MemberItem({ member, isOwner, highestRole, onMessage, onProfile }) {
           </HoverCardContent>
         </HoverCard>
       </ContextMenuTrigger>
-      <ContextMenuContent className="w-48 bg-zinc-900 border-zinc-800">
+      <ContextMenuContent className="w-48 bg-zinc-900/95 backdrop-blur-xl border-zinc-800/80 rounded-xl p-1">
         <ContextMenuItem 
           onClick={() => onProfile?.(member)}
-          className="text-zinc-300 focus:bg-indigo-500/20 focus:text-white"
+          className="text-zinc-300 focus:bg-zinc-800 rounded-lg"
         >
           View Profile
         </ContextMenuItem>
         <ContextMenuItem 
           onClick={() => onMessage?.(member)}
-          className="text-zinc-300 focus:bg-indigo-500/20 focus:text-white"
+          className="text-zinc-300 focus:bg-zinc-800 rounded-lg"
         >
-          <MessageCircle className="w-4 h-4 mr-2" />
+          <MessageCircle className="w-4 h-4 mr-2 text-zinc-500" />
           Message
         </ContextMenuItem>
-        <ContextMenuSeparator className="bg-zinc-800" />
+        <ContextMenuSeparator className="bg-zinc-800/50 my-1" />
         <ContextMenuSub>
-          <ContextMenuSubTrigger className="text-zinc-300 focus:bg-indigo-500/20 focus:text-white">
+          <ContextMenuSubTrigger className="text-zinc-300 focus:bg-zinc-800 rounded-lg">
             Roles
           </ContextMenuSubTrigger>
-          <ContextMenuSubContent className="bg-zinc-900 border-zinc-800">
-            <ContextMenuItem className="text-zinc-300 focus:bg-indigo-500/20 focus:text-white">
+          <ContextMenuSubContent className="bg-zinc-900/95 backdrop-blur-xl border-zinc-800/80 rounded-xl p-1">
+            <ContextMenuItem className="text-zinc-300 focus:bg-zinc-800 rounded-lg">
               Add Role...
             </ContextMenuItem>
           </ContextMenuSubContent>
         </ContextMenuSub>
-        <ContextMenuSeparator className="bg-zinc-800" />
-        <ContextMenuItem className="text-amber-400 focus:bg-amber-500/20 focus:text-amber-400">
+        <ContextMenuSeparator className="bg-zinc-800/50 my-1" />
+        <ContextMenuItem className="text-amber-400 focus:bg-amber-500/10 rounded-lg">
           Timeout
         </ContextMenuItem>
-        <ContextMenuItem className="text-red-400 focus:bg-red-500/20 focus:text-red-400">
+        <ContextMenuItem className="text-rose-400 focus:bg-rose-500/10 rounded-lg">
           <Ban className="w-4 h-4 mr-2" />
           Ban
         </ContextMenuItem>
@@ -241,40 +200,29 @@ export default function MemberList({
   onMemberMessage,
   onMemberProfile 
 }) {
-  // Group members by their highest role
   const groupedMembers = React.useMemo(() => {
     const groups = {};
     const sortedRoles = [...roles].sort((a, b) => (b.position || 0) - (a.position || 0));
     
-    // Create groups for hoisted roles
-    sortedRoles
-      .filter(r => r.is_hoisted)
-      .forEach(role => {
-        groups[role.id] = { role, members: [] };
-      });
+    sortedRoles.filter(r => r.is_hoisted).forEach(role => {
+      groups[role.id] = { role, members: [] };
+    });
     
-    // Add "Online" and "Offline" groups
     groups['online'] = { role: { id: 'online', name: 'Online', color: null }, members: [] };
     groups['offline'] = { role: { id: 'offline', name: 'Offline', color: null }, members: [] };
     
-    // Sort members into groups
     members.forEach(member => {
       const memberRoleIds = member.role_ids || [];
       let placed = false;
       
-      // Check hoisted roles first
       for (const role of sortedRoles.filter(r => r.is_hoisted)) {
         if (memberRoleIds.includes(role.id)) {
-          groups[role.id].members.push({
-            ...member,
-            highestRole: role
-          });
+          groups[role.id].members.push({ ...member, highestRole: role });
           placed = true;
           break;
         }
       }
       
-      // If not placed in a hoisted role, put in online/offline
       if (!placed) {
         const isOnline = member.status && member.status !== 'offline';
         const group = isOnline ? 'online' : 'offline';
@@ -289,23 +237,25 @@ export default function MemberList({
   }, [members, roles]);
 
   return (
-    <div className="w-60 h-full bg-[#121214] border-l border-zinc-800/50 overflow-y-auto scrollbar-thin scrollbar-thumb-zinc-700 scrollbar-track-transparent">
-      <div className="py-4">
+    <div className="w-60 h-full bg-zinc-900/30 border-l border-zinc-800/30 overflow-y-auto scrollbar-thin">
+      <div className="p-3">
         {groupedMembers.map((group) => (
           <div key={group.role.id} className="mb-4">
-            <h3 className="px-4 mb-1 text-xs font-semibold uppercase tracking-wider text-zinc-500">
+            <h3 className="px-3 mb-2 text-[11px] font-semibold uppercase tracking-wider text-zinc-500">
               {group.role.name} — {group.members.length}
             </h3>
-            {group.members.map((member) => (
-              <MemberItem
-                key={member.user_id}
-                member={member}
-                isOwner={member.user_id === ownerId}
-                highestRole={member.highestRole}
-                onMessage={onMemberMessage}
-                onProfile={onMemberProfile}
-              />
-            ))}
+            <div className="space-y-0.5">
+              {group.members.map((member) => (
+                <MemberItem
+                  key={member.user_id}
+                  member={member}
+                  isOwner={member.user_id === ownerId}
+                  highestRole={member.highestRole}
+                  onMessage={onMemberMessage}
+                  onProfile={onMemberProfile}
+                />
+              ))}
+            </div>
           </div>
         ))}
       </div>

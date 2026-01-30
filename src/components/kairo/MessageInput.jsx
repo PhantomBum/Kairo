@@ -1,11 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Plus, Smile, Gift, Sticker, ImageIcon, File, AtSign,
-  X, Send, Mic, PauseCircle, Paperclip
+  Plus, Smile, ImageIcon, File, X, Send, Mic, ArrowUp
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
 import {
   Popover,
   PopoverContent,
@@ -19,7 +17,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { base44 } from '@/api/base44Client';
 
-const commonEmojis = ['😀', '😂', '❤️', '🔥', '👍', '👎', '🎉', '😢', '😮', '🤔', '👀', '💯'];
+const commonEmojis = ['😀', '😂', '❤️', '🔥', '👍', '🎉', '😢', '😮', '🤔', '👀', '💯', '✨'];
 
 export default function MessageInput({ 
   channelName,
@@ -31,7 +29,6 @@ export default function MessageInput({
 }) {
   const [content, setContent] = useState('');
   const [files, setFiles] = useState([]);
-  const [isRecording, setIsRecording] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(null);
   const inputRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -53,7 +50,6 @@ export default function MessageInput({
   const handleSend = async () => {
     if (!content.trim() && files.length === 0) return;
 
-    // Upload files first if any
     let attachments = [];
     if (files.length > 0) {
       setUploadProgress(0);
@@ -102,18 +98,21 @@ export default function MessageInput({
       <AnimatePresence>
         {replyTo && (
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 10 }}
             transition={{ duration: 0.15 }}
-            className="flex items-center gap-2 px-4 py-2 mb-2 bg-zinc-800/50 rounded-t-lg border-l-2 border-indigo-500"
+            className="flex items-center gap-3 px-4 py-3 mb-2 bg-zinc-800/50 backdrop-blur-sm rounded-2xl border border-zinc-700/50"
           >
-            <span className="text-xs text-zinc-500">Replying to</span>
-            <span className="text-xs text-white font-medium">{replyTo.author_name}</span>
-            <span className="text-xs text-zinc-400 truncate flex-1">{replyTo.content?.slice(0, 50)}</span>
+            <div className="w-1 h-8 bg-violet-500 rounded-full" />
+            <div className="flex-1 min-w-0">
+              <span className="text-xs text-zinc-400">Replying to </span>
+              <span className="text-xs text-violet-400 font-medium">{replyTo.author_name}</span>
+              <p className="text-sm text-zinc-400 truncate">{replyTo.content?.slice(0, 60)}</p>
+            </div>
             <button
               onClick={onCancelReply}
-              className="p-1 hover:bg-zinc-700 rounded transition-colors"
+              className="p-1.5 hover:bg-zinc-700 rounded-lg transition-colors"
             >
               <X className="w-4 h-4 text-zinc-400" />
             </button>
@@ -125,19 +124,16 @@ export default function MessageInput({
       <AnimatePresence>
         {files.length > 0 && (
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 10 }}
             transition={{ duration: 0.15 }}
-            className="flex flex-wrap gap-2 px-4 py-3 mb-2 bg-zinc-800/30 rounded-t-lg"
+            className="flex flex-wrap gap-2 px-4 py-3 mb-2 bg-zinc-800/30 backdrop-blur-sm rounded-2xl border border-zinc-800/50"
           >
             {files.map((file, index) => (
-              <div 
-                key={index}
-                className="relative group"
-              >
+              <div key={index} className="relative group">
                 {file.type.startsWith('image/') ? (
-                  <div className="w-20 h-20 rounded-lg overflow-hidden bg-zinc-700">
+                  <div className="w-20 h-20 rounded-xl overflow-hidden bg-zinc-700">
                     <img 
                       src={URL.createObjectURL(file)} 
                       alt=""
@@ -145,8 +141,8 @@ export default function MessageInput({
                     />
                   </div>
                 ) : (
-                  <div className="flex items-center gap-2 px-3 py-2 bg-zinc-700 rounded-lg">
-                    <File className="w-5 h-5 text-zinc-400" />
+                  <div className="flex items-center gap-2 px-3 py-2.5 bg-zinc-800 rounded-xl">
+                    <File className="w-5 h-5 text-violet-400" />
                     <span className="text-sm text-zinc-300 max-w-[100px] truncate">
                       {file.name}
                     </span>
@@ -154,15 +150,15 @@ export default function MessageInput({
                 )}
                 <button
                   onClick={() => removeFile(index)}
-                  className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                  className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-rose-500 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
                 >
                   <X className="w-3 h-3 text-white" />
                 </button>
               </div>
             ))}
             {uploadProgress !== null && (
-              <div className="flex items-center gap-2 text-sm text-zinc-400">
-                <div className="w-4 h-4 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+              <div className="flex items-center gap-2 text-sm text-zinc-400 px-3">
+                <div className="w-4 h-4 border-2 border-violet-500 border-t-transparent rounded-full animate-spin" />
                 Uploading... {Math.round(uploadProgress)}%
               </div>
             )}
@@ -172,23 +168,22 @@ export default function MessageInput({
 
       {/* Input container */}
       <div className={cn(
-        "flex items-end gap-2 bg-zinc-800/50 rounded-lg transition-colors",
-        replyTo && "rounded-t-none",
-        files.length > 0 && !replyTo && "rounded-t-none"
+        "flex items-end gap-2 bg-zinc-800/50 backdrop-blur-sm rounded-2xl border border-zinc-700/30 transition-all focus-within:border-violet-500/50 focus-within:bg-zinc-800/70",
+        (replyTo || files.length > 0) && "rounded-t-2xl"
       )}>
         {/* Attachment button */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button className="p-3 hover:bg-zinc-700/50 rounded-l-lg transition-colors text-zinc-400 hover:text-zinc-200">
+            <button className="p-3 hover:bg-zinc-700/50 rounded-l-2xl transition-colors text-zinc-400 hover:text-zinc-200">
               <Plus className="w-5 h-5" />
             </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-48 bg-zinc-900 border-zinc-800" align="start">
+          <DropdownMenuContent className="w-48 bg-zinc-900/95 backdrop-blur-xl border-zinc-800/80 rounded-xl p-1" align="start">
             <DropdownMenuItem 
               onClick={() => fileInputRef.current?.click()}
-              className="text-zinc-300 focus:bg-zinc-800 focus:text-white"
+              className="text-zinc-300 focus:bg-zinc-800 rounded-lg"
             >
-              <File className="w-4 h-4 mr-2" />
+              <File className="w-4 h-4 mr-2 text-zinc-500" />
               Upload File
             </DropdownMenuItem>
             <DropdownMenuItem 
@@ -196,9 +191,9 @@ export default function MessageInput({
                 fileInputRef.current.accept = 'image/*';
                 fileInputRef.current?.click();
               }}
-              className="text-zinc-300 focus:bg-zinc-800 focus:text-white"
+              className="text-zinc-300 focus:bg-zinc-800 rounded-lg"
             >
-              <ImageIcon className="w-4 h-4 mr-2" />
+              <ImageIcon className="w-4 h-4 mr-2 text-zinc-500" />
               Upload Image
             </DropdownMenuItem>
           </DropdownMenuContent>
@@ -218,17 +213,14 @@ export default function MessageInput({
           value={content}
           onChange={(e) => setContent(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder={`Message #${channelName || 'channel'}`}
+          placeholder={`Message ${channelName ? '#' + channelName : ''}`}
           disabled={disabled}
           rows={1}
           className={cn(
-            "flex-1 bg-transparent text-white placeholder-zinc-500 resize-none py-3 outline-none",
-            "max-h-[200px] scrollbar-thin scrollbar-thumb-zinc-700 scrollbar-track-transparent"
+            "flex-1 bg-transparent text-white placeholder-zinc-500 resize-none py-3 outline-none text-[15px]",
+            "max-h-[200px] scrollbar-thin"
           )}
-          style={{ 
-            height: 'auto',
-            minHeight: '24px'
-          }}
+          style={{ height: 'auto', minHeight: '24px' }}
           onInput={(e) => {
             e.target.style.height = 'auto';
             e.target.style.height = Math.min(e.target.scrollHeight, 200) + 'px';
@@ -240,17 +232,17 @@ export default function MessageInput({
           {/* Emoji picker */}
           <Popover>
             <PopoverTrigger asChild>
-              <button className="p-1.5 hover:bg-zinc-700/50 rounded transition-colors text-zinc-400 hover:text-zinc-200">
+              <button className="p-2 hover:bg-zinc-700/50 rounded-xl transition-colors text-zinc-400 hover:text-zinc-200">
                 <Smile className="w-5 h-5" />
               </button>
             </PopoverTrigger>
-            <PopoverContent className="w-auto p-3 bg-zinc-900 border-zinc-800" align="end">
+            <PopoverContent className="w-auto p-3 bg-zinc-900/95 backdrop-blur-xl border-zinc-800/80 rounded-xl" align="end">
               <div className="grid grid-cols-6 gap-1">
                 {commonEmojis.map((emoji) => (
                   <button
                     key={emoji}
                     onClick={() => insertEmoji(emoji)}
-                    className="w-8 h-8 flex items-center justify-center hover:bg-zinc-800 rounded text-lg transition-colors"
+                    className="w-9 h-9 flex items-center justify-center hover:bg-zinc-800 rounded-lg text-xl transition-colors"
                   >
                     {emoji}
                   </button>
@@ -259,31 +251,19 @@ export default function MessageInput({
             </PopoverContent>
           </Popover>
 
-          {/* Voice message */}
-          <button 
-            onClick={() => setIsRecording(!isRecording)}
+          {/* Send button */}
+          <button
+            onClick={handleSend}
+            disabled={disabled || uploadProgress !== null || (!content.trim() && files.length === 0)}
             className={cn(
-              "p-1.5 rounded transition-colors",
-              isRecording 
-                ? "bg-red-500 text-white" 
-                : "hover:bg-zinc-700/50 text-zinc-400 hover:text-zinc-200"
+              "p-2 rounded-xl transition-all",
+              (content.trim() || files.length > 0)
+                ? "bg-violet-500 hover:bg-violet-600 text-white shadow-lg shadow-violet-500/25"
+                : "bg-zinc-700/50 text-zinc-500 cursor-not-allowed"
             )}
           >
-            {isRecording ? <PauseCircle className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
+            <ArrowUp className="w-5 h-5" />
           </button>
-
-          {/* Send button */}
-          {(content.trim() || files.length > 0) && (
-            <motion.button
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              onClick={handleSend}
-              disabled={disabled || uploadProgress !== null}
-              className="p-1.5 bg-indigo-500 hover:bg-indigo-600 rounded transition-colors text-white"
-            >
-              <Send className="w-5 h-5" />
-            </motion.button>
-          )}
         </div>
       </div>
     </div>
