@@ -92,7 +92,18 @@ export function ProfileProvider({ children }) {
 }
 
 export function useProfiles() {
-  return useContext(ProfileContext);
+  const context = useContext(ProfileContext);
+  if (!context) {
+    // Return defaults if not in provider
+    return {
+      profiles: [],
+      profilesMap: { byId: {}, byUserId: {}, byEmail: {} },
+      getProfile: () => null,
+      refreshProfile: () => {},
+      refreshAllProfiles: () => {}
+    };
+  }
+  return context;
 }
 
 // Hook to get a single profile with fallback
