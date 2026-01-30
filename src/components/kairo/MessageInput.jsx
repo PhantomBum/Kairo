@@ -27,13 +27,19 @@ export default function MessageInput({
   onCancelReply,
   onSendMessage,
   onTyping,
-  disabled
+  disabled,
+  members = []
 }) {
   const [content, setContent] = useState('');
   const [files, setFiles] = useState([]);
   const [uploadProgress, setUploadProgress] = useState(null);
   const [showGifPicker, setShowGifPicker] = useState(false);
   const [showStickerPicker, setShowStickerPicker] = useState(false);
+  const [showMentions, setShowMentions] = useState(false);
+  const [mentionQuery, setMentionQuery] = useState('');
+  const [mentionSuggestions, setMentionSuggestions] = useState([]);
+  const [selectedMentionIndex, setSelectedMentionIndex] = useState(0);
+  const [mentionStart, setMentionStart] = useState(-1);
   const inputRef = useRef(null);
   const fileInputRef = useRef(null);
 
@@ -44,11 +50,79 @@ export default function MessageInput({
   }, [replyTo]);
 
   const handleKeyDown = (e) => {
+    // Handle mention navigation
+    if (showMentions && mentionSuggestions.length > 0) {
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        setSelectedMentionIndex(prev => Math.min(prev + 1, mentionSuggestions.length - 1));
+        return;
+      }
+      if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        setSelectedMentionIndex(prev => Math.max(prev - 1, 0));
+        return;
+      }
+      if (e.key === 'Tab' || (e.key === 'Enter' && mentionSuggestions[selectedMentionIndex])) {
+        e.preventDefault();
+        selectMention(mentionSuggestions[selectedMentionIndex]);
+        return;
+      }
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        setShowMentions(false);
+        return;
+      }
+    }
+    
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSend();
     }
     onTyping?.();
+  };
+
+  const handleContentChange = (e) => {
+    const newValue = e.target.value;
+    const cursorPos = e.target.selectionStart;
+    
+    // Detect @ mentions
+    const textBeforeCursor = newValue.slice(0, cursorPos);
+    const lastAtIndex = textBeforeCursor.lastIndexOf('@');
+    
+    if (lastAtIndex !== -1) {
+      const textAfterAt = textBeforeCursor.slice(lastAtIndex + 1);
+      if (!textAfterAt.includes(' ')) {
+        setMentionQuery(textAfterAt.toLowerCase());
+        setMentionStart(lastAtIndex);
+        
+        const filtered = members.filter(m => {
+          const name = (m.display_name || m.user_name || m.nickname || '').toLowerCase();
+          const username = (m.username || '').toLowerCase();
+          return name.includes(textAfterAt.toLowerCase()) || username.includes(textAfterAt.toLowerCase());
+        }).slice(0, 5);
+        
+        setMentionSuggestions(filtered);
+        setShowMentions(filtered.length > 0);
+        setSelectedMentionIndex(0);
+      } else {
+        setShowMentions(false);
+      }
+    } else {
+      setShowMentions(false);
+    }
+    
+    setContent(newValue);
+  };
+
+  const selectMention = (member) => {
+    const name = member.display_name || member.user_name || member.nickname || 'user';
+    const beforeMention = content.slice(0, mentionStart);
+    const afterMention = content.slice(mentionStart + mentionQuery.length + 1);
+    const newValue = `${beforeMention}@${name} ${afterMention}`;
+    
+    setContent(newValue);
+    setShowMentions(false);
+    inputRef.current?.focus();
   };
 
   const handleSend = async () => {
@@ -232,25 +306,70 @@ export default function MessageInput({
           className="hidden"
         />
 
-        {/* Text input */}
-        <textarea
-          ref={inputRef}
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder={`Message ${channelName ? '#' + channelName : ''}`}
-          disabled={disabled}
-          rows={1}
-          className={cn(
-            "flex-1 bg-transparent text-white placeholder-zinc-500 resize-none py-3.5 outline-none text-[15px]",
-            "max-h-[200px] scrollbar-thin"
-          )}
-          style={{ height: 'auto', minHeight: '24px' }}
-          onInput={(e) => {
-            e.target.style.height = 'auto';
-            e.target.style.height = Math.min(e.target.scrollHeight, 200) + 'px';
-          }}
-        />
+        {/* Text input with mention support */}
+        <div className="flex-1 relative">
+          <textarea
+            ref={inputRef}
+            value={content}
+            onChange={handleContentChange}
+            onKeyDown={handleKeyDown}
+            placeholder={`Message ${channelName ? '#' + channelName : ''} (use @ to mention)`}
+            disabled={disabled}
+            rows={1}
+            className={cn(
+              "w-full bg-transparent text-white placeholder-zinc-500 resize-none py-3.5 outline-none text-[15px]",
+              "max-h-[200px] scrollbar-thin"
+            )}
+            style={{ height: 'auto', minHeight: '24px' }}
+            onInput={(e) => {
+              e.target.style.height = 'auto';
+              e.target.style.height = Math.min(e.target.scrollHeight, 200) + 'px';
+            }}
+          />
+          
+          {/* Mention suggestions */}
+          <AnimatePresence>
+            {showMentions && mentionSuggestions.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 10 }}
+                className="absolute bottom-full left-0 mb-2 w-64 bg-[#1a1a1d] border border-white/10 rounded-xl shadow-2xl overflow-hidden z-50"
+              >
+                <div className="p-1">
+                  <p className="px-3 py-1.5 text-[10px] uppercase tracking-wider text-zinc-500 font-semibold">
+                    Members
+                  </p>
+                  {mentionSuggestions.map((member, index) => (
+                    <button
+                      key={member.user_id || member.id || index}
+                      onClick={() => selectMention(member)}
+                      className={cn(
+                        "w-full flex items-center gap-2.5 px-3 py-2 rounded-lg transition-colors",
+                        index === selectedMentionIndex ? "bg-violet-500/20 text-white" : "text-zinc-300 hover:bg-white/5"
+                      )}
+                    >
+                      <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-indigo-600 overflow-hidden flex-shrink-0">
+                        {member.avatar_url || member.avatar ? (
+                          <img src={member.avatar_url || member.avatar} alt="" className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-white text-xs font-bold">
+                            {(member.display_name || member.user_name || member.nickname)?.charAt(0) || '?'}
+                          </div>
+                        )}
+                      </div>
+                      <div className="text-left min-w-0">
+                        <p className="text-sm font-medium truncate">
+                          {member.display_name || member.user_name || member.nickname || 'Unknown'}
+                        </p>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
 
         {/* Actions */}
         <div className="flex items-center gap-0.5 p-1.5 md:p-2">
