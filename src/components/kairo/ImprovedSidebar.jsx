@@ -32,30 +32,30 @@ function ServerItem({ server, isActive, onClick, isCollapsed, onLeave, onMobileC
               <button
                 onClick={handleClick}
                 className={cn(
-                  "w-full flex items-center gap-2.5 px-2 py-1.5 rounded transition-all group relative",
+                  "w-full flex items-center gap-3 px-2 py-2 rounded-lg transition-all group relative",
                   isActive 
                     ? "bg-white/10 text-white" 
                     : "text-zinc-500 hover:bg-white/5 hover:text-white"
                 )}
               >
                 <div className={cn(
-                  "w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden",
-                  isActive ? "bg-white/10" : "bg-white/5"
+                  "w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 overflow-hidden",
+                  isActive ? "bg-white/10 ring-2 ring-violet-500/30" : "bg-white/5"
                 )}>
                   {server.icon_url ? (
                     <img src={server.icon_url} alt="" className="w-full h-full object-cover" />
                   ) : (
-                    <span className="text-xs font-medium text-white">{server.name?.charAt(0)}</span>
+                    <span className="text-sm font-semibold text-white">{server.name?.charAt(0)}</span>
                   )}
                 </div>
                 {!isCollapsed && (
                   <div className="flex-1 text-left min-w-0">
-                    <p className="font-medium text-xs truncate">{server.name}</p>
-                    <p className="text-[10px] text-zinc-600">{server.member_count || 0} members</p>
+                    <p className="font-medium text-sm truncate">{server.name}</p>
+                    <p className="text-[11px] text-zinc-600">{server.member_count || 0} members</p>
                   </div>
                 )}
                 {!isCollapsed && server.unread > 0 && (
-                  <div className="min-w-[16px] h-[16px] px-1 bg-red-500 text-white rounded text-[9px] font-bold flex items-center justify-center">
+                  <div className="min-w-[18px] h-[18px] px-1.5 bg-red-500 text-white rounded-full text-[10px] font-bold flex items-center justify-center">
                     {server.unread > 99 ? '99+' : server.unread}
                   </div>
                 )}
@@ -103,18 +103,18 @@ function NavButton({ icon: Icon, label, onClick, isActive, badge, isCollapsed, s
           <button
             onClick={handleClick}
             className={cn(
-              "w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded transition-all relative",
+              "w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg transition-all relative",
               isActive 
                 ? "bg-white/10 text-white" 
                 : "text-zinc-500 hover:bg-white/5 hover:text-zinc-300"
             )}
           >
-            <Icon className="w-4 h-4 flex-shrink-0" />
-            {!isCollapsed && <span className="text-xs font-medium">{label}</span>}
+            <Icon className="w-[18px] h-[18px] flex-shrink-0" />
+            {!isCollapsed && <span className="text-sm font-medium">{label}</span>}
             {badge > 0 && (
               <div className={cn(
-                "bg-red-500 text-white text-[9px] font-bold rounded flex items-center justify-center",
-                isCollapsed ? "absolute -top-1 -right-1 w-4 h-4" : "ml-auto min-w-[16px] h-[16px] px-1"
+                "bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center",
+                isCollapsed ? "absolute -top-1 -right-1 w-4 h-4" : "ml-auto min-w-[18px] h-[18px] px-1.5"
               )}>
                 {badge > 99 ? '99+' : badge}
               </div>
@@ -292,6 +292,33 @@ export default function ImprovedSidebar({
             </button>
           </div>
         )}
+      </div>
+
+      {/* Quick Actions */}
+      <div className="px-3 py-2 border-t border-white/5 space-y-0.5">
+        <NavButton 
+          icon={ShoppingBag} 
+          label="Shop" 
+          onClick={onShopClick} 
+          isCollapsed={isCollapsed} 
+          onMobileClose={onMobileClose}
+        />
+        <NavButton 
+          icon={Sparkles} 
+          label="Updates" 
+          onClick={onUpdateLogsClick} 
+          badge={hasNewUpdates ? 1 : 0}
+          isCollapsed={isCollapsed} 
+          onMobileClose={onMobileClose}
+        />
+        <NavButton 
+          icon={Bell} 
+          label="Notifications" 
+          onClick={onNotificationsClick} 
+          badge={notifications?.length || 0}
+          isCollapsed={isCollapsed} 
+          onMobileClose={onMobileClose}
+        />
       </div>
 
       {/* Bottom Actions */}
