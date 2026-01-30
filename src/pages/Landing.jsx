@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  ArrowRight, Zap, Shield, Users, Sparkles, Check, 
-  MessageCircle, Mic, Eye, Lock, Globe, ChevronRight,
-  Key, Copy
+  ArrowRight, Zap, Shield, Users, Check, 
+  MessageCircle, Mic, Eye, Globe,
+  Key, Copy, ChevronRight, Hexagon
 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { useNavigate } from 'react-router-dom';
@@ -12,28 +12,25 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
 const features = [
-  { icon: MessageCircle, title: 'Real-time Messaging', desc: 'Instant messaging with rich media support' },
-  { icon: Mic, title: 'Voice & Video', desc: 'Crystal clear voice channels and video calls' },
-  { icon: Users, title: 'Server Communities', desc: 'Create and manage custom servers' },
-  { icon: Eye, title: 'Listen Mode', desc: 'Join voice channels invisibly' },
-  { icon: Shield, title: 'Privacy First', desc: 'Ghost mode and focus mode' },
-  { icon: Zap, title: 'Blazing Fast', desc: 'Optimized for performance' },
+  { icon: MessageCircle, title: 'Messaging', desc: 'Real-time with rich media' },
+  { icon: Mic, title: 'Voice & Video', desc: 'Crystal clear channels' },
+  { icon: Users, title: 'Communities', desc: 'Create custom servers' },
+  { icon: Eye, title: 'Listen Mode', desc: 'Join invisibly' },
+  { icon: Shield, title: 'Privacy', desc: 'Ghost & focus modes' },
+  { icon: Zap, title: 'Fast', desc: 'Optimized performance' },
 ];
 
 export default function LandingPage() {
   const navigate = useNavigate();
-  const [step, setStep] = useState('landing'); // 'landing' | 'getKey' | 'enterKey' | 'profile'
+  const [step, setStep] = useState('landing');
   const [generatedKey, setGeneratedKey] = useState('');
   const [enteredKey, setEnteredKey] = useState('');
   const [displayName, setDisplayName] = useState('');
-  const [username, setUsername] = useState('');
   const [copied, setCopied] = useState(false);
 
-  // Check if user already has a key in localStorage
   useEffect(() => {
     const savedKey = localStorage.getItem('kairo_access_key');
     if (savedKey) {
-      // Verify the key and redirect if valid
       verifyKeyAndRedirect(savedKey);
     }
   }, [navigate]);
@@ -51,15 +48,13 @@ export default function LandingPage() {
   };
 
   const generateAccessKey = async () => {
-    // Generate a truly unique key
     const randomPart = Math.random().toString(36).substring(2, 10).toUpperCase();
     const timePart = Date.now().toString(36).toUpperCase();
     const key = `KAIRO-${randomPart}-${timePart}`;
     
-    // Check if key exists (very unlikely but just in case)
     const existing = await base44.entities.UserProfile.filter({ username: key });
     if (existing.length > 0) {
-      generateAccessKey(); // Try again
+      generateAccessKey();
       return;
     }
     
@@ -82,16 +77,13 @@ export default function LandingPage() {
     }
     
     try {
-      // Check if key exists
       const profiles = await base44.entities.UserProfile.filter({ username: keyToUse });
       
       if (profiles.length > 0) {
-        // Key exists, log in
         localStorage.setItem('kairo_access_key', keyToUse);
         localStorage.setItem('kairo_current_user', JSON.stringify(profiles[0]));
         navigate(createPageUrl('Kairo'));
       } else if (generatedKey) {
-        // New key, go to profile setup
         setStep('profile');
       } else {
         alert('Invalid access key. Please check and try again.');
@@ -141,37 +133,42 @@ export default function LandingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0a0b] overflow-x-hidden">
-      {/* Animated background */}
+    <div className="min-h-screen bg-[#050506] overflow-x-hidden">
+      {/* Subtle grid pattern */}
+      <div className="fixed inset-0 pointer-events-none opacity-[0.02]" style={{
+        backgroundImage: `linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px)`,
+        backgroundSize: '80px 80px'
+      }} />
+      
+      {/* Minimal gradient accents */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-zinc-800/20 rounded-full blur-[120px]" />
       </div>
 
       {/* Header */}
       <header className="relative z-10 px-6 py-6">
-        <nav className="max-w-7xl mx-auto flex items-center justify-between">
+        <nav className="max-w-6xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg">
-              <span className="text-xl font-bold text-white">K</span>
+            <div className="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center">
+              <span className="text-lg font-bold text-white">K</span>
             </div>
-            <span className="text-xl font-semibold text-white">Kairo</span>
+            <span className="text-lg font-medium text-white/90">Kairo</span>
           </div>
           
           {step === 'landing' && (
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3">
               <button 
                 onClick={() => setStep('enterKey')}
-                className="px-4 py-2 text-zinc-400 hover:text-white transition-colors"
+                className="px-4 py-2 text-sm text-zinc-500 hover:text-white transition-colors"
               >
-                I have a key
+                Sign in
               </button>
-              <Button 
+              <button 
                 onClick={generateAccessKey}
-                className="bg-indigo-500 hover:bg-indigo-600"
+                className="px-4 py-2 text-sm bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-lg transition-all"
               >
-                Get Access Key
-              </Button>
+                Get Started
+              </button>
             </div>
           )}
         </nav>
@@ -186,91 +183,117 @@ export default function LandingPage() {
             exit={{ opacity: 0 }}
           >
             {/* Hero */}
-            <section className="relative z-10 px-6 pt-20 pb-32">
-              <div className="max-w-4xl mx-auto text-center">
+            <section className="relative z-10 px-6 pt-24 pb-32">
+              <div className="max-w-3xl mx-auto text-center">
                 <motion.div
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ type: "spring", duration: 0.6 }}
-                  className="w-32 h-32 mx-auto mb-8 rounded-3xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-2xl shadow-indigo-500/50"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5 }}
                 >
-                  <span className="text-6xl font-bold text-white">K</span>
+                  <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-white/5 border border-white/10 rounded-full text-xs text-zinc-400 mb-8">
+                    <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full" />
+                    Now in public beta
+                  </div>
                 </motion.div>
 
-                <h1 className="text-6xl md:text-7xl font-bold text-white mb-6 leading-tight">
-                  Where communities
+                <motion.h1 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.1 }}
+                  className="text-5xl md:text-6xl font-semibold text-white mb-6 leading-[1.1] tracking-tight"
+                >
+                  Communication
                   <br />
-                  <span className="bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-                    come alive
-                  </span>
-                </h1>
+                  <span className="text-zinc-500">reimagined.</span>
+                </motion.h1>
                 
-                <p className="text-xl text-zinc-400 mb-12 max-w-2xl mx-auto">
-                  A new kind of communication platform. Built for communities, designed for connection. Free forever.
-                </p>
+                <motion.p 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.2 }}
+                  className="text-lg text-zinc-500 mb-12 max-w-lg mx-auto leading-relaxed"
+                >
+                  A platform built for communities. Minimal, fast, and designed with privacy in mind.
+                </motion.p>
 
-                <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                  <Button
+                <motion.div 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.3 }}
+                  className="flex flex-col sm:flex-row items-center justify-center gap-3"
+                >
+                  <button
                     onClick={generateAccessKey}
-                    size="lg"
-                    className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white text-lg px-8 py-6 h-auto rounded-xl shadow-lg"
+                    className="flex items-center gap-2 px-6 py-3 bg-white text-black font-medium rounded-lg hover:bg-zinc-200 transition-all"
                   >
-                    Get Started Free <ArrowRight className="ml-2 w-5 h-5" />
-                  </Button>
-                  <button className="flex items-center gap-2 px-8 py-4 bg-zinc-800/50 hover:bg-zinc-800 text-white font-semibold rounded-xl border border-zinc-700 transition-all">
-                    <Globe className="w-5 h-5" />
+                    Get Access Key
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                  <button className="flex items-center gap-2 px-6 py-3 text-zinc-400 hover:text-white transition-colors">
+                    <Globe className="w-4 h-4" />
                     Explore Servers
                   </button>
-                </div>
+                </motion.div>
               </div>
             </section>
 
-            {/* Features Grid */}
-            <section className="relative z-10 px-6 py-20">
-              <div className="max-w-6xl mx-auto">
-                <div className="text-center mb-16">
-                  <h2 className="text-4xl font-bold text-white mb-4">Everything you need</h2>
-                  <p className="text-zinc-400 max-w-2xl mx-auto">
-                    Functionally deeper and visually superior. Built from the ground up with features that matter.
-                  </p>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {/* Features */}
+            <section className="relative z-10 px-6 py-20 border-t border-white/5">
+              <div className="max-w-4xl mx-auto">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-px bg-white/5 rounded-2xl overflow-hidden">
                   {features.map((feature, i) => (
                     <motion.div
                       key={i}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: i * 0.1 }}
-                      className="bg-zinc-900/50 backdrop-blur-sm rounded-2xl p-6 border border-zinc-800 hover:border-zinc-700 transition-all"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.4 + i * 0.05 }}
+                      className="bg-[#050506] p-6 hover:bg-white/[0.02] transition-colors"
                     >
-                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center mb-4">
-                        <feature.icon className="w-6 h-6 text-white" />
-                      </div>
-                      <h3 className="text-lg font-semibold text-white mb-2">{feature.title}</h3>
-                      <p className="text-sm text-zinc-400">{feature.desc}</p>
+                      <feature.icon className="w-5 h-5 text-zinc-600 mb-4" />
+                      <h3 className="text-sm font-medium text-white mb-1">{feature.title}</h3>
+                      <p className="text-xs text-zinc-600">{feature.desc}</p>
                     </motion.div>
                   ))}
                 </div>
               </div>
             </section>
 
-            {/* CTA */}
+            {/* Stats */}
             <section className="relative z-10 px-6 py-20">
               <div className="max-w-4xl mx-auto">
-                <div className="bg-gradient-to-br from-zinc-800/50 to-zinc-900/50 border border-zinc-800 rounded-3xl p-12 text-center">
-                  <h2 className="text-4xl font-bold text-white mb-4">Ready to get started?</h2>
-                  <p className="text-zinc-400 mb-8 max-w-xl mx-auto">
-                    Get your access key and join the next generation of communication.
-                  </p>
-                  <Button
-                    onClick={generateAccessKey}
-                    size="lg"
-                    className="bg-indigo-500 hover:bg-indigo-600 text-white px-8 py-6 h-auto rounded-xl"
-                  >
-                    Get Access Key <Key className="ml-2 w-5 h-5" />
-                  </Button>
+                <div className="flex items-center justify-center gap-16 text-center">
+                  <div>
+                    <div className="text-3xl font-semibold text-white mb-1">10K+</div>
+                    <div className="text-xs text-zinc-600 uppercase tracking-wider">Users</div>
+                  </div>
+                  <div className="w-px h-12 bg-white/10" />
+                  <div>
+                    <div className="text-3xl font-semibold text-white mb-1">500+</div>
+                    <div className="text-xs text-zinc-600 uppercase tracking-wider">Servers</div>
+                  </div>
+                  <div className="w-px h-12 bg-white/10" />
+                  <div>
+                    <div className="text-3xl font-semibold text-white mb-1">99.9%</div>
+                    <div className="text-xs text-zinc-600 uppercase tracking-wider">Uptime</div>
+                  </div>
                 </div>
+              </div>
+            </section>
+
+            {/* CTA */}
+            <section className="relative z-10 px-6 py-20">
+              <div className="max-w-2xl mx-auto text-center">
+                <h2 className="text-2xl font-medium text-white mb-4">Ready to start?</h2>
+                <p className="text-zinc-500 mb-8 text-sm">
+                  Get your access key and join thousands of communities.
+                </p>
+                <button
+                  onClick={generateAccessKey}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-white/5 hover:bg-white/10 text-white text-sm border border-white/10 rounded-lg transition-all"
+                >
+                  <Key className="w-4 h-4" />
+                  Get Access Key
+                </button>
               </div>
             </section>
           </motion.div>
@@ -284,40 +307,36 @@ export default function LandingPage() {
             exit={{ opacity: 0 }}
             className="relative z-10 px-6 py-32"
           >
-            <div className="max-w-md mx-auto">
-              <div className="bg-zinc-900/80 backdrop-blur-xl rounded-3xl p-8 border border-zinc-800 shadow-2xl">
-                <div className="w-16 h-16 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
-                  <Key className="w-8 h-8 text-white" />
+            <div className="max-w-sm mx-auto">
+              <div className="bg-zinc-900/50 backdrop-blur-xl rounded-2xl p-8 border border-white/5">
+                <div className="w-12 h-12 mx-auto mb-6 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center">
+                  <Key className="w-5 h-5 text-white" />
                 </div>
 
-                <h2 className="text-3xl font-bold text-white mb-2 text-center">Your Access Key</h2>
-                <p className="text-zinc-400 mb-8 text-center">
-                  Save this key somewhere safe. You'll need it to log back in.
+                <h2 className="text-xl font-medium text-white mb-2 text-center">Your Access Key</h2>
+                <p className="text-sm text-zinc-500 mb-6 text-center">
+                  Save this key. You'll need it to sign in.
                 </p>
 
-                <div className="bg-zinc-800 rounded-xl p-4 mb-6 font-mono text-center">
-                  <span className="text-lg text-indigo-400 font-bold">{generatedKey}</span>
+                <div className="bg-black/50 rounded-xl p-4 mb-4 font-mono text-center border border-white/5">
+                  <span className="text-sm text-white">{generatedKey}</span>
                 </div>
 
-                <Button
+                <button
                   onClick={copyKey}
-                  variant="outline"
-                  className="w-full mb-6 bg-zinc-800 border-zinc-700 hover:bg-zinc-700"
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 mb-4 bg-white/5 hover:bg-white/10 text-white text-sm border border-white/10 rounded-lg transition-all"
                 >
-                  <Copy className="w-4 h-4 mr-2" />
+                  <Copy className="w-4 h-4" />
                   {copied ? 'Copied!' : 'Copy Key'}
-                </Button>
+                </button>
 
-                <Button
+                <button
                   onClick={handleKeySubmit}
-                  className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white h-12 rounded-xl"
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-white text-black text-sm font-medium rounded-lg hover:bg-zinc-200 transition-all"
                 >
-                  Continue <ArrowRight className="ml-2 w-5 h-5" />
-                </Button>
-
-                <p className="text-xs text-zinc-500 text-center mt-6">
-                  Make sure to save your key. You'll need it to access your account.
-                </p>
+                  Continue
+                  <ArrowRight className="w-4 h-4" />
+                </button>
               </div>
             </div>
           </motion.div>
@@ -331,14 +350,14 @@ export default function LandingPage() {
             exit={{ opacity: 0 }}
             className="relative z-10 px-6 py-32"
           >
-            <div className="max-w-md mx-auto">
-              <div className="bg-zinc-900/80 backdrop-blur-xl rounded-3xl p-8 border border-zinc-800 shadow-2xl">
-                <div className="w-16 h-16 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
-                  <Key className="w-8 h-8 text-white" />
+            <div className="max-w-sm mx-auto">
+              <div className="bg-zinc-900/50 backdrop-blur-xl rounded-2xl p-8 border border-white/5">
+                <div className="w-12 h-12 mx-auto mb-6 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center">
+                  <Key className="w-5 h-5 text-white" />
                 </div>
 
-                <h2 className="text-3xl font-bold text-white mb-2 text-center">Welcome Back</h2>
-                <p className="text-zinc-400 mb-8 text-center">
+                <h2 className="text-xl font-medium text-white mb-2 text-center">Welcome back</h2>
+                <p className="text-sm text-zinc-500 mb-6 text-center">
                   Enter your access key to continue
                 </p>
 
@@ -346,20 +365,21 @@ export default function LandingPage() {
                   value={enteredKey}
                   onChange={(e) => setEnteredKey(e.target.value.toUpperCase())}
                   placeholder="KAIRO-XXXXXXXX-XXXXXXXX"
-                  className="bg-zinc-800 border-zinc-700 text-white font-mono text-center mb-6"
+                  className="bg-black/50 border-white/10 text-white font-mono text-sm text-center mb-4 placeholder:text-zinc-600"
                 />
 
-                <Button
+                <button
                   onClick={handleKeySubmit}
                   disabled={!enteredKey}
-                  className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white h-12 rounded-xl disabled:opacity-50"
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-white text-black text-sm font-medium rounded-lg hover:bg-zinc-200 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Sign In <ArrowRight className="ml-2 w-5 h-5" />
-                </Button>
+                  Sign In
+                  <ArrowRight className="w-4 h-4" />
+                </button>
 
                 <button
                   onClick={() => setStep('landing')}
-                  className="w-full text-zinc-500 hover:text-zinc-400 text-sm mt-4"
+                  className="w-full text-zinc-600 hover:text-zinc-400 text-xs mt-4 transition-colors"
                 >
                   ← Back
                 </button>
@@ -376,38 +396,37 @@ export default function LandingPage() {
             exit={{ opacity: 0 }}
             className="relative z-10 px-6 py-32"
           >
-            <div className="max-w-md mx-auto">
-              <div className="bg-zinc-900/80 backdrop-blur-xl rounded-3xl p-8 border border-zinc-800 shadow-2xl">
-                <div className="w-16 h-16 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
-                  <Users className="w-8 h-8 text-white" />
+            <div className="max-w-sm mx-auto">
+              <div className="bg-zinc-900/50 backdrop-blur-xl rounded-2xl p-8 border border-white/5">
+                <div className="w-12 h-12 mx-auto mb-6 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center">
+                  <Users className="w-5 h-5 text-white" />
                 </div>
 
-                <h2 className="text-3xl font-bold text-white mb-2 text-center">Set Up Profile</h2>
-                <p className="text-zinc-400 mb-8 text-center">
-                  Let's personalize your Kairo experience
+                <h2 className="text-xl font-medium text-white mb-2 text-center">Create Profile</h2>
+                <p className="text-sm text-zinc-500 mb-6 text-center">
+                  Set up your display name
                 </p>
 
-                <div className="space-y-4 mb-6">
-                  <div>
-                    <label className="block text-sm font-medium text-zinc-300 mb-2">
-                      Display Name
-                    </label>
-                    <Input
-                      value={displayName}
-                      onChange={(e) => setDisplayName(e.target.value)}
-                      placeholder="Enter your display name"
-                      className="bg-zinc-800 border-zinc-700 text-white"
-                    />
-                  </div>
+                <div className="mb-4">
+                  <label className="block text-xs font-medium text-zinc-400 mb-2">
+                    Display Name
+                  </label>
+                  <Input
+                    value={displayName}
+                    onChange={(e) => setDisplayName(e.target.value)}
+                    placeholder="Enter your name"
+                    className="bg-black/50 border-white/10 text-white text-sm placeholder:text-zinc-600"
+                  />
                 </div>
 
-                <Button
+                <button
                   onClick={handleCreateProfile}
                   disabled={!displayName}
-                  className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white h-12 rounded-xl disabled:opacity-50"
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-white text-black text-sm font-medium rounded-lg hover:bg-zinc-200 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Complete Setup <Check className="ml-2 w-5 h-5" />
-                </Button>
+                  Complete
+                  <Check className="w-4 h-4" />
+                </button>
               </div>
             </div>
           </motion.div>
@@ -415,18 +434,17 @@ export default function LandingPage() {
       </AnimatePresence>
 
       {/* Footer */}
-      <footer className="relative z-10 px-6 py-8 border-t border-zinc-800">
-        <div className="max-w-7xl mx-auto flex items-center justify-center md:justify-between flex-wrap gap-4">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
-              <span className="text-sm font-bold text-white">K</span>
+      <footer className="relative z-10 px-6 py-8 border-t border-white/5">
+        <div className="max-w-6xl mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="w-6 h-6 rounded-lg bg-white/5 flex items-center justify-center">
+              <span className="text-xs font-bold text-white">K</span>
             </div>
-            <span className="text-sm text-zinc-500">© 2026 Kairo. All rights reserved.</span>
+            <span className="text-xs text-zinc-600">© 2026 Kairo</span>
           </div>
-          <div className="flex items-center gap-6 text-sm text-zinc-500">
+          <div className="flex items-center gap-6 text-xs text-zinc-600">
             <a href="#" className="hover:text-white transition-colors">Privacy</a>
             <a href="#" className="hover:text-white transition-colors">Terms</a>
-            <a href="#" className="hover:text-white transition-colors">Support</a>
           </div>
         </div>
       </footer>
