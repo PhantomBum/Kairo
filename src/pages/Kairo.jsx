@@ -70,41 +70,45 @@ import GlobalSearch from '@/components/kairo/search/GlobalSearch';
 // Channel header component
 function ChannelHeader({ channel, memberCount, onMembersToggle, showMembers, onShowPinned, showPinned }) {
   return (
-    <div className="h-12 px-4 flex items-center justify-between border-b border-zinc-800/50 bg-[#121214]">
-      <div className="flex items-center gap-2">
-        <Hash className="w-5 h-5 text-zinc-500" />
-        <h2 className="font-semibold text-white">{channel?.name || 'general'}</h2>
-        {channel?.topic && (
-          <>
-            <div className="w-px h-4 bg-zinc-700 mx-2" />
-            <span className="text-sm text-zinc-500 truncate max-w-[300px]">{channel.topic}</span>
-          </>
-        )}
+    <div className="h-14 px-4 flex items-center justify-between border-b border-zinc-800/30 bg-zinc-900/50 backdrop-blur-sm">
+      <div className="flex items-center gap-3">
+        <div className="w-8 h-8 rounded-xl bg-violet-500/20 flex items-center justify-center">
+          <Hash className="w-4 h-4 text-violet-400" />
+        </div>
+        <div>
+          <h2 className="font-semibold text-white text-[15px]">{channel?.name || 'general'}</h2>
+          {channel?.topic && (
+            <p className="text-xs text-zinc-500 truncate max-w-[300px]">{channel.topic}</p>
+          )}
+        </div>
       </div>
       <div className="flex items-center gap-1">
-        <button className="p-2 text-zinc-400 hover:text-zinc-200 transition-colors rounded hover:bg-zinc-800/50">
-          <Bell className="w-5 h-5" />
+        <button className="p-2 text-zinc-400 hover:text-zinc-200 transition-colors rounded-xl hover:bg-zinc-800/50">
+          <Bell className="w-[18px] h-[18px]" />
         </button>
         <button
           onClick={onShowPinned}
           className={cn(
-            "p-2 transition-colors rounded",
-            showPinned ? "text-white bg-zinc-800/50" : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50"
+            "p-2 transition-colors rounded-xl",
+            showPinned ? "text-violet-400 bg-violet-500/15" : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50"
           )}
         >
-          <Pin className="w-5 h-5" />
+          <Pin className="w-[18px] h-[18px]" />
         </button>
         <button
           onClick={onMembersToggle}
           className={cn(
-            "p-2 transition-colors rounded",
-            showMembers ? "text-white bg-zinc-800/50" : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50"
+            "p-2 transition-colors rounded-xl",
+            showMembers ? "text-violet-400 bg-violet-500/15" : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50"
           )}
         >
-          <Users className="w-5 h-5" />
+          <Users className="w-[18px] h-[18px]" />
         </button>
-        <button className="p-2 text-zinc-400 hover:text-zinc-200 transition-colors rounded hover:bg-zinc-800/50">
-          <Settings className="w-5 h-5" />
+        <button 
+          onClick={() => window.dispatchEvent(new CustomEvent('kairo:open-search'))}
+          className="p-2 text-zinc-400 hover:text-zinc-200 transition-colors rounded-xl hover:bg-zinc-800/50"
+        >
+          <Search className="w-[18px] h-[18px]" />
         </button>
       </div>
     </div>
