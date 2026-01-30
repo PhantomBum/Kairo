@@ -4,7 +4,8 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { 
   X, Upload, Sparkles, Palette, Image, Crown, Star, 
-  Check, Eye, Wand2, Layers, Type, Badge
+  Check, Eye, Wand2, Layers, Type, Badge, Link, 
+  Twitter, Github, Linkedin, Instagram, Twitch, Globe
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -170,7 +171,15 @@ export default function ProfileEditor({ profile, inventory = [], onUpdateProfile
     pronouns: profile?.pronouns || '',
     accent_color: profile?.accent_color || '#6366f1',
     avatar_url: profile?.avatar_url || '',
-    banner_url: profile?.banner_url || ''
+    banner_url: profile?.banner_url || '',
+    social_links: profile?.social_links || {
+      twitter: '',
+      github: '',
+      linkedin: '',
+      instagram: '',
+      twitch: '',
+      website: ''
+    }
   });
 
   const [richPresence, setRichPresence] = useState(profile?.rich_presence || {
@@ -281,6 +290,7 @@ export default function ProfileEditor({ profile, inventory = [], onUpdateProfile
             <Tabs defaultValue="profile" className="space-y-6">
               <TabsList className="bg-zinc-800/50">
                 <TabsTrigger value="profile">Profile</TabsTrigger>
+                <TabsTrigger value="socials">Socials</TabsTrigger>
                 <TabsTrigger value="presence">Rich Presence</TabsTrigger>
                 <TabsTrigger value="decorations">Decorations</TabsTrigger>
                 <TabsTrigger value="effects">Effects</TabsTrigger>
@@ -364,12 +374,29 @@ export default function ProfileEditor({ profile, inventory = [], onUpdateProfile
 
                 <div className="space-y-2">
                   <Label className="text-zinc-400">Pronouns</Label>
-                  <Input
+                  <select
                     value={formData.pronouns}
                     onChange={(e) => setFormData({ ...formData, pronouns: e.target.value })}
-                    placeholder="e.g., they/them"
-                    className="bg-zinc-900 border-zinc-800 text-white"
-                  />
+                    className="w-full px-3 py-2 bg-zinc-900 border border-zinc-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  >
+                    <option value="">Select pronouns</option>
+                    <option value="he/him">he/him</option>
+                    <option value="she/her">she/her</option>
+                    <option value="they/them">they/them</option>
+                    <option value="he/they">he/they</option>
+                    <option value="she/they">she/they</option>
+                    <option value="any">any pronouns</option>
+                    <option value="ask">ask me</option>
+                    <option value="custom">custom</option>
+                  </select>
+                  {formData.pronouns === 'custom' && (
+                    <Input
+                      value={formData.custom_pronouns || ''}
+                      onChange={(e) => setFormData({ ...formData, custom_pronouns: e.target.value, pronouns: e.target.value || 'custom' })}
+                      placeholder="Enter custom pronouns"
+                      className="bg-zinc-900 border-zinc-800 text-white mt-2"
+                    />
+                  )}
                 </div>
 
                 <div className="space-y-2">
@@ -399,6 +426,117 @@ export default function ProfileEditor({ profile, inventory = [], onUpdateProfile
                       />
                     ))}
                   </div>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="socials" className="space-y-6">
+                <div>
+                  <h3 className="text-lg font-semibold text-white mb-2">Social Links</h3>
+                  <p className="text-sm text-zinc-400 mb-6">Connect your social media profiles</p>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label className="text-zinc-400 flex items-center gap-2">
+                      <Twitter className="w-4 h-4 text-sky-400" />
+                      Twitter / X
+                    </Label>
+                    <Input
+                      value={formData.social_links?.twitter || ''}
+                      onChange={(e) => setFormData({ 
+                        ...formData, 
+                        social_links: { ...formData.social_links, twitter: e.target.value }
+                      })}
+                      placeholder="https://twitter.com/username"
+                      className="bg-zinc-900 border-zinc-800 text-white"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-zinc-400 flex items-center gap-2">
+                      <Github className="w-4 h-4 text-zinc-300" />
+                      GitHub
+                    </Label>
+                    <Input
+                      value={formData.social_links?.github || ''}
+                      onChange={(e) => setFormData({ 
+                        ...formData, 
+                        social_links: { ...formData.social_links, github: e.target.value }
+                      })}
+                      placeholder="https://github.com/username"
+                      className="bg-zinc-900 border-zinc-800 text-white"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-zinc-400 flex items-center gap-2">
+                      <Linkedin className="w-4 h-4 text-blue-500" />
+                      LinkedIn
+                    </Label>
+                    <Input
+                      value={formData.social_links?.linkedin || ''}
+                      onChange={(e) => setFormData({ 
+                        ...formData, 
+                        social_links: { ...formData.social_links, linkedin: e.target.value }
+                      })}
+                      placeholder="https://linkedin.com/in/username"
+                      className="bg-zinc-900 border-zinc-800 text-white"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-zinc-400 flex items-center gap-2">
+                      <Instagram className="w-4 h-4 text-pink-500" />
+                      Instagram
+                    </Label>
+                    <Input
+                      value={formData.social_links?.instagram || ''}
+                      onChange={(e) => setFormData({ 
+                        ...formData, 
+                        social_links: { ...formData.social_links, instagram: e.target.value }
+                      })}
+                      placeholder="https://instagram.com/username"
+                      className="bg-zinc-900 border-zinc-800 text-white"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-zinc-400 flex items-center gap-2">
+                      <Twitch className="w-4 h-4 text-purple-500" />
+                      Twitch
+                    </Label>
+                    <Input
+                      value={formData.social_links?.twitch || ''}
+                      onChange={(e) => setFormData({ 
+                        ...formData, 
+                        social_links: { ...formData.social_links, twitch: e.target.value }
+                      })}
+                      placeholder="https://twitch.tv/username"
+                      className="bg-zinc-900 border-zinc-800 text-white"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-zinc-400 flex items-center gap-2">
+                      <Globe className="w-4 h-4 text-emerald-400" />
+                      Website
+                    </Label>
+                    <Input
+                      value={formData.social_links?.website || ''}
+                      onChange={(e) => setFormData({ 
+                        ...formData, 
+                        social_links: { ...formData.social_links, website: e.target.value }
+                      })}
+                      placeholder="https://yourwebsite.com"
+                      className="bg-zinc-900 border-zinc-800 text-white"
+                    />
+                  </div>
+                </div>
+
+                <div className="bg-zinc-800/50 rounded-lg p-4 mt-4">
+                  <p className="text-xs text-zinc-500">
+                    Your social links will be visible on your profile. Leave empty to hide.
+                  </p>
                 </div>
               </TabsContent>
 
