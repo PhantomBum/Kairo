@@ -222,13 +222,16 @@ export default function ImprovedSidebar({
                 userProfile?.status === 'online' && "bg-emerald-500",
                 userProfile?.status === 'idle' && "bg-amber-500",
                 userProfile?.status === 'dnd' && "bg-red-500",
+                userProfile?.status === 'invisible' && "bg-zinc-500",
                 (!userProfile?.status || userProfile?.status === 'offline') && "bg-zinc-500"
               )} />
             </div>
             {!isCollapsed && (
               <div className="flex-1 text-left min-w-0">
                 <p className="font-semibold text-white truncate" key={userProfile?.display_name}>{userProfile?.display_name || 'User'}</p>
-                <p className="text-xs text-zinc-500 truncate" key={userProfile?.username}>@{userProfile?.username || 'username'}</p>
+                {userProfile?.custom_status?.text && (
+                  <p className="text-xs text-zinc-500 truncate">{userProfile.custom_status.text}</p>
+                )}
               </div>
             )}
           </button>
