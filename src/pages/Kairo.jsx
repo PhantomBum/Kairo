@@ -292,25 +292,34 @@ export default function KairoPage() {
   });
 
   // Fetch servers user is member of - optimized
+  // UserProfile has id (record id) which is used in ServerMember.user_id and Server.owner_id
   const { data: memberServers = [], isLoading: serversLoading } = useQuery({
-    queryKey: ['memberServers', currentUser?.id, currentUser?.user_id],
+    queryKey: ['memberServers', currentUser?.id],
     queryFn: async () => {
-      if (!currentUser?.id && !currentUser?.user_id) return [];
-      // Try both id and user_id since UserProfile uses user_id field
-      const userId = currentUser.user_id || currentUser.id;
-      const memberships = await base44.entities.ServerMember.filter({ user_id: userId });
-      console.log('[SERVER FETCH] userId:', userId, 'memberships:', memberships);
-      if (memberships.length === 0) {
-        // Also check for servers owned by this user
-        const ownedServers = await base44.entities.Server.filter({ owner_id: userId });
-        console.log('[SERVER FETCH] ownedServers:', ownedServers);
-        return ownedServers;
-      }
-      const serverIds = [...new Set(memberships.map(m => m.server_id))];
+      if (!currentUser?.id) return [];
+      // currentUser.id is the UserProfile record id, which is stored in ServerMember.user_id
+      const profileId = currentUser.id;
+      const memberships = await base44.entities.ServerMember.filter({ user_id: profileId });
+      console.log('[SERVER FETCH] profileId:', profileId, 'memberships:', memberships);
+      
+      // Get servers from memberships
+      let serverIds = [...new Set(memberships.map(m => m.server_id))];
+      
+      // Also check for servers owned by this user (in case membership wasn't created)
+      const ownedServers = await base44.entities.Server.filter({ owner_id: profileId });
+      console.log('[SERVER FETCH] ownedServers:', ownedServers);
+      
+      // Combine owned server IDs
+      ownedServers.forEach(s => {
+        if (!serverIds.includes(s.id)) serverIds.push(s.id);
+      });
+      
+      if (serverIds.length === 0) return [];
+      
       const allServers = await base44.entities.Server.list();
       return allServers.filter(s => serverIds.includes(s.id));
     },
-    enabled: !!(currentUser?.id || currentUser?.user_id),
+    enabled: !!currentUser?.id,
     staleTime: 30000,
     refetchInterval: false
   });
