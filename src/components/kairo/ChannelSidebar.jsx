@@ -195,12 +195,29 @@ export default function ChannelSidebar({
 
   return (
     <div className="w-60 h-full bg-[#0f0f11] flex flex-col border-r border-zinc-800/30">
+      {/* Server Banner */}
+      {server?.banner_url && (
+        <div className="relative h-20 w-full">
+          <img 
+            src={server.banner_url} 
+            alt="" 
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#0f0f11]/50 to-[#0f0f11]" />
+        </div>
+      )}
+      
       {/* Server header */}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <button className="h-14 px-4 flex items-center justify-between border-b border-zinc-800/30 hover:bg-zinc-800/20 transition-colors">
-            <h2 className="font-semibold text-white truncate text-[15px]">{server?.name || 'Server'}</h2>
-            <ChevronDown className="w-4 h-4 text-zinc-500" />
+            <div className="flex items-center gap-3 flex-1 min-w-0">
+              {server?.icon_url && (
+                <img src={server.icon_url} alt="" className="w-8 h-8 rounded-lg flex-shrink-0" />
+              )}
+              <h2 className="font-semibold text-white truncate text-[15px]">{server?.name || 'Server'}</h2>
+            </div>
+            <ChevronDown className="w-4 h-4 text-zinc-500 flex-shrink-0 ml-2" />
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-56 bg-zinc-900 border-zinc-800" align="start">
