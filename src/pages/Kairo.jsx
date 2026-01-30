@@ -73,33 +73,40 @@ import GlobalSearch from '@/components/kairo/search/GlobalSearch';
 import CreateGroupDMModal from '@/components/kairo/CreateGroupDMModal';
 
 // Channel header component
-function ChannelHeader({ channel, memberCount, onMembersToggle, showMembers, onShowPinned, showPinned }) {
+function ChannelHeader({ channel, memberCount, onMembersToggle, showMembers, onShowPinned, showPinned, onMenuToggle }) {
   return (
-    <div className="h-14 px-5 flex items-center justify-between border-b border-white/5 bg-[#050506]/90 backdrop-blur-xl">
-      <div className="flex items-center gap-3">
-        <div className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center">
+    <div className="h-14 px-3 md:px-5 flex items-center justify-between border-b border-white/5 bg-[#050506]/90 backdrop-blur-xl">
+      <div className="flex items-center gap-2 md:gap-3">
+        {/* Mobile menu button */}
+        <button 
+          onClick={onMenuToggle}
+          className="md:hidden p-2 text-zinc-400 hover:text-white transition-all rounded-lg hover:bg-white/5"
+        >
+          <Hash className="w-5 h-5" />
+        </button>
+        <div className="hidden md:flex w-8 h-8 rounded-lg bg-white/5 border border-white/10 items-center justify-center">
           <Hash className="w-4 h-4 text-zinc-400" />
         </div>
         <div>
           <div className="flex items-center gap-2">
             <h2 className="font-medium text-white text-sm">{channel?.name || 'general'}</h2>
             {channel?.is_private && (
-              <span className="px-1 py-0.5 bg-white/5 text-zinc-600 text-[9px] font-medium rounded">PRIVATE</span>
+              <span className="hidden sm:inline px-1 py-0.5 bg-white/5 text-zinc-600 text-[9px] font-medium rounded">PRIVATE</span>
             )}
           </div>
           {channel?.topic && (
-            <p className="text-[11px] text-zinc-600 truncate max-w-[300px]">{channel.topic}</p>
+            <p className="hidden sm:block text-[11px] text-zinc-600 truncate max-w-[200px] md:max-w-[300px]">{channel.topic}</p>
           )}
         </div>
       </div>
-      <div className="flex items-center gap-1">
-        <button className="p-2 text-zinc-500 hover:text-white transition-all rounded-lg hover:bg-white/5">
+      <div className="flex items-center gap-0.5 md:gap-1">
+        <button className="hidden sm:flex p-2 text-zinc-500 hover:text-white transition-all rounded-lg hover:bg-white/5">
           <Bell className="w-4 h-4" />
         </button>
         <button
           onClick={onShowPinned}
           className={cn(
-            "p-2 transition-all rounded-lg",
+            "hidden sm:flex p-2 transition-all rounded-lg",
             showPinned ? "text-white bg-white/10" : "text-zinc-500 hover:text-white hover:bg-white/5"
           )}
         >
@@ -202,6 +209,10 @@ function KairoPageContent() {
 
   // Syncing state
   const [isSyncing, setIsSyncing] = useState(false);
+
+  // Mobile sidebar state
+  const [showMobileSidebar, setShowMobileSidebar] = useState(false);
+  const [showMobileChannels, setShowMobileChannels] = useState(false);
 
   // Get current user from localStorage (key-based auth)
   const [currentUser, setCurrentUser] = React.useState(null);
@@ -1216,8 +1227,27 @@ function KairoPageContent() {
     <>
       <ConnectionMonitor />
       <SyncingIndicator show={isSyncing} />
+      
+      {/* Mobile overlay for sidebars */}
+      <AnimatePresence>
+        {(showMobileSidebar || showMobileChannels) && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => { setShowMobileSidebar(false); setShowMobileChannels(false); }}
+            className="fixed inset-0 bg-black/60 z-40 md:hidden"
+          />
+        )}
+      </AnimatePresence>
+
       <div className={cn("h-screen flex bg-[#0a0a0b]", userSettings?.kairo_features?.focus_mode && "opacity-80")}>
-        <ImprovedSidebar 
+        {/* Mobile sidebar wrapper */}
+        <div className={cn(
+          "fixed md:relative z-50 h-full transition-transform duration-300 md:translate-x-0",
+          showMobileSidebar ? "translate-x-0" : "-translate-x-full"
+        )}>
+          <ImprovedSidebar 
         servers={memberServers} 
         activeServerId={activeServer?.id} 
         onServerSelect={handleServerSelect} 
@@ -1236,25 +1266,33 @@ function KairoPageContent() {
         unreadDMs={conversations.filter(c => c.unread_count > 0).length}
         notifications={notifications}
         hasNewUpdates={hasNewUpdates}
+        onMobileClose={() => setShowMobileSidebar(false)}
       />
+      </div>
 
       {view === 'dms' ? (
-        <div className="flex flex-col">
+        <div className={cn(
+          "fixed md:relative z-50 h-full transition-transform duration-300 md:translate-x-0 flex flex-col",
+          showMobileChannels ? "translate-x-0" : "-translate-x-full md:translate-x-0"
+        )}>
           <DMSidebar conversations={conversations} friends={friends} activeConversationId={activeConversation?.id}
-            onConversationSelect={(convo) => setActiveConversation(convo)} onConversationClose={() => setActiveConversation(null)}
+            onConversationSelect={(convo) => { setActiveConversation(convo); setShowMobileChannels(false); }} onConversationClose={() => setActiveConversation(null)}
             onNewDM={() => setShowNewDM(true)} onAddFriend={() => setShowAddFriend(true)} onJoinServer={() => setShowJoinServer(true)} />
           <UserStatusBar profile={userProfile} isMuted={isMuted} isDeafened={isDeafened} onToggleMute={() => setIsMuted(!isMuted)} onToggleDeafen={() => setIsDeafened(!isDeafened)}
             onOpenSettings={() => setShowSettings(true)} onStatusChange={(status) => updateProfileMutation.mutate({ status })} />
         </div>
       ) : (
-      <div className="flex flex-col">
-        <ChannelSidebar server={activeServer} categories={categories} channels={channels} activeChannelId={activeChannel?.id}
-          onChannelClick={handleChannelClick} onServerSettings={() => setShowServerSettings(true)} onCreateChannel={(categoryId) => { setCreateChannelCategory(categoryId); setShowCreateChannel(true); }}
-          onInvite={() => setShowInvite(true)} voiceStates={voiceStates} />
-        {voiceChannel && <VoiceConnectionBar channel={voiceChannel} server={activeServer} onDisconnect={handleVoiceDisconnect} />}
-        <UserStatusBar profile={userProfile} isMuted={isMuted} isDeafened={isDeafened} onToggleMute={() => setIsMuted(!isMuted)} onToggleDeafen={() => setIsDeafened(!isDeafened)}
-          onOpenSettings={() => setShowSettings(true)} onStatusChange={(status) => updateProfileMutation.mutate({ status })} />
-      </div>
+        <div className={cn(
+          "fixed md:relative z-50 h-full transition-transform duration-300 md:translate-x-0 flex flex-col",
+          showMobileChannels ? "translate-x-0" : "-translate-x-full md:translate-x-0"
+        )}>
+          <ChannelSidebar server={activeServer} categories={categories} channels={channels} activeChannelId={activeChannel?.id}
+            onChannelClick={(channel) => { handleChannelClick(channel); setShowMobileChannels(false); }} onServerSettings={() => setShowServerSettings(true)} onCreateChannel={(categoryId) => { setCreateChannelCategory(categoryId); setShowCreateChannel(true); }}
+            onInvite={() => setShowInvite(true)} voiceStates={voiceStates} />
+          {voiceChannel && <VoiceConnectionBar channel={voiceChannel} server={activeServer} onDisconnect={handleVoiceDisconnect} />}
+          <UserStatusBar profile={userProfile} isMuted={isMuted} isDeafened={isDeafened} onToggleMute={() => setIsMuted(!isMuted)} onToggleDeafen={() => setIsDeafened(!isDeafened)}
+            onOpenSettings={() => setShowSettings(true)} onStatusChange={(status) => updateProfileMutation.mutate({ status })} />
+        </div>
       )}
 
       <div className="flex-1 flex flex-col min-w-0">
@@ -1284,13 +1322,14 @@ function KairoPageContent() {
           ) : (
             <>
               <ChannelHeader 
-                channel={activeChannel} 
-                memberCount={members.length} 
-                onMembersToggle={() => setShowMembers(!showMembers)} 
-                showMembers={showMembers}
-                onShowPinned={() => setShowPinnedPanel(!showPinnedPanel)}
-                showPinned={showPinnedPanel}
-              />
+                    channel={activeChannel} 
+                    memberCount={members.length} 
+                    onMembersToggle={() => setShowMembers(!showMembers)} 
+                    showMembers={showMembers}
+                    onShowPinned={() => setShowPinnedPanel(!showPinnedPanel)}
+                    showPinned={showPinnedPanel}
+                    onMenuToggle={() => setShowMobileChannels(true)}
+                  />
               <div className="flex-1 flex min-h-0">
                 <div className="flex-1 flex flex-col bg-[#121214]">
                   {messagesLoading ? (
@@ -1348,7 +1387,7 @@ function KairoPageContent() {
                   <TypingIndicator typingUsers={typingUsers} className="px-4" />
                   <MessageInput channelName={activeChannel?.name} replyTo={replyTo} onCancelReply={() => setReplyTo(null)} onSendMessage={(data) => sendMessageMutation.mutate(data)} onTyping={sendTypingIndicator} />
                 </div>
-                {showMembers && <MemberList members={members} roles={roles} ownerId={activeServer?.owner_id} />}
+                {showMembers && <div className="hidden md:block"><MemberList members={members} roles={roles} ownerId={activeServer?.owner_id} /></div>}
               </div>
             </>
           )
