@@ -279,25 +279,45 @@ export default function KairoPage() {
   });
 
   // Fetch servers user is member of - optimized
-  const { data: memberServers = [] } = useQuery({
+  const { data: memberServers = [], isLoading: serversLoading } = useQuery({
     queryKey: ['memberServers', currentUser?.id],
     queryFn: async () => {
-      if (!currentUser?.id) return [];
+      if (!currentUser?.id) {
+        console.log('[SERVERS] No current user');
+        return [];
+      }
       try {
+        console.log('[SERVERS] Fetching memberships for user:', currentUser.id);
         const memberships = await base44.entities.ServerMember.filter({ user_id: currentUser.id });
+        console.log('[SERVERS] Found memberships:', memberships.length, memberships);
+        
         if (memberships.length === 0) return [];
+        
         const serverIds = [...new Set(memberships.map(m => m.server_id))];
+        console.log('[SERVERS] Fetching servers with IDs:', serverIds);
+        
         const allServers = await base44.entities.Server.list();
-        return allServers.filter(s => serverIds.includes(s.id));
+        console.log('[SERVERS] All servers:', allServers.length);
+        
+        const filteredServers = allServers.filter(s => serverIds.includes(s.id));
+        console.log('[SERVERS] Filtered servers:', filteredServers.length, filteredServers);
+        
+        return filteredServers;
       } catch (error) {
-        console.error('Error fetching servers:', error);
+        console.error('[SERVERS] Error fetching servers:', error);
         return [];
       }
     },
     enabled: !!currentUser?.id,
-    staleTime: 1000,
-    refetchInterval: 5000
+    staleTime: 0,
+    refetchInterval: 3000
   });
+
+  // Debug logging for servers
+  useEffect(() => {
+    console.log('[SERVERS DEBUG] memberServers:', memberServers);
+    console.log('[SERVERS DEBUG] currentUser:', currentUser);
+  }, [memberServers, currentUser]);
 
   // Fetch notifications
   const { data: notifications = [] } = useQuery({
@@ -336,12 +356,24 @@ export default function KairoPage() {
   // Fetch messages for active channel with optimized caching
   const { data: messages = [], isLoading: messagesLoading, isFetching: messagesFetching } = useQuery({
     queryKey: ['messages', activeChannel?.id],
-    queryFn: () => base44.entities.Message.filter({ channel_id: activeChannel.id }, '-created_date', 100),
+    queryFn: async () => {
+      console.log('[MESSAGES] Fetching for channel:', activeChannel.id);
+      const msgs = await base44.entities.Message.filter({ channel_id: activeChannel.id }, '-created_date', 100);
+      console.log('[MESSAGES] Retrieved:', msgs.length, msgs);
+      return msgs;
+    },
     enabled: !!activeChannel?.id,
-    staleTime: 1000,
-    refetchInterval: 3000,
+    staleTime: 0,
+    refetchInterval: 2000,
     keepPreviousData: true
   });
+
+  // Debug logging for messages
+  useEffect(() => {
+    console.log('[MESSAGES DEBUG] messages:', messages);
+    console.log('[MESSAGES DEBUG] activeChannel:', activeChannel);
+    console.log('[MESSAGES DEBUG] messagesLoading:', messagesLoading);
+  }, [messages, activeChannel, messagesLoading]);
 
   // Show syncing indicator when fetching
   useEffect(() => {
@@ -473,8 +505,15 @@ export default function KairoPage() {
   const sendMessageMutation = useMutation({
     mutationFn: async ({ content, attachments, replyToId }) => {
       if (!activeChannel?.id || !activeServer?.id || !currentUser?.id) {
+        console.error('[SEND MESSAGE] Missing data:', { 
+          channel: activeChannel?.id, 
+          server: activeServer?.id, 
+          user: currentUser?.id 
+        });
         throw new Error('Missing required data for sending message');
       }
+      
+      console.log('[SEND MESSAGE] Sending message...', { content, channel: activeChannel.id });
       
       const replyPreview = replyToId && replyTo ? { author_name: replyTo.author_name, content: replyTo.content?.slice(0, 100) } : null;
       const message = await base44.entities.Message.create({
@@ -493,6 +532,8 @@ export default function KairoPage() {
         reply_preview: replyPreview
       });
 
+      console.log('[SEND MESSAGE] Message created:', message);
+
       // Check for cross-app bridge and send to external platform
       try {
         await base44.functions.invoke('sendToDiscord', { channel_id: activeChannel.id, content, attachments });
@@ -502,7 +543,8 @@ export default function KairoPage() {
 
       return message;
     },
-    onSuccess: async () => { 
+    onSuccess: async (newMessage) => { 
+      console.log('[SEND MESSAGE] Success, refetching messages...');
       await queryClient.invalidateQueries({ queryKey: ['messages', activeChannel?.id] });
       await queryClient.refetchQueries({ queryKey: ['messages', activeChannel?.id] });
       setReplyTo(null); 
