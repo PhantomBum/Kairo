@@ -293,26 +293,47 @@ export default function KairoPage() {
   });
 
   // Fetch servers user is member of - optimized
-  // ServerMember.user_id and Server.owner_id use UserProfile.user_id (like 'user_xxx'), NOT the record id
+  // Data shows: ServerMember stores UserProfile record id (like '697bf1c181ba667e2483175a') in user_id
+  // Server.owner_id also uses UserProfile record id or user_id field depending on creation
   const { data: memberServers = [], isLoading: serversLoading } = useQuery({
     queryKey: ['memberServers', currentUser?.user_id, currentUser?.id],
     queryFn: async () => {
       if (!currentUser) return [];
-      // Try user_id field first (the internal user identifier like 'user_xxx')
-      // Fall back to record id if user_id doesn't exist
-      const userId = currentUser.user_id || currentUser.id;
-      console.log('[SERVER FETCH] Looking for userId:', userId, 'currentUser:', currentUser);
       
-      // Find memberships by user_id
-      const memberships = await base44.entities.ServerMember.filter({ user_id: userId });
-      console.log('[SERVER FETCH] memberships found:', memberships.length);
+      // We need to check BOTH the record id AND the user_id field since different code paths use different values
+      const profileRecordId = currentUser.id; // The UserProfile record id (like '697bf1c181ba667e2483175a')
+      const profileUserId = currentUser.user_id; // The user_id field (like 'user_xxx')
+      
+      console.log('[SERVER FETCH] profileRecordId:', profileRecordId, 'profileUserId:', profileUserId);
+      
+      // Find memberships by BOTH ids (some records use record id, some use user_id)
+      let memberships = [];
+      if (profileRecordId) {
+        const m1 = await base44.entities.ServerMember.filter({ user_id: profileRecordId });
+        memberships = [...m1];
+      }
+      if (profileUserId && profileUserId !== profileRecordId) {
+        const m2 = await base44.entities.ServerMember.filter({ user_id: profileUserId });
+        memberships = [...memberships, ...m2];
+      }
+      
+      console.log('[SERVER FETCH] total memberships found:', memberships.length);
       
       // Get servers from memberships
       let serverIds = [...new Set(memberships.map(m => m.server_id))];
       
-      // Also check for servers owned by this user
-      const ownedServers = await base44.entities.Server.filter({ owner_id: userId });
-      console.log('[SERVER FETCH] ownedServers found:', ownedServers.length);
+      // Also check for servers owned by this user (check both ids)
+      let ownedServers = [];
+      if (profileRecordId) {
+        const o1 = await base44.entities.Server.filter({ owner_id: profileRecordId });
+        ownedServers = [...o1];
+      }
+      if (profileUserId && profileUserId !== profileRecordId) {
+        const o2 = await base44.entities.Server.filter({ owner_id: profileUserId });
+        ownedServers = [...ownedServers, ...o2];
+      }
+      
+      console.log('[SERVER FETCH] total ownedServers found:', ownedServers.length);
       
       // Combine owned server IDs
       ownedServers.forEach(s => {
