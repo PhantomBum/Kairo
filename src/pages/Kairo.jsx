@@ -702,9 +702,9 @@ export default function KairoPage() {
     },
     onSuccess: async (updatedProfile) => {
       // Force immediate refetch
-      const freshProfile = await base44.entities.UserProfile.filter({ user_id: currentUser.id });
-      if (freshProfile.length > 0) {
-        const newProfile = freshProfile[0];
+      const freshProfiles = await base44.entities.UserProfile.filter({ user_id: currentUser.user_id || currentUser.id });
+      if (freshProfiles.length > 0) {
+        const newProfile = freshProfiles[0];
         localStorage.setItem('kairo_current_user', JSON.stringify(newProfile));
         setCurrentUser(newProfile);
         
@@ -712,8 +712,11 @@ export default function KairoPage() {
         queryClient.setQueryData(['userProfile', currentUser.id], newProfile);
       }
       
-      // Invalidate to trigger re-render
+      // Invalidate all related queries to sync profile changes everywhere
       await queryClient.invalidateQueries({ queryKey: ['userProfile'] });
+      await queryClient.invalidateQueries({ queryKey: ['members'] });
+      await queryClient.invalidateQueries({ queryKey: ['conversations'] });
+      await queryClient.invalidateQueries({ queryKey: ['friends'] });
     }
   });
 
