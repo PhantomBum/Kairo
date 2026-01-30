@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { format, isToday, isYesterday, isSameDay } from 'date-fns';
 import { 
   Reply, MoreHorizontal, Smile, Pin, Pencil, Trash2, 
-  Copy, Forward, MessageSquare, Check
+  Copy, Forward, MessageSquare
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
