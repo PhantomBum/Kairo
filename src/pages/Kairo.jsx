@@ -65,6 +65,7 @@ import BridgeManager from '@/components/kairo/crossapp/BridgeManager';
 import ThreadPanel from '@/components/kairo/chat/ThreadPanel';
 import ForwardMessageModal from '@/components/kairo/chat/ForwardMessageModal';
 import PinnedMessagesPanel from '@/components/kairo/chat/PinnedMessagesPanel';
+import GlobalSearch from '@/components/kairo/search/GlobalSearch';
 
 // Channel header component
 function ChannelHeader({ channel, memberCount, onMembersToggle, showMembers, onShowPinned, showPinned }) {
@@ -161,6 +162,7 @@ export default function KairoPage() {
   const [showKeyboardShortcuts, setShowKeyboardShortcuts] = useState(false);
   const [showServerSettings, setShowServerSettings] = useState(false);
   const [showBridgeManager, setShowBridgeManager] = useState(false);
+  const [showGlobalSearch, setShowGlobalSearch] = useState(false);
   
   // Connection status
   const [connectionStatus, setConnectionStatus] = useState('connected');
@@ -189,6 +191,7 @@ export default function KairoPage() {
   // Keyboard shortcuts
   useKeyboardShortcuts({
     'ctrl+k': () => setShowCommandPalette(true),
+    'ctrl+f': () => setShowGlobalSearch(true),
     'ctrl+shift+a': () => {}, // Toggle sidebar - handled in ImprovedSidebar
     'ctrl+shift+m': () => setShowMembers(!showMembers),
     'ctrl+/': () => setShowKeyboardShortcuts(true),
@@ -196,6 +199,7 @@ export default function KairoPage() {
       setShowCommandPalette(false);
       setShowSettings(false);
       setShowKeyboardShortcuts(false);
+      setShowGlobalSearch(false);
     }
   });
 
@@ -1202,6 +1206,19 @@ export default function KairoPage() {
             currentUser={userProfile || currentUser}
             isOpen={!!forwardingMessage}
             onClose={() => setForwardingMessage(null)}
+          />
+        )}
+        {showGlobalSearch && (
+          <GlobalSearch
+            isOpen={showGlobalSearch}
+            onClose={() => setShowGlobalSearch(false)}
+            serverId={activeServer?.id}
+            onResultClick={(result) => {
+              if (result.type === 'message' && result.channel_id) {
+                const channel = channels.find(c => c.id === result.channel_id);
+                if (channel) setActiveChannel(channel);
+              }
+            }}
           />
         )}
         </AnimatePresence>
