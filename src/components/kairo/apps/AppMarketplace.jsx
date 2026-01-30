@@ -179,7 +179,9 @@ export default function AppMarketplace({ server, currentUser, onClose }) {
           {filteredApps.length === 0 && (
             <div className="text-center py-16">
               <Code className="w-16 h-16 text-zinc-700 mx-auto mb-4" />
-              <p className="text-zinc-500">No apps found</p>
+              <p className="text-lg font-semibold text-white mb-2">No Apps Yet</p>
+              <p className="text-sm text-zinc-500 mb-4">The marketplace is empty. Users can create and publish apps here.</p>
+              <p className="text-xs text-zinc-600">Apps created by users will appear in this marketplace</p>
             </div>
           )}
         </div>
