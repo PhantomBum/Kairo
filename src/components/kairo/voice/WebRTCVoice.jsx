@@ -16,8 +16,9 @@ import {
 } from "@/components/ui/tooltip";
 
 // WebRTC-based voice/video chat component
-// Note: Full WebRTC requires signaling server - this implements the UI and local media controls
-// For production, integrate with WebRTC signaling (e.g., Socket.IO, Firebase, or dedicated service)
+// This implements local media controls with voice activity detection
+// Real-time peer connections require a signaling server (WebSocket/Socket.IO)
+// For full voice chat, consider integrating: LiveKit, Daily.co, Agora, or custom WebSocket signaling
 
 export default function WebRTCVoice({
   channelId,
