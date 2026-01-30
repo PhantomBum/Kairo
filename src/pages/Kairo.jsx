@@ -340,15 +340,12 @@ export default function KairoPage() {
     refetchOnMount: true
   });
 
-  // Debug logging for servers - refetch on currentUser change
+  // Refetch servers when currentUser changes
   useEffect(() => {
-    console.log('[SERVERS DEBUG] memberServers:', memberServers);
-    console.log('[SERVERS DEBUG] currentUser:', currentUser);
-    // Refetch servers when currentUser changes
-    if (currentUser && memberServers.length === 0) {
+    if (currentUser) {
       refetchServers();
     }
-  }, [memberServers, currentUser, refetchServers]);
+  }, [currentUser?.id, refetchServers]);
 
   // Fetch notifications
   const { data: notifications = [] } = useQuery({
