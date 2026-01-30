@@ -12,8 +12,12 @@ const defaultCommands = [
   { id: 'create-server', label: 'Create Server', icon: Plus, category: 'Actions' },
   { id: 'join-server', label: 'Join Server', icon: Server, category: 'Actions' },
   { id: 'add-friend', label: 'Add Friend', icon: Users, category: 'Actions' },
+  { id: 'soundboard', label: 'Open Soundboard', icon: Volume2, shortcut: 'S', category: 'Actions' },
+  { id: 'quick-notes', label: 'Quick Notes', icon: MessageCircle, shortcut: 'N', category: 'Actions' },
   { id: 'settings', label: 'User Settings', icon: Settings, shortcut: ',', category: 'Navigation' },
   { id: 'dms', label: 'Direct Messages', icon: MessageCircle, shortcut: 'D', category: 'Navigation' },
+  { id: 'shop', label: 'Open Shop', icon: Server, category: 'Navigation' },
+  { id: 'shortcuts', label: 'Keyboard Shortcuts', icon: Command, shortcut: '/', category: 'Help' },
 ];
 
 export default function CommandPalette({ 

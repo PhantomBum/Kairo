@@ -1026,6 +1026,8 @@ function KairoPageContent() {
       case 'dms': handleDMsClick(); break;
       case 'shop': setShowShop(true); break;
       case 'shortcuts': setShowKeyboardShortcuts(true); break;
+      case 'soundboard': setShowSoundboard(true); break;
+      case 'quick-notes': setShowQuickNotes(!showQuickNotes); break;
       default:
         if (cmd.id.startsWith('server-')) handleServerSelect(cmd.data);
         else if (cmd.id.startsWith('channel-')) handleChannelClick(cmd.data);
