@@ -4,8 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { 
   X, Upload, Sparkles, Palette, Image, Crown, Star, 
-  Check, Eye, Wand2, Layers, Type, Badge, Link, 
-  Twitter, Github, Linkedin, Instagram, Twitch, Globe
+  Check, Eye, Wand2, Layers, Type, Badge, Link
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
