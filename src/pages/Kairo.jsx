@@ -1391,6 +1391,40 @@ function KairoPageContent() {
                         onForward={(msg) => setForwardingMessage(msg)}
                         onPin={handlePinMessage}
                         isLoading={messagesLoading}
+                        members={members}
+                        roles={roles}
+                        sharedServers={memberServers}
+                        onStartDM={async (user) => {
+                          const existing = conversations.find(c => 
+                            c.participants?.some(p => p.user_id === user.user_id)
+                          );
+                          if (existing) {
+                            setActiveConversation(existing);
+                            setView('dms');
+                          } else {
+                            const newConvo = await base44.entities.Conversation.create({
+                              type: 'dm',
+                              participants: [
+                                { user_id: currentUser.id, user_email: currentUser.email, user_name: userProfile?.display_name },
+                                { user_id: user.user_id, user_email: user.user_email, user_name: user.display_name || user.user_name, avatar: user.avatar_url }
+                              ]
+                            });
+                            setActiveConversation(newConvo);
+                            setView('dms');
+                          }
+                        }}
+                        onAddFriend={async (user) => {
+                          await base44.entities.Friendship.create({
+                            user_id: currentUser.id,
+                            friend_id: user.user_id,
+                            friend_email: user.user_email,
+                            friend_name: user.display_name || user.user_name,
+                            friend_avatar: user.avatar_url,
+                            status: 'pending',
+                            initiated_by: currentUser.id
+                          });
+                          queryClient.invalidateQueries({ queryKey: ['friendships'] });
+                        }}
                       />
                       <AnimatePresence>
                         {activeThread && (
@@ -1415,7 +1449,7 @@ function KairoPageContent() {
                     </>
                   )}
                   <TypingIndicator typingUsers={typingUsers} className="px-4" />
-                  <MessageInput channelName={activeChannel?.name} replyTo={replyTo} onCancelReply={() => setReplyTo(null)} onSendMessage={(data) => sendMessageMutation.mutate(data)} onTyping={sendTypingIndicator} />
+                  <MessageInput channelName={activeChannel?.name} replyTo={replyTo} onCancelReply={() => setReplyTo(null)} onSendMessage={(data) => sendMessageMutation.mutate(data)} onTyping={sendTypingIndicator} members={members} />
                 </div>
                 {showMembers && <div className="hidden md:block"><MemberList members={members} roles={roles} ownerId={activeServer?.owner_id} /></div>}
               </div>
