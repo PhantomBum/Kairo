@@ -719,7 +719,7 @@ export default function KairoPage() {
   const joinServerMutation = useMutation({
     mutationFn: async (codeOrServerId) => {
       const userId = currentUser.user_id || currentUser.id;
-      const userEmail = currentUser.user_email || currentUser.email;
+      const userEmail = (currentUser.user_email || currentUser.email || '').toLowerCase();
 
       // Clean up the code - extract from URL if needed
       let cleanCode = codeOrServerId?.trim?.() || codeOrServerId;
@@ -727,6 +727,8 @@ export default function KairoPage() {
         cleanCode = cleanCode.split('kairo.app/invite/')[1]?.split(/[?#]/)[0];
       }
       cleanCode = cleanCode?.toUpperCase?.() || cleanCode;
+
+      console.log('[JOIN SERVER] Attempting to join with code:', cleanCode, 'userId:', userId, 'email:', userEmail);
 
       // Get all servers and find by invite code
       const allServers = await base44.entities.Server.list();
@@ -736,19 +738,25 @@ export default function KairoPage() {
       );
 
       if (!server) {
+        console.log('[JOIN SERVER] Server not found for code:', cleanCode);
         throw new Error('Invalid invite code or server not found');
       }
+
+      console.log('[JOIN SERVER] Found server:', server.name, server.id);
 
       // Check if already a member
       const allMembers = await base44.entities.ServerMember.filter({ server_id: server.id });
       const isAlreadyMember = allMembers.some(m => 
         m.user_id === userId || 
-        m.user_email === userEmail
+        (m.user_email && m.user_email.toLowerCase() === userEmail)
       );
-      
+
       if (isAlreadyMember) {
+        console.log('[JOIN SERVER] Already a member, returning server');
         return server; // Already a member, just return the server
       }
+
+      console.log('[JOIN SERVER] Creating new membership');
 
       // Create membership
       await base44.entities.ServerMember.create({ 
@@ -757,15 +765,18 @@ export default function KairoPage() {
         user_email: userEmail, 
         joined_at: new Date().toISOString() 
       });
-      
+
       // Update member count
       await base44.entities.Server.update(server.id, { 
         member_count: (server.member_count || 0) + 1 
       });
-      
+
+      console.log('[JOIN SERVER] Successfully joined server:', server.name);
+
       return server;
     },
     onSuccess: (server) => { 
+      console.log('[JOIN SERVER] onSuccess, setting active server:', server.name);
       queryClient.removeQueries({ queryKey: ['memberServers'] });
       setActiveServer(server); 
       setView('server'); 
@@ -775,6 +786,10 @@ export default function KairoPage() {
       setTimeout(() => {
         queryClient.refetchQueries({ queryKey: ['memberServers'] });
       }, 300);
+    },
+    onError: (error) => {
+      console.error('[JOIN SERVER] Error:', error.message);
+      alert('Failed to join server: ' + error.message);
     }
   });
 
