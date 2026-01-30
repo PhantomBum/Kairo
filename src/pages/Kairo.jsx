@@ -188,16 +188,8 @@ function KairoPageContent() {
   // Get current user from localStorage (key-based auth)
   const [currentUser, setCurrentUser] = React.useState(null);
 
-  // Profile system - use try/catch since provider is at app level
-  let getProfile = () => null;
-  let refreshAllProfiles = () => {};
-  try {
-    const profiles = useProfiles();
-    getProfile = profiles.getProfile;
-    refreshAllProfiles = profiles.refreshAllProfiles;
-  } catch (e) {
-    // Provider not ready yet
-  }
+  // Profile system
+  const { getProfile, refreshAllProfiles } = useProfiles();
 
   // Core system hooks (after currentUser is declared)
   useCacheOptimization();
