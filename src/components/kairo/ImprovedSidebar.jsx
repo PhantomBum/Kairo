@@ -265,6 +265,7 @@ export default function ImprovedSidebar({
           badge={hasNewUpdates ? 1 : 0}
           isCollapsed={isCollapsed} 
         />
+        <NavButton icon={ShoppingBag} label="Shop" onClick={onShopClick} isCollapsed={isCollapsed} />
       </div>
 
       {/* Servers */}

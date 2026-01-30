@@ -752,14 +752,14 @@ export default function KairoPage() {
             onOpenSettings={() => setShowSettings(true)} onStatusChange={(status) => updateProfileMutation.mutate({ status })} />
         </div>
       ) : (
-        <div className="flex flex-col">
-          <ChannelSidebar server={activeServer} categories={categories} channels={channels} activeChannelId={activeChannel?.id}
-            onChannelClick={handleChannelClick} onServerSettings={() => {}} onCreateChannel={(categoryId) => { setCreateChannelCategory(categoryId); setShowCreateChannel(true); }}
-            onInvite={() => setShowInvite(true)} voiceStates={voiceStates} />
-          {voiceChannel && <VoiceConnectionBar channel={voiceChannel} server={activeServer} onDisconnect={handleVoiceDisconnect} />}
-          <UserStatusBar profile={userProfile} isMuted={isMuted} isDeafened={isDeafened} onToggleMute={() => setIsMuted(!isMuted)} onToggleDeafen={() => setIsDeafened(!isDeafened)}
-            onOpenSettings={() => setShowSettings(true)} onStatusChange={(status) => updateProfileMutation.mutate({ status })} />
-        </div>
+      <div className="flex flex-col">
+        <ChannelSidebar server={activeServer} categories={categories} channels={channels} activeChannelId={activeChannel?.id}
+          onChannelClick={handleChannelClick} onServerSettings={() => setShowServerSettings(true)} onCreateChannel={(categoryId) => { setCreateChannelCategory(categoryId); setShowCreateChannel(true); }}
+          onInvite={() => setShowInvite(true)} voiceStates={voiceStates} />
+        {voiceChannel && <VoiceConnectionBar channel={voiceChannel} server={activeServer} onDisconnect={handleVoiceDisconnect} />}
+        <UserStatusBar profile={userProfile} isMuted={isMuted} isDeafened={isDeafened} onToggleMute={() => setIsMuted(!isMuted)} onToggleDeafen={() => setIsDeafened(!isDeafened)}
+          onOpenSettings={() => setShowSettings(true)} onStatusChange={(status) => updateProfileMutation.mutate({ status })} />
+      </div>
       )}
 
       <div className="flex-1 flex flex-col min-w-0">
