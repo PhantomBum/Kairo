@@ -52,7 +52,6 @@ import WebhookManager from '@/components/kairo/apps/WebhookManager';
 import RoleManager from '@/components/kairo/roles/RoleManager';
 import VoiceChannel from '@/components/kairo/voice/VoiceChannel';
 import ShopIntegrated from '@/components/kairo/shop/ShopIntegrated';
-import CreditsShop from '@/components/kairo/shop/CreditsShop';
 import EnhancedReactions from '@/components/kairo/enhanced/EnhancedReactions';
 import { PollMessage, AnnouncementMessage, SystemPrompt } from '@/components/kairo/enhanced/NewMessageTypes';
 import { KeyboardShortcutsModal, useKeyboardShortcuts } from '@/components/kairo/enhanced/KeyboardShortcuts';
@@ -154,7 +153,7 @@ export default function KairoPage() {
   const [showWebhooks, setShowWebhooks] = useState(false);
   const [showRoles, setShowRoles] = useState(false);
   const [showShop, setShowShop] = useState(false);
-  const [showCreditsShop, setShowCreditsShop] = useState(false);
+
   const [showKeyboardShortcuts, setShowKeyboardShortcuts] = useState(false);
   const [showServerSettings, setShowServerSettings] = useState(false);
   
@@ -942,7 +941,6 @@ export default function KairoPage() {
         {showNotifications && <NotificationsPanel isOpen={showNotifications} onClose={() => setShowNotifications(false)} currentUser={currentUser} />}
         {showAppMarketplace && <AppMarketplace server={activeServer} currentUser={currentUser} onClose={() => setShowAppMarketplace(false)} />}
         {showKeyboardShortcuts && <KeyboardShortcutsModal isOpen={showKeyboardShortcuts} onClose={() => setShowKeyboardShortcuts(false)} />}
-        {showCreditsShop && <CreditsShop currentUser={currentUser} onClose={() => setShowCreditsShop(false)} />}
         {showServerSettings && activeServer && <ServerSettingsModal server={activeServer} currentUser={currentUser} channels={channels} onClose={() => setShowServerSettings(false)} />}
         {showShop && <div className="fixed inset-0 z-50 bg-black/80 flex">
           <div className="flex-1" onClick={() => setShowShop(false)} />
