@@ -27,6 +27,7 @@ import {
 import UserBadges from './UserBadges';
 import CrossAppIndicator from './crossapp/CrossAppIndicator';
 import EditMessageModal from './chat/EditMessageModal';
+import UserProfilePopup from './chat/UserProfilePopup';
 
 const commonEmojis = ['👍', '❤️', '😂', '🎉', '🔥', '👀', '✅', '💯'];
 
@@ -156,7 +157,46 @@ function MessageActions({ message, onReply, onEditClick, onDelete, onReact, onPi
   );
 }
 
-function MessageItem({ message, showHeader, onReply, onEditClick, onDelete, onReact, onPin, onThread, onForward, currentUserId }) {
+// Parse mentions in content
+function renderContentWithMentions(content, onMentionClick) {
+  if (!content) return null;
+  
+  // Regex to find @mentions
+  const mentionRegex = /@(\w+)/g;
+  const parts = [];
+  let lastIndex = 0;
+  let match;
+
+  while ((match = mentionRegex.exec(content)) !== null) {
+    // Add text before mention
+    if (match.index > lastIndex) {
+      parts.push(content.slice(lastIndex, match.index));
+    }
+    
+    // Add mention as clickable span
+    const mentionName = match[1];
+    parts.push(
+      <span
+        key={match.index}
+        onClick={(e) => { e.stopPropagation(); onMentionClick?.(mentionName); }}
+        className="text-violet-400 bg-violet-500/20 px-1 rounded cursor-pointer hover:bg-violet-500/30 transition-colors"
+      >
+        @{mentionName}
+      </span>
+    );
+    
+    lastIndex = match.index + match[0].length;
+  }
+  
+  // Add remaining text
+  if (lastIndex < content.length) {
+    parts.push(content.slice(lastIndex));
+  }
+  
+  return parts.length > 0 ? parts : content;
+}
+
+function MessageItem({ message, showHeader, onReply, onEditClick, onDelete, onReact, onPin, onThread, onForward, currentUserId, onAvatarClick, onMentionClick }) {
   const isOwn = message.author_id === currentUserId;
   
   return (
@@ -188,6 +228,7 @@ function MessageItem({ message, showHeader, onReply, onEditClick, onDelete, onRe
             {showHeader ? (
               <motion.div 
                 whileHover={{ scale: 1.05 }}
+                onClick={() => onAvatarClick?.(message)}
                 className="w-9 h-9 md:w-11 md:h-11 rounded-xl md:rounded-2xl bg-gradient-to-br from-violet-500 to-indigo-600 overflow-hidden flex-shrink-0 cursor-pointer shadow-lg ring-2 ring-transparent hover:ring-violet-500/30 transition-all"
               >
                 {message.author_avatar ? (
@@ -210,7 +251,10 @@ function MessageItem({ message, showHeader, onReply, onEditClick, onDelete, onRe
             <div className="flex-1 min-w-0">
               {showHeader && (
                 <div className="flex items-center gap-2 mb-1.5">
-                  <span className="font-semibold text-white hover:underline cursor-pointer text-[15px]">
+                  <span 
+                    onClick={() => onAvatarClick?.(message)}
+                    className="font-semibold text-white hover:underline cursor-pointer text-[15px]"
+                  >
                     {message.author_name || 'Unknown'}
                   </span>
                   <UserBadges 
@@ -235,7 +279,7 @@ function MessageItem({ message, showHeader, onReply, onEditClick, onDelete, onRe
               )}
               
               <div className="text-zinc-300 break-words whitespace-pre-wrap text-[14px] md:text-[15px] leading-relaxed">
-                {message.content}
+                {renderContentWithMentions(message.content, onMentionClick)}
               </div>
 
               {/* Attachments */}
@@ -383,11 +427,17 @@ export default function MessageList({
   onPin,
   onThread,
   onForward,
-  isLoading
+  isLoading,
+  members = [],
+  onStartDM,
+  onAddFriend,
+  sharedServers = [],
+  roles = []
 }) {
   const listRef = useRef(null);
   const [autoScroll, setAutoScroll] = useState(true);
   const [editingMessage, setEditingMessage] = useState(null);
+  const [profileUser, setProfileUser] = useState(null);
 
   useEffect(() => {
     if (autoScroll && listRef.current) {
@@ -460,6 +510,27 @@ export default function MessageList({
                   onPin={onPin}
                   onThread={onThread}
                   onForward={onForward}
+                  onAvatarClick={(msg) => {
+                    // Find member info for the author
+                    const member = members.find(m => 
+                      m.user_id === msg.author_id || m.id === msg.author_id
+                    );
+                    setProfileUser(member || {
+                      user_id: msg.author_id,
+                      display_name: msg.author_name,
+                      avatar_url: msg.author_avatar,
+                      badges: msg.author_badges,
+                      created_date: msg.created_date
+                    });
+                  }}
+                  onMentionClick={(name) => {
+                    const member = members.find(m => 
+                      (m.display_name || m.user_name || m.nickname || '').toLowerCase() === name.toLowerCase()
+                    );
+                    if (member) {
+                      setProfileUser(member);
+                    }
+                  }}
                 />
               </React.Fragment>
             ))}
@@ -468,10 +539,21 @@ export default function MessageList({
           </div>
 
           <EditMessageModal
-          isOpen={!!editingMessage}
-          onClose={() => setEditingMessage(null)}
-          message={editingMessage}
-          onSave={onEdit}
+            isOpen={!!editingMessage}
+            onClose={() => setEditingMessage(null)}
+            message={editingMessage}
+            onSave={onEdit}
+          />
+
+          <UserProfilePopup
+            user={profileUser}
+            isOpen={!!profileUser}
+            onClose={() => setProfileUser(null)}
+            onMessage={onStartDM}
+            onAddFriend={onAddFriend}
+            sharedServers={sharedServers}
+            roles={roles.filter(r => profileUser?.role_ids?.includes(r.id))}
+            currentUserId={currentUserId}
           />
           </div>
           );
