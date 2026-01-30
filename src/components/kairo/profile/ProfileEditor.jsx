@@ -99,10 +99,60 @@ function ProfilePreview({ profile, equipped }) {
           </p>
         )}
 
+        {/* Pronouns */}
+        {profile?.pronouns && profile.pronouns !== 'custom' && (
+          <p className="text-xs text-zinc-500 mt-1">{profile.pronouns}</p>
+        )}
+
         {/* Bio */}
         {profile?.bio && (
           <div className="mt-3 pt-3 border-t border-zinc-800">
             <p className="text-sm text-zinc-300">{profile.bio}</p>
+          </div>
+        )}
+
+        {/* Social Links */}
+        {profile?.social_links && Object.values(profile.social_links).some(v => v) && (
+          <div className="mt-3 pt-3 border-t border-zinc-800">
+            <p className="text-xs text-zinc-500 uppercase mb-2">Connections</p>
+            <div className="flex gap-2 flex-wrap">
+              {profile.social_links.twitter && (
+                <a href={profile.social_links.twitter} target="_blank" rel="noopener noreferrer" 
+                   className="p-1.5 bg-zinc-800 rounded-lg hover:bg-zinc-700 transition-colors">
+                  <Twitter className="w-4 h-4 text-sky-400" />
+                </a>
+              )}
+              {profile.social_links.github && (
+                <a href={profile.social_links.github} target="_blank" rel="noopener noreferrer"
+                   className="p-1.5 bg-zinc-800 rounded-lg hover:bg-zinc-700 transition-colors">
+                  <Github className="w-4 h-4 text-zinc-300" />
+                </a>
+              )}
+              {profile.social_links.linkedin && (
+                <a href={profile.social_links.linkedin} target="_blank" rel="noopener noreferrer"
+                   className="p-1.5 bg-zinc-800 rounded-lg hover:bg-zinc-700 transition-colors">
+                  <Linkedin className="w-4 h-4 text-blue-500" />
+                </a>
+              )}
+              {profile.social_links.instagram && (
+                <a href={profile.social_links.instagram} target="_blank" rel="noopener noreferrer"
+                   className="p-1.5 bg-zinc-800 rounded-lg hover:bg-zinc-700 transition-colors">
+                  <Instagram className="w-4 h-4 text-pink-500" />
+                </a>
+              )}
+              {profile.social_links.twitch && (
+                <a href={profile.social_links.twitch} target="_blank" rel="noopener noreferrer"
+                   className="p-1.5 bg-zinc-800 rounded-lg hover:bg-zinc-700 transition-colors">
+                  <Twitch className="w-4 h-4 text-purple-500" />
+                </a>
+              )}
+              {profile.social_links.website && (
+                <a href={profile.social_links.website} target="_blank" rel="noopener noreferrer"
+                   className="p-1.5 bg-zinc-800 rounded-lg hover:bg-zinc-700 transition-colors">
+                  <Globe className="w-4 h-4 text-emerald-400" />
+                </a>
+              )}
+            </div>
           </div>
         )}
       </div>
