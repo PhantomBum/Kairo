@@ -294,21 +294,21 @@ export default function AgoraVoiceChat({
 
   if (isJoining) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center bg-[#0f0f11]">
-        <Loader2 className="w-8 h-8 text-violet-500 animate-spin mb-4" />
-        <p className="text-zinc-400">Joining voice channel...</p>
+      <div className="flex-1 flex flex-col items-center justify-center bg-[#050506]">
+        <Loader2 className="w-6 h-6 text-white animate-spin mb-3" />
+        <p className="text-sm text-zinc-500">Joining voice channel...</p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center bg-[#0f0f11]">
+      <div className="flex-1 flex flex-col items-center justify-center bg-[#050506]">
         <div className="text-center">
-          <p className="text-red-400 mb-4">{error}</p>
+          <p className="text-sm text-red-400 mb-4">{error}</p>
           <button 
             onClick={handleLeave}
-            className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-xl text-white"
+            className="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-sm text-white transition-all"
           >
             Go Back
           </button>
@@ -318,48 +318,54 @@ export default function AgoraVoiceChat({
   }
 
   return (
-    <div className="flex-1 flex flex-col bg-[#0f0f11]">
+    <div className="flex-1 flex flex-col bg-[#050506]">
+      {/* Subtle grid */}
+      <div className="fixed inset-0 pointer-events-none opacity-[0.015]" style={{
+        backgroundImage: `linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px)`,
+        backgroundSize: '60px 60px'
+      }} />
+      
       {/* Header */}
-      <div className="h-14 px-4 flex items-center justify-between border-b border-zinc-800/50">
+      <div className="h-14 px-5 flex items-center justify-between border-b border-white/5 bg-[#050506]/90 backdrop-blur-xl relative z-10">
         <div className="flex items-center gap-3">
-          <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+          <div className="w-2 h-2 rounded-full bg-emerald-400" />
           <div>
-            <h2 className="font-semibold text-white">{channelName}</h2>
-            <p className="text-xs text-zinc-500">{serverName}</p>
+            <h2 className="text-sm font-medium text-white">{channelName}</h2>
+            <p className="text-[11px] text-zinc-600">{serverName}</p>
           </div>
         </div>
 
         <div className="flex items-center gap-2">
           {/* Layout toggle */}
-          <div className="flex bg-zinc-800 rounded-lg p-1">
+          <div className="flex bg-white/5 border border-white/5 rounded-lg p-0.5">
             <button
               onClick={() => setLayout('grid')}
-              className={cn("p-1.5 rounded", layout === 'grid' ? "bg-zinc-700 text-white" : "text-zinc-400")}
+              className={cn("p-1.5 rounded-md transition-all", layout === 'grid' ? "bg-white/10 text-white" : "text-zinc-500 hover:text-white")}
             >
-              <Grid className="w-4 h-4" />
+              <Grid className="w-3.5 h-3.5" />
             </button>
             <button
               onClick={() => setLayout('spotlight')}
-              className={cn("p-1.5 rounded", layout === 'spotlight' ? "bg-zinc-700 text-white" : "text-zinc-400")}
+              className={cn("p-1.5 rounded-md transition-all", layout === 'spotlight' ? "bg-white/10 text-white" : "text-zinc-500 hover:text-white")}
             >
-              <Maximize2 className="w-4 h-4" />
+              <Maximize2 className="w-3.5 h-3.5" />
             </button>
           </div>
 
           {/* Volume control */}
-          <div className="flex items-center gap-2 px-3 py-1.5 bg-zinc-800 rounded-lg">
-            <Volume2 className="w-4 h-4 text-zinc-400" />
+          <div className="flex items-center gap-2 px-3 py-1.5 bg-white/5 border border-white/5 rounded-lg">
+            <Volume2 className="w-3.5 h-3.5 text-zinc-500" />
             <Slider
               value={[outputVolume]}
               onValueChange={handleVolumeChange}
               max={100}
-              className="w-20"
+              className="w-16"
             />
           </div>
 
           {/* Participants count */}
-          <div className="flex items-center gap-1.5 px-3 py-1.5 bg-zinc-800 rounded-lg text-sm text-zinc-400">
-            <Users className="w-4 h-4" />
+          <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-white/5 border border-white/5 rounded-lg text-xs text-zinc-400">
+            <Users className="w-3.5 h-3.5" />
             {remoteUsers.length + 1}
           </div>
         </div>
@@ -408,8 +414,8 @@ export default function AgoraVoiceChat({
       </div>
 
       {/* Controls */}
-      <div className="p-4 flex justify-center">
-        <div className="flex items-center gap-3 px-6 py-4 bg-zinc-900/80 backdrop-blur-sm rounded-2xl">
+      <div className="p-4 flex justify-center relative z-10">
+        <div className="flex items-center gap-2 px-4 py-3 bg-white/5 backdrop-blur-xl border border-white/5 rounded-2xl">
           <ControlButton
             icon={isMuted ? MicOff : Mic}
             label={isMuted ? 'Unmute' : 'Mute'}
@@ -429,7 +435,7 @@ export default function AgoraVoiceChat({
             label={isVideoEnabled ? 'Stop Video' : 'Start Video'}
             onClick={toggleVideo}
             active={isVideoEnabled}
-            activeColor="bg-violet-500"
+            activeColor="bg-white text-black"
           />
 
           <ControlButton
@@ -437,7 +443,7 @@ export default function AgoraVoiceChat({
             label={isScreenSharing ? 'Stop Sharing' : 'Share Screen'}
             onClick={toggleScreenShare}
             active={isScreenSharing}
-            activeColor="bg-purple-500"
+            activeColor="bg-white text-black"
           />
 
           <ControlButton
@@ -462,17 +468,17 @@ function ControlButton({ icon: Icon, label, onClick, active, activeColor, disabl
             onClick={onClick}
             disabled={disabled}
             className={cn(
-              "w-12 h-12 rounded-full flex items-center justify-center transition-colors",
+              "w-10 h-10 rounded-xl flex items-center justify-center transition-all",
               disabled && "opacity-50 cursor-not-allowed",
-              danger && "bg-red-500 hover:bg-red-600 text-white",
-              !danger && active && (activeColor || "bg-red-500/20 text-red-400"),
-              !danger && !active && "bg-zinc-800 text-zinc-400 hover:bg-zinc-700 hover:text-white"
+              danger && "bg-red-500/10 text-red-400 hover:bg-red-500/20",
+              !danger && active && (activeColor || "bg-red-500/10 text-red-400"),
+              !danger && !active && "bg-white/5 text-zinc-400 hover:bg-white/10 hover:text-white border border-white/5"
             )}
           >
-            <Icon className="w-5 h-5" />
+            <Icon className="w-4 h-4" />
           </button>
         </TooltipTrigger>
-        <TooltipContent className="bg-zinc-900 border-zinc-800 text-white">
+        <TooltipContent className="bg-zinc-900/95 backdrop-blur-xl border-white/10 text-white text-xs">
           {label}
         </TooltipContent>
       </Tooltip>
@@ -504,11 +510,12 @@ function ParticipantTile({ participant, isSpeaking, isMuted, isCurrentUser, vide
 
   return (
     <motion.div
-      whileHover={{ scale: 1.02 }}
+      whileHover={{ scale: 1.01 }}
+      whileTap={{ scale: 0.99 }}
       onClick={onClick}
       className={cn(
-        "relative aspect-video rounded-xl overflow-hidden bg-zinc-800/50 cursor-pointer",
-        isSpeaking && !isMuted && "ring-2 ring-emerald-500",
+        "relative aspect-video rounded-2xl overflow-hidden bg-white/[0.02] border cursor-pointer transition-all",
+        isSpeaking && !isMuted ? "border-emerald-500/50" : "border-white/5",
         isMuted && "opacity-60"
       )}
     >
@@ -518,13 +525,13 @@ function ParticipantTile({ participant, isSpeaking, isMuted, isCurrentUser, vide
           <div ref={videoRef} className="w-full h-full" />
         ) : (
           <div className={cn(
-            "w-24 h-24 rounded-full overflow-hidden",
-            isSpeaking && !isMuted && "ring-4 ring-emerald-500"
+            "w-20 h-20 rounded-2xl overflow-hidden border-2 transition-all",
+            isSpeaking && !isMuted ? "border-emerald-400" : "border-white/10"
           )}>
             {participant.user_avatar ? (
               <img src={participant.user_avatar} alt="" className="w-full h-full object-cover" />
             ) : (
-              <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-violet-500 to-indigo-600 text-white text-2xl font-medium">
+              <div className="w-full h-full flex items-center justify-center bg-white/5 text-white text-xl font-medium">
                 {participant.user_name?.charAt(0) || '?'}
               </div>
             )}
@@ -533,22 +540,22 @@ function ParticipantTile({ participant, isSpeaking, isMuted, isCurrentUser, vide
       </div>
 
       {/* Status indicators */}
-      <div className="absolute bottom-2 left-2 flex items-center gap-1.5">
+      <div className="absolute bottom-3 left-3 flex items-center gap-1.5">
         {isMuted && (
-          <div className="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center">
-            <MicOff className="w-3 h-3 text-white" />
+          <div className="w-5 h-5 bg-red-500/20 border border-red-500/30 rounded-lg flex items-center justify-center">
+            <MicOff className="w-2.5 h-2.5 text-red-400" />
           </div>
         )}
         {isCurrentUser && (
-          <span className="px-2 py-0.5 bg-violet-500/80 rounded text-xs text-white">You</span>
+          <span className="px-1.5 py-0.5 bg-white/10 border border-white/10 rounded text-[10px] text-white font-medium">You</span>
         )}
       </div>
 
       {/* Name */}
-      <div className="absolute bottom-2 right-2">
+      <div className="absolute bottom-3 right-3">
         <span className={cn(
-          "px-2 py-1 rounded-md text-sm font-medium bg-black/50 text-white",
-          isSpeaking && !isMuted && "bg-emerald-500/80"
+          "px-2 py-1 rounded-lg text-xs font-medium transition-all",
+          isSpeaking && !isMuted ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30" : "bg-black/30 text-white"
         )}>
           {participant.user_name}
         </span>
