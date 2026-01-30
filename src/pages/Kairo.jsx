@@ -56,6 +56,10 @@ import EnhancedReactions from '@/components/kairo/enhanced/EnhancedReactions';
 import { PollMessage, AnnouncementMessage, SystemPrompt } from '@/components/kairo/enhanced/NewMessageTypes';
 import { KeyboardShortcutsModal, useKeyboardShortcuts } from '@/components/kairo/enhanced/KeyboardShortcuts';
 import InlineEditField from '@/components/kairo/enhanced/InlineEditField';
+import ConnectionMonitor from '@/components/kairo/core/ConnectionMonitor';
+import { LoadingSpinner, SkeletonMessage, SyncingIndicator } from '@/components/kairo/core/LoadingState';
+import { usePresenceSync, useVoiceStateSync, useMessageSync } from '@/components/kairo/core/PresenceSync';
+import { useCacheOptimization, usePrefetchStrategies } from '@/components/kairo/core/CacheManager';
 
 // Channel header component
 function ChannelHeader({ channel, memberCount, onMembersToggle, showMembers }) {
@@ -162,6 +166,16 @@ export default function KairoPage() {
   
   // Reply state
   const [replyTo, setReplyTo] = useState(null);
+
+  // Syncing state
+  const [isSyncing, setIsSyncing] = useState(false);
+
+  // Core system hooks
+  useCacheOptimization();
+  usePrefetchStrategies(activeServer, activeChannel);
+  usePresenceSync(currentUser?.id);
+  useVoiceStateSync(currentUser?.id, voiceChannel);
+  useMessageSync(activeChannel?.id, view === 'server');
 
   // Keyboard shortcuts
   useKeyboardShortcuts({
@@ -316,12 +330,20 @@ export default function KairoPage() {
     enabled: !!activeServer?.id
   });
 
-  // Fetch messages for active channel
-  const { data: messages = [], isLoading: messagesLoading } = useQuery({
+  // Fetch messages for active channel with optimized caching
+  const { data: messages = [], isLoading: messagesLoading, isFetching: messagesFetching } = useQuery({
     queryKey: ['messages', activeChannel?.id],
     queryFn: () => base44.entities.Message.filter({ channel_id: activeChannel.id }, '-created_date', 100),
-    enabled: !!activeChannel?.id
+    enabled: !!activeChannel?.id,
+    staleTime: 3000,
+    refetchInterval: 5000,
+    keepPreviousData: true
   });
+
+  // Show syncing indicator when fetching
+  useEffect(() => {
+    setIsSyncing(messagesFetching);
+  }, [messagesFetching]);
 
   // Fetch server members
   const { data: members = [] } = useQuery({
@@ -818,8 +840,11 @@ export default function KairoPage() {
   }
 
   return (
-    <div className={cn("h-screen flex bg-[#0a0a0b]", userSettings?.kairo_features?.focus_mode && "opacity-80")}>
-      <ImprovedSidebar 
+    <>
+      <ConnectionMonitor />
+      <SyncingIndicator show={isSyncing} />
+      <div className={cn("h-screen flex bg-[#0a0a0b]", userSettings?.kairo_features?.focus_mode && "opacity-80")}>
+        <ImprovedSidebar 
         servers={memberServers} 
         activeServerId={activeServer?.id} 
         onServerSelect={handleServerSelect} 
@@ -883,23 +908,32 @@ export default function KairoPage() {
               <ChannelHeader channel={activeChannel} memberCount={members.length} onMembersToggle={() => setShowMembers(!showMembers)} showMembers={showMembers} />
               <div className="flex-1 flex min-h-0">
                 <div className="flex-1 flex flex-col bg-[#121214]">
-                  <MessageList 
-                    messages={[...messages].reverse()} 
-                    currentUserId={currentUser?.id} 
-                    onReply={(msg) => setReplyTo(msg)} 
-                    onEdit={() => {}} 
-                    onDelete={handleDeleteMessage} 
-                    onReact={handleReact} 
-                    isLoading={messagesLoading}
-                    renderReactions={(msg) => (
-                      <EnhancedReactions
-                        reactions={msg.reactions}
-                        currentUserId={currentUser?.id}
-                        onReact={(emoji) => handleReact(msg.id, emoji)}
-                        onRemoveReact={(emoji) => handleReact(msg.id, emoji)}
-                      />
-                    )}
-                  />
+                  {messagesLoading ? (
+                    <div className="flex-1 overflow-y-auto">
+                      <SkeletonMessage />
+                      <SkeletonMessage />
+                      <SkeletonMessage />
+                      <SkeletonMessage />
+                    </div>
+                  ) : (
+                    <MessageList 
+                      messages={[...messages].reverse()} 
+                      currentUserId={currentUser?.id} 
+                      onReply={(msg) => setReplyTo(msg)} 
+                      onEdit={() => {}} 
+                      onDelete={handleDeleteMessage} 
+                      onReact={handleReact} 
+                      isLoading={messagesLoading}
+                      renderReactions={(msg) => (
+                        <EnhancedReactions
+                          reactions={msg.reactions}
+                          currentUserId={currentUser?.id}
+                          onReact={(emoji) => handleReact(msg.id, emoji)}
+                          onRemoveReact={(emoji) => handleReact(msg.id, emoji)}
+                        />
+                      )}
+                    />
+                  )}
                   <TypingIndicator typingUsers={typingUsers} className="px-4" />
                   <MessageInput channelName={activeChannel?.name} replyTo={replyTo} onCancelReply={() => setReplyTo(null)} onSendMessage={(data) => sendMessageMutation.mutate(data)} onTyping={sendTypingIndicator} />
                 </div>
@@ -984,6 +1018,7 @@ export default function KairoPage() {
           </motion.div>
         </div>}
         </AnimatePresence>
-    </div>
+      </div>
+    </>
   );
 }

@@ -8,7 +8,11 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 
-const commonEmojis = ['👍', '❤️', '😂', '😮', '😢', '😡', '🎉', '🔥', '👀', '💯'];
+const commonEmojis = [
+  '👍', '❤️', '😂', '😮', '😢', '😡', '🎉', '🔥', '👀', '💯',
+  '✨', '⭐', '💪', '🙏', '👏', '🤔', '😍', '🥳', '😎', '🚀',
+  '💀', '🤡', '👻', '💩', '🤝', '💙', '💚', '💜', '🧡', '🤍'
+];
 
 export default function EnhancedReactions({ reactions = [], currentUserId, onReact, onRemoveReact }) {
   const [showPicker, setShowPicker] = useState(false);
