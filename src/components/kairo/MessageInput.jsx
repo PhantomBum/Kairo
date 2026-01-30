@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Plus, Smile, ImageIcon, File, X, Send, Mic, ArrowUp
+  Plus, Smile, ImageIcon, File, X, Send, Mic, ArrowUp, Sparkles, Sticker, Gift
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
@@ -16,6 +16,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { base44 } from '@/api/base44Client';
+import GifPicker from './chat/GifPicker';
+import StickerPicker from './chat/StickerPicker';
 
 const commonEmojis = ['😀', '😂', '❤️', '🔥', '👍', '🎉', '😢', '😮', '🤔', '👀', '💯', '✨'];
 
@@ -30,6 +32,8 @@ export default function MessageInput({
   const [content, setContent] = useState('');
   const [files, setFiles] = useState([]);
   const [uploadProgress, setUploadProgress] = useState(null);
+  const [showGifPicker, setShowGifPicker] = useState(false);
+  const [showStickerPicker, setShowStickerPicker] = useState(false);
   const inputRef = useRef(null);
   const fileInputRef = useRef(null);
 
@@ -90,6 +94,16 @@ export default function MessageInput({
     const newContent = content.slice(0, start) + emoji + content.slice(start);
     setContent(newContent);
     inputRef.current?.focus();
+  };
+
+  const handleGifSelect = (gifUrl) => {
+    onSendMessage({ content: gifUrl, attachments: [], replyToId: replyTo?.id });
+    setShowGifPicker(false);
+  };
+
+  const handleStickerSelect = (sticker) => {
+    onSendMessage({ content: sticker.url, attachments: [], replyToId: replyTo?.id });
+    setShowStickerPicker(false);
   };
 
   return (
@@ -229,6 +243,30 @@ export default function MessageInput({
 
         {/* Actions */}
         <div className="flex items-center gap-1 p-2">
+          {/* GIF picker */}
+          <Popover open={showGifPicker} onOpenChange={setShowGifPicker}>
+            <PopoverTrigger asChild>
+              <button className="p-2 hover:bg-zinc-700/50 rounded-xl transition-colors text-zinc-400 hover:text-zinc-200">
+                <Gift className="w-5 h-5" />
+              </button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0 bg-transparent border-none" align="end" sideOffset={8}>
+              <GifPicker onSelect={handleGifSelect} onClose={() => setShowGifPicker(false)} />
+            </PopoverContent>
+          </Popover>
+
+          {/* Sticker picker */}
+          <Popover open={showStickerPicker} onOpenChange={setShowStickerPicker}>
+            <PopoverTrigger asChild>
+              <button className="p-2 hover:bg-zinc-700/50 rounded-xl transition-colors text-zinc-400 hover:text-zinc-200">
+                <Sticker className="w-5 h-5" />
+              </button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0 bg-transparent border-none" align="end" sideOffset={8}>
+              <StickerPicker onSelect={handleStickerSelect} onClose={() => setShowStickerPicker(false)} />
+            </PopoverContent>
+          </Popover>
+
           {/* Emoji picker */}
           <Popover>
             <PopoverTrigger asChild>
