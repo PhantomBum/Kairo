@@ -124,10 +124,10 @@ export default function CreateServerModal({ isOpen, onClose, onCreate }) {
 
       {/* Modal */}
       <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="relative w-full max-w-md mx-4 bg-[#121214] rounded-xl shadow-2xl overflow-hidden"
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.95 }}
+        className="relative w-full max-w-md mx-4 bg-zinc-900 rounded-2xl shadow-2xl overflow-hidden border border-zinc-800/50"
       >
         {/* Close button */}
         <button
@@ -147,10 +147,10 @@ export default function CreateServerModal({ isOpen, onClose, onCreate }) {
               className="p-6"
             >
               <h2 className="text-2xl font-bold text-white text-center mb-2">
-                Create a Server
+                Create a Space
               </h2>
               <p className="text-zinc-400 text-center text-sm mb-6">
-                Your server is where you and your friends hang out. Make yours and start talking.
+                Your space is where you and your friends hang out. Make yours and start talking.
               </p>
 
               <div className="space-y-2 max-h-[400px] overflow-y-auto pr-2">
@@ -162,8 +162,8 @@ export default function CreateServerModal({ isOpen, onClose, onCreate }) {
                       setStep(2);
                     }}
                     className={cn(
-                      "w-full flex items-center gap-4 p-3 rounded-lg border border-zinc-800 transition-all",
-                      "hover:bg-zinc-800/50 hover:border-zinc-700"
+                      "w-full flex items-center gap-4 p-3 rounded-xl border border-zinc-800/50 transition-all",
+                      "hover:bg-zinc-800/50 hover:border-zinc-700/50"
                     )}
                   >
                     <div className={cn(
@@ -200,24 +200,24 @@ export default function CreateServerModal({ isOpen, onClose, onCreate }) {
               </button>
 
               <h2 className="text-2xl font-bold text-white text-center mb-2">
-                Customize your server
+                Customize your space
               </h2>
               <p className="text-zinc-400 text-center text-sm mb-6">
-                Give your new server a personality with a name and an icon. You can always change it later.
+                Give your new space a personality with a name and an icon. You can always change it later.
               </p>
 
               {/* Icon upload */}
               <div className="flex justify-center mb-6">
                 <label className="relative cursor-pointer group">
                   <div className={cn(
-                    "w-24 h-24 rounded-full flex items-center justify-center transition-all",
-                    "border-2 border-dashed border-zinc-700 group-hover:border-indigo-500",
+                    "w-24 h-24 rounded-2xl flex items-center justify-center transition-all",
+                    "border-2 border-dashed border-zinc-700 group-hover:border-violet-500",
                     iconPreview && "border-solid border-transparent"
                   )}>
                     {iconPreview ? (
-                      <img src={iconPreview} alt="" className="w-full h-full rounded-full object-cover" />
+                      <img src={iconPreview} alt="" className="w-full h-full rounded-2xl object-cover" />
                     ) : (
-                      <div className="flex flex-col items-center text-zinc-500 group-hover:text-indigo-400">
+                      <div className="flex flex-col items-center text-zinc-500 group-hover:text-violet-400">
                         <Upload className="w-8 h-8 mb-1" />
                         <span className="text-xs">Upload</span>
                       </div>
@@ -230,7 +230,7 @@ export default function CreateServerModal({ isOpen, onClose, onCreate }) {
                     className="hidden"
                   />
                   {iconPreview && (
-                    <div className="absolute inset-0 rounded-full bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <div className="absolute inset-0 rounded-2xl bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                       <ImageIcon className="w-8 h-8 text-white" />
                     </div>
                   )}
@@ -240,13 +240,13 @@ export default function CreateServerModal({ isOpen, onClose, onCreate }) {
               {/* Server name */}
               <div className="space-y-2 mb-4">
                 <Label className="text-xs font-semibold uppercase text-zinc-400">
-                  Server Name
+                  Space Name
                 </Label>
                 <Input
                   value={serverName}
                   onChange={(e) => setServerName(e.target.value)}
-                  placeholder={`${selectedTemplate?.name || 'My'} Server`}
-                  className="bg-zinc-900 border-zinc-800 text-white placeholder-zinc-600 focus:border-indigo-500"
+                  placeholder={`${selectedTemplate?.name || 'My'} Space`}
+                  className="bg-zinc-800/70 border-zinc-700/50 text-white placeholder-zinc-500 focus:border-violet-500 rounded-xl"
                 />
               </div>
 
@@ -258,9 +258,9 @@ export default function CreateServerModal({ isOpen, onClose, onCreate }) {
                 <Textarea
                   value={serverDescription}
                   onChange={(e) => setServerDescription(e.target.value)}
-                  placeholder="What's your server about?"
+                  placeholder="What's your space about?"
                   rows={2}
-                  className="bg-zinc-900 border-zinc-800 text-white placeholder-zinc-600 focus:border-indigo-500 resize-none"
+                  className="bg-zinc-800/70 border-zinc-700/50 text-white placeholder-zinc-500 focus:border-violet-500 resize-none rounded-xl"
                 />
               </div>
 
@@ -285,7 +285,7 @@ export default function CreateServerModal({ isOpen, onClose, onCreate }) {
               <Button
                 onClick={handleCreate}
                 disabled={!serverName.trim() || isCreating}
-                className="w-full bg-indigo-500 hover:bg-indigo-600 text-white"
+                className="w-full bg-violet-500 hover:bg-violet-600 text-white rounded-xl"
               >
                 {isCreating ? (
                   <div className="flex items-center gap-2">
@@ -295,13 +295,13 @@ export default function CreateServerModal({ isOpen, onClose, onCreate }) {
                 ) : (
                   <div className="flex items-center gap-2">
                     <Check className="w-4 h-4" />
-                    Create Server
+                    Create Space
                   </div>
                 )}
               </Button>
 
               <p className="text-xs text-zinc-500 text-center mt-4">
-                By creating a server, you agree to Kairo's Community Guidelines.
+                By creating a space, you agree to Kairo's Community Guidelines.
               </p>
             </motion.div>
           )}
