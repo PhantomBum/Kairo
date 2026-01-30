@@ -635,6 +635,7 @@ export default function KairoPage() {
           onProfileClick={() => setShowProfileEditor(true)}
           onUpdateLogsClick={() => setShowUpdateLogs(true)}
           onNotificationsClick={() => setShowNotifications(true)}
+          onShopClick={() => setShowShop(true)}
           isDMsActive={false} 
           userProfile={userProfile}
           notifications={notifications}
@@ -703,6 +704,7 @@ export default function KairoPage() {
           onProfileClick={() => setShowProfileEditor(true)}
           onUpdateLogsClick={() => setShowUpdateLogs(true)}
           onNotificationsClick={() => setShowNotifications(true)}
+          onShopClick={() => setShowShop(true)}
           isDMsActive={false} 
           userProfile={userProfile}
           notifications={notifications}
@@ -710,7 +712,7 @@ export default function KairoPage() {
         />
         <div className="flex flex-col">
           <ChannelSidebar server={activeServer} categories={categories} channels={channels} activeChannelId={activeChannel?.id}
-            onChannelClick={handleChannelClick} onServerSettings={() => {}} onCreateChannel={(categoryId) => { setCreateChannelCategory(categoryId); setShowCreateChannel(true); }}
+            onChannelClick={handleChannelClick} onServerSettings={() => setShowServerSettings(true)} onCreateChannel={(categoryId) => { setCreateChannelCategory(categoryId); setShowCreateChannel(true); }}
             onInvite={() => setShowInvite(true)} voiceStates={voiceStates} />
           {voiceChannel && <VoiceConnectionBar channel={voiceChannel} server={activeServer} onDisconnect={handleVoiceDisconnect} />}
           <UserStatusBar profile={userProfile} isMuted={isMuted} isDeafened={isDeafened} onToggleMute={() => setIsMuted(!isMuted)} onToggleDeafen={() => setIsDeafened(!isDeafened)}
