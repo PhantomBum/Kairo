@@ -49,27 +49,34 @@ function ChannelItem({ channel, isActive, onClick, voiceUsers = [] }) {
           <button
             onClick={() => onClick(channel)}
             className={cn(
-              "w-full flex items-center gap-1.5 px-2 py-1 rounded text-xs transition-all group text-left",
+              "w-full flex items-center gap-2 px-3 py-2 rounded-xl text-sm transition-all duration-200 group text-left",
               isActive 
-                ? "bg-emerald-500/20 text-emerald-400" 
-                : "text-zinc-500 hover:text-zinc-300 hover:bg-white/5"
+                ? "bg-gradient-to-r from-emerald-500/20 to-teal-500/10 text-emerald-400 shadow-sm" 
+                : "text-zinc-400 hover:text-white hover:bg-white/[0.04]"
             )}
           >
-            <Icon className={cn(
-              "w-3.5 h-3.5 flex-shrink-0",
-              isActive ? "text-emerald-400" : "text-zinc-600"
-            )} />
+            <div className={cn(
+              "w-7 h-7 rounded-lg flex items-center justify-center transition-all",
+              isActive 
+                ? "bg-emerald-500/20" 
+                : "bg-white/[0.04] group-hover:bg-white/[0.08]"
+            )}>
+              <Icon className={cn(
+                "w-4 h-4",
+                isActive ? "text-emerald-400" : "text-zinc-500 group-hover:text-zinc-300"
+              )} />
+            </div>
             
-            <span className="flex-1 truncate">
+            <span className="flex-1 truncate font-medium">
               {channel.name}
             </span>
 
             {channel.is_private && (
-              <Lock className="w-3 h-3 text-zinc-600" />
+              <Lock className="w-3.5 h-3.5 text-zinc-600" />
             )}
             
             {isVoice && voiceUsers.length > 0 && (
-              <span className="text-[10px] text-emerald-400">
+              <span className="text-xs font-semibold text-emerald-400 bg-emerald-500/20 px-1.5 py-0.5 rounded-full">
                 {voiceUsers.length}
               </span>
             )}
@@ -139,24 +146,26 @@ function CategoryItem({ category, channels, activeChannelId, onChannelClick, onC
   const categoryChannels = channels.filter(c => c.category_id === category.id);
 
   return (
-    <div className="mt-3 first:mt-0">
+    <div className="mt-4 first:mt-0">
       <button
         onClick={() => setIsCollapsed(!isCollapsed)}
-        className="flex items-center gap-1 px-2 w-full group py-1"
+        className="flex items-center gap-2 px-3 w-full group py-2"
       >
         <ChevronRight className={cn(
-          "w-2 h-2 text-zinc-600 transition-transform",
+          "w-3 h-3 text-zinc-600 transition-transform duration-200",
           !isCollapsed && "rotate-90"
         )} />
-        <span className="text-[10px] font-medium uppercase tracking-wider text-zinc-600 group-hover:text-zinc-500 truncate">
+        <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 group-hover:text-zinc-400 truncate transition-colors">
           {category.name}
         </span>
-        <button 
+        <motion.button 
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
           onClick={(e) => { e.stopPropagation(); onCreateChannel?.(category.id); }}
-          className="ml-auto opacity-0 group-hover:opacity-100 p-0.5 hover:bg-white/5 rounded transition-all"
+          className="ml-auto opacity-0 group-hover:opacity-100 p-1 hover:bg-white/[0.06] rounded-lg transition-all"
         >
-          <Plus className="w-2.5 h-2.5 text-zinc-600" />
-        </button>
+          <Plus className="w-3 h-3 text-zinc-500" />
+        </motion.button>
       </button>
 
       <AnimatePresence>
@@ -199,19 +208,26 @@ export default function ChannelSidebar({
   const uncategorizedChannels = channels.filter(c => !c.category_id);
 
   return (
-    <div className="w-56 h-full bg-[#111113] flex flex-col border-r border-white/5">
+    <div className="w-60 h-full bg-gradient-to-b from-[#111113] to-[#0e0e10] flex flex-col border-r border-white/[0.06]">
       
-      {/* Server header - Kloak style */}
+      {/* Server header - Premium V2 style */}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <button className="px-3 py-3 flex items-center justify-between hover:bg-white/5 transition-colors border-b border-white/5">
-            <div className="flex items-center gap-2 flex-1 min-w-0">
-              <div className="w-6 h-6 rounded bg-emerald-500 flex items-center justify-center flex-shrink-0">
-                <span className="text-white font-bold text-xs">{server?.name?.charAt(0) || 'K'}</span>
+          <button className="px-4 py-4 flex items-center justify-between hover:bg-white/[0.04] transition-all duration-200 border-b border-white/[0.06] group">
+            <div className="flex items-center gap-3 flex-1 min-w-0">
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center flex-shrink-0 shadow-lg shadow-emerald-500/20 group-hover:shadow-emerald-500/30 transition-shadow">
+                {server?.icon_url ? (
+                  <img src={server.icon_url} alt="" className="w-full h-full object-cover rounded-xl" />
+                ) : (
+                  <span className="text-white font-bold text-sm">{server?.name?.charAt(0) || 'K'}</span>
+                )}
               </div>
-              <span className="font-medium text-white text-sm truncate">{server?.name || 'Server'}</span>
+              <div className="min-w-0">
+                <span className="font-semibold text-white text-sm block truncate">{server?.name || 'Server'}</span>
+                <span className="text-[10px] text-zinc-500">{server?.member_count || 0} members</span>
+              </div>
             </div>
-            <ChevronDown className="w-3.5 h-3.5 text-zinc-500 flex-shrink-0" />
+            <ChevronDown className="w-4 h-4 text-zinc-500 flex-shrink-0 group-hover:text-zinc-400 transition-colors" />
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-52 bg-[#1a1a1d] border-white/10 rounded-lg p-1" align="start">
