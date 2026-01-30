@@ -3,7 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Hash, Volume2, ChevronDown, ChevronRight, Plus, Settings,
   Video, Megaphone, MessagesSquare, ImageIcon, Lock, Users,
-  MoreHorizontal, Edit, Trash2, Bell, BellOff, Copy, UserPlus
+  MoreHorizontal, Edit, Trash2, Bell, BellOff, Copy, UserPlus,
+  FolderPlus, Code, Webhook
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
