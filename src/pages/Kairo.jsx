@@ -816,12 +816,15 @@ export default function KairoPage() {
       }
     };
 
+    const handleOpenSearch = () => setShowGlobalSearch(true);
+
     window.addEventListener('kairo:show-apps', handleShowApps);
     window.addEventListener('kairo:show-webhooks', handleShowWebhooks);
     window.addEventListener('kairo:show-roles', handleShowRoles);
     window.addEventListener('kairo:show-bridges', handleShowBridges);
     window.addEventListener('kairo:leave-server', handleLeaveServerEvent);
     window.addEventListener('kairo:update-status', handleUpdateStatus);
+    window.addEventListener('kairo:open-search', handleOpenSearch);
 
     return () => {
       window.removeEventListener('kairo:show-apps', handleShowApps);
@@ -830,6 +833,7 @@ export default function KairoPage() {
       window.removeEventListener('kairo:show-bridges', handleShowBridges);
       window.removeEventListener('kairo:leave-server', handleLeaveServerEvent);
       window.removeEventListener('kairo:update-status', handleUpdateStatus);
+      window.removeEventListener('kairo:open-search', handleOpenSearch);
     };
   }, [activeServer, currentUser, userProfile]);
 
