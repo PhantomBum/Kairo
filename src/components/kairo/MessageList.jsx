@@ -52,7 +52,7 @@ function DateDivider({ date }) {
   );
 }
 
-function MessageActions({ message, onReply, onEdit, onDelete, onReact, isOwn }) {
+function MessageActions({ message, onReply, onEdit, onDelete, onReact, onPin, isOwn }) {
   return (
     <div className="absolute -top-3 right-4 opacity-0 group-hover:opacity-100 transition-all">
       <div className="flex items-center bg-zinc-900/95 backdrop-blur-xl border border-zinc-800/80 rounded-xl shadow-xl p-1 gap-0.5">
