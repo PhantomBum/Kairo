@@ -321,8 +321,8 @@ function MessageItem({ message, showHeader, onReply, onEditClick, onDelete, onRe
             onPin={onPin}
             isOwn={isOwn}
           />
-        </motion.div>
-      </ContextMenuTrigger>
+        </div>
+        </ContextMenuTrigger>
       <ContextMenuContent className="w-48 bg-zinc-900/95 backdrop-blur-xl border-zinc-800/80 rounded-xl p-1">
         <ContextMenuItem 
           onClick={() => onReply?.(message)}
