@@ -328,14 +328,18 @@ export default function KairoPage() {
   const { data: categories = [] } = useQuery({
     queryKey: ['categories', activeServer?.id],
     queryFn: () => base44.entities.Category.filter({ server_id: activeServer.id }),
-    enabled: !!activeServer?.id
+    enabled: !!activeServer?.id,
+    staleTime: 60000,
+    keepPreviousData: true
   });
 
   // Fetch channels for active server
   const { data: channels = [] } = useQuery({
     queryKey: ['channels', activeServer?.id],
     queryFn: () => base44.entities.Channel.filter({ server_id: activeServer.id }),
-    enabled: !!activeServer?.id
+    enabled: !!activeServer?.id,
+    staleTime: 60000,
+    keepPreviousData: true
   });
 
   // Fetch messages for active channel with optimized caching
@@ -346,8 +350,8 @@ export default function KairoPage() {
       return msgs;
     },
     enabled: !!activeChannel?.id,
-    staleTime: 1000,
-    refetchInterval: 2000,
+    staleTime: 30000,
+    refetchInterval: false,
     keepPreviousData: true
   });
 
@@ -385,14 +389,18 @@ export default function KairoPage() {
   const { data: members = [] } = useQuery({
     queryKey: ['members', activeServer?.id],
     queryFn: () => base44.entities.ServerMember.filter({ server_id: activeServer.id }),
-    enabled: !!activeServer?.id
+    enabled: !!activeServer?.id,
+    staleTime: 30000,
+    keepPreviousData: true
   });
 
   // Fetch roles
   const { data: roles = [] } = useQuery({
     queryKey: ['roles', activeServer?.id],
     queryFn: () => base44.entities.Role.filter({ server_id: activeServer.id }),
-    enabled: !!activeServer?.id
+    enabled: !!activeServer?.id,
+    staleTime: 60000,
+    keepPreviousData: true
   });
 
   // Fetch voice states
@@ -428,8 +436,9 @@ export default function KairoPage() {
     queryKey: ['dmMessages', activeConversation?.id],
     queryFn: () => base44.entities.DirectMessage.filter({ conversation_id: activeConversation.id }, '-created_date', 100),
     enabled: !!activeConversation?.id,
-    staleTime: 1000,
-    refetchInterval: 2000
+    staleTime: 30000,
+    refetchInterval: false,
+    keepPreviousData: true
   });
 
   // Fetch typing indicators
