@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
-import { Hash, Users, Pin, Bell, Search, Inbox, HelpCircle, ShoppingBag, Calendar, Wifi, WifiOff, RefreshCw } from 'lucide-react';
+import { Hash, Users, Pin, Bell, Search, MessageSquare, Settings, ShoppingBag, Calendar, Wifi, WifiOff, RefreshCw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { createPageUrl } from '@/utils';
 import { Button } from '@/components/ui/button';
@@ -77,6 +77,9 @@ function ChannelHeader({ channel, memberCount, onMembersToggle, showMembers }) {
       </div>
       <div className="flex items-center gap-1">
         <button className="p-2 text-zinc-400 hover:text-zinc-200 transition-colors rounded hover:bg-zinc-800/50">
+          <MessageSquare className="w-5 h-5" />
+        </button>
+        <button className="p-2 text-zinc-400 hover:text-zinc-200 transition-colors rounded hover:bg-zinc-800/50">
           <Bell className="w-5 h-5" />
         </button>
         <button className="p-2 text-zinc-400 hover:text-zinc-200 transition-colors rounded hover:bg-zinc-800/50">
@@ -100,10 +103,7 @@ function ChannelHeader({ channel, memberCount, onMembersToggle, showMembers }) {
           />
         </div>
         <button className="p-2 text-zinc-400 hover:text-zinc-200 transition-colors rounded hover:bg-zinc-800/50">
-          <Inbox className="w-5 h-5" />
-        </button>
-        <button className="p-2 text-zinc-400 hover:text-zinc-200 transition-colors rounded hover:bg-zinc-800/50">
-          <HelpCircle className="w-5 h-5" />
+          <Settings className="w-5 h-5" />
         </button>
       </div>
     </div>
@@ -941,8 +941,9 @@ export default function KairoPage() {
                 const memberProfile = m.user_id === currentUser?.id ? userProfile : null;
                 return {
                   ...m,
-                  user_name: m.nickname || m.user_email?.split('@')[0],
-                  status: 'online',
+                  user_name: m.nickname || memberProfile?.display_name || m.user_email?.split('@')[0] || 'User',
+                  user_avatar: memberProfile?.avatar_url,
+                  status: memberProfile?.status || 'online',
                   badges: memberProfile?.badges || [],
                   youtube_url: memberProfile?.youtube_channel?.url,
                   youtube_show_icon: memberProfile?.youtube_channel?.show_icon
