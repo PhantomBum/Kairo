@@ -38,34 +38,33 @@ function ConversationItem({ conversation, isActive, onClick, onClose }) {
   return (
     <ContextMenu>
       <ContextMenuTrigger>
-        <motion.div
-          whileHover={{ x: 2 }}
+        <div
           onClick={() => onClick(conversation)}
           className={cn(
-            "group flex items-center gap-3 px-2 py-1.5 mx-2 rounded-md cursor-pointer transition-colors",
+            "group flex items-center gap-2.5 px-2 py-1.5 mx-1 rounded cursor-pointer transition-colors",
             isActive 
-              ? "bg-zinc-700/50 text-white" 
-              : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50"
+              ? "bg-white/10 text-white" 
+              : "text-zinc-400 hover:text-white hover:bg-white/5"
           )}
         >
           {/* Avatar */}
           <div className="relative flex-shrink-0">
-            <div className="w-8 h-8 rounded-full overflow-hidden bg-zinc-700">
+            <div className="w-8 h-8 rounded-full overflow-hidden bg-white/10">
               {avatar ? (
                 <img src={avatar} alt="" className="w-full h-full object-cover" />
               ) : isGroup ? (
                 <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-indigo-500 to-purple-600">
-                  <Users className="w-4 h-4 text-white" />
+                  <Users className="w-3.5 h-3.5 text-white" />
                 </div>
               ) : (
-                <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-indigo-500 to-purple-600 text-white text-sm font-medium">
+                <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-indigo-500 to-purple-600 text-white text-xs font-medium">
                   {displayName?.charAt(0)}
                 </div>
               )}
             </div>
             {!isGroup && status && (
               <div className={cn(
-                "absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-2 border-[#121214]",
+                "absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-[#0a0a0b]",
                 statusColors[status] || statusColors.offline
               )} />
             )}
@@ -73,16 +72,9 @@ function ConversationItem({ conversation, isActive, onClick, onClose }) {
 
           {/* Name and preview */}
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2">
-              <span className="font-medium text-sm truncate">{displayName}</span>
-              {isGroup && (
-                <span className="text-xs text-zinc-500">
-                  {conversation.participants?.length}
-                </span>
-              )}
-            </div>
+            <span className="font-medium text-xs truncate block">{displayName}</span>
             {conversation.last_message_preview && (
-              <p className="text-xs text-zinc-500 truncate">
+              <p className="text-[10px] text-zinc-600 truncate">
                 {conversation.last_message_preview}
               </p>
             )}
@@ -91,36 +83,36 @@ function ConversationItem({ conversation, isActive, onClick, onClose }) {
           {/* Close button */}
           <button
             onClick={(e) => { e.stopPropagation(); onClose?.(conversation); }}
-            className="hidden group-hover:flex p-1 hover:bg-zinc-700 rounded transition-colors"
+            className="hidden group-hover:flex p-1 hover:bg-white/10 rounded transition-colors"
           >
-            <X className="w-4 h-4" />
+            <X className="w-3 h-3" />
           </button>
-        </motion.div>
+        </div>
       </ContextMenuTrigger>
-      <ContextMenuContent className="w-48 bg-zinc-900 border-zinc-800">
-        <ContextMenuItem className="text-zinc-300 focus:bg-indigo-500/20 focus:text-white">
-          <VolumeX className="w-4 h-4 mr-2" />
-          Mute Conversation
+      <ContextMenuContent className="w-44 bg-[#0a0a0b] border-white/10 rounded-lg p-1">
+        <ContextMenuItem className="text-zinc-300 focus:bg-white/5 focus:text-white rounded px-3 py-2 text-xs">
+          <VolumeX className="w-3.5 h-3.5 mr-2" />
+          Mute
         </ContextMenuItem>
         {!isGroup && (
           <>
-            <ContextMenuItem className="text-zinc-300 focus:bg-indigo-500/20 focus:text-white">
+            <ContextMenuItem className="text-zinc-300 focus:bg-white/5 focus:text-white rounded px-3 py-2 text-xs">
               View Profile
             </ContextMenuItem>
-            <ContextMenuSeparator className="bg-zinc-800" />
-            <ContextMenuItem className="text-red-400 focus:bg-red-500/20 focus:text-red-400">
-              <UserX className="w-4 h-4 mr-2" />
+            <ContextMenuSeparator className="bg-white/5 my-1" />
+            <ContextMenuItem className="text-red-400 focus:bg-red-500/10 rounded px-3 py-2 text-xs">
+              <UserX className="w-3.5 h-3.5 mr-2" />
               Block
             </ContextMenuItem>
           </>
         )}
-        <ContextMenuSeparator className="bg-zinc-800" />
+        <ContextMenuSeparator className="bg-white/5 my-1" />
         <ContextMenuItem 
           onClick={() => onClose?.(conversation)}
-          className="text-red-400 focus:bg-red-500/20 focus:text-red-400"
+          className="text-red-400 focus:bg-red-500/10 rounded px-3 py-2 text-xs"
         >
-          <Trash2 className="w-4 h-4 mr-2" />
-          Close DM
+          <Trash2 className="w-3.5 h-3.5 mr-2" />
+          Close
         </ContextMenuItem>
       </ContextMenuContent>
     </ContextMenu>
@@ -131,66 +123,62 @@ function FriendItem({ friend, onMessage, onRemove }) {
   return (
     <ContextMenu>
       <ContextMenuTrigger>
-        <motion.div
-          whileHover={{ x: 2 }}
-          className="group flex items-center gap-3 px-3 py-2 hover:bg-zinc-800/50 rounded-md cursor-pointer transition-colors"
+        <div
+          className="group flex items-center gap-2.5 px-2 py-1.5 mx-1 hover:bg-white/5 rounded cursor-pointer transition-colors"
         >
           <div className="relative flex-shrink-0">
-            <div className="w-10 h-10 rounded-full overflow-hidden bg-zinc-700">
+            <div className="w-8 h-8 rounded-full overflow-hidden bg-white/10">
               {friend.friend_avatar ? (
                 <img src={friend.friend_avatar} alt="" className="w-full h-full object-cover" />
               ) : (
-                <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-indigo-500 to-purple-600 text-white font-medium">
+                <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-indigo-500 to-purple-600 text-white text-xs font-medium">
                   {friend.friend_name?.charAt(0)}
                 </div>
               )}
             </div>
             <div className={cn(
-              "absolute bottom-0 right-0 w-4 h-4 rounded-full border-2 border-[#121214]",
+              "absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-[#0a0a0b]",
               statusColors[friend.status] || statusColors.offline
             )} />
           </div>
 
           <div className="flex-1 min-w-0">
-            <span className="font-medium text-white text-sm truncate block">
+            <span className="font-medium text-white text-xs truncate block">
               {friend.friend_name}
             </span>
-            <span className="text-xs text-zinc-500 capitalize">
+            <span className="text-[10px] text-zinc-600 capitalize">
               {friend.status || 'Offline'}
             </span>
           </div>
 
-          <div className="hidden group-hover:flex items-center gap-1">
+          <div className="hidden group-hover:flex items-center">
             <button
               onClick={(e) => { e.stopPropagation(); onMessage?.(friend); }}
-              className="p-1.5 hover:bg-zinc-700 rounded transition-colors"
+              className="p-1 hover:bg-white/10 rounded transition-colors"
             >
-              <MessageCircle className="w-4 h-4 text-zinc-400" />
-            </button>
-            <button className="p-1.5 hover:bg-zinc-700 rounded transition-colors">
-              <MoreHorizontal className="w-4 h-4 text-zinc-400" />
+              <MessageCircle className="w-3.5 h-3.5 text-zinc-400" />
             </button>
           </div>
-        </motion.div>
+        </div>
       </ContextMenuTrigger>
-      <ContextMenuContent className="w-48 bg-zinc-900 border-zinc-800">
+      <ContextMenuContent className="w-44 bg-[#0a0a0b] border-white/10 rounded-lg p-1">
         <ContextMenuItem 
           onClick={() => onMessage?.(friend)}
-          className="text-zinc-300 focus:bg-indigo-500/20 focus:text-white"
+          className="text-zinc-300 focus:bg-white/5 focus:text-white rounded px-3 py-2 text-xs"
         >
-          <MessageCircle className="w-4 h-4 mr-2" />
+          <MessageCircle className="w-3.5 h-3.5 mr-2" />
           Message
         </ContextMenuItem>
-        <ContextMenuItem className="text-zinc-300 focus:bg-indigo-500/20 focus:text-white">
+        <ContextMenuItem className="text-zinc-300 focus:bg-white/5 focus:text-white rounded px-3 py-2 text-xs">
           View Profile
         </ContextMenuItem>
-        <ContextMenuSeparator className="bg-zinc-800" />
+        <ContextMenuSeparator className="bg-white/5 my-1" />
         <ContextMenuItem 
           onClick={() => onRemove?.(friend)}
-          className="text-red-400 focus:bg-red-500/20 focus:text-red-400"
+          className="text-red-400 focus:bg-red-500/10 rounded px-3 py-2 text-xs"
         >
-          <UserX className="w-4 h-4 mr-2" />
-          Remove Friend
+          <UserX className="w-3.5 h-3.5 mr-2" />
+          Remove
         </ContextMenuItem>
       </ContextMenuContent>
     </ContextMenu>
@@ -222,64 +210,64 @@ export default function DMSidebar({
   );
 
   return (
-    <div className="w-[280px] md:w-64 h-full bg-zinc-900/50 flex flex-col border-r border-zinc-800/30">
+    <div className="w-[260px] md:w-60 h-full bg-[#0a0a0b] flex flex-col border-r border-white/5">
       {/* Header */}
-      <div className="p-4">
+      <div className="px-3 py-3 border-b border-white/5">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
+          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-zinc-600" />
           <Input
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search messages..."
-            className="w-full pl-10 h-9 bg-zinc-800/70 border-zinc-700/50 rounded-xl text-sm text-white placeholder-zinc-500"
+            placeholder="Search"
+            className="w-full pl-8 h-8 bg-white/5 border-white/5 rounded text-xs text-white placeholder-zinc-600"
           />
         </div>
       </div>
 
       {/* Navigation */}
-      <div className="px-3 pb-2 space-y-1">
+      <div className="px-2 py-2 space-y-0.5">
         <button
           onClick={() => setActiveView('friends')}
           className={cn(
-            "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-colors",
+            "w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded transition-colors",
             activeView === 'friends' 
-              ? "bg-zinc-800/80 text-white" 
-              : "hover:bg-zinc-800/50 text-zinc-400 hover:text-white"
+              ? "bg-white/10 text-white" 
+              : "hover:bg-white/5 text-zinc-500 hover:text-white"
           )}
         >
-          <Users className="w-[18px] h-[18px]" />
-          <span className="text-[13px] font-medium">Friends</span>
+          <Users className="w-4 h-4" />
+          <span className="text-xs font-medium">Friends</span>
           {pendingRequests.length > 0 && (
-            <span className="ml-auto bg-violet-500 text-white text-[10px] px-1.5 py-0.5 rounded-full font-bold">
+            <span className="ml-auto bg-red-500 text-white text-[9px] px-1.5 py-0.5 rounded font-bold">
               {pendingRequests.length}
             </span>
           )}
         </button>
         <button
           onClick={onAddFriend}
-          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-zinc-800/50 text-zinc-400 hover:text-white transition-colors"
+          className="w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded hover:bg-white/5 text-zinc-500 hover:text-white transition-colors"
         >
-          <UserPlus className="w-[18px] h-[18px]" />
-          <span className="text-[13px] font-medium">Add Friend</span>
+          <UserPlus className="w-4 h-4" />
+          <span className="text-xs font-medium">Add Friend</span>
         </button>
         <button
           onClick={onJoinServer}
-          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-zinc-800/50 text-zinc-400 hover:text-white transition-colors"
+          className="w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded hover:bg-white/5 text-zinc-500 hover:text-white transition-colors"
         >
-          <Link2 className="w-[18px] h-[18px]" />
-          <span className="text-[13px] font-medium">Join Space</span>
+          <Link2 className="w-4 h-4" />
+          <span className="text-xs font-medium">Join Server</span>
         </button>
       </div>
 
-      <div className="h-px bg-zinc-800/30 mx-3" />
+      <div className="h-px bg-white/5 mx-2" />
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto scrollbar-thin px-2 py-2">
+      <div className="flex-1 overflow-y-auto scrollbar-thin">
         {activeView === 'friends' ? (
           <>
-            <h3 className="px-3 py-2 text-[11px] font-semibold uppercase tracking-wider text-zinc-500">
+            <div className="px-3 py-2 text-[9px] font-semibold uppercase tracking-wider text-zinc-600">
               Friends — {filteredFriends.length}
-            </h3>
+            </div>
             {filteredFriends.map((friend) => (
               <FriendItem
                 key={friend.id}
@@ -299,30 +287,23 @@ export default function DMSidebar({
               />
             ))}
             {filteredFriends.length === 0 && (
-              <div className="flex flex-col items-center justify-center py-8 text-zinc-500">
-                <Users className="w-12 h-12 mb-2 opacity-50" />
-                <p className="text-sm">No friends yet</p>
-                <Button
-                  variant="link"
-                  onClick={onAddFriend}
-                  className="text-violet-400 text-sm"
-                >
-                  Add a friend
-                </Button>
+              <div className="flex flex-col items-center justify-center py-8 text-zinc-600">
+                <Users className="w-8 h-8 mb-2 opacity-50" />
+                <p className="text-xs">No friends yet</p>
               </div>
             )}
           </>
         ) : (
           <>
             <div className="flex items-center justify-between px-3 py-2">
-              <h3 className="text-[11px] font-semibold uppercase tracking-wider text-zinc-500">
+              <span className="text-[9px] font-semibold uppercase tracking-wider text-zinc-600">
                 Messages
-              </h3>
+              </span>
               <button
                 onClick={onNewDM}
-                className="p-1.5 hover:bg-zinc-800 rounded-lg transition-colors text-zinc-400 hover:text-white"
+                className="p-1 hover:bg-white/5 rounded transition-colors text-zinc-600 hover:text-white"
               >
-                <Plus className="w-4 h-4" />
+                <Plus className="w-3.5 h-3.5" />
               </button>
             </div>
             {filteredConversations.map((conversation) => (
@@ -335,12 +316,9 @@ export default function DMSidebar({
               />
             ))}
             {filteredConversations.length === 0 && (
-              <div className="flex flex-col items-center justify-center py-8 text-zinc-500">
-                <MessageCircle className="w-12 h-12 mb-2 opacity-50" />
-                <p className="text-sm">No conversations yet</p>
-                <button onClick={onNewDM} className="text-violet-400 text-sm mt-1 hover:underline">
-                  Start a conversation
-                </button>
+              <div className="flex flex-col items-center justify-center py-8 text-zinc-600">
+                <MessageCircle className="w-8 h-8 mb-2 opacity-50" />
+                <p className="text-xs">No messages</p>
               </div>
             )}
           </>
