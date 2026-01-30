@@ -188,8 +188,16 @@ function KairoPageContent() {
   // Get current user from localStorage (key-based auth)
   const [currentUser, setCurrentUser] = React.useState(null);
 
-  // Profile system
-  const { getProfile, refreshAllProfiles } = useProfiles();
+  // Profile system - use try/catch since provider is at app level
+  let getProfile = () => null;
+  let refreshAllProfiles = () => {};
+  try {
+    const profiles = useProfiles();
+    getProfile = profiles.getProfile;
+    refreshAllProfiles = profiles.refreshAllProfiles;
+  } catch (e) {
+    // Provider not ready yet
+  }
 
   // Core system hooks (after currentUser is declared)
   useCacheOptimization();
@@ -1373,5 +1381,14 @@ function KairoPageContent() {
         </AnimatePresence>
       </div>
     </>
+  );
+}
+
+// Main export with ProfileProvider wrapper
+export default function KairoPage() {
+  return (
+    <ProfileProvider>
+      <KairoPageContent />
+    </ProfileProvider>
   );
 }
