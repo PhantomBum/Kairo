@@ -542,9 +542,16 @@ export default function KairoPage() {
         author_id: currentUser.id,
         author_name: userProfile?.display_name || currentUser.full_name,
         author_avatar: userProfile?.avatar_url,
-        created_date: new Date().toISOString()
+        author_badges: userProfile?.badges || [],
+        author_youtube_url: userProfile?.youtube_channel?.url,
+        author_youtube_show_icon: userProfile?.youtube_channel?.show_icon,
+        created_date: new Date().toISOString(),
+        type: newMsg.replyToId ? 'reply' : 'default',
+        reply_to_id: newMsg.replyToId,
+        reply_preview: newMsg.replyToId && replyTo ? { author_name: replyTo.author_name, content: replyTo.content?.slice(0, 100) } : null
       };
-      queryClient.setQueryData(['messages', activeChannel?.id], old => [...(old || []), optimisticMessage]);
+      // Messages are fetched in descending order, so prepend the new message
+      queryClient.setQueryData(['messages', activeChannel?.id], old => [optimisticMessage, ...(old || [])]);
       return { previousMessages };
     },
     onError: (err, newMsg, context) => {
