@@ -307,6 +307,7 @@ function MessageItem({ message, showHeader, onReply, onEdit, onDelete, onReact, 
             onEdit={onEdit}
             onDelete={onDelete}
             onReact={onReact}
+            onPin={onPin}
             isOwn={isOwn}
           />
         </motion.div>
