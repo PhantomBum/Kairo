@@ -297,71 +297,44 @@ export default function KairoPage() {
     queryKey: ['memberServers', currentUser?.user_id, currentUser?.id, currentUser?.user_email],
     queryFn: async () => {
       if (!currentUser) return [];
-      
+
       const profileRecordId = currentUser.id;
       const profileUserId = currentUser.user_id;
       const userEmail = currentUser.user_email || currentUser.email;
-      
+
       console.log('[SERVER FETCH] Looking for:', { profileRecordId, profileUserId, userEmail });
-      
-      // Find memberships by ALL possible identifiers
-      let memberships = [];
-      
-      // By record id
-      if (profileRecordId) {
-        const m1 = await base44.entities.ServerMember.filter({ user_id: profileRecordId });
-        memberships = [...m1];
-      }
-      
-      // By user_id field
-      if (profileUserId && profileUserId !== profileRecordId) {
-        const m2 = await base44.entities.ServerMember.filter({ user_id: profileUserId });
-        memberships = [...memberships, ...m2];
-      }
-      
-      // By email (most reliable since it's always set)
-      if (userEmail) {
-        const m3 = await base44.entities.ServerMember.filter({ user_email: userEmail });
-        // Deduplicate
-        m3.forEach(m => {
-          if (!memberships.find(existing => existing.id === m.id)) {
-            memberships.push(m);
-          }
-        });
-      }
-      
-      console.log('[SERVER FETCH] memberships found:', memberships.length);
-      
-      // Get servers from memberships
-      let serverIds = [...new Set(memberships.map(m => m.server_id))];
-      
-      // Also check for servers owned by this user
-      let ownedServers = [];
-      if (profileRecordId) {
-        const o1 = await base44.entities.Server.filter({ owner_id: profileRecordId });
-        ownedServers = [...o1];
-      }
-      if (profileUserId && profileUserId !== profileRecordId) {
-        const o2 = await base44.entities.Server.filter({ owner_id: profileUserId });
-        ownedServers = [...ownedServers, ...o2];
-      }
-      
-      console.log('[SERVER FETCH] ownedServers found:', ownedServers.length);
-      
-      // Combine owned server IDs
-      ownedServers.forEach(s => {
-        if (!serverIds.includes(s.id)) serverIds.push(s.id);
-      });
-      
-      console.log('[SERVER FETCH] total serverIds:', serverIds);
-      
-      if (serverIds.length === 0) return [];
-      
-      const allServers = await base44.entities.Server.list();
-      return allServers.filter(s => serverIds.includes(s.id));
+
+      // Get ALL servers and memberships - then filter client-side for reliability
+      const [allServers, allMemberships] = await Promise.all([
+        base44.entities.Server.list(),
+        base44.entities.ServerMember.list()
+      ]);
+
+      // Find memberships for this user (check all possible identifiers)
+      const myMemberships = allMemberships.filter(m => 
+        m.user_id === profileRecordId || 
+        m.user_id === profileUserId ||
+        m.user_email === userEmail
+      );
+
+      console.log('[SERVER FETCH] myMemberships found:', myMemberships.length);
+
+      // Get server IDs from memberships
+      const memberServerIds = new Set(myMemberships.map(m => m.server_id));
+
+      // Also include servers where user is owner
+      const myServers = allServers.filter(s => 
+        memberServerIds.has(s.id) ||
+        s.owner_id === profileRecordId ||
+        s.owner_id === profileUserId
+      );
+
+      console.log('[SERVER FETCH] myServers found:', myServers.length, myServers.map(s => s.name));
+
+      return myServers;
     },
     enabled: !!currentUser,
-    staleTime: 30000,
+    staleTime: 10000,
     refetchInterval: false
   });
 
