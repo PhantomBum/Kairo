@@ -66,6 +66,7 @@ import ThreadPanel from '@/components/kairo/chat/ThreadPanel';
 import ForwardMessageModal from '@/components/kairo/chat/ForwardMessageModal';
 import PinnedMessagesPanel from '@/components/kairo/chat/PinnedMessagesPanel';
 import GlobalSearch from '@/components/kairo/search/GlobalSearch';
+import CreateGroupDMModal from '@/components/kairo/CreateGroupDMModal';
 
 // Channel header component
 function ChannelHeader({ channel, memberCount, onMembersToggle, showMembers, onShowPinned, showPinned }) {
