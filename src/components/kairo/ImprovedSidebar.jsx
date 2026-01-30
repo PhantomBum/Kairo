@@ -326,27 +326,9 @@ export default function ImprovedSidebar({
 
       {/* Quick Actions Section */}
       <div className="px-2 py-2 border-t border-white/5 space-y-1">
-        {!isCollapsed && (
-          <div className="px-2 mb-2">
-            <span className="text-[10px] font-semibold text-zinc-600 uppercase tracking-wider">Quick Actions</span>
-          </div>
-        )}
         <NavItem icon={Sparkles} label="Updates" badge={hasNewUpdates ? 1 : 0} onClick={() => { onUpdateLogsClick?.(); onMobileClose?.(); }} isCollapsed={isCollapsed} />
         <NavItem icon={Bell} label="Notifications" badge={notifications?.length || 0} onClick={() => { onNotificationsClick?.(); onMobileClose?.(); }} isCollapsed={isCollapsed} />
         <NavItem icon={ShoppingBag} label="Shop" onClick={() => { onShopClick?.(); onMobileClose?.(); }} isCollapsed={isCollapsed} />
-        <NavItem icon={Gift} label="Nitro" onClick={() => {}} isCollapsed={isCollapsed} premium />
-      </div>
-
-      {/* Tools Section */}
-      <div className="px-2 py-2 border-t border-white/5 space-y-1">
-        {!isCollapsed && (
-          <div className="px-2 mb-2">
-            <span className="text-[10px] font-semibold text-zinc-600 uppercase tracking-wider">Tools</span>
-          </div>
-        )}
-        <NavItem icon={Palette} label="Themes" onClick={() => {}} isCollapsed={isCollapsed} />
-        <NavItem icon={Keyboard} label="Shortcuts" onClick={() => window.dispatchEvent(new CustomEvent('kairo:open-shortcuts'))} isCollapsed={isCollapsed} />
-        <NavItem icon={Headphones} label="Audio" onClick={() => {}} isCollapsed={isCollapsed} />
       </div>
 
       {/* User Section */}
