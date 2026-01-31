@@ -398,6 +398,68 @@ function KairoAppContent() {
     return map;
   }, [profiles]);
   
+  // Message action handlers
+  const handleEditMessage = async (message) => {
+    // Inline edit handled by MessageItem
+    const newContent = prompt('Edit message:', message.content);
+    if (newContent && newContent !== message.content) {
+      await base44.entities.Message.update(message.id, { 
+        content: newContent, 
+        is_edited: true,
+        edited_at: new Date().toISOString()
+      });
+      queryClient.invalidateQueries({ queryKey: ['messages', activeChannel?.id] });
+    }
+  };
+  
+  const handleDeleteMessage = async (message) => {
+    if (confirm('Delete this message?')) {
+      await base44.entities.Message.update(message.id, { is_deleted: true });
+      queryClient.invalidateQueries({ queryKey: ['messages', activeChannel?.id] });
+    }
+  };
+  
+  const handlePinMessage = async (message) => {
+    await base44.entities.Message.update(message.id, { is_pinned: !message.is_pinned });
+    queryClient.invalidateQueries({ queryKey: ['messages', activeChannel?.id] });
+  };
+  
+  const handleReact = (message) => {
+    // Show emoji picker - for now add a thumbs up
+    handleToggleReaction(message, '👍');
+  };
+  
+  const handleToggleReaction = async (message, emoji) => {
+    const reactions = message.reactions || [];
+    const existing = reactions.find(r => r.emoji === emoji);
+    
+    let newReactions;
+    if (existing) {
+      const hasReacted = existing.users?.includes(currentUser.id);
+      if (hasReacted) {
+        // Remove reaction
+        newReactions = reactions.map(r => 
+          r.emoji === emoji 
+            ? { ...r, count: r.count - 1, users: r.users.filter(u => u !== currentUser.id) }
+            : r
+        ).filter(r => r.count > 0);
+      } else {
+        // Add to existing
+        newReactions = reactions.map(r => 
+          r.emoji === emoji 
+            ? { ...r, count: r.count + 1, users: [...(r.users || []), currentUser.id] }
+            : r
+        );
+      }
+    } else {
+      // New reaction
+      newReactions = [...reactions, { emoji, count: 1, users: [currentUser.id] }];
+    }
+    
+    await base44.entities.Message.update(message.id, { reactions: newReactions });
+    queryClient.invalidateQueries({ queryKey: ['messages', activeChannel?.id] });
+  };
+  
   // Handlers
   const handleServerSelect = (server) => {
     setActiveServer(server);
@@ -539,36 +601,52 @@ function KairoAppContent() {
           onRemoveFriend={(f) => removeFriendMutation.mutate(f)}
         />
       ) : view === 'server' && activeChannel ? (
-        <div className="flex-1 flex flex-col min-h-0">
-          <MessageList
-            messages={messages}
-            currentUserId={currentUser?.id}
-            channelName={activeChannel.name}
-            isLoading={messagesLoading}
-            onReply={setReplyTo}
-            onEdit={() => {}}
-            onDelete={() => {}}
-            onReact={() => {}}
-            onToggleReaction={() => {}}
-            onPin={() => {}}
-            onAvatarClick={() => {}}
-          />
-          <div>
-            <SlowModeIndicator 
-              seconds={activeChannel?.slow_mode_seconds} 
-              remainingTime={slowModeRemaining}
-              className="px-4 pb-2"
+        <NSFWGate channel={activeChannel} onConfirm={() => {}}>
+          {activeChannel.type === 'forum' ? (
+            <ForumChannelView
+              channel={activeChannel}
+              serverId={activeServer?.id}
+              currentUser={currentUser}
+              onPostSelect={(post) => {
+                // Navigate to thread/post
+                console.log('Selected post:', post);
+              }}
             />
-            <MessageComposer
-              channelName={activeChannel.name}
-              replyTo={replyTo}
-              onCancelReply={() => setReplyTo(null)}
-              onSendMessage={(data) => sendMessageMutation.mutate(data)}
-              members={members}
-              disabled={!canSendSlowMode}
-            />
-          </div>
-        </div>
+          ) : (
+            <div className="flex-1 flex flex-col min-h-0">
+              <MessageList
+                messages={messages}
+                currentUserId={currentUser?.id}
+                channelName={activeChannel.name}
+                isLoading={messagesLoading}
+                onReply={setReplyTo}
+                onEdit={handleEditMessage}
+                onDelete={handleDeleteMessage}
+                onReact={handleReact}
+                onToggleReaction={handleToggleReaction}
+                onPin={handlePinMessage}
+                onAvatarClick={() => {}}
+              />
+              <div>
+                <SlowModeIndicator 
+                  seconds={activeChannel?.slow_mode_seconds} 
+                  remainingTime={slowModeRemaining}
+                  className="px-4 pb-2"
+                />
+                <MessageComposer
+                  channelName={activeChannel.name}
+                  replyTo={replyTo}
+                  onCancelReply={() => setReplyTo(null)}
+                  onSendMessage={(data) => sendMessageMutation.mutate(data)}
+                  members={members}
+                  disabled={!canSendSlowMode}
+                  onCreatePoll={() => setShowCreatePoll(true)}
+                  onScheduleMessage={() => setShowScheduleMessage(true)}
+                />
+              </div>
+            </div>
+          )}
+        </NSFWGate>
       ) : (
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center">

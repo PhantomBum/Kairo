@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Hash, Volume2, ChevronDown, ChevronRight, Plus, 
-  Settings, UserPlus, Lock, Radio, Video, Bell, BellOff
+  Settings, UserPlus, Lock, Radio, Video, Bell, BellOff,
+  MessageSquare, Clock, AlertTriangle
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Panel, PanelHeader, PanelContent, PanelFooter } from './AppShell';
@@ -14,6 +15,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 const channelIcons = {
   text: Hash,
@@ -21,6 +28,7 @@ const channelIcons = {
   announcement: Bell,
   stage: Radio,
   video: Video,
+  forum: MessageSquare,
 };
 
 function ChannelItem({ channel, isActive, onClick, voiceUsers = [] }) {
@@ -29,24 +37,54 @@ function ChannelItem({ channel, isActive, onClick, voiceUsers = [] }) {
   
   return (
     <div>
-      <button
-        onClick={onClick}
-        className={cn(
-          'w-full flex items-center gap-2 px-2 py-1.5 rounded-md transition-colors group',
-          isActive 
-            ? 'bg-white/[0.08] text-white' 
-            : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.04]'
-        )}
-      >
-        <Icon className="w-4 h-4 flex-shrink-0 opacity-60" />
-        <span className="flex-1 text-sm truncate text-left">{channel.name}</span>
-        {channel.is_private && <Lock className="w-3 h-3 opacity-40" />}
-        
-        {/* Voice user count */}
-        {isVoice && voiceUsers.length > 0 && (
-          <span className="text-xs text-zinc-500">{voiceUsers.length}</span>
-        )}
-      </button>
+      <TooltipProvider delayDuration={0}>
+        <button
+          onClick={onClick}
+          className={cn(
+            'w-full flex items-center gap-2 px-2 py-1.5 rounded-md transition-colors group',
+            isActive 
+              ? 'bg-white/[0.08] text-white' 
+              : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.04]'
+          )}
+        >
+          <Icon className="w-4 h-4 flex-shrink-0 opacity-60" />
+          <span className="flex-1 text-sm truncate text-left">{channel.name}</span>
+          
+          {/* Channel indicators */}
+          <div className="flex items-center gap-1">
+            {channel.is_private && <Lock className="w-3 h-3 opacity-40" />}
+            
+            {channel.is_nsfw && (
+              <Tooltip>
+                <TooltipTrigger>
+                  <span className="px-1 py-0.5 text-[9px] font-bold bg-red-500/20 text-red-400 rounded">
+                    18+
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent side="right" className="bg-[#111113] border-white/[0.08]">
+                  <span className="text-xs">Age-Restricted Channel</span>
+                </TooltipContent>
+              </Tooltip>
+            )}
+            
+            {channel.slow_mode_seconds > 0 && (
+              <Tooltip>
+                <TooltipTrigger>
+                  <Clock className="w-3 h-3 text-amber-400/60" />
+                </TooltipTrigger>
+                <TooltipContent side="right" className="bg-[#111113] border-white/[0.08]">
+                  <span className="text-xs">Slow mode: {channel.slow_mode_seconds}s</span>
+                </TooltipContent>
+              </Tooltip>
+            )}
+            
+            {/* Voice user count */}
+            {isVoice && voiceUsers.length > 0 && (
+              <span className="text-xs text-zinc-500">{voiceUsers.length}</span>
+            )}
+          </div>
+        </button>
+      </TooltipProvider>
       
       {/* Voice users in channel */}
       {isVoice && voiceUsers.length > 0 && (
