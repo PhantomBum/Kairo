@@ -100,11 +100,18 @@ export default function LandingPage() {
     }
     
     try {
-      const profiles = await base44.entities.UserProfile.filter({ username: keyToUse });
+      // Look up by the email pattern (key@kairo.app)
+      const profiles = await base44.entities.UserProfile.filter({ user_email: keyToUse + '@kairo.app' });
       
       if (profiles.length > 0) {
+        // Update status to online
+        await base44.entities.UserProfile.update(profiles[0].id, { 
+          status: 'online',
+          is_online: true,
+          last_seen: new Date().toISOString()
+        });
         localStorage.setItem('kairo_access_key', keyToUse);
-        localStorage.setItem('kairo_current_user', JSON.stringify(profiles[0]));
+        localStorage.setItem('kairo_current_user', JSON.stringify({ ...profiles[0], status: 'online' }));
         navigate(createPageUrl('Kairo'));
       } else if (generatedKey) {
         setStep('profile');
