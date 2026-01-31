@@ -176,7 +176,7 @@ function ServerItem({ server, isActive, isCollapsed, index, onClick, onLeave }) 
                     )}
                   </button>
                 </ContextMenuTrigger>
-                <ContextMenuContent className="w-48 bg-[#111113] border-white/[0.06] rounded-lg p-1"
+                <ContextMenuContent className="w-48 bg-[#111113] border-white/[0.06] rounded-lg p-1">
                   <ContextMenuItem className="text-zinc-300 focus:bg-white/5 focus:text-white rounded px-3 py-2 cursor-pointer text-sm">
                     <UserPlus className="w-4 h-4 mr-2 text-zinc-500" />
                     Invite People
