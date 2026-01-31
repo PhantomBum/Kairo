@@ -221,9 +221,9 @@ function AccountSettings({ profile, settings, onUpdate }) {
         <div className="space-y-2">
           <Label className="text-zinc-400">Accent Color</Label>
           <div className="flex flex-wrap gap-2">
-            {accentColors.map((color) => (
+            {accentColors.map((color, idx) => (
               <button
-                key={color}
+                key={`color-${color}-${idx}`}
                 onClick={() => setFormData({ ...formData, accent_color: color })}
                 className={cn(
                   "w-10 h-10 rounded-full transition-all",
@@ -914,8 +914,8 @@ function KeybindsSettings({ settings, onUpdate }) {
           <div key={index} className="flex items-center justify-between p-4 bg-zinc-800/30 rounded-lg">
             <span className="text-white">{keybind.action}</span>
             <div className="flex items-center gap-1">
-              {keybind.modifiers.map((mod) => (
-                <span key={mod} className="px-2 py-1 bg-zinc-700 rounded text-xs text-zinc-300">
+              {keybind.modifiers.map((mod, idx) => (
+                <span key={`mod-${mod}-${idx}`} className="px-2 py-1 bg-zinc-700 rounded text-xs text-zinc-300">
                   {mod}
                 </span>
               ))}
