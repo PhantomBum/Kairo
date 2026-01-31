@@ -199,7 +199,7 @@ export default function ChannelSidebar({
   const uncategorizedChannels = channels.filter(c => !c.category_id);
 
   return (
-    <div className="w-60 h-full bg-[#2b2d31] flex flex-col">
+    <div className="w-60 h-full bg-[#181818] flex flex-col">
       
       {/* Server header - Clean style */}
       <DropdownMenu>

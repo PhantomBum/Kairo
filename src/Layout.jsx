@@ -11,28 +11,28 @@ export default function Layout({ children }) {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#0a0a0b]">
+    <div className="min-h-screen bg-[#111111]">
       <style>{`
         :root {
-          --background: 0 0% 4%;
+          --background: 0 0% 7%;
           --foreground: 0 0% 98%;
-          --card: 0 0% 7%;
+          --card: 0 0% 9%;
           --card-foreground: 0 0% 98%;
-          --popover: 0 0% 7%;
+          --popover: 0 0% 9%;
           --popover-foreground: 0 0% 98%;
-          --primary: 263 70% 58%;
-          --primary-foreground: 0 0% 98%;
-          --secondary: 0 0% 15%;
+          --primary: 0 0% 98%;
+          --primary-foreground: 0 0% 9%;
+          --secondary: 0 0% 14%;
           --secondary-foreground: 0 0% 98%;
-          --muted: 0 0% 15%;
-          --muted-foreground: 0 0% 64%;
-          --accent: 0 0% 15%;
+          --muted: 0 0% 14%;
+          --muted-foreground: 0 0% 55%;
+          --accent: 0 0% 14%;
           --accent-foreground: 0 0% 98%;
           --destructive: 0 84% 60%;
           --destructive-foreground: 0 0% 98%;
-          --border: 0 0% 15%;
-          --input: 0 0% 15%;
-          --ring: 263 70% 58%;
+          --border: 0 0% 14%;
+          --input: 0 0% 14%;
+          --ring: 0 0% 50%;
         }
 
         * {
@@ -40,7 +40,7 @@ export default function Layout({ children }) {
         }
 
         body {
-          background-color: #0a0a0b;
+          background-color: #111111;
           color: hsl(var(--foreground));
           font-feature-settings: "rlig" 1, "calt" 1;
         }

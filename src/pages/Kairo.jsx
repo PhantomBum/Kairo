@@ -75,7 +75,7 @@ import CreateGroupDMModal from '@/components/kairo/CreateGroupDMModal';
 // Channel header component - Clean style
 function ChannelHeader({ channel, memberCount, onMembersToggle, showMembers, onShowPinned, showPinned, onMenuToggle }) {
   return (
-    <div className="h-12 px-4 flex items-center justify-between border-b border-zinc-800 bg-[#313338]">
+    <div className="h-12 px-4 flex items-center justify-between border-b border-white/5 bg-[#1a1a1a]">
       <div className="flex items-center gap-2">
         {/* Mobile menu button */}
         <button 

@@ -262,8 +262,8 @@ export default function MessageInput({
       {/* Input container - Clean style */}
       <div 
         className={cn(
-          "relative flex items-end gap-2 bg-[#383a40] rounded-lg transition-colors",
-          isFocused && "ring-1 ring-white/20"
+          "relative flex items-end gap-2 bg-[#1e1e1e] border border-white/5 rounded-lg transition-colors",
+          isFocused && "border-white/10"
         )}
       >
 
