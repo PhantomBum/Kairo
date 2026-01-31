@@ -190,7 +190,11 @@ function ServerItem({ server, isActive, isCollapsed, index, onClick, onLeave }) 
                   </ContextMenuItem>
                   <ContextMenuSeparator className="bg-white/5 my-1" />
                   <ContextMenuItem 
-                    onClick={() => onLeave?.(server)} 
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      window.dispatchEvent(new CustomEvent('kairo:leave-server', { detail: server }));
+                    }} 
                     className="text-red-400 focus:bg-red-500/10 rounded px-3 py-2 cursor-pointer text-sm"
                   >
                     Leave Server
@@ -266,7 +270,11 @@ function ServerItem({ server, isActive, isCollapsed, index, onClick, onLeave }) 
         </ContextMenuItem>
         <ContextMenuSeparator className="bg-white/5 my-1" />
         <ContextMenuItem 
-          onClick={() => onLeave?.(server)} 
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            window.dispatchEvent(new CustomEvent('kairo:leave-server', { detail: server }));
+          }} 
           className="text-red-400 focus:bg-red-500/10 rounded px-3 py-2 cursor-pointer text-sm"
         >
           Leave Server
