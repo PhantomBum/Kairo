@@ -90,15 +90,29 @@ export default function MessageInput({
     
     if (lastAtIndex !== -1) {
       const textAfterAt = textBeforeCursor.slice(lastAtIndex + 1);
-      if (!textAfterAt.includes(' ')) {
-        setMentionQuery(textAfterAt.toLowerCase());
+      // Only show mentions if @ is at start or after a space, and no space after
+      const charBeforeAt = lastAtIndex > 0 ? textBeforeCursor[lastAtIndex - 1] : ' ';
+      const isValidMentionStart = charBeforeAt === ' ' || charBeforeAt === '\n' || lastAtIndex === 0;
+      
+      if (isValidMentionStart && !textAfterAt.includes(' ') && members.length > 0) {
+        const query = textAfterAt.toLowerCase();
+        setMentionQuery(query);
         setMentionStart(lastAtIndex);
         
         const filtered = members.filter(m => {
-          const name = (m.display_name || m.user_name || m.nickname || '').toLowerCase();
+          const displayName = (m.display_name || '').toLowerCase();
+          const userName = (m.user_name || '').toLowerCase();
+          const nickname = (m.nickname || '').toLowerCase();
           const username = (m.username || '').toLowerCase();
-          return name.includes(textAfterAt.toLowerCase()) || username.includes(textAfterAt.toLowerCase());
-        }).slice(0, 5);
+          const email = (m.user_email || '').split('@')[0].toLowerCase();
+          
+          // Match against all possible name fields
+          return displayName.includes(query) || 
+                 userName.includes(query) || 
+                 nickname.includes(query) ||
+                 username.includes(query) ||
+                 email.includes(query);
+        }).slice(0, 8);
         
         setMentionSuggestions(filtered);
         setShowMentions(filtered.length > 0);
