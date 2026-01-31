@@ -113,13 +113,17 @@ export default function LandingPage() {
   const handleCreateProfile = async () => {
     try {
       const userId = 'user_' + Math.random().toString(36).substring(2);
+      // Create a clean username from the display name
+      const cleanUsername = displayName.toLowerCase().replace(/[^a-z0-9]/g, '') + '_' + Math.random().toString(36).substring(2, 6);
       
       const profile = await base44.entities.UserProfile.create({
         user_id: userId,
         user_email: generatedKey + '@kairo.app',
         display_name: displayName,
-        username: generatedKey,
+        username: cleanUsername, // Use clean username for @mentions
         status: 'online',
+        is_online: true,
+        last_seen: new Date().toISOString(),
         settings: { theme: 'dark', message_display: 'cozy' }
       });
 
