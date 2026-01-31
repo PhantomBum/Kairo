@@ -174,8 +174,8 @@ export function CreateInviteModal({ server, isOpen, onClose }) {
                   </SelectTrigger>
                   <SelectContent className="bg-zinc-900 border-zinc-800">
                     <SelectItem value={null}>No role</SelectItem>
-                    {roles.filter(r => !r.is_default).map(role => (
-                      <SelectItem key={role.id} value={role.id}>
+                    {roles.filter(r => !r.is_default).map((role, idx) => (
+                      <SelectItem key={role.id || `role-select-${idx}`} value={role.id}>
                         <span style={{ color: role.color }}>{role.name}</span>
                       </SelectItem>
                     ))}
