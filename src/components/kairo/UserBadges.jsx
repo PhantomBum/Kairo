@@ -1,5 +1,4 @@
 import React from 'react';
-import { Crown, Shield, CheckCircle, Sparkles, Bug, Youtube } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
   Tooltip,
@@ -8,101 +7,119 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-const badgeConfig = {
-  premium: {
-    icon: Crown,
-    color: 'text-amber-400',
-    label: 'Premium User',
-    bg: 'bg-amber-500/10'
+// Badge configurations with colors and icons
+const badgeConfigs = {
+  owner: {
+    label: 'Owner of Kairo',
+    color: 'bg-gradient-to-r from-amber-500 to-orange-500',
+    textColor: 'text-amber-500',
+    icon: '👑'
   },
-  youtube: {
-    icon: Youtube,
-    color: 'text-red-500',
-    label: 'YouTube Creator',
-    bg: 'bg-red-500/10'
+  admin: {
+    label: 'Kairo Admin',
+    color: 'bg-gradient-to-r from-red-500 to-rose-500',
+    textColor: 'text-red-500',
+    icon: '🛡️'
+  },
+  developer: {
+    label: 'Kairo Developer',
+    color: 'bg-gradient-to-r from-purple-500 to-violet-500',
+    textColor: 'text-purple-500',
+    icon: '⚡'
+  },
+  moderator: {
+    label: 'Moderator',
+    color: 'bg-gradient-to-r from-blue-500 to-cyan-500',
+    textColor: 'text-blue-500',
+    icon: '🔧'
+  },
+  premium: {
+    label: 'Kairo Premium',
+    color: 'bg-gradient-to-r from-emerald-500 to-teal-500',
+    textColor: 'text-emerald-500',
+    icon: '✨'
   },
   verified: {
-    icon: CheckCircle,
-    color: 'text-blue-500',
     label: 'Verified',
-    bg: 'bg-blue-500/10'
+    color: 'bg-gradient-to-r from-blue-500 to-indigo-500',
+    textColor: 'text-blue-500',
+    icon: '✓'
   },
   partner: {
-    icon: Sparkles,
-    color: 'text-purple-500',
-    label: 'Partner',
-    bg: 'bg-purple-500/10'
+    label: 'Kairo Partner',
+    color: 'bg-gradient-to-r from-indigo-500 to-purple-500',
+    textColor: 'text-indigo-500',
+    icon: '🤝'
   },
   early_supporter: {
-    icon: Shield,
-    color: 'text-emerald-500',
     label: 'Early Supporter',
-    bg: 'bg-emerald-500/10'
+    color: 'bg-gradient-to-r from-pink-500 to-rose-500',
+    textColor: 'text-pink-500',
+    icon: '❤️'
   },
   bug_hunter: {
-    icon: Bug,
-    color: 'text-lime-500',
     label: 'Bug Hunter',
-    bg: 'bg-lime-500/10'
+    color: 'bg-gradient-to-r from-green-500 to-emerald-500',
+    textColor: 'text-green-500',
+    icon: '🐛'
+  },
+  youtube: {
+    label: 'YouTube Creator',
+    color: 'bg-gradient-to-r from-red-600 to-red-500',
+    textColor: 'text-red-500',
+    icon: '▶'
   }
 };
 
-export default function UserBadges({ badges = [], size = 'sm', showYoutube = false, youtubeUrl = null, className }) {
+function Badge({ badge, size = 'sm' }) {
+  const config = badgeConfigs[badge];
+  if (!config) return null;
+
   const sizeClasses = {
-    xs: 'w-3 h-3',
-    sm: 'w-4 h-4',
-    md: 'w-5 h-5',
-    lg: 'w-6 h-6'
+    xs: 'w-3.5 h-3.5 text-[8px]',
+    sm: 'w-4 h-4 text-[9px]',
+    md: 'w-5 h-5 text-[10px]',
+    lg: 'w-6 h-6 text-xs'
   };
 
+  return (
+    <TooltipProvider delayDuration={0}>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <div 
+            className={cn(
+              "rounded-full flex items-center justify-center font-bold cursor-default",
+              config.color,
+              sizeClasses[size]
+            )}
+          >
+            <span className="filter drop-shadow-sm">{config.icon}</span>
+          </div>
+        </TooltipTrigger>
+        <TooltipContent 
+          side="top" 
+          className="bg-[#111113] border-white/10 text-white text-xs px-2 py-1"
+        >
+          {config.label}
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+}
+
+export default function UserBadges({ badges = [], size = 'sm', maxBadges = 5 }) {
   if (!badges || badges.length === 0) return null;
 
+  const displayBadges = badges.slice(0, maxBadges);
+  const remainingCount = badges.length - maxBadges;
+
   return (
-    <div className={cn("flex items-center gap-1", className)}>
-      {badges.map((badge) => {
-        const config = badgeConfig[badge];
-        if (!config) return null;
-
-        const Icon = config.icon;
-
-        return (
-          <TooltipProvider key={badge} delayDuration={0}>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <div className={cn(
-                  "flex items-center justify-center rounded-full p-0.5",
-                  config.bg
-                )}>
-                  <Icon className={cn(sizeClasses[size], config.color)} />
-                </div>
-              </TooltipTrigger>
-              <TooltipContent className="bg-zinc-900 border-zinc-800">
-                <p className="text-white">{config.label}</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        );
-      })}
-
-      {showYoutube && youtubeUrl && badges.includes('youtube') && (
-        <TooltipProvider delayDuration={0}>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <a
-                href={youtubeUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center justify-center rounded-full p-0.5 bg-red-500/10 hover:bg-red-500/20 transition-colors"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <Youtube className={cn(sizeClasses[size], 'text-red-500')} />
-              </a>
-            </TooltipTrigger>
-            <TooltipContent className="bg-zinc-900 border-zinc-800">
-              <p className="text-white">Visit YouTube Channel</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+    <div className="flex items-center gap-0.5">
+      {displayBadges.map((badge, idx) => (
+        <Badge key={`${badge}-${idx}`} badge={badge} size={size} />
+      ))}
+      {remainingCount > 0 && (
+        <span className="text-[10px] text-zinc-500 ml-0.5">+{remainingCount}</span>
       )}
     </div>
   );
