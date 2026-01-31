@@ -67,7 +67,7 @@ export default function HomePage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    navigate(createPageUrl('Landing'));
+    navigate(createPageUrl('KairoV4'));
   }, [navigate]);
 
   return (
