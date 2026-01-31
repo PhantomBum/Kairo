@@ -175,32 +175,52 @@ export default function FriendSystem({ currentUser, onStartDM, onAddFriend }) {
   const [view, setView] = useState('online'); // online, all, pending, blocked, info
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Fetch friends
+  // Fetch friends - all friendships where user is involved
   const { data: friendships = [] } = useQuery({
     queryKey: ['friendships', currentUser?.id],
-    queryFn: () => base44.entities.Friendship.filter({ user_id: currentUser?.id }),
+    queryFn: async () => {
+      // Get friendships created by this user
+      const myFriendships = await base44.entities.Friendship.filter({ user_id: currentUser?.id });
+      return myFriendships;
+    },
     enabled: !!currentUser?.id
   });
 
-  // Fetch incoming requests (where friend_id is current user)
+  // Fetch incoming requests - where this user is the target (friend_id) 
   const { data: incomingRequests = [] } = useQuery({
-    queryKey: ['incomingRequests', currentUser?.id],
-    queryFn: () => base44.entities.Friendship.filter({ friend_id: currentUser?.id, status: 'pending' }),
+    queryKey: ['incomingRequests', currentUser?.id, currentUser?.user_email],
+    queryFn: async () => {
+      // Try both user_id and friend_email for incoming requests
+      const allPending = await base44.entities.Friendship.filter({ status: 'pending' });
+      const userEmail = (currentUser?.user_email || currentUser?.email || '').toLowerCase();
+      const userId = currentUser?.user_id || currentUser?.id;
+      
+      // Filter for requests where current user is the target
+      return allPending.filter(f => 
+        f.friend_id === userId || 
+        (f.friend_email && f.friend_email.toLowerCase() === userEmail)
+      );
+    },
     enabled: !!currentUser?.id
   });
 
   // Accept friend request
   const acceptMutation = useMutation({
     mutationFn: async (request) => {
-      // Update the request
+      // Update the original request to accepted
       await base44.entities.Friendship.update(request.id, { status: 'accepted' });
       
-      // Create reverse friendship
+      // Get sender's profile for reverse friendship
+      const senderProfiles = await base44.entities.UserProfile.filter({ user_id: request.user_id });
+      const senderProfile = senderProfiles[0];
+      
+      // Create reverse friendship so both users see each other
       await base44.entities.Friendship.create({
-        user_id: currentUser.id,
+        user_id: currentUser.user_id || currentUser.id,
         friend_id: request.user_id,
-        friend_email: request.created_by,
-        friend_name: request.user_name || 'User',
+        friend_email: request.created_by || senderProfile?.user_email,
+        friend_name: senderProfile?.display_name || senderProfile?.username || 'User',
+        friend_avatar: senderProfile?.avatar_url,
         status: 'accepted',
         initiated_by: request.user_id
       });
@@ -208,6 +228,7 @@ export default function FriendSystem({ currentUser, onStartDM, onAddFriend }) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['friendships'] });
       queryClient.invalidateQueries({ queryKey: ['incomingRequests'] });
+      queryClient.invalidateQueries({ queryKey: ['friends'] });
     }
   });
 
