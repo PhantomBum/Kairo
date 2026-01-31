@@ -210,16 +210,16 @@ export default function DMSidebar({
   );
 
   return (
-    <div className="w-[260px] md:w-60 h-full bg-[#0a0a0b] flex flex-col border-r border-white/5">
+    <div className="w-[260px] md:w-60 h-full bg-[#0a0a0b] flex flex-col border-r border-white/[0.04]">
       {/* Header */}
-      <div className="px-3 py-3 border-b border-white/5">
+      <div className="px-3 py-3 border-b border-white/[0.04]">
         <div className="relative">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-zinc-600" />
           <Input
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search"
-            className="w-full pl-8 h-8 bg-white/5 border-white/5 rounded text-xs text-white placeholder-zinc-600"
+            className="w-full pl-8 h-7 bg-[#111113] border-white/[0.04] rounded text-xs text-white placeholder-zinc-600"
           />
         </div>
       </div>
@@ -259,7 +259,7 @@ export default function DMSidebar({
         </button>
       </div>
 
-      <div className="h-px bg-white/5 mx-2" />
+      <div className="h-px bg-white/[0.04] mx-2" />
 
       {/* Content */}
       <div className="flex-1 overflow-y-auto scrollbar-thin">

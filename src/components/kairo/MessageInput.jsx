@@ -192,7 +192,7 @@ export default function MessageInput({
             exit={{ opacity: 0, y: 10 }}
             className="mb-2"
           >
-            <div className="flex items-center gap-2 px-3 py-2 bg-white/5 border border-white/5 rounded-lg">
+            <div className="flex items-center gap-2 px-3 py-2 bg-[#111113] border border-white/[0.04] rounded-lg">
               <div className="w-0.5 h-8 bg-white/30 rounded-full" />
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
@@ -221,7 +221,7 @@ export default function MessageInput({
             exit={{ opacity: 0, y: 10 }}
             className="mb-2"
           >
-            <div className="flex flex-wrap gap-2 px-3 py-2 bg-white/5 border border-white/5 rounded-lg">
+            <div className="flex flex-wrap gap-2 px-3 py-2 bg-[#111113] border border-white/[0.04] rounded-lg">
               {files.map((file, index) => (
                 <div key={index} className="relative group">
                   {file.type.startsWith('image/') ? (
@@ -274,7 +274,7 @@ export default function MessageInput({
               <Plus className="w-5 h-5" />
             </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-44 bg-[#1a1a1a] border-white/10 rounded-lg p-1" align="start">
+          <DropdownMenuContent className="w-44 bg-[#111113] border-white/[0.06] rounded-lg p-1" align="start">
             <DropdownMenuItem 
               onClick={() => fileInputRef.current?.click()}
               className="text-zinc-300 focus:bg-white/5 rounded px-3 py-2 cursor-pointer text-sm"
@@ -329,7 +329,7 @@ export default function MessageInput({
           {/* Mention suggestions */}
           <AnimatePresence>
             {showMentions && mentionSuggestions.length > 0 && (
-              <div className="absolute bottom-full left-0 mb-2 w-64 bg-[#1a1a1a] border border-white/10 rounded-lg shadow-xl overflow-hidden z-50">
+              <div className="absolute bottom-full left-0 mb-2 w-64 bg-[#111113] border border-white/[0.06] rounded-lg shadow-xl overflow-hidden z-50">
                 <div className="p-1">
                   <p className="px-3 py-1.5 text-[10px] uppercase tracking-wider text-zinc-500 font-semibold">
                     Members
@@ -403,7 +403,7 @@ export default function MessageInput({
                 <Smile className="w-5 h-5" />
               </button>
             </PopoverTrigger>
-            <PopoverContent className="w-auto p-2 bg-[#1a1a1a] border-white/10 rounded-lg" align="end">
+            <PopoverContent className="w-auto p-2 bg-[#111113] border-white/[0.06] rounded-lg" align="end">
               <div className="grid grid-cols-6 gap-0.5">
                 {commonEmojis.map((emoji) => (
                   <button

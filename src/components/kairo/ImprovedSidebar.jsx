@@ -58,7 +58,7 @@ function MoreMenu({ isCollapsed, onOpenShortcuts }) {
           </button>
         )}
       </DropdownMenuTrigger>
-      <DropdownMenuContent side="right" align="end" className="w-48 bg-[#1a1a1a] border-white/10 rounded-lg p-1">
+      <DropdownMenuContent side="right" align="end" className="w-48 bg-[#111113] border-white/[0.06] rounded-lg p-1">
         <DropdownMenuItem className="text-zinc-300 focus:bg-white/5 focus:text-white rounded px-3 py-2 cursor-pointer text-sm">
           <Crown className="w-4 h-4 mr-2 text-zinc-500" />
           Nitro
@@ -107,7 +107,7 @@ function NavItem({ icon: Icon, label, isActive, badge, onClick, isCollapsed }) {
               )}
             </button>
           </TooltipTrigger>
-          <TooltipContent side="right" className="bg-[#1a1a1a] border-white/10 text-white text-xs px-2 py-1.5 rounded-md">
+          <TooltipContent side="right" className="bg-[#111113] border-white/[0.06] text-zinc-300 text-xs px-2 py-1 rounded">
             {label}
           </TooltipContent>
         </Tooltip>
@@ -176,7 +176,7 @@ function ServerItem({ server, isActive, isCollapsed, index, onClick, onLeave }) 
                     )}
                   </button>
                 </ContextMenuTrigger>
-                <ContextMenuContent className="w-48 bg-[#1a1a1a] border-white/10 rounded-lg p-1">
+                <ContextMenuContent className="w-48 bg-[#111113] border-white/[0.06] rounded-lg p-1"
                   <ContextMenuItem className="text-zinc-300 focus:bg-white/5 focus:text-white rounded px-3 py-2 cursor-pointer text-sm">
                     <UserPlus className="w-4 h-4 mr-2 text-zinc-500" />
                     Invite People
@@ -202,7 +202,7 @@ function ServerItem({ server, isActive, isCollapsed, index, onClick, onLeave }) 
               )}
             </div>
           </TooltipTrigger>
-          <TooltipContent side="right" className="bg-[#1a1a1a] border-white/10 text-white rounded-md px-3 py-2">
+          <TooltipContent side="right" className="bg-[#111113] border-white/[0.06] text-zinc-300 rounded px-2 py-1.5">
             <p className="font-medium">{server.name}</p>
             <p className="text-xs text-zinc-500">{server.member_count || 0} members</p>
           </TooltipContent>
@@ -252,7 +252,7 @@ function ServerItem({ server, isActive, isCollapsed, index, onClick, onLeave }) 
           )}
         </button>
       </ContextMenuTrigger>
-      <ContextMenuContent className="w-48 bg-[#1a1a1a] border-white/10 rounded-lg p-1">
+      <ContextMenuContent className="w-48 bg-[#111113] border-white/[0.06] rounded-lg p-1">
         <ContextMenuItem className="text-zinc-300 focus:bg-white/5 focus:text-white rounded px-3 py-2 cursor-pointer text-sm">
           <UserPlus className="w-4 h-4 mr-2 text-zinc-500" />
           Invite People
@@ -306,13 +306,13 @@ export default function ImprovedSidebar({
       {/* Content */}
       <div className="flex flex-col h-full">
         {/* Header */}
-        <div className="flex items-center justify-between px-3 py-3 border-b border-white/5">
+        <div className="flex items-center justify-between px-3 py-3 border-b border-white/[0.04]">
           {!isCollapsed && (
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center">
-                <Zap className="w-4 h-4 text-white" />
+              <div className="w-7 h-7 rounded-lg bg-[#111113] border border-white/[0.06] flex items-center justify-center">
+                <Zap className="w-3.5 h-3.5 text-zinc-400" />
               </div>
-              <span className="font-medium text-white">Kairo</span>
+              <span className="font-medium text-zinc-300 text-sm">Kairo</span>
             </div>
           )}
 
@@ -386,7 +386,7 @@ export default function ImprovedSidebar({
                       <Compass className="w-5 h-5" />
                     </button>
                   </TooltipTrigger>
-                  <TooltipContent side="right" className="bg-[#1a1a1a] border-white/10 text-white text-xs px-2 py-1.5 rounded-md">
+                  <TooltipContent side="right" className="bg-[#111113] border-white/[0.06] text-zinc-300 text-xs px-2 py-1.5 rounded">
                     Discover Servers
                   </TooltipContent>
                 </Tooltip>
