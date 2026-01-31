@@ -158,13 +158,14 @@ function AccountSettings({ profile, settings, onUpdate }) {
                 className="hidden"
                 id="avatar-upload"
               />
-              <label htmlFor="avatar-upload">
-                <button 
-                  className="absolute bottom-0 right-0 w-8 h-8 bg-indigo-500 rounded-full flex items-center justify-center hover:bg-indigo-600"
-                  disabled={isUploading}
-                >
-                  <Upload className="w-4 h-4 text-white" />
-                </button>
+              <label 
+                htmlFor="avatar-upload"
+                className={cn(
+                  "absolute bottom-0 right-0 w-8 h-8 bg-indigo-500 rounded-full flex items-center justify-center hover:bg-indigo-600 cursor-pointer transition-colors",
+                  isUploading && "opacity-50 pointer-events-none"
+                )}
+              >
+                <Upload className="w-4 h-4 text-white" />
               </label>
             </div>
             <div className="flex-1 pt-10">
