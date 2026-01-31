@@ -183,58 +183,49 @@ export default function MessageInput({
 
   return (
     <div className="px-4 pb-5 pt-2">
-      {/* Reply preview - Premium style */}
+      {/* Reply preview */}
       <AnimatePresence>
         {replyTo && (
           <motion.div
-            initial={{ opacity: 0, y: 10, height: 0 }}
-            animate={{ opacity: 1, y: 0, height: 'auto' }}
-            exit={{ opacity: 0, y: 10, height: 0 }}
-            transition={{ duration: 0.2 }}
-            className="mb-3"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 10 }}
+            className="mb-2"
           >
-            <div className="flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-violet-500/10 to-transparent backdrop-blur-sm rounded-2xl border border-violet-500/20">
-              <div className="w-1 h-10 bg-gradient-to-b from-violet-500 to-purple-600 rounded-full" />
+            <div className="flex items-center gap-2 px-3 py-2 bg-zinc-800 rounded-lg">
+              <div className="w-0.5 h-8 bg-indigo-500 rounded-full" />
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
                   <span className="text-xs text-zinc-500">Replying to</span>
-                  <span className="text-xs text-violet-400 font-semibold">{replyTo.author_name}</span>
+                  <span className="text-xs text-white font-medium">{replyTo.author_name}</span>
                 </div>
-                <p className="text-sm text-zinc-400 truncate mt-0.5">{replyTo.content?.slice(0, 60)}</p>
+                <p className="text-sm text-zinc-400 truncate">{replyTo.content?.slice(0, 60)}</p>
               </div>
-              <motion.button
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
+              <button
                 onClick={onCancelReply}
-                className="p-2 hover:bg-white/10 rounded-xl transition-colors"
+                className="p-1.5 hover:bg-white/10 rounded transition-colors"
               >
                 <X className="w-4 h-4 text-zinc-400" />
-              </motion.button>
+              </button>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* File previews - Premium style */}
+      {/* File previews */}
       <AnimatePresence>
         {files.length > 0 && (
           <motion.div
-            initial={{ opacity: 0, y: 10, height: 0 }}
-            animate={{ opacity: 1, y: 0, height: 'auto' }}
-            exit={{ opacity: 0, y: 10, height: 0 }}
-            transition={{ duration: 0.2 }}
-            className="mb-3"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 10 }}
+            className="mb-2"
           >
-            <div className="flex flex-wrap gap-2 px-4 py-3 bg-white/[0.03] backdrop-blur-sm rounded-2xl border border-white/[0.06]">
+            <div className="flex flex-wrap gap-2 px-3 py-2 bg-zinc-800 rounded-lg">
               {files.map((file, index) => (
-                <motion.div 
-                  key={index} 
-                  initial={{ scale: 0.8, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  className="relative group"
-                >
+                <div key={index} className="relative group">
                   {file.type.startsWith('image/') ? (
-                    <div className="w-20 h-20 rounded-xl overflow-hidden bg-zinc-800 ring-2 ring-white/10">
+                    <div className="w-16 h-16 rounded overflow-hidden bg-zinc-700">
                       <img 
                         src={URL.createObjectURL(file)} 
                         alt=""
@@ -242,26 +233,24 @@ export default function MessageInput({
                       />
                     </div>
                   ) : (
-                    <div className="flex items-center gap-2 px-3 py-2.5 bg-white/[0.05] rounded-xl border border-white/[0.08]">
-                      <File className="w-5 h-5 text-violet-400" />
-                      <span className="text-sm text-zinc-300 max-w-[100px] truncate">
+                    <div className="flex items-center gap-2 px-2 py-1.5 bg-zinc-700 rounded">
+                      <File className="w-4 h-4 text-zinc-400" />
+                      <span className="text-xs text-zinc-300 max-w-[80px] truncate">
                         {file.name}
                       </span>
                     </div>
                   )}
-                  <motion.button
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
+                  <button
                     onClick={() => removeFile(index)}
-                    className="absolute -top-2 -right-2 w-6 h-6 bg-gradient-to-br from-rose-500 to-pink-600 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
+                    className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
                   >
-                    <X className="w-3.5 h-3.5 text-white" />
-                  </motion.button>
-                </motion.div>
+                    <X className="w-3 h-3 text-white" />
+                  </button>
+                </div>
               ))}
               {uploadProgress !== null && (
-                <div className="flex items-center gap-3 text-sm text-zinc-400 px-4">
-                  <div className="w-5 h-5 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+                <div className="flex items-center gap-2 text-sm text-zinc-400">
+                  <div className="w-4 h-4 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
                   <span>Uploading... {Math.round(uploadProgress)}%</span>
                 </div>
               )}
@@ -270,41 +259,27 @@ export default function MessageInput({
         )}
       </AnimatePresence>
 
-      {/* Input container - Premium glassmorphism style */}
+      {/* Input container - Clean style */}
       <div 
         className={cn(
-          "relative flex items-end gap-2 bg-[#18181b]/80 backdrop-blur-xl rounded-2xl border transition-all duration-300",
-          isFocused 
-            ? "border-emerald-500/40 shadow-lg shadow-emerald-500/10" 
-            : hasContent 
-              ? "border-white/[0.15]" 
-              : "border-white/[0.08] hover:border-white/[0.12]"
+          "relative flex items-end gap-2 bg-[#383a40] rounded-lg transition-colors",
+          isFocused && "ring-1 ring-white/20"
         )}
       >
-        {/* Glow effect when focused */}
-        {isFocused && (
-          <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-emerald-500/5 via-transparent to-teal-500/5 pointer-events-none" />
-        )}
 
         {/* Attachment button */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <motion.button 
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="p-3 ml-1 hover:bg-white/[0.06] rounded-xl transition-all text-zinc-500 hover:text-zinc-300"
-            >
+            <button className="p-3 ml-1 hover:bg-white/10 rounded transition-colors text-zinc-400 hover:text-zinc-200">
               <Plus className="w-5 h-5" />
-            </motion.button>
+            </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-48 bg-[#18181b]/95 backdrop-blur-xl border-white/[0.08] rounded-xl p-2 shadow-2xl" align="start">
+          <DropdownMenuContent className="w-44 bg-zinc-900 border-zinc-800 rounded-lg p-1" align="start">
             <DropdownMenuItem 
               onClick={() => fileInputRef.current?.click()}
-              className="text-zinc-300 focus:bg-white/[0.06] rounded-lg px-3 py-2.5 cursor-pointer group"
+              className="text-zinc-300 focus:bg-zinc-800 rounded px-3 py-2 cursor-pointer text-sm"
             >
-              <div className="w-8 h-8 rounded-lg bg-white/[0.05] flex items-center justify-center mr-3 group-hover:bg-violet-500/20 transition-colors">
-                <File className="w-4 h-4 text-zinc-500 group-hover:text-violet-400 transition-colors" />
-              </div>
+              <File className="w-4 h-4 mr-2 text-zinc-500" />
               Upload File
             </DropdownMenuItem>
             <DropdownMenuItem 
@@ -312,11 +287,9 @@ export default function MessageInput({
                 fileInputRef.current.accept = 'image/*';
                 fileInputRef.current?.click();
               }}
-              className="text-zinc-300 focus:bg-white/[0.06] rounded-lg px-3 py-2.5 cursor-pointer group"
+              className="text-zinc-300 focus:bg-zinc-800 rounded px-3 py-2 cursor-pointer text-sm"
             >
-              <div className="w-8 h-8 rounded-lg bg-white/[0.05] flex items-center justify-center mr-3 group-hover:bg-blue-500/20 transition-colors">
-                <ImageIcon className="w-4 h-4 text-zinc-500 group-hover:text-blue-400 transition-colors" />
-              </div>
+              <ImageIcon className="w-4 h-4 mr-2 text-zinc-500" />
               Upload Image
             </DropdownMenuItem>
           </DropdownMenuContent>
@@ -353,70 +326,60 @@ export default function MessageInput({
             }}
           />
           
-          {/* Mention suggestions - Premium style */}
+          {/* Mention suggestions */}
           <AnimatePresence>
             {showMentions && mentionSuggestions.length > 0 && (
-              <motion.div
-                initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                className="absolute bottom-full left-0 mb-3 w-72 bg-[#18181b]/95 backdrop-blur-xl border border-white/[0.08] rounded-2xl shadow-2xl shadow-black/50 overflow-hidden z-50"
-              >
-                <div className="p-2">
-                  <p className="px-3 py-2 text-[10px] uppercase tracking-widest text-zinc-500 font-bold">
+              <div className="absolute bottom-full left-0 mb-2 w-64 bg-zinc-900 border border-zinc-800 rounded-lg shadow-xl overflow-hidden z-50">
+                <div className="p-1">
+                  <p className="px-3 py-1.5 text-[10px] uppercase tracking-wider text-zinc-500 font-semibold">
                     Members
                   </p>
                   {mentionSuggestions.map((member, index) => (
-                    <motion.button
+                    <button
                       key={member.user_id || member.id || index}
-                      whileHover={{ x: 4 }}
                       onClick={() => selectMention(member)}
                       className={cn(
-                        "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all",
+                        "w-full flex items-center gap-2 px-3 py-2 rounded transition-colors",
                         index === selectedMentionIndex 
-                          ? "bg-gradient-to-r from-violet-500/20 to-transparent text-white" 
-                          : "text-zinc-300 hover:bg-white/[0.05]"
+                          ? "bg-indigo-500 text-white" 
+                          : "text-zinc-300 hover:bg-zinc-800"
                       )}
                     >
-                      <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-500 to-indigo-600 overflow-hidden flex-shrink-0 ring-2 ring-white/10">
+                      <div className="w-8 h-8 rounded-full bg-zinc-700 overflow-hidden flex-shrink-0">
                         {member.avatar_url || member.avatar ? (
                           <img src={member.avatar_url || member.avatar} alt="" className="w-full h-full object-cover" />
                         ) : (
-                          <div className="w-full h-full flex items-center justify-center text-white text-sm font-bold">
+                          <div className="w-full h-full flex items-center justify-center text-white text-sm font-medium">
                             {(member.display_name || member.user_name || member.nickname)?.charAt(0) || '?'}
                           </div>
                         )}
                       </div>
                       <div className="text-left min-w-0">
-                        <p className="text-sm font-semibold truncate">
+                        <p className="text-sm truncate">
                           {member.display_name || member.user_name || member.nickname || 'Unknown'}
                         </p>
                         {member.username && (
                           <p className="text-xs text-zinc-500">@{member.username}</p>
                         )}
                       </div>
-                    </motion.button>
+                    </button>
                   ))}
                 </div>
-              </motion.div>
+              </div>
             )}
           </AnimatePresence>
         </div>
 
-        {/* Actions - Premium style */}
-        <div className="flex items-center gap-1 p-2">
+        {/* Actions */}
+        <div className="flex items-center gap-0.5 p-2">
           {/* GIF picker */}
           <Popover open={showGifPicker} onOpenChange={setShowGifPicker}>
             <PopoverTrigger asChild>
-              <motion.button 
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                className="hidden sm:flex p-2.5 hover:bg-white/[0.06] rounded-xl transition-all text-zinc-500 hover:text-zinc-300"
-              >
+              <button className="hidden sm:flex p-2 hover:bg-white/10 rounded transition-colors text-zinc-400 hover:text-zinc-200">
                 <Gift className="w-5 h-5" />
-              </motion.button>
+              </button>
             </PopoverTrigger>
-            <PopoverContent className="w-auto p-0 bg-transparent border-none" align="end" sideOffset={12}>
+            <PopoverContent className="w-auto p-0 bg-transparent border-none" align="end" sideOffset={8}>
               <GifPicker onSelect={handleGifSelect} onClose={() => setShowGifPicker(false)} />
             </PopoverContent>
           </Popover>
@@ -424,15 +387,11 @@ export default function MessageInput({
           {/* Sticker picker */}
           <Popover open={showStickerPicker} onOpenChange={setShowStickerPicker}>
             <PopoverTrigger asChild>
-              <motion.button 
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                className="hidden sm:flex p-2.5 hover:bg-white/[0.06] rounded-xl transition-all text-zinc-500 hover:text-zinc-300"
-              >
+              <button className="hidden sm:flex p-2 hover:bg-white/10 rounded transition-colors text-zinc-400 hover:text-zinc-200">
                 <Sticker className="w-5 h-5" />
-              </motion.button>
+              </button>
             </PopoverTrigger>
-            <PopoverContent className="w-auto p-0 bg-transparent border-none" align="end" sideOffset={12}>
+            <PopoverContent className="w-auto p-0 bg-transparent border-none" align="end" sideOffset={8}>
               <StickerPicker onSelect={handleStickerSelect} onClose={() => setShowStickerPicker(false)} />
             </PopoverContent>
           </Popover>
@@ -440,46 +399,38 @@ export default function MessageInput({
           {/* Emoji picker */}
           <Popover>
             <PopoverTrigger asChild>
-              <motion.button 
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                className="p-2.5 hover:bg-white/[0.06] rounded-xl transition-all text-zinc-500 hover:text-zinc-300"
-              >
+              <button className="p-2 hover:bg-white/10 rounded transition-colors text-zinc-400 hover:text-zinc-200">
                 <Smile className="w-5 h-5" />
-              </motion.button>
+              </button>
             </PopoverTrigger>
-            <PopoverContent className="w-auto p-3 bg-[#18181b]/95 backdrop-blur-xl border-white/[0.08] rounded-xl shadow-2xl" align="end">
-              <div className="grid grid-cols-6 gap-1">
+            <PopoverContent className="w-auto p-2 bg-zinc-900 border-zinc-800 rounded-lg" align="end">
+              <div className="grid grid-cols-6 gap-0.5">
                 {commonEmojis.map((emoji) => (
-                  <motion.button
+                  <button
                     key={emoji}
-                    whileHover={{ scale: 1.2 }}
-                    whileTap={{ scale: 0.9 }}
                     onClick={() => insertEmoji(emoji)}
-                    className="w-9 h-9 flex items-center justify-center hover:bg-white/[0.1] rounded-lg text-xl transition-all"
+                    className="w-8 h-8 flex items-center justify-center hover:bg-zinc-800 rounded text-lg transition-colors"
                   >
                     {emoji}
-                  </motion.button>
+                  </button>
                 ))}
               </div>
             </PopoverContent>
           </Popover>
 
-          {/* Send button - Premium gradient */}
-          <motion.button
-            whileHover={{ scale: hasContent ? 1.05 : 1 }}
-            whileTap={{ scale: hasContent ? 0.95 : 1 }}
+          {/* Send button */}
+          <button
             onClick={handleSend}
             disabled={disabled || uploadProgress !== null || !hasContent}
             className={cn(
-              "p-2.5 rounded-xl transition-all duration-300 ml-1",
+              "p-2 rounded transition-colors ml-1",
               hasContent
-                ? "bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/50"
-                : "bg-white/[0.05] text-zinc-600 cursor-not-allowed"
+                ? "bg-indigo-500 hover:bg-indigo-600 text-white"
+                : "bg-zinc-700 text-zinc-500 cursor-not-allowed"
             )}
           >
             <ArrowUp className="w-5 h-5" />
-          </motion.button>
+          </button>
         </div>
       </div>
     </div>
