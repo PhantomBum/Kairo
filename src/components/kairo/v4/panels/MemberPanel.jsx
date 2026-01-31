@@ -11,7 +11,7 @@ import {
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
 
-function MemberItem({ member, profile, isOwner, onMessage, onViewProfile, onKick, onBan }) {
+function MemberItem({ member, profile, isOwner, onMessage, onViewProfile, onKick, onBan, onTimeout }) {
   const displayName = profile?.display_name || member.nickname || member.user_name || 'Unknown';
   const avatarUrl = member.avatar_override || profile?.avatar_url;
   const status = profile?.status || 'offline';
@@ -84,7 +84,7 @@ function MemberItem({ member, profile, isOwner, onMessage, onViewProfile, onKick
   );
 }
 
-function MemberGroup({ title, members, profiles, ownerId, onMessage, onViewProfile, onKick, onBan }) {
+function MemberGroup({ title, members, profiles, ownerId, onMessage, onViewProfile, onKick, onBan, onTimeout }) {
   if (members.length === 0) return null;
   
   return (
