@@ -212,11 +212,31 @@ function KairoPageContent() {
     const savedUser = localStorage.getItem('kairo_current_user');
     if (savedUser) {
       const user = JSON.parse(savedUser);
-      console.log('[INIT] Loaded user from localStorage:', user);
-      setCurrentUser(user);
+      // Set status to online when loading
+      setCurrentUser({ ...user, status: 'online' });
+      
+      // Update profile status in database
+      if (user.id) {
+        base44.entities.UserProfile.update(user.id, { 
+          status: 'online',
+          last_seen: new Date().toISOString(),
+          is_online: true
+        }).catch(() => {});
+      }
     } else {
       navigate(createPageUrl('Landing'));
     }
+    
+    // Set offline when leaving
+    return () => {
+      const user = JSON.parse(localStorage.getItem('kairo_current_user') || '{}');
+      if (user.id) {
+        base44.entities.UserProfile.update(user.id, { 
+          status: 'offline',
+          is_online: false
+        }).catch(() => {});
+      }
+    };
   }, [navigate]);
 
   // Fetch fresh user profile data
