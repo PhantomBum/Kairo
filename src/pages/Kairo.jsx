@@ -769,9 +769,13 @@ function KairoPageContent() {
       
       // Invalidate all related queries to sync profile changes everywhere
       await queryClient.invalidateQueries({ queryKey: ['userProfile'] });
+      await queryClient.invalidateQueries({ queryKey: ['allUserProfiles'] }); // Sync across all servers
       await queryClient.invalidateQueries({ queryKey: ['members'] });
       await queryClient.invalidateQueries({ queryKey: ['conversations'] });
       await queryClient.invalidateQueries({ queryKey: ['friends'] });
+      
+      // Refresh profile provider cache
+      refreshAllProfiles();
     }
   });
 
