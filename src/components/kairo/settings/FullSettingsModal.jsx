@@ -62,12 +62,17 @@ function AccountSettings({ profile, settings, onUpdate }) {
     setIsUploading(true);
     try {
       const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      // Update local form state immediately for visual feedback
+      setFormData(prev => ({ ...prev, avatar_url: file_url }));
+      // Then persist to database
       await onUpdate?.({ avatar_url: file_url });
     } catch (error) {
       console.error('Avatar upload failed:', error);
       alert('Failed to upload avatar');
     } finally {
       setIsUploading(false);
+      // Clear file input so same file can be selected again
+      e.target.value = '';
     }
   };
 
