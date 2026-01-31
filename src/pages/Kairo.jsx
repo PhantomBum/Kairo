@@ -56,6 +56,7 @@ import WebhookManager from '@/components/kairo/apps/WebhookManager';
 import RoleManager from '@/components/kairo/roles/RoleManager';
 import VoiceChannel from '@/components/kairo/voice/VoiceChannel';
 import ShopIntegrated from '@/components/kairo/shop/ShopIntegrated';
+import NitroPage from '@/components/kairo/shop/NitroPage';
 import EnhancedReactions from '@/components/kairo/enhanced/EnhancedReactions';
 import { PollMessage, AnnouncementMessage, SystemPrompt } from '@/components/kairo/enhanced/NewMessageTypes';
 import { KeyboardShortcutsModal, useKeyboardShortcuts } from '@/components/kairo/enhanced/KeyboardShortcuts';
@@ -189,6 +190,7 @@ function KairoPageContent() {
   const [showNewDM, setShowNewDM] = useState(false);
   const [showSoundboard, setShowSoundboard] = useState(false);
   const [showQuickNotes, setShowQuickNotes] = useState(false);
+  const [showNitro, setShowNitro] = useState(false);
   
   // Connection status
   const [connectionStatus, setConnectionStatus] = useState('connected');
