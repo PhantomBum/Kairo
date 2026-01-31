@@ -259,7 +259,7 @@ export default function LandingPage() {
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-px bg-white/5 rounded-2xl overflow-hidden">
                   {features.map((feature, i) => (
                     <motion.div
-                      key={i}
+                      key={`feature-${i}`}
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ delay: 0.4 + i * 0.05 }}
