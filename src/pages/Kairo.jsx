@@ -1387,7 +1387,7 @@ function KairoPageContent() {
                 />
           ) : USE_V3_UI ? (
             <>
-              <ChannelHeader 
+              <ChannelHeaderV3 
                 channel={activeChannel} 
                 memberCount={members.length} 
                 onToggleMembers={() => setShowMembers(!showMembers)} 
