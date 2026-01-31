@@ -53,9 +53,16 @@ export default function LandingPage() {
 
   const verifyKeyAndRedirect = async (key) => {
     try {
-      const profiles = await base44.entities.UserProfile.filter({ username: key });
+      // Check both the access key stored and by matching the email pattern
+      const profiles = await base44.entities.UserProfile.filter({ user_email: key + '@kairo.app' });
       if (profiles.length > 0) {
-        localStorage.setItem('kairo_current_user', JSON.stringify(profiles[0]));
+        // Update status to online
+        await base44.entities.UserProfile.update(profiles[0].id, { 
+          status: 'online',
+          is_online: true,
+          last_seen: new Date().toISOString()
+        });
+        localStorage.setItem('kairo_current_user', JSON.stringify({ ...profiles[0], status: 'online' }));
         navigate(createPageUrl('Kairo'));
       }
     } catch (error) {
