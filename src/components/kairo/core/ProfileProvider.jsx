@@ -114,30 +114,49 @@ export function useProfile(identifier) {
 
 // Hook to enrich member data with profile info
 export function useEnrichedMembers(members = [], currentUserId) {
-  const { getProfile } = useProfiles();
+  const { getProfile, profiles } = useProfiles();
   
   return React.useMemo(() => {
     return members.map(member => {
-      // Try to find the profile for this member
-      const profile = getProfile(member.user_id) || getProfile(member.user_email);
+      // Try to find the profile for this member using multiple identifiers
+      let profile = getProfile(member.user_id);
+      if (!profile && member.user_email) {
+        profile = getProfile(member.user_email);
+      }
+      // Also try matching by created_by field
+      if (!profile && member.created_by) {
+        profile = profiles.find(p => p.user_email === member.created_by);
+      }
       
       if (profile) {
+        // Determine if user is online based on profile status and last_seen
+        const isRecentlyActive = profile.last_seen && 
+          (new Date() - new Date(profile.last_seen)) < 5 * 60 * 1000; // 5 minutes
+        const effectiveStatus = profile.is_online || isRecentlyActive 
+          ? (profile.status || 'online') 
+          : 'offline';
+        
         return {
           ...member,
+          display_name: profile.display_name,
           user_name: member.nickname || profile.display_name || profile.username || member.user_email?.split('@')[0] || 'User',
+          username: profile.username,
           user_avatar: member.avatar_override || profile.avatar_url,
+          avatar_url: profile.avatar_url,
           banner_url: profile.banner_url,
-          status: profile.status || 'offline',
+          status: effectiveStatus,
           badges: profile.badges || [],
           youtube_url: profile.youtube_channel?.url,
           youtube_show_icon: profile.youtube_channel?.show_icon,
           bio: profile.bio,
           accent_color: profile.accent_color,
-          pronouns: profile.pronouns
+          pronouns: profile.pronouns,
+          rich_presence: profile.rich_presence,
+          social_links: profile.social_links
         };
       }
       
-      // Fallback if no profile found
+      // Fallback if no profile found - still show them but as offline
       return {
         ...member,
         user_name: member.nickname || member.user_email?.split('@')[0] || 'User',
@@ -148,5 +167,5 @@ export function useEnrichedMembers(members = [], currentUserId) {
         youtube_show_icon: false
       };
     });
-  }, [members, getProfile]);
+  }, [members, getProfile, profiles]);
 }
