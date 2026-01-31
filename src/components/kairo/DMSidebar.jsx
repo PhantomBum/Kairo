@@ -268,9 +268,9 @@ export default function DMSidebar({
             <div className="px-3 py-2 text-[9px] font-semibold uppercase tracking-wider text-zinc-600">
               Friends — {filteredFriends.length}
             </div>
-            {filteredFriends.map((friend) => (
+            {filteredFriends.map((friend, idx) => (
               <FriendItem
-                key={friend.id}
+                key={friend.id || `dm-friend-${idx}`}
                 friend={friend}
                 onMessage={() => {
                   const existingConvo = conversations.find(c => 
@@ -306,9 +306,9 @@ export default function DMSidebar({
                 <Plus className="w-3.5 h-3.5" />
               </button>
             </div>
-            {filteredConversations.map((conversation) => (
+            {filteredConversations.map((conversation, idx) => (
               <ConversationItem
-                key={conversation.id}
+                key={conversation.id || `convo-${idx}`}
                 conversation={conversation}
                 isActive={activeConversationId === conversation.id}
                 onClick={onConversationSelect}

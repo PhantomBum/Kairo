@@ -294,7 +294,7 @@ function MessageItem({ message, showHeader, onReply, onEditClick, onDelete, onRe
                 <div className="flex flex-wrap gap-1 mt-2">
                   {message.reactions.map((reaction, i) => (
                     <button
-                      key={i}
+                      key={`${reaction.emoji}-${i}`}
                       onClick={() => onReact?.(message.id, reaction.emoji)}
                       className={cn(
                         "flex items-center gap-1 px-2 py-0.5 rounded text-xs transition-all",
@@ -461,7 +461,7 @@ export default function MessageList({
         ) : (
           <AnimatePresence>
             {messages.map((message, index) => (
-              <React.Fragment key={message.id}>
+              <React.Fragment key={message.id || `msg-${index}`}>
                 {shouldShowDateDivider(message, index) && (
                   <DateDivider date={message.created_date} />
                 )}
