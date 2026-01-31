@@ -553,7 +553,7 @@ function KairoAppContent() {
             memberCount={members.length}
             showMembers={showMembers}
             onToggleMembers={() => setShowMembers(!showMembers)}
-            onShowSearch={() => {}}
+            onShowSearch={() => setShowAdvancedSearch(true)}
             onShowPinned={() => {}}
           />
         ) : view === 'dms' && activeConversation ? (
