@@ -59,8 +59,11 @@ function MoreMenu({ isCollapsed, onOpenShortcuts }) {
         )}
       </DropdownMenuTrigger>
       <DropdownMenuContent side="right" align="end" className="w-48 bg-[#111113] border-white/[0.06] rounded-lg p-1">
-        <DropdownMenuItem className="text-zinc-300 focus:bg-white/5 focus:text-white rounded px-3 py-2 cursor-pointer text-sm">
-          <Crown className="w-4 h-4 mr-2 text-zinc-500" />
+        <DropdownMenuItem 
+          className="text-zinc-300 focus:bg-white/5 focus:text-white rounded px-3 py-2 cursor-pointer text-sm"
+          onClick={() => window.dispatchEvent(new CustomEvent('kairo:open-nitro'))}
+        >
+          <Crown className="w-4 h-4 mr-2 text-amber-500" />
           Nitro
         </DropdownMenuItem>
         <DropdownMenuSeparator className="bg-white/5 my-1" />
