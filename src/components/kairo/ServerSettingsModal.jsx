@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { X, Server, Shield, Code, Webhook, Zap, DollarSign, BarChart3, Smile, ShieldAlert } from 'lucide-react';
+import { X, Server, Shield, Code, Webhook, Zap, DollarSign, BarChart3, Smile, ShieldAlert, Palette, Link2 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import RoleManager from './roles/RoleManager';
@@ -10,9 +10,13 @@ import ServerSubscriptionManager from './shop/ServerSubscriptionManager';
 import ServerAnalyticsDashboard from './server/ServerAnalyticsDashboard';
 import EmojiManager from './server/EmojiManager';
 import AutoModManager from './moderation/AutoModManager';
+import ServerCustomization from './server/ServerCustomization';
+import BridgeManager from './crossapp/BridgeManager';
 
 export default function ServerSettingsModal({ server, currentUser, channels, onClose }) {
   const [activeTab, setActiveTab] = useState('overview');
+  const [showCustomization, setShowCustomization] = useState(false);
+  const [showBridges, setShowBridges] = useState(false);
 
   return (
     <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-6">
@@ -40,6 +44,10 @@ export default function ServerSettingsModal({ server, currentUser, channels, onC
                 <Server className="w-4 h-4 mr-2" />
                 Overview
               </TabsTrigger>
+              <TabsTrigger value="customization" className="w-full justify-start">
+                <Palette className="w-4 h-4 mr-2" />
+                Customization
+              </TabsTrigger>
               <TabsTrigger value="analytics" className="w-full justify-start">
                 <BarChart3 className="w-4 h-4 mr-2" />
                 Analytics
@@ -55,6 +63,10 @@ export default function ServerSettingsModal({ server, currentUser, channels, onC
               <TabsTrigger value="automod" className="w-full justify-start">
                 <ShieldAlert className="w-4 h-4 mr-2" />
                 Auto-Mod
+              </TabsTrigger>
+              <TabsTrigger value="bridges" className="w-full justify-start">
+                <Link2 className="w-4 h-4 mr-2" />
+                Cross-App
               </TabsTrigger>
               <TabsTrigger value="apps" className="w-full justify-start">
                 <Code className="w-4 h-4 mr-2" />
@@ -79,6 +91,29 @@ export default function ServerSettingsModal({ server, currentUser, channels, onC
                 <div className="space-y-4">
                   <h3 className="text-lg font-bold text-white">Server Overview</h3>
                   <p className="text-zinc-400">Manage your server settings here.</p>
+                  <div className="grid grid-cols-2 gap-4 mt-6">
+                    <div className="p-4 bg-zinc-800/50 rounded-xl">
+                      <p className="text-sm text-zinc-500">Members</p>
+                      <p className="text-2xl font-bold text-white">{server?.member_count || 1}</p>
+                    </div>
+                    <div className="p-4 bg-zinc-800/50 rounded-xl">
+                      <p className="text-sm text-zinc-500">Channels</p>
+                      <p className="text-2xl font-bold text-white">{channels?.length || 0}</p>
+                    </div>
+                  </div>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="customization" className="p-6">
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="text-lg font-bold text-white mb-2">Server Customization</h3>
+                    <p className="text-sm text-zinc-500 mb-4">Theme, branding, welcome screens, and more</p>
+                  </div>
+                  <Button onClick={() => setShowCustomization(true)} className="bg-emerald-600 hover:bg-emerald-700">
+                    <Palette className="w-4 h-4 mr-2" />
+                    Open Customization Studio
+                  </Button>
                 </div>
               </TabsContent>
 
@@ -96,6 +131,19 @@ export default function ServerSettingsModal({ server, currentUser, channels, onC
 
               <TabsContent value="automod" className="p-0">
                 <AutoModManager server={server} />
+              </TabsContent>
+
+              <TabsContent value="bridges" className="p-6">
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="text-lg font-bold text-white mb-2">Cross-App Bridges</h3>
+                    <p className="text-sm text-zinc-500 mb-4">Connect channels with Discord, Slack, Telegram & more</p>
+                  </div>
+                  <Button onClick={() => setShowBridges(true)} className="bg-indigo-600 hover:bg-indigo-700">
+                    <Link2 className="w-4 h-4 mr-2" />
+                    Manage Bridges
+                  </Button>
+                </div>
               </TabsContent>
 
               <TabsContent value="apps" className="p-6">
@@ -128,6 +176,14 @@ export default function ServerSettingsModal({ server, currentUser, channels, onC
           </Tabs>
         </div>
       </motion.div>
+
+      {showCustomization && (
+        <ServerCustomization server={server} onClose={() => setShowCustomization(false)} />
+      )}
+      
+      {showBridges && (
+        <BridgeManager server={server} channels={channels} isOpen={showBridges} onClose={() => setShowBridges(false)} />
+      )}
     </div>
   );
 }
