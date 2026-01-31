@@ -1385,12 +1385,91 @@ function KairoPageContent() {
                     }
                   }}
                 />
+          ) : USE_V3_UI ? (
+            <>
+              <ChannelHeader 
+                channel={activeChannel} 
+                memberCount={members.length} 
+                onToggleMembers={() => setShowMembers(!showMembers)} 
+                showMembers={showMembers}
+                onShowPinned={() => setShowPinnedPanel(!showPinnedPanel)}
+                showPinned={showPinnedPanel}
+                onMenuToggle={() => setShowMobileChannels(true)}
+              />
+              <div className="flex-1 flex min-h-0">
+                <div className="flex-1 flex flex-col bg-[#09090b]">
+                  {messagesLoading ? (
+                    <div className="flex-1 overflow-y-auto">
+                      <SkeletonMessage />
+                      <SkeletonMessage />
+                      <SkeletonMessage />
+                    </div>
+                  ) : (
+                    <>
+                      <MessageListV3 
+                        messages={[...messages].reverse()} 
+                        currentUserId={currentUser?.id} 
+                        onReply={(msg) => setReplyTo(msg)} 
+                        onEdit={async (msg, newContent) => {
+                          if (msg?.id && newContent) {
+                            await base44.entities.Message.update(msg.id, { 
+                              content: newContent, 
+                              is_edited: true,
+                              edited_at: new Date().toISOString()
+                            });
+                            queryClient.invalidateQueries({ queryKey: ['messages', activeChannel?.id] });
+                          }
+                        }} 
+                        onDelete={handleDeleteMessage} 
+                        onReact={handleReact}
+                        onPin={handlePinMessage}
+                        isLoading={messagesLoading}
+                        onAvatarClick={(msg) => {
+                          const member = members.find(m => m.user_id === msg.author_id || m.id === msg.author_id);
+                          // Could open profile popup here
+                        }}
+                      />
+                      <AnimatePresence>
+                        {activeThread && (
+                          <ThreadPanel
+                            thread={activeThread}
+                            parentMessage={messages.find(m => m.id === activeThread.parent_message_id)}
+                            currentUser={userProfile || currentUser}
+                            channelName={activeChannel.name}
+                            onClose={() => setActiveThread(null)}
+                          />
+                        )}
+                        {showPinnedPanel && (
+                          <PinnedMessagesPanel
+                            messages={pinnedMessages}
+                            isOpen={showPinnedPanel}
+                            onClose={() => setShowPinnedPanel(false)}
+                            onUnpin={handlePinMessage}
+                            onJumpTo={(msg) => {}}
+                          />
+                        )}
+                      </AnimatePresence>
+                    </>
+                  )}
+                  <TypingIndicator typingUsers={typingUsers} className="px-4" />
+                  <MessageComposerV3 
+                    channelName={activeChannel?.name} 
+                    replyTo={replyTo} 
+                    onCancelReply={() => setReplyTo(null)} 
+                    onSendMessage={(data) => sendMessageMutation.mutate(data)} 
+                    onTyping={sendTypingIndicator} 
+                    members={members} 
+                  />
+                </div>
+                {showMembers && <div className="hidden md:block"><MemberPanelV3 members={members} roles={roles} ownerId={activeServer?.owner_id} /></div>}
+              </div>
+            </>
           ) : (
             <>
               <ChannelHeader 
                     channel={activeChannel} 
                     memberCount={members.length} 
-                    onMembersToggle={() => setShowMembers(!showMembers)} 
+                    onToggleMembers={() => setShowMembers(!showMembers)} 
                     showMembers={showMembers}
                     onShowPinned={() => setShowPinnedPanel(!showPinnedPanel)}
                     showPinned={showPinnedPanel}
