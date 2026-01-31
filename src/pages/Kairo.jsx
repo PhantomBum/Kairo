@@ -10,16 +10,27 @@ import { Button } from '@/components/ui/button';
 
 // Core Components
 import LoadingScreen from '@/components/kairo/LoadingScreen';
-import ImprovedSidebar from '@/components/kairo/ImprovedSidebar';
 import UpdateLogsModal from '@/components/kairo/UpdateLogsModal';
 import NotificationsPanel from '@/components/kairo/NotificationsPanel';
+import VoiceConnectionBar from '@/components/kairo/VoiceConnectionBar';
+
+// V3 Components - New Design System
+import SidebarV3 from '@/components/kairo/v3/Sidebar';
+import ChannelListV3 from '@/components/kairo/v3/ChannelList';
+import DMPanelV3 from '@/components/kairo/v3/DMPanel';
+import { ChannelHeader, MessageListV3 } from '@/components/kairo/v3/ChatView';
+import MessageComposerV3 from '@/components/kairo/v3/MessageComposer';
+import MemberPanelV3 from '@/components/kairo/v3/MemberPanel';
+import UserBarV3 from '@/components/kairo/v3/UserBar';
+
+// Legacy components for backward compatibility
+import ImprovedSidebar from '@/components/kairo/ImprovedSidebar';
 import ChannelSidebar from '@/components/kairo/ChannelSidebar';
 import DMSidebar from '@/components/kairo/DMSidebar';
 import MessageList from '@/components/kairo/MessageList';
 import MessageInput from '@/components/kairo/MessageInput';
 import MemberList from '@/components/kairo/MemberList';
 import UserStatusBar from '@/components/kairo/UserStatusBar';
-import VoiceConnectionBar from '@/components/kairo/VoiceConnectionBar';
 
 // Modals
 import CreateServerModal from '@/components/kairo/CreateServerModal';
