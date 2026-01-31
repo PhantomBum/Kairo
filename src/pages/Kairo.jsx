@@ -1236,27 +1236,50 @@ function KairoPageContent() {
           "fixed md:relative z-50 h-full transition-transform duration-300 md:translate-x-0",
           showMobileSidebar ? "translate-x-0" : "-translate-x-full"
         )}>
-          <ImprovedSidebar 
-        servers={memberServers} 
-        activeServerId={activeServer?.id} 
-        onServerSelect={handleServerSelect} 
-        onDMsClick={handleDMsClick}
-        onDiscoverClick={() => setView('discover')} 
-        onCreateServer={() => setShowCreateServer(true)}
-        onSettingsClick={() => setShowSettings(true)} 
-        onProfileClick={() => setShowProfileEditor(true)}
-        onFriendsClick={() => setView('friends')}
-        onUpdateLogsClick={() => setShowUpdateLogs(true)}
-        onNotificationsClick={() => setShowNotifications(true)}
-        onShopClick={() => setShowShop(true)}
-        onLeaveServer={handleLeaveServer}
-        isDMsActive={view === 'dms'} 
-        userProfile={userProfile}
-        unreadDMs={conversations.filter(c => c.unread_count > 0).length}
-        notifications={notifications}
-        hasNewUpdates={hasNewUpdates}
-        onMobileClose={() => setShowMobileSidebar(false)}
-      />
+          {USE_V3_UI ? (
+            <SidebarV3 
+              servers={memberServers} 
+              activeServerId={activeServer?.id} 
+              onServerSelect={handleServerSelect} 
+              onDMsClick={handleDMsClick}
+              onDiscoverClick={() => setView('discover')} 
+              onCreateServer={() => setShowCreateServer(true)}
+              onSettingsClick={() => setShowSettings(true)} 
+              onFriendsClick={() => setView('friends')}
+              onUpdateLogsClick={() => setShowUpdateLogs(true)}
+              onNotificationsClick={() => setShowNotifications(true)}
+              onShopClick={() => setShowShop(true)}
+              onLeaveServer={handleLeaveServer}
+              isDMsActive={view === 'dms'} 
+              userProfile={userProfile}
+              unreadDMs={conversations.filter(c => c.unread_count > 0).length}
+              notifications={notifications}
+              hasNewUpdates={hasNewUpdates}
+              onMobileClose={() => setShowMobileSidebar(false)}
+            />
+          ) : (
+            <ImprovedSidebar 
+              servers={memberServers} 
+              activeServerId={activeServer?.id} 
+              onServerSelect={handleServerSelect} 
+              onDMsClick={handleDMsClick}
+              onDiscoverClick={() => setView('discover')} 
+              onCreateServer={() => setShowCreateServer(true)}
+              onSettingsClick={() => setShowSettings(true)} 
+              onProfileClick={() => setShowProfileEditor(true)}
+              onFriendsClick={() => setView('friends')}
+              onUpdateLogsClick={() => setShowUpdateLogs(true)}
+              onNotificationsClick={() => setShowNotifications(true)}
+              onShopClick={() => setShowShop(true)}
+              onLeaveServer={handleLeaveServer}
+              isDMsActive={view === 'dms'} 
+              userProfile={userProfile}
+              unreadDMs={conversations.filter(c => c.unread_count > 0).length}
+              notifications={notifications}
+              hasNewUpdates={hasNewUpdates}
+              onMobileClose={() => setShowMobileSidebar(false)}
+            />
+          )}
       </div>
 
       {view === 'dms' ? (
