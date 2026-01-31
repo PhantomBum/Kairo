@@ -43,6 +43,10 @@ import { UserNoteEditor } from '@/components/kairo/features/UserNotes';
 import { ForumChannelView } from '@/components/kairo/features/ForumChannel';
 import { AnnouncementMessage } from '@/components/kairo/features/AnnouncementChannel';
 import { ServerEmojiPicker, parseEmojis } from '@/components/kairo/features/CustomEmoji';
+import { useServerFolders } from '@/components/kairo/features/ServerFolders';
+import { AdvancedSearchModal } from '@/components/kairo/v4/features/AdvancedSearch';
+import { NitroCheckoutModal, BoostCheckoutModal } from '@/components/kairo/v4/features/NitroCheckout';
+import { StageChannel } from '@/components/kairo/v4/features/StageChannel';
 
 function KairoAppContent() {
   const queryClient = useQueryClient();
@@ -72,6 +76,9 @@ function KairoAppContent() {
   const [showTimeoutMember, setShowTimeoutMember] = useState(null);
   const [showCreatePoll, setShowCreatePoll] = useState(false);
   const [showScheduleMessage, setShowScheduleMessage] = useState(false);
+  const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
+  const [showNitroCheckout, setShowNitroCheckout] = useState(false);
+  const [showBoostCheckout, setShowBoostCheckout] = useState(false);
   
   // Current user
   const { data: currentUser } = useQuery({
@@ -728,6 +735,35 @@ function KairoAppContent() {
             onClose={() => setShowScheduleMessage(false)}
             channelId={activeChannel?.id}
             serverId={activeServer?.id}
+            currentUser={currentUser}
+          />
+        )}
+        
+        {showAdvancedSearch && (
+          <AdvancedSearchModal
+            isOpen={showAdvancedSearch}
+            onClose={() => setShowAdvancedSearch(false)}
+            serverId={activeServer?.id}
+            onResultClick={(msg) => {
+              // Navigate to message
+              console.log('Navigate to:', msg);
+            }}
+          />
+        )}
+        
+        {showNitroCheckout && (
+          <NitroCheckoutModal
+            isOpen={showNitroCheckout}
+            onClose={() => setShowNitroCheckout(false)}
+            currentUser={currentUser}
+          />
+        )}
+        
+        {showBoostCheckout && (
+          <BoostCheckoutModal
+            isOpen={showBoostCheckout}
+            onClose={() => setShowBoostCheckout(false)}
+            server={activeServer}
             currentUser={currentUser}
           />
         )}

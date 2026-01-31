@@ -1,110 +1,118 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.6';
-import Stripe from 'npm:stripe@17.5.0';
+import Stripe from 'npm:stripe@14.0.0';
 
-const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY'), {
-  apiVersion: '2024-12-18.acacia',
-});
+const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY'));
+const webhookSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET');
 
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
-    
-    const signature = req.headers.get('stripe-signature');
     const body = await req.text();
+    const signature = req.headers.get('stripe-signature');
     
     let event;
     try {
-      event = await stripe.webhooks.constructEventAsync(
-        body,
-        signature,
-        Deno.env.get('STRIPE_WEBHOOK_SECRET')
-      );
+      event = await stripe.webhooks.constructEventAsync(body, signature, webhookSecret);
     } catch (err) {
       console.error('Webhook signature verification failed:', err.message);
       return Response.json({ error: 'Invalid signature' }, { status: 400 });
     }
-
-    console.log('Webhook event type:', event.type);
-
-    if (event.type === 'checkout.session.completed') {
-      const session = event.data.object;
-      const metadata = session.metadata;
-
-      console.log('Checkout completed:', metadata);
-
-      if (metadata.type === 'server_boost') {
-        const expiresAt = new Date();
-        expiresAt.setMonth(expiresAt.getMonth() + parseInt(metadata.duration));
-
-        await base44.asServiceRole.entities.ServerBoost.create({
-          server_id: metadata.serverId,
-          user_id: metadata.userId,
-          user_email: metadata.userEmail,
-          user_name: metadata.userName || 'User',
-          boost_level: 1,
-          expires_at: expiresAt.toISOString(),
-          is_active: true,
-          payment_id: session.payment_intent
-        });
-
-        const server = await base44.asServiceRole.entities.Server.filter({ id: metadata.serverId });
-        if (server.length > 0) {
-          await base44.asServiceRole.entities.Server.update(metadata.serverId, {
-            member_count: (server[0].member_count || 0) + 1
+    
+    console.log('Processing webhook event:', event.type);
+    
+    const session = event.data.object;
+    const { user_id, server_id, product_type } = session.metadata || {};
+    
+    switch (event.type) {
+      case 'checkout.session.completed': {
+        if (product_type === 'nitro') {
+          // Grant premium status
+          const profiles = await base44.asServiceRole.entities.UserProfile.filter({ user_id });
+          if (profiles.length > 0) {
+            const badges = profiles[0].badges || [];
+            if (!badges.includes('premium')) {
+              badges.push('premium');
+              await base44.asServiceRole.entities.UserProfile.update(profiles[0].id, { 
+                badges,
+              });
+            }
+          }
+          console.log('Granted premium to user:', user_id);
+        } else if (product_type === 'boost') {
+          // Create server boost
+          await base44.asServiceRole.entities.ServerBoost.create({
+            server_id,
+            user_id,
+            boost_level: 1,
+            is_active: true,
+            payment_id: session.subscription || session.payment_intent,
           });
+          
+          // Update server boost count
+          const servers = await base44.asServiceRole.entities.Server.filter({ id: server_id });
+          if (servers.length > 0) {
+            const features = servers[0].features || [];
+            if (!features.includes('boosted')) features.push('boosted');
+            await base44.asServiceRole.entities.Server.update(servers[0].id, { features });
+          }
+          console.log('Created server boost for:', server_id);
+        } else if (product_type === 'credits') {
+          // Add credits to user
+          const credits = await base44.asServiceRole.entities.UserCredits.filter({ user_id });
+          if (credits.length > 0) {
+            await base44.asServiceRole.entities.UserCredits.update(credits[0].id, {
+              balance: (credits[0].balance || 0) + 1000,
+            });
+          } else {
+            await base44.asServiceRole.entities.UserCredits.create({
+              user_id,
+              balance: 1000,
+            });
+          }
+          console.log('Added 1000 credits to user:', user_id);
         }
-
-        console.log('Server boost created successfully');
-
-      } else if (metadata.type === 'server_subscription') {
-        await base44.asServiceRole.entities.UserSubscription.create({
-          user_id: metadata.userId,
-          user_email: metadata.userEmail,
-          server_id: metadata.serverId,
-          subscription_id: metadata.subscriptionId,
-          subscription_name: metadata.subscriptionName,
-          tier: 1,
-          status: 'active',
-          started_at: new Date().toISOString(),
-          payment_id: session.subscription
-        });
-
-        const subscription = await base44.asServiceRole.entities.ServerSubscription.filter({ 
-          id: metadata.subscriptionId 
-        });
-        if (subscription.length > 0) {
-          await base44.asServiceRole.entities.ServerSubscription.update(metadata.subscriptionId, {
-            subscriber_count: (subscription[0].subscriber_count || 0) + 1
-          });
-        }
-
-        console.log('User subscription created successfully');
+        break;
       }
-
-    } else if (event.type === 'customer.subscription.deleted') {
-      const subscription = event.data.object;
       
-      const userSubs = await base44.asServiceRole.entities.UserSubscription.filter({
-        payment_id: subscription.id
-      });
-
-      for (const userSub of userSubs) {
-        await base44.asServiceRole.entities.UserSubscription.update(userSub.id, {
-          status: 'cancelled',
-          expires_at: new Date().toISOString()
-        });
+      case 'customer.subscription.deleted': {
+        // Handle subscription cancellation
+        if (product_type === 'nitro') {
+          const profiles = await base44.asServiceRole.entities.UserProfile.filter({ user_id });
+          if (profiles.length > 0) {
+            const badges = (profiles[0].badges || []).filter(b => b !== 'premium');
+            await base44.asServiceRole.entities.UserProfile.update(profiles[0].id, { badges });
+          }
+          console.log('Removed premium from user:', user_id);
+        } else if (product_type === 'boost') {
+          const boosts = await base44.asServiceRole.entities.ServerBoost.filter({
+            server_id,
+            user_id,
+            is_active: true,
+          });
+          for (const boost of boosts) {
+            await base44.asServiceRole.entities.ServerBoost.update(boost.id, { is_active: false });
+          }
+          console.log('Deactivated boost for server:', server_id);
+        }
+        break;
       }
-
-      console.log('Subscription cancelled successfully');
+      
+      case 'invoice.paid': {
+        // Subscription renewed
+        console.log('Invoice paid for:', session.subscription);
+        break;
+      }
+      
+      case 'invoice.payment_failed': {
+        // Payment failed
+        console.log('Payment failed for subscription:', session.subscription);
+        break;
+      }
     }
-
+    
     return Response.json({ received: true });
-
   } catch (error) {
-    console.error('Webhook processing error:', error);
-    return Response.json({ 
-      error: error.message,
-      stack: error.stack 
-    }, { status: 500 });
+    console.error('Webhook error:', error);
+    return Response.json({ error: error.message }, { status: 500 });
   }
 });

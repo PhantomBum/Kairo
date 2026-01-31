@@ -1,95 +1,91 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.6';
-import Stripe from 'npm:stripe@17.5.0';
+import Stripe from 'npm:stripe@14.0.0';
 
-const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY'), {
-  apiVersion: '2024-12-18.acacia',
-});
+const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY'));
 
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
-    const { type, serverId, serverName, subscriptionId, subscriptionName, duration, userId, userEmail } = await req.json();
-
-    // Get app URL with fallback
-    const appUrl = Deno.env.get('BASE44_APP_URL') || 'https://kairo-8406c21a.base44.app';
     
-    let sessionConfig = {
+    // Get request body
+    const { product_type, price_id, success_url, cancel_url, user_id, server_id } = await req.json();
+    
+    // Create checkout session
+    const sessionConfig = {
       payment_method_types: ['card'],
-      mode: 'payment',
-      success_url: `${appUrl}/Kairo?payment=success`,
-      cancel_url: `${appUrl}/Kairo?payment=cancelled`,
+      mode: product_type === 'subscription' ? 'subscription' : 'payment',
+      success_url: success_url || `${req.headers.get('origin') || 'https://app.base44.com'}/success`,
+      cancel_url: cancel_url || `${req.headers.get('origin') || 'https://app.base44.com'}/cancel`,
       metadata: {
         base44_app_id: Deno.env.get('BASE44_APP_ID'),
-        type,
-        serverId: serverId || '',
-        serverName: serverName || '',
-        userId: userId || '',
-        userEmail: userEmail || ''
-      }
+        user_id,
+        server_id,
+        product_type,
+      },
     };
 
-    // Add customer email if provided (required for subscriptions)
-    if (userEmail) {
-      sessionConfig.customer_email = userEmail;
-    }
-
-    if (type === 'server_boost') {
-      const prices = {
-        1: 499,  // $4.99
-        3: 1299, // $12.99
-        12: 4999 // $49.99
-      };
-
+    // Handle different product types
+    if (product_type === 'nitro') {
+      // Kairo Premium/Nitro
       sessionConfig.line_items = [{
         price_data: {
           currency: 'usd',
           product_data: {
-            name: `${serverName} Server Boost`,
-            description: `${duration} month${duration > 1 ? 's' : ''} of server boost`,
+            name: 'Kairo Premium',
+            description: 'Custom profiles, animated avatars, higher upload limits, and more',
           },
-          unit_amount: prices[duration],
+          unit_amount: 999, // $9.99
+          recurring: { interval: 'month' },
         },
         quantity: 1,
       }];
-      sessionConfig.metadata.duration = duration;
-
-    } else if (type === 'server_subscription') {
-      const subscription = await base44.entities.ServerSubscription.filter({ id: subscriptionId });
-      if (subscription.length === 0) {
-        return Response.json({ error: 'Subscription not found' }, { status: 404 });
-      }
-
-      const sub = subscription[0];
       sessionConfig.mode = 'subscription';
+    } else if (product_type === 'boost') {
+      // Server boost
       sessionConfig.line_items = [{
         price_data: {
           currency: 'usd',
           product_data: {
-            name: `${serverName} - ${sub.name}`,
-            description: sub.description || `Tier ${sub.tier} subscription`,
+            name: 'Server Boost',
+            description: 'Boost this server for better quality and perks',
           },
-          unit_amount: Math.round(sub.price * 100),
-          recurring: {
-            interval: 'month',
-          },
+          unit_amount: 499, // $4.99
+          recurring: { interval: 'month' },
         },
         quantity: 1,
       }];
-      sessionConfig.metadata.subscriptionId = subscriptionId;
-      sessionConfig.metadata.subscriptionName = subscriptionName || '';
+      sessionConfig.mode = 'subscription';
+    } else if (product_type === 'credits') {
+      // Kairo credits
+      sessionConfig.line_items = [{
+        price_data: {
+          currency: 'usd',
+          product_data: {
+            name: '1000 Kairo Credits',
+            description: 'Use credits to purchase profile decorations and items',
+          },
+          unit_amount: 499, // $4.99
+        },
+        quantity: 1,
+      }];
+      sessionConfig.mode = 'payment';
+    } else if (price_id) {
+      // Custom price ID
+      sessionConfig.line_items = [{ price: price_id, quantity: 1 }];
     } else {
-      return Response.json({ error: 'Invalid type' }, { status: 400 });
+      return Response.json({ error: 'Invalid product type' }, { status: 400 });
     }
-
+    
     const session = await stripe.checkout.sessions.create(sessionConfig);
-
-    return Response.json({ url: session.url });
-
+    
+    console.log('Created checkout session:', session.id);
+    
+    return Response.json({ 
+      url: session.url,
+      session_id: session.id,
+    });
   } catch (error) {
     console.error('Stripe checkout error:', error);
-    return Response.json({ 
-      error: error.message,
-      details: error.stack 
-    }, { status: 500 });
+    return Response.json({ error: error.message }, { status: 500 });
   }
 });
