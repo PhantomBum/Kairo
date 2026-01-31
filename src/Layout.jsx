@@ -14,26 +14,26 @@ export default function Layout({ children }) {
     <div className="min-h-screen bg-[#0a0a0b]">
       <style>{`
         :root {
-          --background: 0 0% 4%;
-          --foreground: 0 0% 90%;
-          --card: 0 0% 6%;
-          --card-foreground: 0 0% 90%;
-          --popover: 0 0% 6%;
-          --popover-foreground: 0 0% 90%;
-          --primary: 0 0% 90%;
-          --primary-foreground: 0 0% 6%;
-          --secondary: 0 0% 10%;
-          --secondary-foreground: 0 0% 90%;
-          --muted: 0 0% 10%;
-          --muted-foreground: 0 0% 45%;
-          --accent: 0 0% 10%;
-          --accent-foreground: 0 0% 90%;
-          --destructive: 0 84% 60%;
-          --destructive-foreground: 0 0% 98%;
-          --border: 0 0% 12%;
-          --input: 0 0% 10%;
-          --ring: 0 0% 40%;
-        }
+            --background: 0 0% 4%;
+            --foreground: 0 0% 98%;
+            --card: 0 0% 5%;
+            --card-foreground: 0 0% 98%;
+            --popover: 0 0% 6%;
+            --popover-foreground: 0 0% 98%;
+            --primary: 160 84% 39%;
+            --primary-foreground: 0 0% 98%;
+            --secondary: 0 0% 8%;
+            --secondary-foreground: 0 0% 98%;
+            --muted: 0 0% 8%;
+            --muted-foreground: 0 0% 45%;
+            --accent: 0 0% 8%;
+            --accent-foreground: 0 0% 98%;
+            --destructive: 0 84% 60%;
+            --destructive-foreground: 0 0% 98%;
+            --border: 0 0% 10%;
+            --input: 0 0% 8%;
+            --ring: 160 84% 39%;
+          }
 
         * {
           border-color: hsl(var(--border));
