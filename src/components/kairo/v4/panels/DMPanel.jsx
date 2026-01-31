@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Plus, Users, MessageCircle, X } from 'lucide-react';
+import { Search, Plus, Users, MessageCircle, UserPlus, Globe, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Avatar from '../primitives/Avatar';
-import Input from '../primitives/Input';
 import IconButton from '../primitives/IconButton';
-import { Panel, PanelHeader, PanelContent, PanelFooter } from '../layout/AppShell';
+import { Panel, PanelHeader, PanelContent } from '../layout/AppShell';
 import {
   ContextMenu,
   ContextMenuContent,
@@ -14,10 +13,29 @@ import {
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
 
-function ConversationItem({ conversation, isActive, onClick, onClose, onMute, onBlock }) {
+function SearchInput({ value, onChange, placeholder }) {
+  return (
+    <div className="relative group">
+      <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/20 via-purple-500/20 to-indigo-500/20 rounded-lg opacity-0 group-focus-within:opacity-100 blur-lg transition-opacity" />
+      <div className="relative flex items-center gap-2 px-3 h-9 bg-white/[0.04] border border-white/[0.06] rounded-lg group-focus-within:border-white/[0.12] transition-colors">
+        <Search className="w-4 h-4 text-zinc-500" />
+        <input
+          type="text"
+          value={value}
+          onChange={onChange}
+          placeholder={placeholder}
+          className="flex-1 bg-transparent text-sm text-white placeholder:text-zinc-600 focus:outline-none"
+        />
+      </div>
+    </div>
+  );
+}
+
+function ConversationItem({ conversation, isActive, onClick, onClose, onMute }) {
+  const [isHovered, setIsHovered] = useState(false);
   const isGroup = conversation.is_group;
-  const name = conversation.name || conversation.participants?.[0]?.user_name || 'Unknown';
-  const avatar = conversation.icon_url || conversation.participants?.[0]?.user_avatar;
+  const name = conversation.name || conversation.participants?.find(p => p.user_name)?.user_name || 'Unknown';
+  const avatar = conversation.icon_url || conversation.participants?.find(p => p.user_avatar)?.user_avatar;
   const status = conversation.participants?.[0]?.status || 'offline';
   const lastMessage = conversation.last_message;
   const unread = conversation.unread_count || 0;
@@ -25,16 +43,27 @@ function ConversationItem({ conversation, isActive, onClick, onClose, onMute, on
   return (
     <ContextMenu>
       <ContextMenuTrigger>
-        <button
+        <motion.button
           onClick={onClick}
           className={cn(
-            'w-full flex items-center gap-3 px-2 py-2 rounded-lg transition-colors',
+            'relative w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all',
             isActive 
-              ? 'bg-white/[0.08]' 
+              ? 'bg-gradient-to-r from-white/[0.08] to-white/[0.04]' 
               : 'hover:bg-white/[0.04]'
           )}
+          onHoverStart={() => setIsHovered(true)}
+          onHoverEnd={() => setIsHovered(false)}
+          whileHover={{ x: 2 }}
+          whileTap={{ scale: 0.98 }}
         >
-          <div className="relative">
+          {/* Active indicator */}
+          <motion.div
+            className="absolute left-0 top-1/2 -translate-y-1/2 w-1 rounded-r-full bg-emerald-500"
+            initial={{ height: 0 }}
+            animate={{ height: isActive ? 24 : 0 }}
+          />
+          
+          <div className="relative flex-shrink-0">
             <Avatar
               src={avatar}
               name={name}
@@ -42,14 +71,14 @@ function ConversationItem({ conversation, isActive, onClick, onClose, onMute, on
               size="md"
             />
             {isGroup && (
-              <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-[#0a0a0b] rounded-full flex items-center justify-center">
-                <Users className="w-2.5 h-2.5 text-zinc-400" />
+              <div className="absolute -bottom-0.5 -right-0.5 w-5 h-5 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center border-2 border-[#0d0d0f]">
+                <Users className="w-2.5 h-2.5 text-white" />
               </div>
             )}
           </div>
           
           <div className="flex-1 min-w-0 text-left">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between gap-2">
               <span className={cn(
                 'text-sm font-medium truncate',
                 isActive ? 'text-white' : 'text-zinc-300'
@@ -57,63 +86,54 @@ function ConversationItem({ conversation, isActive, onClick, onClose, onMute, on
                 {name}
               </span>
               {unread > 0 && (
-                <span className="ml-2 min-w-[18px] h-[18px] px-1 bg-red-500 rounded-full text-[10px] font-bold text-white flex items-center justify-center">
+                <motion.span 
+                  className="min-w-[20px] h-[20px] px-1.5 bg-gradient-to-r from-red-500 to-rose-500 rounded-full text-[10px] font-bold text-white flex items-center justify-center shadow-lg shadow-red-500/30"
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ type: 'spring', stiffness: 500 }}
+                >
                   {unread > 99 ? '99+' : unread}
-                </span>
+                </motion.span>
               )}
             </div>
             {lastMessage && (
-              <p className="text-xs text-zinc-500 truncate">
+              <p className="text-xs text-zinc-500 truncate mt-0.5">
                 {lastMessage.content}
               </p>
             )}
           </div>
-        </button>
+        </motion.button>
       </ContextMenuTrigger>
-      <ContextMenuContent className="w-48 bg-[#111113] border-white/[0.08]">
-        <ContextMenuItem 
-          onClick={onMute}
-          className="text-zinc-300 focus:text-white focus:bg-white/[0.06]"
-        >
+      <ContextMenuContent className="w-48 bg-[#18181b]/95 backdrop-blur-xl border-white/[0.1]">
+        <ContextMenuItem onClick={onMute} className="text-zinc-300 focus:text-white focus:bg-white/[0.08]">
           Mute Conversation
         </ContextMenuItem>
-        <ContextMenuSeparator className="bg-white/[0.06]" />
-        <ContextMenuItem 
-          onClick={onClose}
-          className="text-zinc-300 focus:text-white focus:bg-white/[0.06]"
-        >
+        <ContextMenuSeparator className="bg-white/[0.08]" />
+        <ContextMenuItem onClick={onClose} className="text-red-400 focus:text-red-300 focus:bg-red-500/10">
           Close DM
         </ContextMenuItem>
-        {!isGroup && (
-          <ContextMenuItem 
-            onClick={onBlock}
-            className="text-red-400 focus:text-red-300 focus:bg-red-500/10"
-          >
-            Block User
-          </ContextMenuItem>
-        )}
       </ContextMenuContent>
     </ContextMenu>
   );
 }
 
-function FriendItem({ friend, onClick, onRemove }) {
+function QuickAction({ icon: Icon, label, onClick, gradient }) {
   return (
-    <button
+    <motion.button
       onClick={onClick}
-      className="w-full flex items-center gap-3 px-2 py-2 rounded-lg hover:bg-white/[0.04] transition-colors"
+      className={cn(
+        'flex-1 flex flex-col items-center gap-1.5 p-3 rounded-xl transition-all',
+        'bg-gradient-to-br border border-white/[0.04]',
+        gradient
+      )}
+      whileHover={{ scale: 1.02, y: -1 }}
+      whileTap={{ scale: 0.98 }}
     >
-      <Avatar
-        src={friend.friend_avatar}
-        name={friend.friend_name}
-        status={friend.status || 'offline'}
-        size="sm"
-      />
-      <div className="flex-1 min-w-0 text-left">
-        <span className="text-sm text-zinc-300 truncate block">{friend.friend_name}</span>
-        <span className="text-xs text-zinc-600 capitalize">{friend.status || 'Offline'}</span>
+      <div className="w-8 h-8 rounded-lg bg-white/[0.1] flex items-center justify-center">
+        <Icon className="w-4 h-4 text-white" />
       </div>
-    </button>
+      <span className="text-[11px] font-medium text-zinc-300">{label}</span>
+    </motion.button>
   );
 }
 
@@ -124,35 +144,39 @@ export default function DMPanel({
   onConversationSelect,
   onFriendSelect,
   onCreateDM,
-  onCreateGroupDM,
   onShowFriends,
   onCloseConversation,
   onMuteConversation,
-  onBlockUser,
+  onJoinServer,
+  onNitro,
 }) {
   const [search, setSearch] = useState('');
-  const [view, setView] = useState('conversations'); // conversations | friends
 
   const filteredConversations = conversations.filter(c => {
-    const name = c.name || c.participants?.[0]?.user_name || '';
+    const name = c.name || c.participants?.find(p => p.user_name)?.user_name || '';
     return name.toLowerCase().includes(search.toLowerCase());
   });
 
-  const filteredFriends = friends.filter(f =>
-    f.friend_name?.toLowerCase().includes(search.toLowerCase())
-  );
+  const onlineFriends = friends.filter(f => f.status === 'online' || f.friend_status === 'online');
 
   return (
-    <Panel width={240}>
-      <PanelHeader className="flex-col items-stretch gap-2 py-3">
-        <div className="flex items-center justify-between">
-          <button
+    <Panel width={260}>
+      <PanelHeader className="flex-col items-stretch gap-3 pt-4 pb-3 px-3 border-b-0">
+        {/* Title with friend count */}
+        <div className="flex items-center justify-between px-1">
+          <motion.button
             onClick={onShowFriends}
-            className="flex items-center gap-2 px-2 py-1 -ml-2 rounded hover:bg-white/[0.04] transition-colors"
+            className="flex items-center gap-2 text-white font-semibold hover:text-indigo-400 transition-colors"
+            whileHover={{ x: 2 }}
           >
-            <Users className="w-4 h-4 text-zinc-400" />
-            <span className="text-sm font-medium text-white">Friends</span>
-          </button>
+            <Users className="w-5 h-5" />
+            <span>Friends</span>
+            {onlineFriends.length > 0 && (
+              <span className="px-1.5 py-0.5 text-[10px] font-bold bg-emerald-500/20 text-emerald-400 rounded">
+                {onlineFriends.length}
+              </span>
+            )}
+          </motion.button>
           <IconButton
             icon={Plus}
             size="sm"
@@ -162,95 +186,81 @@ export default function DMPanel({
           />
         </div>
         
-        <Input
+        {/* Search */}
+        <SearchInput
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search..."
-          leftIcon={<Search className="w-4 h-4" />}
-          className="h-8"
+          placeholder="Find a conversation"
         />
       </PanelHeader>
 
       <PanelContent className="px-2 py-2">
-        {/* Tab buttons */}
-        <div className="flex gap-1 mb-3 p-1 bg-white/[0.02] rounded-lg">
-          <button
-            onClick={() => setView('conversations')}
-            className={cn(
-              'flex-1 py-1.5 text-xs font-medium rounded-md transition-colors',
-              view === 'conversations' 
-                ? 'bg-white/[0.08] text-white' 
-                : 'text-zinc-500 hover:text-zinc-300'
-            )}
-          >
-            Messages
-          </button>
-          <button
-            onClick={() => setView('friends')}
-            className={cn(
-              'flex-1 py-1.5 text-xs font-medium rounded-md transition-colors',
-              view === 'friends' 
-                ? 'bg-white/[0.08] text-white' 
-                : 'text-zinc-500 hover:text-zinc-300'
-            )}
-          >
-            Friends
-          </button>
+        {/* Quick Actions */}
+        <div className="flex gap-2 mb-3 px-1">
+          <QuickAction
+            icon={UserPlus}
+            label="Add Friend"
+            onClick={onCreateDM}
+            gradient="from-indigo-500/10 to-indigo-600/5"
+          />
+          <QuickAction
+            icon={Globe}
+            label="Join Server"
+            onClick={onJoinServer}
+            gradient="from-emerald-500/10 to-emerald-600/5"
+          />
+          <QuickAction
+            icon={Sparkles}
+            label="Premium"
+            onClick={onNitro}
+            gradient="from-purple-500/10 to-pink-500/5"
+          />
+        </div>
+        
+        {/* Section header */}
+        <div className="flex items-center justify-between px-2 py-2">
+          <span className="text-[11px] font-semibold text-zinc-600 uppercase tracking-wider">
+            Direct Messages
+          </span>
+          <span className="text-[10px] text-zinc-700">{filteredConversations.length}</span>
         </div>
 
-        <AnimatePresence mode="wait">
-          {view === 'conversations' ? (
-            <motion.div
-              key="conversations"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="space-y-0.5"
-            >
-              {filteredConversations.length === 0 ? (
-                <div className="text-center py-8">
-                  <MessageCircle className="w-8 h-8 mx-auto text-zinc-700 mb-2" />
-                  <p className="text-xs text-zinc-600">No conversations</p>
+        {/* Conversations list */}
+        <div className="space-y-0.5">
+          <AnimatePresence mode="popLayout">
+            {filteredConversations.length === 0 ? (
+              <motion.div 
+                className="text-center py-12"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+              >
+                <div className="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-zinc-800 to-zinc-900 flex items-center justify-center mb-3">
+                  <MessageCircle className="w-7 h-7 text-zinc-600" />
                 </div>
-              ) : (
-                filteredConversations.map((conv) => (
+                <p className="text-sm font-medium text-zinc-500">No conversations yet</p>
+                <p className="text-xs text-zinc-600 mt-1">Start chatting with friends!</p>
+              </motion.div>
+            ) : (
+              filteredConversations.map((conv, i) => (
+                <motion.div
+                  key={conv.id}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ delay: i * 0.02 }}
+                >
                   <ConversationItem
-                    key={conv.id}
                     conversation={conv}
                     isActive={activeConversationId === conv.id}
                     onClick={() => onConversationSelect(conv)}
                     onClose={() => onCloseConversation?.(conv)}
                     onMute={() => onMuteConversation?.(conv)}
-                    onBlock={() => onBlockUser?.(conv.participants?.[0])}
                   />
-                ))
-              )}
-            </motion.div>
-          ) : (
-            <motion.div
-              key="friends"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="space-y-0.5"
-            >
-              {filteredFriends.length === 0 ? (
-                <div className="text-center py-8">
-                  <Users className="w-8 h-8 mx-auto text-zinc-700 mb-2" />
-                  <p className="text-xs text-zinc-600">No friends online</p>
-                </div>
-              ) : (
-                filteredFriends.map((friend) => (
-                  <FriendItem
-                    key={friend.id}
-                    friend={friend}
-                    onClick={() => onFriendSelect(friend)}
-                  />
-                ))
-              )}
-            </motion.div>
-          )}
-        </AnimatePresence>
+                </motion.div>
+              ))
+            )}
+          </AnimatePresence>
+        </div>
       </PanelContent>
     </Panel>
   );

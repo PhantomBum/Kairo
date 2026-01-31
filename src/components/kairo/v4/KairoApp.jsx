@@ -520,6 +520,7 @@ function KairoAppContent() {
           onCreateServer={() => setShowCreateServer(true)}
           onDiscoverClick={() => setShowDiscover(true)}
           isDMsActive={view === 'dms' || view === 'friends'}
+          onNitro={() => setShowNitroCheckout(true)}
         />
       }
       secondarySidebar={
@@ -543,6 +544,8 @@ function KairoAppContent() {
             onFriendSelect={handleStartDM}
             onShowFriends={handleFriendsClick}
             onCreateDM={() => setShowAddFriend(true)}
+            onJoinServer={() => setShowJoinServer(true)}
+            onNitro={() => setShowNitroCheckout(true)}
           />
         ) : null
       }
@@ -586,6 +589,8 @@ function KairoAppContent() {
           onToggleMute={() => setIsMuted(!isMuted)}
           onToggleDeafen={() => setIsDeafened(!isDeafened)}
           onOpenSettings={() => setShowSettings(true)}
+          isPremium={userProfile?.badges?.includes('premium')}
+          onLogout={() => base44.auth.logout()}
           onStatusChange={async (status) => {
             if (userProfile) {
               await base44.entities.UserProfile.update(userProfile.id, { status });
