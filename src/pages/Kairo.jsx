@@ -1287,23 +1287,77 @@ function KairoPageContent() {
           "fixed md:relative z-50 h-full transition-transform duration-300 md:translate-x-0 flex flex-col",
           showMobileChannels ? "translate-x-0" : "-translate-x-full md:translate-x-0"
         )}>
-          <DMSidebar conversations={conversations} friends={friends} activeConversationId={activeConversation?.id}
-            onConversationSelect={(convo) => { setActiveConversation(convo); setShowMobileChannels(false); }} onConversationClose={() => setActiveConversation(null)}
-            onNewDM={() => setShowNewDM(true)} onAddFriend={() => setShowAddFriend(true)} onJoinServer={() => setShowJoinServer(true)} />
-          <UserStatusBar profile={userProfile} isMuted={isMuted} isDeafened={isDeafened} onToggleMute={() => setIsMuted(!isMuted)} onToggleDeafen={() => setIsDeafened(!isDeafened)}
-            onOpenSettings={() => setShowSettings(true)} onStatusChange={(status) => updateProfileMutation.mutate({ status })} />
+          {USE_V3_UI ? (
+            <>
+              <DMPanelV3 
+                conversations={conversations} 
+                friends={friends} 
+                activeConversationId={activeConversation?.id}
+                onConversationSelect={(convo) => { setActiveConversation(convo); setShowMobileChannels(false); }} 
+                onConversationClose={() => setActiveConversation(null)}
+                onNewDM={() => setShowNewDM(true)} 
+                onAddFriend={() => setShowAddFriend(true)} 
+                onJoinServer={() => setShowJoinServer(true)} 
+              />
+              <UserBarV3 
+                profile={userProfile} 
+                isMuted={isMuted} 
+                isDeafened={isDeafened} 
+                onToggleMute={() => setIsMuted(!isMuted)} 
+                onToggleDeafen={() => setIsDeafened(!isDeafened)}
+                onOpenSettings={() => setShowSettings(true)} 
+                onStatusChange={(status) => updateProfileMutation.mutate({ status })} 
+              />
+            </>
+          ) : (
+            <>
+              <DMSidebar conversations={conversations} friends={friends} activeConversationId={activeConversation?.id}
+                onConversationSelect={(convo) => { setActiveConversation(convo); setShowMobileChannels(false); }} onConversationClose={() => setActiveConversation(null)}
+                onNewDM={() => setShowNewDM(true)} onAddFriend={() => setShowAddFriend(true)} onJoinServer={() => setShowJoinServer(true)} />
+              <UserStatusBar profile={userProfile} isMuted={isMuted} isDeafened={isDeafened} onToggleMute={() => setIsMuted(!isMuted)} onToggleDeafen={() => setIsDeafened(!isDeafened)}
+                onOpenSettings={() => setShowSettings(true)} onStatusChange={(status) => updateProfileMutation.mutate({ status })} />
+            </>
+          )}
         </div>
       ) : (
         <div className={cn(
           "fixed md:relative z-50 h-full transition-transform duration-300 md:translate-x-0 flex flex-col",
           showMobileChannels ? "translate-x-0" : "-translate-x-full md:translate-x-0"
         )}>
-          <ChannelSidebar server={activeServer} categories={categories} channels={channels} activeChannelId={activeChannel?.id}
-            onChannelClick={(channel) => { handleChannelClick(channel); setShowMobileChannels(false); }} onServerSettings={() => setShowServerSettings(true)} onCreateChannel={(categoryId) => { setCreateChannelCategory(categoryId); setShowCreateChannel(true); }}
-            onInvite={() => setShowInvite(true)} voiceStates={voiceStates} />
-          {voiceChannel && <VoiceConnectionBar channel={voiceChannel} server={activeServer} onDisconnect={handleVoiceDisconnect} />}
-          <UserStatusBar profile={userProfile} isMuted={isMuted} isDeafened={isDeafened} onToggleMute={() => setIsMuted(!isMuted)} onToggleDeafen={() => setIsDeafened(!isDeafened)}
-            onOpenSettings={() => setShowSettings(true)} onStatusChange={(status) => updateProfileMutation.mutate({ status })} />
+          {USE_V3_UI ? (
+            <>
+              <ChannelListV3 
+                server={activeServer} 
+                categories={categories} 
+                channels={channels} 
+                activeChannelId={activeChannel?.id}
+                onChannelClick={(channel) => { handleChannelClick(channel); setShowMobileChannels(false); }} 
+                onServerSettings={() => setShowServerSettings(true)} 
+                onCreateChannel={(categoryId) => { setCreateChannelCategory(categoryId); setShowCreateChannel(true); }}
+                onInvite={() => setShowInvite(true)} 
+                voiceStates={voiceStates} 
+              />
+              {voiceChannel && <VoiceConnectionBar channel={voiceChannel} server={activeServer} onDisconnect={handleVoiceDisconnect} />}
+              <UserBarV3 
+                profile={userProfile} 
+                isMuted={isMuted} 
+                isDeafened={isDeafened} 
+                onToggleMute={() => setIsMuted(!isMuted)} 
+                onToggleDeafen={() => setIsDeafened(!isDeafened)}
+                onOpenSettings={() => setShowSettings(true)} 
+                onStatusChange={(status) => updateProfileMutation.mutate({ status })} 
+              />
+            </>
+          ) : (
+            <>
+              <ChannelSidebar server={activeServer} categories={categories} channels={channels} activeChannelId={activeChannel?.id}
+                onChannelClick={(channel) => { handleChannelClick(channel); setShowMobileChannels(false); }} onServerSettings={() => setShowServerSettings(true)} onCreateChannel={(categoryId) => { setCreateChannelCategory(categoryId); setShowCreateChannel(true); }}
+                onInvite={() => setShowInvite(true)} voiceStates={voiceStates} />
+              {voiceChannel && <VoiceConnectionBar channel={voiceChannel} server={activeServer} onDisconnect={handleVoiceDisconnect} />}
+              <UserStatusBar profile={userProfile} isMuted={isMuted} isDeafened={isDeafened} onToggleMute={() => setIsMuted(!isMuted)} onToggleDeafen={() => setIsDeafened(!isDeafened)}
+                onOpenSettings={() => setShowSettings(true)} onStatusChange={(status) => updateProfileMutation.mutate({ status })} />
+            </>
+          )}
         </div>
       )}
 
