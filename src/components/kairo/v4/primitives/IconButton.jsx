@@ -57,11 +57,7 @@ export default function IconButton({
       disabled={disabled}
       {...props}
     >
-      {typeof Icon === 'function' ? (
-        <Icon className={iconSizes[size]} />
-      ) : (
-        Icon
-      )}
+      {Icon && <Icon className={iconSizes[size]} />}
       
       {badge !== undefined && badge > 0 && (
         <span className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 bg-red-500 rounded-full text-[10px] font-medium text-white flex items-center justify-center">
