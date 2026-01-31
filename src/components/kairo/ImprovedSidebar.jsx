@@ -58,24 +58,24 @@ function MoreMenu({ isCollapsed, onOpenShortcuts }) {
           </button>
         )}
       </DropdownMenuTrigger>
-      <DropdownMenuContent side="right" align="end" className="w-48 bg-zinc-900 border-zinc-800 rounded-lg p-1">
-        <DropdownMenuItem className="text-zinc-300 focus:bg-zinc-800 focus:text-white rounded px-3 py-2 cursor-pointer text-sm">
-          <Crown className="w-4 h-4 mr-2 text-amber-500" />
+      <DropdownMenuContent side="right" align="end" className="w-48 bg-[#1a1a1a] border-white/10 rounded-lg p-1">
+        <DropdownMenuItem className="text-zinc-300 focus:bg-white/5 focus:text-white rounded px-3 py-2 cursor-pointer text-sm">
+          <Crown className="w-4 h-4 mr-2 text-zinc-500" />
           Nitro
         </DropdownMenuItem>
-        <DropdownMenuSeparator className="bg-zinc-800 my-1" />
-        <DropdownMenuItem className="text-zinc-300 focus:bg-zinc-800 focus:text-white rounded px-3 py-2 cursor-pointer text-sm">
+        <DropdownMenuSeparator className="bg-white/5 my-1" />
+        <DropdownMenuItem className="text-zinc-300 focus:bg-white/5 focus:text-white rounded px-3 py-2 cursor-pointer text-sm">
           <Palette className="w-4 h-4 mr-2 text-zinc-500" />
           Themes
         </DropdownMenuItem>
         <DropdownMenuItem 
-          className="text-zinc-300 focus:bg-zinc-800 focus:text-white rounded px-3 py-2 cursor-pointer text-sm" 
+          className="text-zinc-300 focus:bg-white/5 focus:text-white rounded px-3 py-2 cursor-pointer text-sm" 
           onClick={() => window.dispatchEvent(new CustomEvent('kairo:open-shortcuts'))}
         >
           <Keyboard className="w-4 h-4 mr-2 text-zinc-500" />
           Shortcuts
         </DropdownMenuItem>
-        <DropdownMenuItem className="text-zinc-300 focus:bg-zinc-800 focus:text-white rounded px-3 py-2 cursor-pointer text-sm">
+        <DropdownMenuItem className="text-zinc-300 focus:bg-white/5 focus:text-white rounded px-3 py-2 cursor-pointer text-sm">
           <Headphones className="w-4 h-4 mr-2 text-zinc-500" />
           Audio
         </DropdownMenuItem>
@@ -107,7 +107,7 @@ function NavItem({ icon: Icon, label, isActive, badge, onClick, isCollapsed }) {
               )}
             </button>
           </TooltipTrigger>
-          <TooltipContent side="right" className="bg-zinc-900 border-zinc-800 text-white text-xs px-2 py-1.5 rounded-md">
+          <TooltipContent side="right" className="bg-[#1a1a1a] border-white/10 text-white text-xs px-2 py-1.5 rounded-md">
             {label}
           </TooltipContent>
         </Tooltip>
@@ -160,8 +160,8 @@ function ServerItem({ server, isActive, isCollapsed, index, onClick, onLeave }) 
                       <img src={server.icon_url} alt="" className="w-full h-full object-cover" />
                     ) : (
                       <div className={cn(
-                        "w-full h-full flex items-center justify-center text-white text-sm font-semibold",
-                        isActive ? "bg-indigo-500" : "bg-zinc-700 hover:bg-zinc-600"
+                        "w-full h-full flex items-center justify-center text-white text-sm font-medium",
+                        isActive ? "bg-white/10" : "bg-white/5 hover:bg-white/10"
                       )}>
                         {server.name?.charAt(0)}
                       </div>
@@ -176,16 +176,16 @@ function ServerItem({ server, isActive, isCollapsed, index, onClick, onLeave }) 
                     )}
                   </button>
                 </ContextMenuTrigger>
-                <ContextMenuContent className="w-48 bg-zinc-900 border-zinc-800 rounded-lg p-1">
-                  <ContextMenuItem className="text-zinc-300 focus:bg-zinc-800 focus:text-white rounded px-3 py-2 cursor-pointer text-sm">
+                <ContextMenuContent className="w-48 bg-[#1a1a1a] border-white/10 rounded-lg p-1">
+                  <ContextMenuItem className="text-zinc-300 focus:bg-white/5 focus:text-white rounded px-3 py-2 cursor-pointer text-sm">
                     <UserPlus className="w-4 h-4 mr-2 text-zinc-500" />
                     Invite People
                   </ContextMenuItem>
-                  <ContextMenuItem className="text-zinc-300 focus:bg-zinc-800 focus:text-white rounded px-3 py-2 cursor-pointer text-sm">
+                  <ContextMenuItem className="text-zinc-300 focus:bg-white/5 focus:text-white rounded px-3 py-2 cursor-pointer text-sm">
                     <Settings className="w-4 h-4 mr-2 text-zinc-500" />
                     Server Settings
                   </ContextMenuItem>
-                  <ContextMenuSeparator className="bg-zinc-800 my-1" />
+                  <ContextMenuSeparator className="bg-white/5 my-1" />
                   <ContextMenuItem 
                     onClick={() => onLeave?.(server)} 
                     className="text-red-400 focus:bg-red-500/10 rounded px-3 py-2 cursor-pointer text-sm"
@@ -202,7 +202,7 @@ function ServerItem({ server, isActive, isCollapsed, index, onClick, onLeave }) 
               )}
             </div>
           </TooltipTrigger>
-          <TooltipContent side="right" className="bg-zinc-900 border-zinc-800 text-white rounded-md px-3 py-2">
+          <TooltipContent side="right" className="bg-[#1a1a1a] border-white/10 text-white rounded-md px-3 py-2">
             <p className="font-medium">{server.name}</p>
             <p className="text-xs text-zinc-500">{server.member_count || 0} members</p>
           </TooltipContent>
@@ -230,8 +230,8 @@ function ServerItem({ server, isActive, isCollapsed, index, onClick, onLeave }) 
               <img src={server.icon_url} alt="" className="w-full h-full object-cover" />
             ) : (
               <div className={cn(
-                "w-full h-full flex items-center justify-center text-white text-sm font-semibold",
-                isActive ? "bg-indigo-500" : "bg-zinc-700"
+                "w-full h-full flex items-center justify-center text-white text-sm font-medium",
+                isActive ? "bg-white/10" : "bg-white/5"
               )}>
                 {server.name?.charAt(0)}
               </div>
@@ -252,16 +252,16 @@ function ServerItem({ server, isActive, isCollapsed, index, onClick, onLeave }) 
           )}
         </button>
       </ContextMenuTrigger>
-      <ContextMenuContent className="w-48 bg-zinc-900 border-zinc-800 rounded-lg p-1">
-        <ContextMenuItem className="text-zinc-300 focus:bg-zinc-800 focus:text-white rounded px-3 py-2 cursor-pointer text-sm">
+      <ContextMenuContent className="w-48 bg-[#1a1a1a] border-white/10 rounded-lg p-1">
+        <ContextMenuItem className="text-zinc-300 focus:bg-white/5 focus:text-white rounded px-3 py-2 cursor-pointer text-sm">
           <UserPlus className="w-4 h-4 mr-2 text-zinc-500" />
           Invite People
         </ContextMenuItem>
-        <ContextMenuItem className="text-zinc-300 focus:bg-zinc-800 focus:text-white rounded px-3 py-2 cursor-pointer text-sm">
+        <ContextMenuItem className="text-zinc-300 focus:bg-white/5 focus:text-white rounded px-3 py-2 cursor-pointer text-sm">
           <Settings className="w-4 h-4 mr-2 text-zinc-500" />
           Server Settings
         </ContextMenuItem>
-        <ContextMenuSeparator className="bg-zinc-800 my-1" />
+        <ContextMenuSeparator className="bg-white/5 my-1" />
         <ContextMenuItem 
           onClick={() => onLeave?.(server)} 
           className="text-red-400 focus:bg-red-500/10 rounded px-3 py-2 cursor-pointer text-sm"
@@ -309,10 +309,10 @@ export default function ImprovedSidebar({
         <div className="flex items-center justify-between px-3 py-3 border-b border-white/5">
           {!isCollapsed && (
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-indigo-500 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center">
                 <Zap className="w-4 h-4 text-white" />
               </div>
-              <span className="font-semibold text-white">Kairo</span>
+              <span className="font-medium text-white">Kairo</span>
             </div>
           )}
 
@@ -381,12 +381,12 @@ export default function ImprovedSidebar({
                   <TooltipTrigger asChild>
                     <button
                       onClick={() => { onDiscoverClick?.(); onMobileClose?.(); }}
-                      className="w-11 h-11 rounded-2xl hover:rounded-xl bg-zinc-700 hover:bg-emerald-600 text-zinc-400 hover:text-white flex items-center justify-center transition-all"
+                      className="w-11 h-11 rounded-2xl hover:rounded-xl bg-white/5 hover:bg-white/10 text-zinc-500 hover:text-white flex items-center justify-center transition-all border border-white/5 hover:border-white/10"
                     >
                       <Compass className="w-5 h-5" />
                     </button>
                   </TooltipTrigger>
-                  <TooltipContent side="right" className="bg-zinc-900 border-zinc-800 text-white text-xs px-2 py-1.5 rounded-md">
+                  <TooltipContent side="right" className="bg-[#1a1a1a] border-white/10 text-white text-xs px-2 py-1.5 rounded-md">
                     Discover Servers
                   </TooltipContent>
                 </Tooltip>
@@ -394,7 +394,7 @@ export default function ImprovedSidebar({
             ) : (
               <button
                 onClick={() => { onDiscoverClick?.(); onMobileClose?.(); }}
-                className="w-full flex items-center gap-3 px-2 py-1.5 rounded-md text-zinc-500 hover:text-emerald-400 hover:bg-white/5 transition-colors"
+                className="w-full flex items-center gap-3 px-2 py-1.5 rounded-md text-zinc-500 hover:text-white hover:bg-white/5 transition-colors"
               >
                 <Compass className="w-5 h-5" />
                 <span className="text-sm">Discover</span>
