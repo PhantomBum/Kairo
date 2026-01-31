@@ -75,7 +75,7 @@ import CreateGroupDMModal from '@/components/kairo/CreateGroupDMModal';
 // Channel header component - Clean style
 function ChannelHeader({ channel, memberCount, onMembersToggle, showMembers, onShowPinned, showPinned, onMenuToggle }) {
   return (
-    <div className="h-12 px-4 flex items-center justify-between border-b border-white/5 bg-[#1a1a1a]">
+    <div className="h-12 px-4 flex items-center justify-between border-b border-white/[0.04] bg-[#0a0a0b]">
       <div className="flex items-center gap-2">
         {/* Mobile menu button */}
         <button 
@@ -1355,7 +1355,7 @@ function KairoPageContent() {
                     onMenuToggle={() => setShowMobileChannels(true)}
                   />
               <div className="flex-1 flex min-h-0">
-                <div className="flex-1 flex flex-col bg-[#121214]">
+                <div className="flex-1 flex flex-col bg-[#0a0a0b]">
                   {messagesLoading ? (
                     <div className="flex-1 overflow-y-auto">
                       <SkeletonMessage />
@@ -1451,7 +1451,7 @@ function KairoPageContent() {
           )
         ) : view === 'dms' && activeConversation ? (
           <>
-            <div className="h-12 px-3 md:px-4 flex items-center border-b border-zinc-800/50 bg-[#121214]">
+            <div className="h-12 px-3 md:px-4 flex items-center border-b border-white/[0.04] bg-[#0a0a0b]">
               <div className="flex items-center gap-2 md:gap-3">
                 <button 
                   onClick={() => setShowMobileChannels(true)}
@@ -1465,7 +1465,7 @@ function KairoPageContent() {
                 <span className="font-semibold text-white">{activeConversation.name || activeConversation.participants?.[0]?.user_name}</span>
               </div>
             </div>
-            <div className="flex-1 flex flex-col bg-[#121214]">
+            <div className="flex-1 flex flex-col bg-[#0a0a0b]">
               <MessageList messages={[...dmMessages].reverse()} currentUserId={currentUser?.id} onReply={(msg) => setReplyTo(msg)} onReact={() => {}} isLoading={dmMessagesLoading} />
               <TypingIndicator typingUsers={typingUsers} className="px-4" />
               <MessageInput channelName={activeConversation.participants?.[0]?.user_name} replyTo={replyTo} onCancelReply={() => setReplyTo(null)} onSendMessage={(data) => sendDMMutation.mutate(data)} onTyping={sendTypingIndicator} />

@@ -51,7 +51,7 @@ function MemberItem({ member, isOwner, highestRole, onMessage, onProfile }) {
                   )}
                 </div>
                 <div className={cn(
-                  "absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-[#181818]",
+                  "absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-[#0c0c0d]",
                   statusColors[member.status] || statusColors.offline
                 )} />
               </div>
@@ -227,9 +227,9 @@ export default function MemberList({
   }, [members, roles]);
 
   return (
-    <div className="w-60 h-full bg-[#181818] border-l border-white/5 overflow-y-auto scrollbar-thin">
+    <div className="w-60 h-full bg-[#0c0c0d] border-l border-white/[0.04] overflow-y-auto scrollbar-thin">
       {/* Header */}
-      <div className="sticky top-0 z-10 px-4 py-3 bg-[#181818]">
+      <div className="sticky top-0 z-10 px-4 py-3 bg-[#0c0c0d]">
         <h2 className="text-[11px] font-semibold uppercase tracking-wide text-zinc-500">Members — {members.length}</h2>
       </div>
       

@@ -301,7 +301,7 @@ export default function ImprovedSidebar({
   return (
     <div 
       style={{ width: isCollapsed ? collapsedWidth : expandedWidth }}
-      className="h-full flex flex-col bg-[#141414] transition-all duration-200"
+      className="h-full flex flex-col bg-[#0a0a0b] transition-all duration-200"
     >
       {/* Content */}
       <div className="flex flex-col h-full">

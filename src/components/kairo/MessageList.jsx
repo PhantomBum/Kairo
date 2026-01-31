@@ -46,10 +46,10 @@ function DateDivider({ date }) {
   else label = format(d, 'EEEE, MMMM d');
 
   return (
-    <div className="flex items-center gap-4 py-6 px-4">
-      <div className="flex-1 h-px bg-gradient-to-r from-transparent via-zinc-800 to-transparent" />
-      <span className="text-xs font-medium text-zinc-500 bg-zinc-900 px-3 py-1 rounded-full">{label}</span>
-      <div className="flex-1 h-px bg-gradient-to-r from-transparent via-zinc-800 to-transparent" />
+    <div className="flex items-center gap-4 py-4 px-4">
+      <div className="flex-1 h-px bg-white/[0.04]" />
+      <span className="text-[10px] font-medium text-zinc-600 uppercase tracking-wider">{label}</span>
+      <div className="flex-1 h-px bg-white/[0.04]" />
     </div>
   );
 }
@@ -57,14 +57,14 @@ function DateDivider({ date }) {
 function MessageActions({ message, onReply, onEditClick, onDelete, onReact, onPin, isOwn }) {
   return (
     <div className="absolute -top-2 right-4 opacity-0 group-hover:opacity-100 transition-all">
-      <div className="flex items-center bg-[#1a1a1d] border border-white/10 rounded shadow-xl p-0.5 gap-0.5">
+      <div className="flex items-center bg-[#111113] border border-white/[0.06] rounded shadow-xl p-0.5 gap-0.5">
         <Popover>
           <PopoverTrigger asChild>
             <button className="p-1.5 hover:bg-white/10 rounded text-zinc-500 hover:text-white transition-colors">
               <Smile className="w-3.5 h-3.5" />
             </button>
           </PopoverTrigger>
-          <PopoverContent className="w-auto p-1.5 bg-[#1a1a1d] border-white/10 rounded-lg" align="end">
+          <PopoverContent className="w-auto p-1.5 bg-[#111113] border-white/[0.06] rounded-lg" align="end">
             <div className="flex gap-0.5">
               {commonEmojis.map((emoji) => (
                 <button
@@ -101,7 +101,7 @@ function MessageActions({ message, onReply, onEditClick, onDelete, onReact, onPi
               <MoreHorizontal className="w-3.5 h-3.5" />
             </button>
           </PopoverTrigger>
-          <PopoverContent className="w-40 p-1 bg-[#1a1a1d] border-white/10 rounded-lg" align="end">
+          <PopoverContent className="w-40 p-1 bg-[#111113] border-white/[0.06] rounded-lg" align="end">
             <button 
               onClick={() => navigator.clipboard.writeText(message.content)}
               className="w-full flex items-center gap-2 px-2.5 py-1.5 text-xs text-zinc-300 hover:bg-white/5 rounded transition-colors"
@@ -323,57 +323,57 @@ function MessageItem({ message, showHeader, onReply, onEditClick, onDelete, onRe
           />
         </div>
         </ContextMenuTrigger>
-      <ContextMenuContent className="w-48 bg-zinc-900/95 backdrop-blur-xl border-zinc-800/80 rounded-xl p-1">
+      <ContextMenuContent className="w-48 bg-[#111113] border-white/[0.06] rounded-lg p-1">
         <ContextMenuItem 
           onClick={() => onReply?.(message)}
-          className="text-zinc-300 focus:bg-zinc-800 rounded-lg"
+          className="text-zinc-400 focus:bg-white/[0.04] focus:text-white rounded px-3 py-1.5 text-xs"
         >
-          <Reply className="w-4 h-4 mr-2 text-zinc-500" />
+          <Reply className="w-3.5 h-3.5 mr-2 text-zinc-600" />
           Reply
         </ContextMenuItem>
         <ContextMenuItem 
           onClick={() => onThread?.(message)}
-          className="text-zinc-300 focus:bg-zinc-800 rounded-lg"
+          className="text-zinc-400 focus:bg-white/[0.04] focus:text-white rounded px-3 py-1.5 text-xs"
         >
-          <MessageSquare className="w-4 h-4 mr-2 text-zinc-500" />
+          <MessageSquare className="w-3.5 h-3.5 mr-2 text-zinc-600" />
           Create Thread
         </ContextMenuItem>
         <ContextMenuItem 
           onClick={() => navigator.clipboard.writeText(message.content)}
-          className="text-zinc-300 focus:bg-zinc-800 rounded-lg"
+          className="text-zinc-400 focus:bg-white/[0.04] focus:text-white rounded px-3 py-1.5 text-xs"
         >
-          <Copy className="w-4 h-4 mr-2 text-zinc-500" />
+          <Copy className="w-3.5 h-3.5 mr-2 text-zinc-600" />
           Copy Text
         </ContextMenuItem>
         <ContextMenuItem 
           onClick={() => onPin?.(message)}
-          className="text-zinc-300 focus:bg-zinc-800 rounded-lg"
+          className="text-zinc-400 focus:bg-white/[0.04] focus:text-white rounded px-3 py-1.5 text-xs"
         >
-          <Pin className="w-4 h-4 mr-2 text-zinc-500" />
+          <Pin className="w-3.5 h-3.5 mr-2 text-zinc-600" />
           {message.is_pinned ? 'Unpin Message' : 'Pin Message'}
         </ContextMenuItem>
         <ContextMenuItem 
           onClick={() => onForward?.(message)}
-          className="text-zinc-300 focus:bg-zinc-800 rounded-lg"
+          className="text-zinc-400 focus:bg-white/[0.04] focus:text-white rounded px-3 py-1.5 text-xs"
         >
-          <Forward className="w-4 h-4 mr-2 text-zinc-500" />
+          <Forward className="w-3.5 h-3.5 mr-2 text-zinc-600" />
           Forward
         </ContextMenuItem>
         {isOwn && (
           <>
-            <ContextMenuSeparator className="bg-zinc-800/50 my-1" />
+            <ContextMenuSeparator className="bg-white/[0.04] my-1" />
             <ContextMenuItem 
               onClick={() => onEditClick?.(message)}
-              className="text-zinc-300 focus:bg-zinc-800 rounded-lg"
+              className="text-zinc-400 focus:bg-white/[0.04] focus:text-white rounded px-3 py-1.5 text-xs"
             >
-              <Pencil className="w-4 h-4 mr-2 text-zinc-500" />
+              <Pencil className="w-3.5 h-3.5 mr-2 text-zinc-600" />
               Edit
             </ContextMenuItem>
             <ContextMenuItem 
               onClick={() => onDelete?.(message.id)}
-              className="text-rose-400 focus:bg-rose-500/10 rounded-lg"
+              className="text-red-400 focus:bg-red-500/10 rounded px-3 py-1.5 text-xs"
             >
-              <Trash2 className="w-4 h-4 mr-2" />
+              <Trash2 className="w-3.5 h-3.5 mr-2" />
               Delete
             </ContextMenuItem>
           </>

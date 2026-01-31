@@ -11,28 +11,28 @@ export default function Layout({ children }) {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#111111]">
+    <div className="min-h-screen bg-[#0a0a0b]">
       <style>{`
         :root {
-          --background: 0 0% 7%;
-          --foreground: 0 0% 98%;
-          --card: 0 0% 9%;
-          --card-foreground: 0 0% 98%;
-          --popover: 0 0% 9%;
-          --popover-foreground: 0 0% 98%;
-          --primary: 0 0% 98%;
-          --primary-foreground: 0 0% 9%;
-          --secondary: 0 0% 14%;
-          --secondary-foreground: 0 0% 98%;
-          --muted: 0 0% 14%;
-          --muted-foreground: 0 0% 55%;
-          --accent: 0 0% 14%;
-          --accent-foreground: 0 0% 98%;
+          --background: 0 0% 4%;
+          --foreground: 0 0% 90%;
+          --card: 0 0% 6%;
+          --card-foreground: 0 0% 90%;
+          --popover: 0 0% 6%;
+          --popover-foreground: 0 0% 90%;
+          --primary: 0 0% 90%;
+          --primary-foreground: 0 0% 6%;
+          --secondary: 0 0% 10%;
+          --secondary-foreground: 0 0% 90%;
+          --muted: 0 0% 10%;
+          --muted-foreground: 0 0% 45%;
+          --accent: 0 0% 10%;
+          --accent-foreground: 0 0% 90%;
           --destructive: 0 84% 60%;
           --destructive-foreground: 0 0% 98%;
-          --border: 0 0% 14%;
-          --input: 0 0% 14%;
-          --ring: 0 0% 50%;
+          --border: 0 0% 12%;
+          --input: 0 0% 10%;
+          --ring: 0 0% 40%;
         }
 
         * {
@@ -40,7 +40,7 @@ export default function Layout({ children }) {
         }
 
         body {
-          background-color: #111111;
+          background-color: #0a0a0b;
           color: hsl(var(--foreground));
           font-feature-settings: "rlig" 1, "calt" 1;
         }
