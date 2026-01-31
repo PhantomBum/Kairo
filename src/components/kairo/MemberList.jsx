@@ -194,17 +194,20 @@ export default function MemberList({
     const groups = {};
     const sortedRoles = [...roles].sort((a, b) => (b.position || 0) - (a.position || 0));
     
+    // Create groups for hoisted roles
     sortedRoles.filter(r => r.is_hoisted).forEach(role => {
       groups[role.id] = { role, members: [] };
     });
     
-    groups['online'] = { role: { id: 'online', name: 'Online', color: null }, members: [] };
-    groups['offline'] = { role: { id: 'offline', name: 'Offline', color: null }, members: [] };
+    // Always create Online and Offline groups
+    groups['online'] = { role: { id: 'online', name: 'Online', color: '#10b981' }, members: [] };
+    groups['offline'] = { role: { id: 'offline', name: 'Offline', color: '#52525b' }, members: [] };
     
     members.forEach(member => {
       const memberRoleIds = member.role_ids || [];
       let placed = false;
       
+      // Try to place in hoisted role group
       for (const role of sortedRoles.filter(r => r.is_hoisted)) {
         if (memberRoleIds.includes(role.id)) {
           groups[role.id].members.push({ ...member, highestRole: role });
@@ -213,17 +216,38 @@ export default function MemberList({
         }
       }
       
+      // If not in hoisted role, place by online status
       if (!placed) {
-        const isOnline = member.status && member.status !== 'offline';
-        const group = isOnline ? 'online' : 'offline';
-        groups[group].members.push({
+        const isOnline = member.status && member.status !== 'offline' && member.status !== 'invisible';
+        const groupKey = isOnline ? 'online' : 'offline';
+        groups[groupKey].members.push({
           ...member,
           highestRole: sortedRoles.find(r => memberRoleIds.includes(r.id)) || null
         });
       }
     });
     
-    return Object.values(groups).filter(g => g.members.length > 0);
+    // Return groups with members, prioritizing Online then Offline
+    const result = [];
+    
+    // Add hoisted role groups first
+    sortedRoles.filter(r => r.is_hoisted).forEach(role => {
+      if (groups[role.id]?.members.length > 0) {
+        result.push(groups[role.id]);
+      }
+    });
+    
+    // Add Online group
+    if (groups['online'].members.length > 0) {
+      result.push(groups['online']);
+    }
+    
+    // Add Offline group last
+    if (groups['offline'].members.length > 0) {
+      result.push(groups['offline']);
+    }
+    
+    return result;
   }, [members, roles]);
 
   return (
