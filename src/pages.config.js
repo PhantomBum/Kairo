@@ -49,16 +49,16 @@
  */
 import Home from './pages/Home';
 import Kairo from './pages/Kairo';
-import Landing from './pages/Landing';
 import KairoV4 from './pages/KairoV4';
+import Landing from './pages/Landing';
 import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
     "Home": Home,
     "Kairo": Kairo,
-    "Landing": Landing,
     "KairoV4": KairoV4,
+    "Landing": Landing,
 }
 
 export const pagesConfig = {
