@@ -72,65 +72,54 @@ import PinnedMessagesPanel from '@/components/kairo/chat/PinnedMessagesPanel';
 import GlobalSearch from '@/components/kairo/search/GlobalSearch';
 import CreateGroupDMModal from '@/components/kairo/CreateGroupDMModal';
 
-// Channel header component - Premium V2 style
+// Channel header component - Clean style
 function ChannelHeader({ channel, memberCount, onMembersToggle, showMembers, onShowPinned, showPinned, onMenuToggle }) {
   return (
-    <div className="h-14 px-4 flex items-center justify-between border-b border-white/[0.06] bg-gradient-to-r from-[#0d0d0f] to-[#101012]">
-      <div className="flex items-center gap-3">
+    <div className="h-12 px-4 flex items-center justify-between border-b border-zinc-800 bg-[#313338]">
+      <div className="flex items-center gap-2">
         {/* Mobile menu button */}
         <button 
           onClick={onMenuToggle}
-          className="md:hidden p-2 text-zinc-500 hover:text-white transition-all rounded-xl hover:bg-white/[0.06]"
+          className="md:hidden p-1.5 text-zinc-400 hover:text-white transition-colors rounded hover:bg-white/5"
         >
           <Hash className="w-5 h-5" />
         </button>
-        <div className="hidden md:flex items-center justify-center w-8 h-8 rounded-xl bg-white/[0.05]">
-          <Hash className="w-4 h-4 text-zinc-500" />
-        </div>
-        <div className="flex flex-col">
-          <span className="font-semibold text-white text-sm">{channel?.name || 'general'}</span>
-          {channel?.topic && (
-            <span className="hidden md:inline text-[11px] text-zinc-600 truncate max-w-[300px]">{channel.topic}</span>
-          )}
-        </div>
-        {channel?.is_private && (
-          <span className="px-2 py-1 bg-gradient-to-r from-amber-500/20 to-orange-500/10 text-amber-400 text-[10px] font-semibold rounded-full border border-amber-500/20">
-            Private
-          </span>
+        <Hash className="hidden md:block w-5 h-5 text-zinc-500" />
+        <span className="font-semibold text-white">{channel?.name || 'general'}</span>
+        {channel?.topic && (
+          <>
+            <div className="hidden md:block w-px h-5 bg-zinc-700 mx-2" />
+            <span className="hidden md:inline text-sm text-zinc-400 truncate max-w-[300px]">{channel.topic}</span>
+          </>
         )}
       </div>
-      <div className="flex items-center gap-1">
-        <button className="p-2.5 text-zinc-500 hover:text-white transition-all rounded-xl hover:bg-white/[0.06]">
-          <Bell className="w-4 h-4" />
+      <div className="flex items-center gap-0.5">
+        <button className="p-2 text-zinc-400 hover:text-zinc-200 transition-colors rounded hover:bg-white/5">
+          <Bell className="w-5 h-5" />
         </button>
         <button
           onClick={onShowPinned}
           className={cn(
-            "p-2.5 transition-all rounded-xl",
-            showPinned 
-              ? "text-amber-400 bg-amber-500/10" 
-              : "text-zinc-500 hover:text-white hover:bg-white/[0.06]"
+            "p-2 transition-colors rounded hover:bg-white/5",
+            showPinned ? "text-white" : "text-zinc-400 hover:text-zinc-200"
           )}
         >
-          <Pin className="w-4 h-4" />
+          <Pin className="w-5 h-5" />
         </button>
         <button 
           onClick={() => window.dispatchEvent(new CustomEvent('kairo:open-search'))}
-          className="p-2.5 text-zinc-500 hover:text-white transition-all rounded-xl hover:bg-white/[0.06]"
+          className="p-2 text-zinc-400 hover:text-zinc-200 transition-colors rounded hover:bg-white/5"
         >
-          <Search className="w-4 h-4" />
+          <Search className="w-5 h-5" />
         </button>
         <button
           onClick={onMembersToggle}
           className={cn(
-            "p-2.5 transition-all rounded-xl flex items-center gap-2",
-            showMembers 
-              ? "text-emerald-400 bg-emerald-500/10" 
-              : "text-zinc-500 hover:text-white hover:bg-white/[0.06]"
+            "p-2 transition-colors rounded hover:bg-white/5",
+            showMembers ? "text-white" : "text-zinc-400 hover:text-zinc-200"
           )}
         >
-          <Users className="w-4 h-4" />
-          <span className="text-xs font-medium">{memberCount}</span>
+          <Users className="w-5 h-5" />
         </button>
       </div>
     </div>

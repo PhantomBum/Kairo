@@ -19,9 +19,9 @@ import {
 } from "@/components/ui/hover-card";
 
 const statusColors = {
-  online: 'bg-emerald-400 shadow-emerald-400/40 shadow-sm',
-  idle: 'bg-amber-400 shadow-amber-400/40 shadow-sm',
-  dnd: 'bg-rose-400 shadow-rose-400/40 shadow-sm',
+  online: 'bg-emerald-500',
+  idle: 'bg-amber-500',
+  dnd: 'bg-rose-500',
   invisible: 'bg-zinc-500',
   offline: 'bg-zinc-600'
 };
@@ -34,10 +34,10 @@ function MemberItem({ member, isOwner, highestRole, onMessage, onProfile }) {
       <ContextMenuTrigger>
         <HoverCard openDelay={400}>
           <HoverCardTrigger asChild>
-            <button className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl cursor-pointer hover:bg-white/[0.04] transition-all duration-200 group text-left">
-              {/* Avatar with status - Premium style */}
+            <button className="w-full flex items-center gap-2 px-2 py-1 rounded cursor-pointer hover:bg-white/5 transition-colors group text-left">
+              {/* Avatar with status */}
               <div className="relative flex-shrink-0">
-                <div className="w-8 h-8 rounded-xl overflow-hidden bg-zinc-800 ring-1 ring-white/10 group-hover:ring-white/20 transition-all">
+                <div className="w-8 h-8 rounded-full overflow-hidden bg-zinc-700">
                   {member.avatar_override || member.user_avatar ? (
                     <img 
                       src={member.avatar_override || member.user_avatar} 
@@ -45,28 +45,28 @@ function MemberItem({ member, isOwner, highestRole, onMessage, onProfile }) {
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-violet-500 to-indigo-600 text-white text-xs font-bold">
+                    <div className="w-full h-full flex items-center justify-center bg-indigo-500 text-white text-xs font-medium">
                       {(member.nickname || member.user_name)?.charAt(0)}
                     </div>
                   )}
                 </div>
                 <div className={cn(
-                  "absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-[#111113]",
+                  "absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-[#2b2d31]",
                   statusColors[member.status] || statusColors.offline
                 )} />
               </div>
 
-              {/* Name - Premium style */}
+              {/* Name */}
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-1.5">
+                <div className="flex items-center gap-1">
                   <span 
-                    className="text-sm font-medium truncate group-hover:opacity-100 opacity-80 transition-opacity"
+                    className="text-sm truncate"
                     style={{ color: roleColor }}
                   >
                     {member.nickname || member.user_name}
                   </span>
                   {isOwner && (
-                    <Crown className="w-3.5 h-3.5 text-amber-400 flex-shrink-0" />
+                    <Crown className="w-3 h-3 text-amber-400 flex-shrink-0" />
                   )}
                 </div>
               </div>
@@ -227,10 +227,10 @@ export default function MemberList({
   }, [members, roles]);
 
   return (
-    <div className="w-56 h-full bg-gradient-to-b from-[#111113] to-[#0e0e10] border-l border-white/[0.06] overflow-y-auto scrollbar-thin">
-      {/* Header - Premium style */}
-      <div className="sticky top-0 z-10 px-4 py-3 bg-[#111113]/95 backdrop-blur-sm border-b border-white/[0.06]">
-        <h2 className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Members — {members.length}</h2>
+    <div className="w-60 h-full bg-[#2b2d31] border-l border-zinc-800 overflow-y-auto scrollbar-thin">
+      {/* Header */}
+      <div className="sticky top-0 z-10 px-4 py-3 bg-[#2b2d31]">
+        <h2 className="text-[11px] font-semibold uppercase tracking-wide text-zinc-500">Members — {members.length}</h2>
       </div>
       
       <div className="p-2 space-y-4">

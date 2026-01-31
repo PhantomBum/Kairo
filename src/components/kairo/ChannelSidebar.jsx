@@ -49,25 +49,18 @@ function ChannelItem({ channel, isActive, onClick, voiceUsers = [] }) {
           <button
             onClick={() => onClick(channel)}
             className={cn(
-              "w-full flex items-center gap-2 px-3 py-2 rounded-xl text-sm transition-all duration-200 group text-left",
+              "w-full flex items-center gap-1.5 px-2 py-1.5 rounded text-sm transition-colors group text-left",
               isActive 
-                ? "bg-gradient-to-r from-emerald-500/20 to-teal-500/10 text-emerald-400 shadow-sm" 
-                : "text-zinc-400 hover:text-white hover:bg-white/[0.04]"
+                ? "bg-white/10 text-white" 
+                : "text-zinc-400 hover:text-zinc-200 hover:bg-white/5"
             )}
           >
-            <div className={cn(
-              "w-7 h-7 rounded-lg flex items-center justify-center transition-all",
-              isActive 
-                ? "bg-emerald-500/20" 
-                : "bg-white/[0.04] group-hover:bg-white/[0.08]"
-            )}>
-              <Icon className={cn(
-                "w-4 h-4",
-                isActive ? "text-emerald-400" : "text-zinc-500 group-hover:text-zinc-300"
-              )} />
-            </div>
+            <Icon className={cn(
+              "w-5 h-5 flex-shrink-0",
+              isActive ? "text-white" : "text-zinc-500"
+            )} />
             
-            <span className="flex-1 truncate font-medium">
+            <span className="flex-1 truncate">
               {channel.name}
             </span>
 
@@ -76,7 +69,7 @@ function ChannelItem({ channel, isActive, onClick, voiceUsers = [] }) {
             )}
             
             {isVoice && voiceUsers.length > 0 && (
-              <span className="text-xs font-semibold text-emerald-400 bg-emerald-500/20 px-1.5 py-0.5 rounded-full">
+              <span className="text-xs text-zinc-400">
                 {voiceUsers.length}
               </span>
             )}
@@ -149,23 +142,21 @@ function CategoryItem({ category, channels, activeChannelId, onChannelClick, onC
     <div className="mt-4 first:mt-0">
       <button
         onClick={() => setIsCollapsed(!isCollapsed)}
-        className="flex items-center gap-2 px-3 w-full group py-2"
+        className="flex items-center gap-1 px-1 w-full group py-1"
       >
         <ChevronRight className={cn(
-          "w-3 h-3 text-zinc-600 transition-transform duration-200",
+          "w-3 h-3 text-zinc-500 transition-transform",
           !isCollapsed && "rotate-90"
         )} />
-        <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 group-hover:text-zinc-400 truncate transition-colors">
+        <span className="text-[11px] font-semibold uppercase tracking-wide text-zinc-500 group-hover:text-zinc-400 truncate">
           {category.name}
         </span>
-        <motion.button 
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
+        <button 
           onClick={(e) => { e.stopPropagation(); onCreateChannel?.(category.id); }}
-          className="ml-auto opacity-0 group-hover:opacity-100 p-1 hover:bg-white/[0.06] rounded-lg transition-all"
+          className="ml-auto opacity-0 group-hover:opacity-100 p-0.5 hover:bg-white/10 rounded transition-all"
         >
           <Plus className="w-3 h-3 text-zinc-500" />
-        </motion.button>
+        </button>
       </button>
 
       <AnimatePresence>
@@ -208,64 +199,42 @@ export default function ChannelSidebar({
   const uncategorizedChannels = channels.filter(c => !c.category_id);
 
   return (
-    <div className="w-60 h-full bg-gradient-to-b from-[#111113] to-[#0e0e10] flex flex-col border-r border-white/[0.06]">
+    <div className="w-60 h-full bg-[#2b2d31] flex flex-col">
       
-      {/* Server header - Premium V2 style */}
+      {/* Server header - Clean style */}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <button className="px-4 py-4 flex items-center justify-between hover:bg-white/[0.04] transition-all duration-200 border-b border-white/[0.06] group">
-            <div className="flex items-center gap-3 flex-1 min-w-0">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center flex-shrink-0 shadow-lg shadow-emerald-500/20 group-hover:shadow-emerald-500/30 transition-shadow">
-                {server?.icon_url ? (
-                  <img src={server.icon_url} alt="" className="w-full h-full object-cover rounded-xl" />
-                ) : (
-                  <span className="text-white font-bold text-sm">{server?.name?.charAt(0) || 'K'}</span>
-                )}
-              </div>
-              <div className="min-w-0">
-                <span className="font-semibold text-white text-sm block truncate">{server?.name || 'Server'}</span>
-                <span className="text-[10px] text-zinc-500">{server?.member_count || 0} members</span>
-              </div>
-            </div>
-            <ChevronDown className="w-4 h-4 text-zinc-500 flex-shrink-0 group-hover:text-zinc-400 transition-colors" />
+          <button className="px-4 h-12 flex items-center justify-between hover:bg-white/5 transition-colors shadow-sm">
+            <span className="font-semibold text-white text-sm truncate">{server?.name || 'Server'}</span>
+            <ChevronDown className="w-4 h-4 text-zinc-400 flex-shrink-0" />
           </button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent className="w-52 bg-[#1a1a1d] border-white/10 rounded-lg p-1" align="start">
-          <DropdownMenuItem onClick={onInvite} className="text-zinc-300 focus:bg-white/5 focus:text-white rounded px-3 py-2 text-xs">
-            <UserPlus className="w-3.5 h-3.5 mr-2 text-zinc-500" />
+        <DropdownMenuContent className="w-52 bg-zinc-900 border-zinc-800 rounded-lg p-1" align="start">
+          <DropdownMenuItem onClick={onInvite} className="text-zinc-300 focus:bg-zinc-800 focus:text-white rounded px-3 py-2 text-sm">
+            <UserPlus className="w-4 h-4 mr-2 text-zinc-500" />
             Invite People
           </DropdownMenuItem>
-          <DropdownMenuSeparator className="bg-white/5 my-1" />
-          <DropdownMenuItem onClick={onServerSettings} className="text-zinc-300 focus:bg-white/5 focus:text-white rounded px-3 py-2 text-xs">
-            <Settings className="w-3.5 h-3.5 mr-2 text-zinc-500" />
+          <DropdownMenuSeparator className="bg-zinc-800 my-1" />
+          <DropdownMenuItem onClick={onServerSettings} className="text-zinc-300 focus:bg-zinc-800 focus:text-white rounded px-3 py-2 text-sm">
+            <Settings className="w-4 h-4 mr-2 text-zinc-500" />
             Server Settings
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => onCreateChannel?.()} className="text-zinc-300 focus:bg-white/5 focus:text-white rounded px-3 py-2 text-xs">
-            <Plus className="w-3.5 h-3.5 mr-2 text-zinc-500" />
+          <DropdownMenuItem onClick={() => onCreateChannel?.()} className="text-zinc-300 focus:bg-zinc-800 focus:text-white rounded px-3 py-2 text-sm">
+            <Plus className="w-4 h-4 mr-2 text-zinc-500" />
             Create Channel
           </DropdownMenuItem>
-          <DropdownMenuSeparator className="bg-white/5 my-1" />
+          <DropdownMenuSeparator className="bg-zinc-800 my-1" />
           <DropdownMenuItem 
             onClick={() => window.dispatchEvent(new CustomEvent('kairo:leave-server', { detail: server }))}
-            className="text-red-400 focus:bg-red-500/10 rounded px-3 py-2 text-xs"
+            className="text-red-400 focus:bg-red-500/10 rounded px-3 py-2 text-sm"
           >
             Leave Server
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
 
-      {/* Overview link - Kloak style */}
-      <div className="px-2 py-2">
-        <button className="w-full flex items-center gap-2 px-2 py-1.5 text-zinc-400 hover:text-white hover:bg-white/5 rounded text-xs transition-colors">
-          <div className="w-4 h-4 rounded border border-zinc-600 flex items-center justify-center">
-            <span className="text-[8px]">○</span>
-          </div>
-          <span>Overview</span>
-        </button>
-      </div>
-
-      {/* Channels list - Kloak style */}
-      <div className="flex-1 overflow-y-auto scrollbar-thin px-2 pb-4">
+      {/* Channels list */}
+      <div className="flex-1 overflow-y-auto scrollbar-thin px-2 py-2">
         {/* Uncategorized channels */}
         {uncategorizedChannels.length > 0 && (
           <div className="space-y-0.5 mb-2">
