@@ -103,6 +103,7 @@ function MemberGroup({ title, members, profiles, ownerId, onMessage, onViewProfi
             onViewProfile={onViewProfile}
             onKick={onKick}
             onBan={onBan}
+            onTimeout={onTimeout}
           />
         ))}
       </div>
@@ -178,6 +179,7 @@ export default function MemberPanel({
             onViewProfile={onViewProfile}
             onKick={onKick}
             onBan={onBan}
+            onTimeout={onTimeout}
           />
         ))}
       </PanelContent>
