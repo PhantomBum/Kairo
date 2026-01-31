@@ -37,7 +37,8 @@ function AccountSettings({ profile, settings, onUpdate }) {
     pronouns: profile?.pronouns || '',
     accent_color: profile?.accent_color || '#5865f2',
     youtube_channel: profile?.youtube_channel || { url: '', show_icon: true },
-    badges: profile?.badges || []
+    badges: profile?.badges || [],
+    avatar_url: profile?.avatar_url || ''
   });
   const [avatarFile, setAvatarFile] = useState(null);
   const [bannerFile, setBannerFile] = useState(null);
