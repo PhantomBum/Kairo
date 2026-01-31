@@ -200,7 +200,7 @@ function ServerSubscriptions({ server, currentUser }) {
             {sub.benefits?.length > 0 && (
               <div className="mb-4 space-y-1.5">
                 {sub.benefits.slice(0, 3).map((benefit, i) => (
-                  <div key={i} className="flex items-start gap-2 text-xs text-zinc-400">
+                  <div key={`benefit-${sub.id}-${i}`} className="flex items-start gap-2 text-xs text-zinc-400">
                     <span className="text-emerald-400 mt-0.5">•</span>
                     <span>{benefit}</span>
                   </div>
