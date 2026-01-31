@@ -18,7 +18,7 @@ import VoiceConnectionBar from '@/components/kairo/VoiceConnectionBar';
 import SidebarV3 from '@/components/kairo/v3/Sidebar';
 import ChannelListV3 from '@/components/kairo/v3/ChannelList';
 import DMPanelV3 from '@/components/kairo/v3/DMPanel';
-import { ChannelHeader, MessageListV3 } from '@/components/kairo/v3/ChatView';
+import { ChannelHeader as ChannelHeaderV3, MessageListV3 } from '@/components/kairo/v3/ChatView';
 import MessageComposerV3 from '@/components/kairo/v3/MessageComposer';
 import MemberPanelV3 from '@/components/kairo/v3/MemberPanel';
 import UserBarV3 from '@/components/kairo/v3/UserBar';
