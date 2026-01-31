@@ -1046,6 +1046,7 @@ function KairoPageContent() {
     const handleOpenSearch = () => setShowGlobalSearch(true);
     const handleShowSoundboard = () => setShowSoundboard(true);
     const handleShowNotes = () => setShowQuickNotes(!showQuickNotes);
+    const handleOpenNitro = () => setShowNitro(true);
     
     const handleDeleteChannel = async (e) => {
       const channel = e.detail;
@@ -1072,6 +1073,7 @@ function KairoPageContent() {
     window.addEventListener('kairo:delete-channel', handleDeleteChannel);
     window.addEventListener('kairo:show-soundboard', handleShowSoundboard);
     window.addEventListener('kairo:show-notes', handleShowNotes);
+    window.addEventListener('kairo:open-nitro', handleOpenNitro);
 
     return () => {
       window.removeEventListener('kairo:show-apps', handleShowApps);
@@ -1084,6 +1086,7 @@ function KairoPageContent() {
       window.removeEventListener('kairo:delete-channel', handleDeleteChannel);
       window.removeEventListener('kairo:show-soundboard', handleShowSoundboard);
       window.removeEventListener('kairo:show-notes', handleShowNotes);
+      window.removeEventListener('kairo:open-nitro', handleOpenNitro);
     };
   }, [activeServer, currentUser, userProfile, activeChannel, showQuickNotes]);
 
