@@ -342,9 +342,9 @@ export default function FriendSystem({ currentUser, onStartDM, onAddFriend }) {
                   <div className="px-4 py-2 text-[10px] font-semibold text-zinc-600 uppercase tracking-wider">
                     Incoming — {pendingIncoming.length}
                   </div>
-                  {pendingIncoming.map((request) => (
+                  {pendingIncoming.map((request, idx) => (
                     <FriendRequestCard
-                      key={request.id}
+                      key={request.id || `incoming-${idx}`}
                       request={request}
                       type="incoming"
                       onAccept={(r) => acceptMutation.mutate(r)}
@@ -359,9 +359,9 @@ export default function FriendSystem({ currentUser, onStartDM, onAddFriend }) {
                   <div className="px-4 py-2 text-[10px] font-semibold text-zinc-600 uppercase tracking-wider">
                     Outgoing — {pendingOutgoing.length}
                   </div>
-                  {pendingOutgoing.map((request) => (
+                  {pendingOutgoing.map((request, idx) => (
                     <FriendRequestCard
-                      key={request.id}
+                      key={request.id || `outgoing-${idx}`}
                       request={request}
                       type="outgoing"
                       onDecline={(r) => removeMutation.mutate(r)}
@@ -416,9 +416,9 @@ export default function FriendSystem({ currentUser, onStartDM, onAddFriend }) {
                   <div className="px-4 py-2 text-[10px] font-semibold text-zinc-600 uppercase tracking-wider">
                     Online — {onlineFriends.length}
                   </div>
-                  {onlineFriends.map((friend) => (
+                  {onlineFriends.map((friend, idx) => (
                     <FriendCard
-                      key={friend.id}
+                      key={friend.id || `online-${idx}`}
                       friend={friend}
                       onMessage={onStartDM}
                       onRemove={(f) => removeMutation.mutate(f)}
@@ -447,9 +447,9 @@ export default function FriendSystem({ currentUser, onStartDM, onAddFriend }) {
                   <div className="px-4 py-2 text-[10px] font-semibold text-zinc-600 uppercase tracking-wider">
                     All Friends — {filteredFriends.length}
                   </div>
-                  {filteredFriends.map((friend) => (
+                  {filteredFriends.map((friend, idx) => (
                     <FriendCard
-                      key={friend.id}
+                      key={friend.id || `friend-${idx}`}
                       friend={friend}
                       onMessage={onStartDM}
                       onRemove={(f) => removeMutation.mutate(f)}

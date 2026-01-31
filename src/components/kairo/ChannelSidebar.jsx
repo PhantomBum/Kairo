@@ -84,9 +84,9 @@ function ChannelItem({ channel, isActive, onClick, voiceUsers = [] }) {
                 exit={{ height: 0, opacity: 0 }}
                 className="ml-5 mt-0.5 space-y-0.5 pb-1 overflow-hidden"
               >
-                {voiceUsers.map((user) => (
+                {voiceUsers.map((user, idx) => (
                   <div 
-                    key={user.user_id}
+                    key={user.user_id || user.id || `voice-${idx}`}
                     className="flex items-center gap-1.5 px-2 py-1 text-[11px] text-zinc-500"
                   >
                     <div className="w-4 h-4 rounded bg-zinc-700 overflow-hidden">

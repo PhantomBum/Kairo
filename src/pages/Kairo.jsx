@@ -457,11 +457,7 @@ function KairoPageContent() {
   });
 
   // Debug logging for messages
-  useEffect(() => {
-    console.log('[MESSAGES DEBUG] messages:', messages);
-    console.log('[MESSAGES DEBUG] activeChannel:', activeChannel);
-    console.log('[MESSAGES DEBUG] messagesLoading:', messagesLoading);
-  }, [messages, activeChannel, messagesLoading]);
+  // Debug logging removed for production
 
   // Show syncing indicator when fetching
   useEffect(() => {
@@ -1258,8 +1254,8 @@ function KairoPageContent() {
       <SyncingIndicator show={isSyncing} />
       
       {/* Mobile overlay for sidebars */}
-      <AnimatePresence>
-        {(showMobileSidebar || showMobileChannels) && (
+      <AnimatePresence mode="wait">
+                {(showMobileSidebar || showMobileChannels) && (
           <motion.div 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -1500,7 +1496,7 @@ function KairoPageContent() {
         )}
       </div>
 
-      <AnimatePresence>
+      <AnimatePresence mode="wait">
         {showCreateServer && <CreateServerModal isOpen={showCreateServer} onClose={() => setShowCreateServer(false)} onCreate={(data) => createServerMutation.mutate(data)} />}
         {showCreateChannel && <CreateChannelModal isOpen={showCreateChannel} onClose={() => setShowCreateChannel(false)} onCreate={(data) => createChannelMutation.mutate(data)} categories={categories} defaultCategoryId={createChannelCategory} />}
         {showSettings && <FullSettingsModal isOpen={showSettings} onClose={() => setShowSettings(false)} profile={userProfile} userSettings={userSettings} onUpdateProfile={(data) => updateProfileMutation.mutate(data)} onUpdateSettings={(data) => updateSettingsMutation.mutate(data)} onLogout={() => base44.auth.logout()} />}

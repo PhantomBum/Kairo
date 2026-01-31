@@ -240,9 +240,9 @@ export default function MemberList({
               {group.role.name} — {group.members.length}
             </h3>
             <div className="space-y-0">
-              {group.members.map((member) => (
+              {group.members.map((member, idx) => (
                 <MemberItem
-                  key={member.user_id}
+                  key={member.user_id || member.id || `member-${idx}`}
                   member={member}
                   isOwner={member.user_id === ownerId}
                   highestRole={member.highestRole}
