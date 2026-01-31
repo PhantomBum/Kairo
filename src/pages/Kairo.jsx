@@ -86,14 +86,24 @@ import PinnedMessagesPanel from '@/components/kairo/chat/PinnedMessagesPanel';
 import GlobalSearch from '@/components/kairo/search/GlobalSearch';
 import CreateGroupDMModal from '@/components/kairo/CreateGroupDMModal';
 
+// Wave 2-4 Components
+import QuickSwitcher from '@/components/kairo/ui/QuickSwitcher';
+import { ToastProvider, useToast, setGlobalToast } from '@/components/kairo/ui/ToastSystem';
+import { AccessibilityProvider } from '@/components/kairo/ui/AccessibilityProvider';
+import ImageLightbox from '@/components/kairo/ui/ImageLightbox';
+
 // Use V3 flag to switch between old and new UI
 const USE_V3_UI = true;
 
 export default function KairoPage() {
   return (
-    <ProfileProvider>
-      <KairoPageContent />
-    </ProfileProvider>
+    <AccessibilityProvider>
+      <ToastProvider>
+        <ProfileProvider>
+          <KairoPageContent />
+        </ProfileProvider>
+      </ToastProvider>
+    </AccessibilityProvider>
   );
 }
 
@@ -155,6 +165,9 @@ function KairoPageContent() {
   const [showNitro, setShowNitro] = useState(false);
   const [showDMBridges, setShowDMBridges] = useState(false);
   const [showAdvancedProfile, setShowAdvancedProfile] = useState(false);
+  const [showQuickSwitcher, setShowQuickSwitcher] = useState(false);
+  const [lightboxImages, setLightboxImages] = useState([]);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
   
   // Connection status
   const [connectionStatus, setConnectionStatus] = useState('connected');
@@ -192,7 +205,8 @@ function KairoPageContent() {
 
   // Keyboard shortcuts
   useKeyboardShortcuts({
-    'ctrl+k': () => setShowCommandPalette(true),
+    'ctrl+k': () => setShowQuickSwitcher(true),
+    'ctrl+p': () => setShowCommandPalette(true),
     'ctrl+f': () => setShowGlobalSearch(true),
     'ctrl+shift+a': () => {}, // Toggle sidebar - handled in ImprovedSidebar
     'ctrl+shift+m': () => setShowMembers(!showMembers),
@@ -205,6 +219,7 @@ function KairoPageContent() {
       setShowKeyboardShortcuts(false);
       setShowGlobalSearch(false);
       setShowSoundboard(false);
+      setShowQuickSwitcher(false);
     }
   });
 
@@ -1806,6 +1821,28 @@ function KairoPageContent() {
             inventory={userInventory}
             onUpdateProfile={(data) => updateProfileMutation.mutate(data)}
             onClose={() => setShowAdvancedProfile(false)}
+          />
+        )}
+        {showQuickSwitcher && (
+          <QuickSwitcher
+            isOpen={showQuickSwitcher}
+            onClose={() => setShowQuickSwitcher(false)}
+            servers={memberServers}
+            channels={channels}
+            conversations={conversations}
+            friends={friends}
+            onSelectServer={(server) => { handleServerSelect(server); setShowQuickSwitcher(false); }}
+            onSelectChannel={(channel) => { handleChannelClick(channel); setShowQuickSwitcher(false); }}
+            onSelectConversation={(convo) => { setActiveConversation(convo); setView('dms'); setShowQuickSwitcher(false); }}
+            onSelectFriend={(friend) => { setView('friends'); setShowQuickSwitcher(false); }}
+          />
+        )}
+        {lightboxImages.length > 0 && (
+          <ImageLightbox
+            isOpen={lightboxImages.length > 0}
+            onClose={() => setLightboxImages([])}
+            images={lightboxImages}
+            initialIndex={lightboxIndex}
           />
         )}
         </AnimatePresence>
