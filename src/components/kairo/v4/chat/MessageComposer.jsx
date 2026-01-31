@@ -291,16 +291,16 @@ export default function MessageComposer({
             <IconButton icon={Gift} size="sm" variant="ghost" tooltip="GIF" />
             
             {/* Send button */}
-            {(content.trim() || files.length > 0) && (
+            {(content.trim() || files.length > 0) ? (
               <IconButton
                 icon={Send}
                 size="sm"
                 variant="solid"
                 tooltip="Send"
                 onClick={handleSend}
-                disabled={uploading}
+                disabled={uploading || disabled}
               />
-            )}
+            ) : null}
           </div>
         </div>
       </div>

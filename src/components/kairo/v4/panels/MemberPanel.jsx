@@ -62,6 +62,12 @@ function MemberItem({ member, profile, isOwner, onMessage, onViewProfile, onKick
         </ContextMenuItem>
         <ContextMenuSeparator className="bg-white/[0.06]" />
         <ContextMenuItem 
+          onClick={() => onTimeout?.(member)}
+          className="text-amber-400 focus:text-amber-300 focus:bg-amber-500/10"
+        >
+          Timeout
+        </ContextMenuItem>
+        <ContextMenuItem 
           onClick={() => onKick?.(member)}
           className="text-red-400 focus:text-red-300 focus:bg-red-500/10"
         >
@@ -113,6 +119,7 @@ export default function MemberPanel({
   onViewProfile,
   onKick,
   onBan,
+  onTimeout,
 }) {
   // Group members by role and status
   const groupedMembers = useMemo(() => {

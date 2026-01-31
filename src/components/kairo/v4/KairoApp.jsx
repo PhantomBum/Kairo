@@ -28,6 +28,22 @@ import Modal from './primitives/Modal';
 // Providers
 import { ProfileProvider, useProfiles } from '@/components/kairo/core/ProfileProvider';
 
+// Feature hooks
+import { useRealtimeMessages, useRealtimeDMs, useRealtimeTyping } from '@/components/kairo/core/RealtimeMessages';
+import { useSlowMode, SlowModeIndicator } from '@/components/kairo/features/SlowMode';
+import { useReadReceipts, ReadReceiptIndicator } from '@/components/kairo/features/ReadReceipts';
+import { KickMemberModal, BanMemberModal, TimeoutMemberModal } from '@/components/kairo/moderation/ModerationActions';
+import { PermissionProvider, usePermissions, Permissions } from '@/components/kairo/permissions/PermissionSystem';
+import { NSFWGate, NSFWBadge } from '@/components/kairo/features/NSFWChannel';
+import { VerificationGate } from '@/components/kairo/features/VerificationLevel';
+import { CreatePollModal, PollEmbed } from '@/components/kairo/features/Polls';
+import { ScheduleMessageModal, ScheduledMessagesList } from '@/components/kairo/features/MessageScheduler';
+import { processAutoMod, executeAutoModAction } from '@/components/kairo/moderation/AutoModProcessor';
+import { UserNoteEditor } from '@/components/kairo/features/UserNotes';
+import { ForumChannelView } from '@/components/kairo/features/ForumChannel';
+import { AnnouncementMessage } from '@/components/kairo/features/AnnouncementChannel';
+import { ServerEmojiPicker, parseEmojis } from '@/components/kairo/features/CustomEmoji';
+
 function KairoAppContent() {
   const queryClient = useQueryClient();
   const { profiles, profileMap, getProfile } = useProfiles();
@@ -51,6 +67,11 @@ function KairoAppContent() {
   const [showServerSettings, setShowServerSettings] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [showDiscover, setShowDiscover] = useState(false);
+  const [showKickMember, setShowKickMember] = useState(null);
+  const [showBanMember, setShowBanMember] = useState(null);
+  const [showTimeoutMember, setShowTimeoutMember] = useState(null);
+  const [showCreatePoll, setShowCreatePoll] = useState(false);
+  const [showScheduleMessage, setShowScheduleMessage] = useState(false);
   
   // Current user
   const { data: currentUser } = useQuery({
@@ -143,6 +164,32 @@ function KairoAppContent() {
     enabled: !!currentUser?.id,
   });
   
+  // Auto-mod rules
+  const { data: autoModRules = [] } = useQuery({
+    queryKey: ['autoModRules', activeServer?.id],
+    queryFn: () => base44.entities.AutoModRule.filter({ server_id: activeServer.id }),
+    enabled: !!activeServer?.id,
+  });
+  
+  // Real-time subscriptions
+  useRealtimeMessages(activeChannel?.id, view === 'server');
+  useRealtimeDMs(activeConversation?.id, view === 'dms');
+  useRealtimeTyping(activeChannel?.id, activeConversation?.id);
+  
+  // Slow mode
+  const { canSend: canSendSlowMode, remainingTime: slowModeRemaining, recordMessage } = useSlowMode(
+    activeChannel?.id,
+    activeChannel?.slow_mode_seconds || 0,
+    currentUser?.id
+  );
+  
+  // Read receipts
+  const { markAsRead, getReaders } = useReadReceipts(
+    activeChannel?.id,
+    activeConversation?.id,
+    currentUser?.id
+  );
+  
   // Friends
   const { data: friendships = [] } = useQuery({
     queryKey: ['friendships', currentUser?.id],
@@ -165,10 +212,30 @@ function KairoAppContent() {
   const friends = friendships.filter(f => f.status === 'accepted');
   const outgoingRequests = friendships.filter(f => f.status === 'pending');
   
-  // Send message mutation
+  // Send message mutation with auto-mod
   const sendMessageMutation = useMutation({
     mutationFn: async ({ content, attachments, replyToId }) => {
-      return base44.entities.Message.create({
+      // Check slow mode
+      if (!canSendSlowMode) {
+        throw new Error(`Please wait ${slowModeRemaining}s before sending another message`);
+      }
+      
+      // Process auto-moderation
+      const messageData = {
+        content,
+        attachments,
+        author_id: currentUser.id,
+      };
+      
+      const modResult = await processAutoMod(messageData, activeServer?.id, autoModRules);
+      
+      if (!modResult.allowed) {
+        await executeAutoModAction(modResult, messageData, activeServer?.id, currentUser.id);
+        throw new Error(`Message blocked: ${modResult.violations[0]?.violation?.type || 'auto-mod'}`);
+      }
+      
+      // Create message
+      const message = await base44.entities.Message.create({
         channel_id: activeChannel.id,
         server_id: activeServer?.id,
         author_id: currentUser.id,
@@ -180,6 +247,11 @@ function KairoAppContent() {
         reply_to_id: replyToId,
         type: replyToId ? 'reply' : 'default',
       });
+      
+      // Record for slow mode
+      recordMessage();
+      
+      return message;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['messages', activeChannel?.id] });
@@ -431,6 +503,9 @@ function KairoAppContent() {
             roles={roles}
             ownerId={activeServer.owner_id}
             onMessage={handleStartDM}
+            onKick={setShowKickMember}
+            onBan={setShowBanMember}
+            onTimeout={setShowTimeoutMember}
           />
         ) : null
       }
@@ -478,13 +553,21 @@ function KairoAppContent() {
             onPin={() => {}}
             onAvatarClick={() => {}}
           />
-          <MessageComposer
-            channelName={activeChannel.name}
-            replyTo={replyTo}
-            onCancelReply={() => setReplyTo(null)}
-            onSendMessage={(data) => sendMessageMutation.mutate(data)}
-            members={members}
-          />
+          <div>
+            <SlowModeIndicator 
+              seconds={activeChannel?.slow_mode_seconds} 
+              remainingTime={slowModeRemaining}
+              className="px-4 pb-2"
+            />
+            <MessageComposer
+              channelName={activeChannel.name}
+              replyTo={replyTo}
+              onCancelReply={() => setReplyTo(null)}
+              onSendMessage={(data) => sendMessageMutation.mutate(data)}
+              members={members}
+              disabled={!canSendSlowMode}
+            />
+          </div>
         </div>
       ) : (
         <div className="flex-1 flex items-center justify-center">
@@ -520,6 +603,53 @@ function KairoAppContent() {
             isOpen={showCreateServer}
             onClose={() => setShowCreateServer(false)}
             onCreate={handleServerSelect}
+            currentUser={currentUser}
+          />
+        )}
+        
+        {showKickMember && (
+          <KickMemberModal
+            isOpen={!!showKickMember}
+            onClose={() => setShowKickMember(null)}
+            member={showKickMember}
+            server={activeServer}
+          />
+        )}
+        
+        {showBanMember && (
+          <BanMemberModal
+            isOpen={!!showBanMember}
+            onClose={() => setShowBanMember(null)}
+            member={showBanMember}
+            server={activeServer}
+          />
+        )}
+        
+        {showTimeoutMember && (
+          <TimeoutMemberModal
+            isOpen={!!showTimeoutMember}
+            onClose={() => setShowTimeoutMember(null)}
+            member={showTimeoutMember}
+            server={activeServer}
+          />
+        )}
+        
+        {showCreatePoll && (
+          <CreatePollModal
+            isOpen={showCreatePoll}
+            onClose={() => setShowCreatePoll(false)}
+            channelId={activeChannel?.id}
+            serverId={activeServer?.id}
+            currentUser={currentUser}
+          />
+        )}
+        
+        {showScheduleMessage && (
+          <ScheduleMessageModal
+            isOpen={showScheduleMessage}
+            onClose={() => setShowScheduleMessage(false)}
+            channelId={activeChannel?.id}
+            serverId={activeServer?.id}
             currentUser={currentUser}
           />
         )}
