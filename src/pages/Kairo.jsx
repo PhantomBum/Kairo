@@ -78,7 +78,9 @@ import { usePresenceSync, useVoiceStateSync, useMessageSync } from '@/components
 import { useCacheOptimization, usePrefetchStrategies } from '@/components/kairo/core/CacheManager';
 import CrossAppIndicator from '@/components/kairo/crossapp/CrossAppIndicator';
 import BridgeManager from '@/components/kairo/crossapp/BridgeManager';
+import DMBridgeManager from '@/components/kairo/crossapp/DMBridgeManager';
 import ThreadPanel from '@/components/kairo/chat/ThreadPanel';
+import AdvancedProfileEditor from '@/components/kairo/profile/AdvancedProfileEditor';
 import ForwardMessageModal from '@/components/kairo/chat/ForwardMessageModal';
 import PinnedMessagesPanel from '@/components/kairo/chat/PinnedMessagesPanel';
 import GlobalSearch from '@/components/kairo/search/GlobalSearch';
@@ -151,6 +153,8 @@ function KairoPageContent() {
   const [showSoundboard, setShowSoundboard] = useState(false);
   const [showQuickNotes, setShowQuickNotes] = useState(false);
   const [showNitro, setShowNitro] = useState(false);
+  const [showDMBridges, setShowDMBridges] = useState(false);
+  const [showAdvancedProfile, setShowAdvancedProfile] = useState(false);
   
   // Connection status
   const [connectionStatus, setConnectionStatus] = useState('connected');
@@ -1007,6 +1011,8 @@ function KairoPageContent() {
     const handleShowSoundboard = () => setShowSoundboard(true);
     const handleShowNotes = () => setShowQuickNotes(!showQuickNotes);
     const handleOpenNitro = () => setShowNitro(true);
+    const handleOpenDMBridges = () => setShowDMBridges(true);
+    const handleOpenAdvancedProfile = () => setShowAdvancedProfile(true);
     
     const handleDeleteChannel = async (e) => {
       const channel = e.detail;
@@ -1034,6 +1040,8 @@ function KairoPageContent() {
     window.addEventListener('kairo:show-soundboard', handleShowSoundboard);
     window.addEventListener('kairo:show-notes', handleShowNotes);
     window.addEventListener('kairo:open-nitro', handleOpenNitro);
+    window.addEventListener('kairo:open-dm-bridges', handleOpenDMBridges);
+    window.addEventListener('kairo:open-advanced-profile', handleOpenAdvancedProfile);
 
     return () => {
       window.removeEventListener('kairo:show-apps', handleShowApps);
@@ -1047,6 +1055,8 @@ function KairoPageContent() {
       window.removeEventListener('kairo:show-soundboard', handleShowSoundboard);
       window.removeEventListener('kairo:show-notes', handleShowNotes);
       window.removeEventListener('kairo:open-nitro', handleOpenNitro);
+      window.removeEventListener('kairo:open-dm-bridges', handleOpenDMBridges);
+      window.removeEventListener('kairo:open-advanced-profile', handleOpenAdvancedProfile);
     };
   }, [activeServer, currentUser, userProfile, activeChannel, showQuickNotes]);
 
@@ -1740,6 +1750,22 @@ function KairoPageContent() {
               <NitroPage currentUser={currentUser} userCredits={userCredits} onClose={() => setShowNitro(false)} />
             </motion.div>
           </div>
+        )}
+        {showDMBridges && (
+          <DMBridgeManager 
+            currentUser={currentUser}
+            conversations={conversations}
+            isOpen={showDMBridges}
+            onClose={() => setShowDMBridges(false)}
+          />
+        )}
+        {showAdvancedProfile && (
+          <AdvancedProfileEditor
+            profile={userProfile}
+            inventory={userInventory}
+            onUpdateProfile={(data) => updateProfileMutation.mutate(data)}
+            onClose={() => setShowAdvancedProfile(false)}
+          />
         )}
         </AnimatePresence>
       </div>
