@@ -1190,11 +1190,32 @@ function KairoPageContent() {
           onAddFriend={() => setShowAddFriend(true)}
         />
         <AnimatePresence>
-          {showAddFriend && <AddFriendModal isOpen={showAddFriend} onClose={() => setShowAddFriend(false)} onSendRequest={async (username) => {
-            const profiles = await base44.entities.UserProfile.filter({ username });
-            if (profiles.length === 0) throw new Error('User not found');
-            await base44.entities.Friendship.create({ user_id: currentUser.id, friend_id: profiles[0].user_id, friend_email: profiles[0].user_email, friend_name: profiles[0].display_name, friend_avatar: profiles[0].avatar_url, status: 'pending', initiated_by: currentUser.id });
+          {showAddFriend && <AddFriendModal isOpen={showAddFriend} onClose={() => setShowAddFriend(false)} onSendRequest={async (usernameOrName) => {
+            // Search by username OR display_name
+            const allProfiles = await base44.entities.UserProfile.list();
+            const targetProfile = allProfiles.find(p => 
+              (p.username && p.username.toLowerCase() === usernameOrName.toLowerCase()) ||
+              (p.display_name && p.display_name.toLowerCase() === usernameOrName.toLowerCase())
+            );
+
+            if (!targetProfile) throw new Error('User not found. Try searching by their exact username or display name.');
+
+            // Check if already friends or pending
+            const existingFriendships = await base44.entities.Friendship.filter({ user_id: currentUser.user_id || currentUser.id });
+            const alreadyFriends = existingFriendships.some(f => f.friend_id === targetProfile.user_id);
+            if (alreadyFriends) throw new Error('You are already friends or have a pending request with this user.');
+
+            await base44.entities.Friendship.create({ 
+              user_id: currentUser.user_id || currentUser.id, 
+              friend_id: targetProfile.user_id, 
+              friend_email: targetProfile.user_email, 
+              friend_name: targetProfile.display_name, 
+              friend_avatar: targetProfile.avatar_url, 
+              status: 'pending', 
+              initiated_by: currentUser.user_id || currentUser.id 
+            });
             queryClient.invalidateQueries({ queryKey: ['friendships'] });
+            queryClient.invalidateQueries({ queryKey: ['incomingRequests'] });
           }} />}
           {showJoinServer && <JoinByInviteModal isOpen={showJoinServer} onClose={() => setShowJoinServer(false)} onJoin={(code) => joinServerMutation.mutate(code)} isJoining={joinServerMutation.isPending} />}
           {showSettings && <FullSettingsModal isOpen={showSettings} onClose={() => setShowSettings(false)} profile={userProfile} userSettings={userSettings} onUpdateProfile={(data) => updateProfileMutation.mutate(data)} onUpdateSettings={(data) => updateSettingsMutation.mutate(data)} onLogout={() => base44.auth.logout()} />}
