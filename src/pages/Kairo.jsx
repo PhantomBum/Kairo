@@ -84,59 +84,8 @@ import PinnedMessagesPanel from '@/components/kairo/chat/PinnedMessagesPanel';
 import GlobalSearch from '@/components/kairo/search/GlobalSearch';
 import CreateGroupDMModal from '@/components/kairo/CreateGroupDMModal';
 
-// Channel header component - Clean style
-function ChannelHeader({ channel, memberCount, onMembersToggle, showMembers, onShowPinned, showPinned, onMenuToggle }) {
-  return (
-    <div className="h-12 px-4 flex items-center justify-between border-b border-white/[0.04] bg-[#0a0a0b]">
-      <div className="flex items-center gap-2">
-        {/* Mobile menu button */}
-        <button 
-          onClick={onMenuToggle}
-          className="md:hidden p-1.5 text-zinc-400 hover:text-white transition-colors rounded hover:bg-white/5"
-        >
-          <Hash className="w-5 h-5" />
-        </button>
-        <Hash className="hidden md:block w-5 h-5 text-zinc-500" />
-        <span className="font-semibold text-white">{channel?.name || 'general'}</span>
-        {channel?.topic && (
-          <>
-            <div className="hidden md:block w-px h-5 bg-zinc-700 mx-2" />
-            <span className="hidden md:inline text-sm text-zinc-400 truncate max-w-[300px]">{channel.topic}</span>
-          </>
-        )}
-      </div>
-      <div className="flex items-center gap-0.5">
-        <button className="p-2 text-zinc-400 hover:text-zinc-200 transition-colors rounded hover:bg-white/5">
-          <Bell className="w-5 h-5" />
-        </button>
-        <button
-          onClick={onShowPinned}
-          className={cn(
-            "p-2 transition-colors rounded hover:bg-white/5",
-            showPinned ? "text-white" : "text-zinc-400 hover:text-zinc-200"
-          )}
-        >
-          <Pin className="w-5 h-5" />
-        </button>
-        <button 
-          onClick={() => window.dispatchEvent(new CustomEvent('kairo:open-search'))}
-          className="p-2 text-zinc-400 hover:text-zinc-200 transition-colors rounded hover:bg-white/5"
-        >
-          <Search className="w-5 h-5" />
-        </button>
-        <button
-          onClick={onMembersToggle}
-          className={cn(
-            "p-2 transition-colors rounded hover:bg-white/5",
-            showMembers ? "text-white" : "text-zinc-400 hover:text-zinc-200"
-          )}
-        >
-          <Users className="w-5 h-5" />
-        </button>
-      </div>
-    </div>
-  );
-}
+// Use V3 flag to switch between old and new UI
+const USE_V3_UI = true;
 
 export default function KairoPage() {
   return (
