@@ -257,6 +257,13 @@ export default function DMSidebar({
           <Link2 className="w-4 h-4" />
           <span className="text-xs font-medium">Join Server</span>
         </button>
+        <button
+          onClick={() => window.dispatchEvent(new CustomEvent('kairo:open-dm-bridges'))}
+          className="w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded hover:bg-white/5 text-zinc-500 hover:text-emerald-400 transition-colors"
+        >
+          <Link2 className="w-4 h-4" />
+          <span className="text-xs font-medium">DM Bridges</span>
+        </button>
       </div>
 
       <div className="h-px bg-white/[0.04] mx-2" />
