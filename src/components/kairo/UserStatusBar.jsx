@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { 
   Mic, MicOff, Headphones, HeadphoneOff, Settings, 
-  Circle, Moon, MinusCircle, Eye
+  Circle, Moon, MinusCircle, Eye, Sparkles
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
@@ -138,6 +138,22 @@ export default function UserStatusBar({
             </TooltipTrigger>
             <TooltipContent side="top" className="bg-[#111113] border-white/10 text-white text-xs">
               {isDeafened ? 'Undeafen' : 'Deafen'}
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+
+        <TooltipProvider delayDuration={0}>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                onClick={() => window.dispatchEvent(new CustomEvent('kairo:open-advanced-profile'))}
+                className="p-1.5 rounded text-zinc-500 hover:bg-white/5 hover:text-emerald-400 transition-colors"
+              >
+                <Sparkles className="w-4 h-4" />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent side="top" className="bg-[#111113] border-white/10 text-white text-xs">
+              Customize Profile
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
