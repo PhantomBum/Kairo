@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import KairoApp from '@/components/kairo/v4/KairoApp';
+import KairoApp from '@/components/kairo/v5/KairoApp';
 import LoadingScreen from '@/components/kairo/LoadingScreen';
 
 export default function KairoV4Page() {
