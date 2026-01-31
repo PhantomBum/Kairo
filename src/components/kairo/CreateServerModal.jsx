@@ -272,7 +272,7 @@ export default function CreateServerModal({ isOpen, onClose, onCreate }) {
                   </h4>
                   <div className="text-xs text-zinc-400 space-y-1">
                     {templateChannels[selectedTemplate.id]?.map((cat, i) => (
-                      <div key={i}>
+                      <div key={`cat-${i}`}>
                         {cat.category && <span className="text-zinc-500">{cat.category}: </span>}
                         {cat.channels.map(c => `#${c.name}`).join(', ')}
                       </div>
