@@ -150,8 +150,8 @@ function AccountSettings({ profile, settings, onUpdate }) {
           <div className="flex items-end gap-4">
             <div className="relative">
               <div className="w-20 h-20 rounded-full border-4 border-[#121214] overflow-hidden bg-zinc-800">
-                {profile?.avatar_url ? (
-                  <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
+                {(formData.avatar_url || profile?.avatar_url) ? (
+                  <img src={formData.avatar_url || profile.avatar_url} alt="" className="w-full h-full object-cover" />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-indigo-500 to-purple-600 text-white text-2xl font-bold">
                     {formData.display_name?.charAt(0) || '?'}
