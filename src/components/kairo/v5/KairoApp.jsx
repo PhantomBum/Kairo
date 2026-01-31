@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { AnimatePresence } from 'framer-motion';
@@ -19,10 +19,13 @@ import FriendsPanel from './panels/FriendsPanel';
 import MessageList from './chat/MessageList';
 import MessageComposer from './chat/MessageComposer';
 
-// Shared modals (from v4)
-import AddFriendModal from '../v4/modals/AddFriendModal';
-import JoinServerModal from '../v4/modals/JoinServerModal';
-import CreateServerModal from '../v4/modals/CreateServerModal';
+// V5 Modals
+import AddFriendModal from './modals/AddFriendModal';
+import JoinServerModal from './modals/JoinServerModal';
+import CreateServerModal from './modals/CreateServerModal';
+import SettingsModal from './modals/SettingsModal';
+import ServerSettingsModal from './modals/ServerSettingsModal';
+import DiscoverServersModal from './modals/DiscoverServersModal';
 
 // Providers
 import { ProfileProvider, useProfiles } from '@/components/kairo/core/ProfileProvider';
@@ -56,11 +59,13 @@ function KairoAppContent() {
   const [isMuted, setIsMuted] = useState(false);
   const [isDeafened, setIsDeafened] = useState(false);
   
-  // Modal state
+  // Modal state - ALL MODALS
   const [showAddFriend, setShowAddFriend] = useState(false);
   const [showJoinServer, setShowJoinServer] = useState(false);
   const [showCreateServer, setShowCreateServer] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [showServerSettings, setShowServerSettings] = useState(false);
+  const [showDiscover, setShowDiscover] = useState(false);
   const [showKickMember, setShowKickMember] = useState(null);
   const [showBanMember, setShowBanMember] = useState(null);
   const [showTimeoutMember, setShowTimeoutMember] = useState(null);
@@ -76,7 +81,7 @@ function KairoAppContent() {
     queryFn: () => base44.auth.me(),
   });
   
-  const { data: userProfile } = useQuery({
+  const { data: userProfile, refetch: refetchProfile } = useQuery({
     queryKey: ['userProfile', currentUser?.id],
     queryFn: async () => {
       const profiles = await base44.entities.UserProfile.filter({ 
@@ -161,6 +166,16 @@ function KairoAppContent() {
     enabled: !!currentUser?.id,
   });
   
+  // DM Messages for active conversation
+  const { data: dmMessages = [], isLoading: dmMessagesLoading } = useQuery({
+    queryKey: ['dmMessages', activeConversation?.id],
+    queryFn: async () => {
+      const msgs = await base44.entities.DirectMessage.filter({ conversation_id: activeConversation.id });
+      return msgs.sort((a, b) => new Date(a.created_date) - new Date(b.created_date));
+    },
+    enabled: !!activeConversation?.id,
+  });
+  
   // Auto-mod rules
   const { data: autoModRules = [] } = useQuery({
     queryKey: ['autoModRules', activeServer?.id],
@@ -212,10 +227,23 @@ function KairoAppContent() {
   // Send message mutation
   const sendMessageMutation = useMutation({
     mutationFn: async ({ content, attachments, replyToId }) => {
-      if (!canSendSlowMode) {
+      if (!canSendSlowMode && activeChannel) {
         throw new Error(`Please wait ${slowModeRemaining}s`);
       }
       
+      // For DMs
+      if (activeConversation) {
+        return base44.entities.DirectMessage.create({
+          conversation_id: activeConversation.id,
+          sender_id: currentUser.id,
+          sender_name: userProfile?.display_name || currentUser.full_name,
+          sender_avatar: userProfile?.avatar_url,
+          content,
+          attachments,
+        });
+      }
+      
+      // For channels
       const messageData = {
         content,
         attachments,
@@ -246,7 +274,11 @@ function KairoAppContent() {
       return message;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['messages', activeChannel?.id] });
+      if (activeConversation) {
+        queryClient.invalidateQueries({ queryKey: ['dmMessages', activeConversation?.id] });
+      } else {
+        queryClient.invalidateQueries({ queryKey: ['messages', activeChannel?.id] });
+      }
       setReplyTo(null);
     },
   });
@@ -264,6 +296,13 @@ function KairoAppContent() {
       }
       
       if (!target) throw new Error('User not found');
+      
+      // Check if already friends or request pending
+      const existing = await base44.entities.Friendship.filter({
+        user_id: currentUser.id,
+        friend_id: target.user_id,
+      });
+      if (existing.length > 0) throw new Error('Already friends or request pending');
       
       return base44.entities.Friendship.create({
         user_id: currentUser.id,
@@ -328,6 +367,13 @@ function KairoAppContent() {
       const server = servers[0];
       if (!server) throw new Error('Invalid invite code');
       
+      // Check if already member
+      const existing = await base44.entities.ServerMember.filter({
+        server_id: server.id,
+        user_id: currentUser.id,
+      });
+      if (existing.length > 0) throw new Error('Already a member');
+      
       await base44.entities.ServerMember.create({
         server_id: server.id,
         user_id: currentUser.id,
@@ -345,6 +391,19 @@ function KairoAppContent() {
       queryClient.invalidateQueries({ queryKey: ['memberServers'] });
       setActiveServer(server);
       setView('server');
+      setShowJoinServer(false);
+    },
+  });
+  
+  // Update profile
+  const updateProfileMutation = useMutation({
+    mutationFn: async (data) => {
+      if (userProfile) {
+        await base44.entities.UserProfile.update(userProfile.id, data);
+      }
+    },
+    onSuccess: () => {
+      refetchProfile();
     },
   });
   
@@ -426,6 +485,7 @@ function KairoAppContent() {
   const handleServerSelect = (server) => {
     setActiveServer(server);
     setActiveChannel(null);
+    setActiveConversation(null);
     setView('server');
   };
   
@@ -441,6 +501,7 @@ function KairoAppContent() {
   
   const handleFriendsClick = () => {
     setView('friends');
+    setActiveConversation(null);
   };
   
   const handleStartDM = async (friend) => {
@@ -451,7 +512,7 @@ function KairoAppContent() {
     if (!conversation) {
       conversation = await base44.entities.Conversation.create({
         participants: [
-          { user_id: currentUser.id, user_name: userProfile?.display_name },
+          { user_id: currentUser.id, user_name: userProfile?.display_name, user_avatar: userProfile?.avatar_url },
           { user_id: friend.friend_id, user_name: friend.friend_name, user_avatar: friend.friend_avatar },
         ],
         is_group: false,
@@ -461,6 +522,18 @@ function KairoAppContent() {
     
     setActiveConversation(conversation);
     setView('dms');
+  };
+  
+  const handleConversationSelect = (conv) => {
+    setActiveConversation(conv);
+    setView('dms');
+  };
+  
+  const handleCloseConversation = async (conv) => {
+    // Just remove from view, don't delete
+    if (activeConversation?.id === conv.id) {
+      setActiveConversation(null);
+    }
   };
 
   return (
@@ -472,7 +545,7 @@ function KairoAppContent() {
           onServerSelect={handleServerSelect}
           onDMsClick={handleDMsClick}
           onCreateServer={() => setShowCreateServer(true)}
-          onDiscoverClick={() => {}}
+          onDiscoverClick={() => setShowDiscover(true)}
           isDMsActive={view === 'dms' || view === 'friends'}
           onNitro={() => setShowNitroCheckout(true)}
         />
@@ -485,8 +558,10 @@ function KairoAppContent() {
             channels={channels}
             activeChannelId={activeChannel?.id}
             onChannelClick={handleChannelSelect}
-            onServerSettings={() => {}}
-            onInvite={() => {}}
+            onServerSettings={() => setShowServerSettings(true)}
+            onInvite={() => {
+              navigator.clipboard.writeText(`https://kairo.app/invite/${activeServer.invite_code}`);
+            }}
             voiceStates={voiceStates}
           />
         ) : view === 'dms' || view === 'friends' ? (
@@ -494,9 +569,10 @@ function KairoAppContent() {
             conversations={conversations}
             friends={friends}
             activeConversationId={activeConversation?.id}
-            onConversationSelect={setActiveConversation}
+            onConversationSelect={handleConversationSelect}
             onShowFriends={handleFriendsClick}
             onCreateDM={() => setShowAddFriend(true)}
+            onCloseConversation={handleCloseConversation}
             onJoinServer={() => setShowJoinServer(true)}
             onNitro={() => setShowNitroCheckout(true)}
           />
@@ -609,6 +685,29 @@ function KairoAppContent() {
             </div>
           )}
         </NSFWGate>
+      ) : view === 'dms' && activeConversation ? (
+        <div className="flex-1 flex flex-col min-h-0">
+          <MessageList
+            messages={dmMessages}
+            currentUserId={currentUser?.id}
+            channelName={activeConversation.name || activeConversation.participants?.find(p => p.user_id !== currentUser?.id)?.user_name || 'DM'}
+            isLoading={dmMessagesLoading}
+            onReply={setReplyTo}
+            onEdit={() => {}}
+            onDelete={() => {}}
+            onReact={() => {}}
+            onToggleReaction={() => {}}
+            onPin={() => {}}
+            onAvatarClick={() => {}}
+          />
+          <MessageComposer
+            channelName={activeConversation.name || 'this conversation'}
+            replyTo={replyTo}
+            onCancelReply={() => setReplyTo(null)}
+            onSendMessage={(data) => sendMessageMutation.mutate(data)}
+            members={[]}
+          />
+        </div>
       ) : (
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center">
@@ -616,12 +715,26 @@ function KairoAppContent() {
               <span className="text-4xl">👋</span>
             </div>
             <h2 className="text-xl font-bold text-white mb-2">Welcome to Kairo</h2>
-            <p className="text-sm text-zinc-500">Select a server or start a conversation</p>
+            <p className="text-sm text-zinc-500 mb-6">Select a server or start a conversation</p>
+            <div className="flex items-center justify-center gap-3">
+              <button 
+                onClick={() => setShowCreateServer(true)}
+                className="px-4 h-9 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-500 rounded-lg transition-colors"
+              >
+                Create Server
+              </button>
+              <button 
+                onClick={() => setShowJoinServer(true)}
+                className="px-4 h-9 text-sm font-medium text-zinc-300 bg-white/[0.06] hover:bg-white/[0.1] rounded-lg transition-colors"
+              >
+                Join Server
+              </button>
+            </div>
           </div>
         </div>
       )}
       
-      {/* Modals */}
+      {/* ALL MODALS */}
       <AnimatePresence>
         {showAddFriend && (
           <AddFriendModal
@@ -637,6 +750,10 @@ function KairoAppContent() {
             isOpen={showJoinServer}
             onClose={() => setShowJoinServer(false)}
             onJoin={(code) => joinServerMutation.mutateAsync(code)}
+            onDiscover={() => {
+              setShowJoinServer(false);
+              setShowDiscover(true);
+            }}
           />
         )}
         
@@ -646,6 +763,38 @@ function KairoAppContent() {
             onClose={() => setShowCreateServer(false)}
             onCreate={handleServerSelect}
             currentUser={currentUser}
+          />
+        )}
+        
+        {showSettings && (
+          <SettingsModal
+            isOpen={showSettings}
+            onClose={() => setShowSettings(false)}
+            profile={userProfile}
+            onUpdateProfile={(data) => updateProfileMutation.mutate(data)}
+            onLogout={() => base44.auth.logout()}
+          />
+        )}
+        
+        {showServerSettings && (
+          <ServerSettingsModal
+            isOpen={showServerSettings}
+            onClose={() => setShowServerSettings(false)}
+            server={activeServer}
+            members={members}
+            onUpdate={(updated) => {
+              setActiveServer(updated);
+              queryClient.invalidateQueries({ queryKey: ['memberServers'] });
+            }}
+          />
+        )}
+        
+        {showDiscover && (
+          <DiscoverServersModal
+            isOpen={showDiscover}
+            onClose={() => setShowDiscover(false)}
+            currentUser={currentUser}
+            onJoinServer={handleServerSelect}
           />
         )}
         
