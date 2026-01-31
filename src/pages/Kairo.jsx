@@ -1571,27 +1571,51 @@ function KairoPageContent() {
             </>
           )
         ) : view === 'dms' && activeConversation ? (
-          <>
-            <div className="h-12 px-3 md:px-4 flex items-center border-b border-white/[0.04] bg-[#0a0a0b]">
-              <div className="flex items-center gap-2 md:gap-3">
-                <button 
-                  onClick={() => setShowMobileChannels(true)}
-                  className="md:hidden p-2 text-zinc-400 hover:text-white transition-all rounded-lg hover:bg-white/5"
-                >
-                  <Menu className="w-5 h-5" />
-                </button>
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-sm font-medium">
-                  {activeConversation.participants?.[0]?.user_name?.charAt(0) || '?'}
+          USE_V3_UI ? (
+            <>
+              <div className="h-14 px-4 flex items-center border-b border-white/[0.04] bg-[#09090b]">
+                <div className="flex items-center gap-3">
+                  <button 
+                    onClick={() => setShowMobileChannels(true)}
+                    className="md:hidden p-2 text-zinc-400 hover:text-white rounded-lg hover:bg-white/[0.04]"
+                  >
+                    <Menu className="w-5 h-5" />
+                  </button>
+                  <div className="w-9 h-9 rounded-full bg-gradient-to-br from-violet-600 to-indigo-600 flex items-center justify-center text-white text-sm font-medium">
+                    {activeConversation.participants?.[0]?.user_name?.charAt(0) || '?'}
+                  </div>
+                  <span className="font-semibold text-white text-[14px]">{activeConversation.name || activeConversation.participants?.[0]?.user_name}</span>
                 </div>
-                <span className="font-semibold text-white">{activeConversation.name || activeConversation.participants?.[0]?.user_name}</span>
               </div>
-            </div>
-            <div className="flex-1 flex flex-col bg-[#0a0a0b]">
-              <MessageList messages={[...dmMessages].reverse()} currentUserId={currentUser?.id} onReply={(msg) => setReplyTo(msg)} onReact={() => {}} isLoading={dmMessagesLoading} />
-              <TypingIndicator typingUsers={typingUsers} className="px-4" />
-              <MessageInput channelName={activeConversation.participants?.[0]?.user_name} replyTo={replyTo} onCancelReply={() => setReplyTo(null)} onSendMessage={(data) => sendDMMutation.mutate(data)} onTyping={sendTypingIndicator} />
-            </div>
-          </>
+              <div className="flex-1 flex flex-col bg-[#09090b]">
+                <MessageListV3 messages={[...dmMessages].reverse()} currentUserId={currentUser?.id} onReply={(msg) => setReplyTo(msg)} onReact={() => {}} isLoading={dmMessagesLoading} />
+                <TypingIndicator typingUsers={typingUsers} className="px-4" />
+                <MessageComposerV3 channelName={activeConversation.participants?.[0]?.user_name} replyTo={replyTo} onCancelReply={() => setReplyTo(null)} onSendMessage={(data) => sendDMMutation.mutate(data)} onTyping={sendTypingIndicator} />
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="h-12 px-3 md:px-4 flex items-center border-b border-white/[0.04] bg-[#0a0a0b]">
+                <div className="flex items-center gap-2 md:gap-3">
+                  <button 
+                    onClick={() => setShowMobileChannels(true)}
+                    className="md:hidden p-2 text-zinc-400 hover:text-white transition-all rounded-lg hover:bg-white/5"
+                  >
+                    <Menu className="w-5 h-5" />
+                  </button>
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-sm font-medium">
+                    {activeConversation.participants?.[0]?.user_name?.charAt(0) || '?'}
+                  </div>
+                  <span className="font-semibold text-white">{activeConversation.name || activeConversation.participants?.[0]?.user_name}</span>
+                </div>
+              </div>
+              <div className="flex-1 flex flex-col bg-[#0a0a0b]">
+                <MessageList messages={[...dmMessages].reverse()} currentUserId={currentUser?.id} onReply={(msg) => setReplyTo(msg)} onReact={() => {}} isLoading={dmMessagesLoading} />
+                <TypingIndicator typingUsers={typingUsers} className="px-4" />
+                <MessageInput channelName={activeConversation.participants?.[0]?.user_name} replyTo={replyTo} onCancelReply={() => setReplyTo(null)} onSendMessage={(data) => sendDMMutation.mutate(data)} onTyping={sendTypingIndicator} />
+              </div>
+            </>
+          )
         ) : (
           <div className="flex flex-col h-full">
               {/* Mobile header for welcome screen */}
