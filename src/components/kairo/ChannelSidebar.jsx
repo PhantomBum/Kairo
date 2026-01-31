@@ -106,7 +106,7 @@ function ChannelItem({ channel, isActive, onClick, voiceUsers = [] }) {
           </AnimatePresence>
         </div>
       </ContextMenuTrigger>
-      <ContextMenuContent className="w-44 bg-[#1a1a1d] border-white/10 rounded-lg p-1">
+      <ContextMenuContent className="w-44 bg-[#1a1a1a] border-white/10 rounded-lg p-1">
         <ContextMenuItem 
           onClick={() => window.dispatchEvent(new CustomEvent('kairo:edit-channel', { detail: channel }))}
           className="text-zinc-300 focus:bg-white/5 focus:text-white rounded px-3 py-2 text-sm"
@@ -209,21 +209,21 @@ export default function ChannelSidebar({
             <ChevronDown className="w-4 h-4 text-zinc-400 flex-shrink-0" />
           </button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent className="w-52 bg-zinc-900 border-zinc-800 rounded-lg p-1" align="start">
-          <DropdownMenuItem onClick={onInvite} className="text-zinc-300 focus:bg-zinc-800 focus:text-white rounded px-3 py-2 text-sm">
+        <DropdownMenuContent className="w-52 bg-[#1a1a1a] border-white/10 rounded-lg p-1" align="start">
+          <DropdownMenuItem onClick={onInvite} className="text-zinc-300 focus:bg-white/5 focus:text-white rounded px-3 py-2 text-sm">
             <UserPlus className="w-4 h-4 mr-2 text-zinc-500" />
             Invite People
           </DropdownMenuItem>
-          <DropdownMenuSeparator className="bg-zinc-800 my-1" />
-          <DropdownMenuItem onClick={onServerSettings} className="text-zinc-300 focus:bg-zinc-800 focus:text-white rounded px-3 py-2 text-sm">
+          <DropdownMenuSeparator className="bg-white/5 my-1" />
+          <DropdownMenuItem onClick={onServerSettings} className="text-zinc-300 focus:bg-white/5 focus:text-white rounded px-3 py-2 text-sm">
             <Settings className="w-4 h-4 mr-2 text-zinc-500" />
             Server Settings
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => onCreateChannel?.()} className="text-zinc-300 focus:bg-zinc-800 focus:text-white rounded px-3 py-2 text-sm">
+          <DropdownMenuItem onClick={() => onCreateChannel?.()} className="text-zinc-300 focus:bg-white/5 focus:text-white rounded px-3 py-2 text-sm">
             <Plus className="w-4 h-4 mr-2 text-zinc-500" />
             Create Channel
           </DropdownMenuItem>
-          <DropdownMenuSeparator className="bg-zinc-800 my-1" />
+          <DropdownMenuSeparator className="bg-white/5 my-1" />
           <DropdownMenuItem 
             onClick={() => window.dispatchEvent(new CustomEvent('kairo:leave-server', { detail: server }))}
             className="text-red-400 focus:bg-red-500/10 rounded px-3 py-2 text-sm"

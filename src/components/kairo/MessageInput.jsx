@@ -192,8 +192,8 @@ export default function MessageInput({
             exit={{ opacity: 0, y: 10 }}
             className="mb-2"
           >
-            <div className="flex items-center gap-2 px-3 py-2 bg-zinc-800 rounded-lg">
-              <div className="w-0.5 h-8 bg-indigo-500 rounded-full" />
+            <div className="flex items-center gap-2 px-3 py-2 bg-white/5 border border-white/5 rounded-lg">
+              <div className="w-0.5 h-8 bg-white/30 rounded-full" />
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
                   <span className="text-xs text-zinc-500">Replying to</span>
@@ -221,11 +221,11 @@ export default function MessageInput({
             exit={{ opacity: 0, y: 10 }}
             className="mb-2"
           >
-            <div className="flex flex-wrap gap-2 px-3 py-2 bg-zinc-800 rounded-lg">
+            <div className="flex flex-wrap gap-2 px-3 py-2 bg-white/5 border border-white/5 rounded-lg">
               {files.map((file, index) => (
                 <div key={index} className="relative group">
                   {file.type.startsWith('image/') ? (
-                    <div className="w-16 h-16 rounded overflow-hidden bg-zinc-700">
+                    <div className="w-16 h-16 rounded overflow-hidden bg-white/10">
                       <img 
                         src={URL.createObjectURL(file)} 
                         alt=""
@@ -233,7 +233,7 @@ export default function MessageInput({
                       />
                     </div>
                   ) : (
-                    <div className="flex items-center gap-2 px-2 py-1.5 bg-zinc-700 rounded">
+                    <div className="flex items-center gap-2 px-2 py-1.5 bg-white/5 rounded">
                       <File className="w-4 h-4 text-zinc-400" />
                       <span className="text-xs text-zinc-300 max-w-[80px] truncate">
                         {file.name}
@@ -250,7 +250,7 @@ export default function MessageInput({
               ))}
               {uploadProgress !== null && (
                 <div className="flex items-center gap-2 text-sm text-zinc-400">
-                  <div className="w-4 h-4 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                   <span>Uploading... {Math.round(uploadProgress)}%</span>
                 </div>
               )}
@@ -274,10 +274,10 @@ export default function MessageInput({
               <Plus className="w-5 h-5" />
             </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-44 bg-zinc-900 border-zinc-800 rounded-lg p-1" align="start">
+          <DropdownMenuContent className="w-44 bg-[#1a1a1a] border-white/10 rounded-lg p-1" align="start">
             <DropdownMenuItem 
               onClick={() => fileInputRef.current?.click()}
-              className="text-zinc-300 focus:bg-zinc-800 rounded px-3 py-2 cursor-pointer text-sm"
+              className="text-zinc-300 focus:bg-white/5 rounded px-3 py-2 cursor-pointer text-sm"
             >
               <File className="w-4 h-4 mr-2 text-zinc-500" />
               Upload File
@@ -287,7 +287,7 @@ export default function MessageInput({
                 fileInputRef.current.accept = 'image/*';
                 fileInputRef.current?.click();
               }}
-              className="text-zinc-300 focus:bg-zinc-800 rounded px-3 py-2 cursor-pointer text-sm"
+              className="text-zinc-300 focus:bg-white/5 rounded px-3 py-2 cursor-pointer text-sm"
             >
               <ImageIcon className="w-4 h-4 mr-2 text-zinc-500" />
               Upload Image
@@ -329,7 +329,7 @@ export default function MessageInput({
           {/* Mention suggestions */}
           <AnimatePresence>
             {showMentions && mentionSuggestions.length > 0 && (
-              <div className="absolute bottom-full left-0 mb-2 w-64 bg-zinc-900 border border-zinc-800 rounded-lg shadow-xl overflow-hidden z-50">
+              <div className="absolute bottom-full left-0 mb-2 w-64 bg-[#1a1a1a] border border-white/10 rounded-lg shadow-xl overflow-hidden z-50">
                 <div className="p-1">
                   <p className="px-3 py-1.5 text-[10px] uppercase tracking-wider text-zinc-500 font-semibold">
                     Members
@@ -341,11 +341,11 @@ export default function MessageInput({
                       className={cn(
                         "w-full flex items-center gap-2 px-3 py-2 rounded transition-colors",
                         index === selectedMentionIndex 
-                          ? "bg-indigo-500 text-white" 
-                          : "text-zinc-300 hover:bg-zinc-800"
+                          ? "bg-white/10 text-white" 
+                          : "text-zinc-300 hover:bg-white/5"
                       )}
                     >
-                      <div className="w-8 h-8 rounded-full bg-zinc-700 overflow-hidden flex-shrink-0">
+                      <div className="w-8 h-8 rounded-full bg-white/10 overflow-hidden flex-shrink-0">
                         {member.avatar_url || member.avatar ? (
                           <img src={member.avatar_url || member.avatar} alt="" className="w-full h-full object-cover" />
                         ) : (
@@ -403,13 +403,13 @@ export default function MessageInput({
                 <Smile className="w-5 h-5" />
               </button>
             </PopoverTrigger>
-            <PopoverContent className="w-auto p-2 bg-zinc-900 border-zinc-800 rounded-lg" align="end">
+            <PopoverContent className="w-auto p-2 bg-[#1a1a1a] border-white/10 rounded-lg" align="end">
               <div className="grid grid-cols-6 gap-0.5">
                 {commonEmojis.map((emoji) => (
                   <button
                     key={emoji}
                     onClick={() => insertEmoji(emoji)}
-                    className="w-8 h-8 flex items-center justify-center hover:bg-zinc-800 rounded text-lg transition-colors"
+                    className="w-8 h-8 flex items-center justify-center hover:bg-white/10 rounded text-lg transition-colors"
                   >
                     {emoji}
                   </button>
@@ -425,8 +425,8 @@ export default function MessageInput({
             className={cn(
               "p-2 rounded transition-colors ml-1",
               hasContent
-                ? "bg-indigo-500 hover:bg-indigo-600 text-white"
-                : "bg-zinc-700 text-zinc-500 cursor-not-allowed"
+                ? "bg-white text-black hover:bg-zinc-200"
+                : "bg-white/10 text-zinc-500 cursor-not-allowed"
             )}
           >
             <ArrowUp className="w-5 h-5" />
