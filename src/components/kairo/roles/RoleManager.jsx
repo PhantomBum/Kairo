@@ -217,7 +217,7 @@ export default function RoleManager({ server, currentUser }) {
           {(provided) => (
             <div {...provided.droppableProps} ref={provided.innerRef} className="space-y-2">
               {sortedRoles.map((role, index) => (
-                <Draggable key={role.id} draggableId={role.id} index={index}>
+                <Draggable key={role.id || `role-${index}`} draggableId={role.id || `role-${index}`} index={index}>
                   {(provided, snapshot) => (
                     <div
                       ref={provided.innerRef}
