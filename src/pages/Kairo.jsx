@@ -1588,6 +1588,19 @@ function KairoPageContent() {
           />
         )}
         <QuickNotes isOpen={showQuickNotes} onClose={() => setShowQuickNotes(false)} />
+        {showNitro && (
+          <div className="fixed inset-0 z-50 bg-black/80 flex">
+            <div className="flex-1" onClick={() => setShowNitro(false)} />
+            <motion.div 
+              initial={{ opacity: 0, x: 20 }} 
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              className="w-full max-w-4xl bg-[#0a0a0b] border-l border-white/10 overflow-hidden flex flex-col"
+            >
+              <NitroPage currentUser={currentUser} userCredits={userCredits} onClose={() => setShowNitro(false)} />
+            </motion.div>
+          </div>
+        )}
         </AnimatePresence>
       </div>
     </>
