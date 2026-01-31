@@ -1,7 +1,7 @@
 // Kairo User Bar v3.0 - Minimal user status bar
 
 import React from 'react';
-import { Mic, MicOff, Headphones, HeadphoneOff, Settings } from 'lucide-react';
+import { Mic, MicOff, Headphones, HeadphoneOff, Settings, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Text, Avatar, IconButton, StatusDot } from '../ui/DesignSystem';
 import {
@@ -91,6 +91,15 @@ export default function UserBarV3({
           className={isDeafened ? 'bg-red-500/20 text-red-400' : ''}
         >
           {isDeafened ? <HeadphoneOff className="w-4 h-4" /> : <Headphones className="w-4 h-4" />}
+        </IconButton>
+        
+        <IconButton 
+          size="sm" 
+          variant="ghost" 
+          onClick={() => window.dispatchEvent(new CustomEvent('kairo:open-advanced-profile'))}
+          className="hover:text-emerald-400"
+        >
+          <Sparkles className="w-4 h-4" />
         </IconButton>
         
         <IconButton size="sm" variant="ghost" onClick={onOpenSettings}>
