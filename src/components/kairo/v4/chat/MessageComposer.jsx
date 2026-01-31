@@ -2,40 +2,55 @@ import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Plus, Smile, Gift, Image, Send, X, File, 
-  Sticker, AtSign, Mic, StopCircle, BarChart3, Calendar
+  Sticker, AtSign, Mic, BarChart3, Calendar, Sparkles
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { base44 } from '@/api/base44Client';
 import IconButton from '../primitives/IconButton';
 import Avatar from '../primitives/Avatar';
 
-// File preview component
-const FilePreview = ({ file, onRemove }) => (
-  <div className="relative group">
+// File preview with glass morphism
+const FilePreview = ({ file, onRemove, progress }) => (
+  <motion.div 
+    className="relative group"
+    initial={{ scale: 0.8, opacity: 0 }}
+    animate={{ scale: 1, opacity: 1 }}
+    exit={{ scale: 0.8, opacity: 0 }}
+  >
     {file.type.startsWith('image/') ? (
-      <div className="w-20 h-20 rounded-lg overflow-hidden bg-zinc-800">
+      <div className="w-24 h-24 rounded-xl overflow-hidden bg-zinc-800/50 ring-1 ring-white/[0.1]">
         <img 
           src={URL.createObjectURL(file)} 
           alt="" 
           className="w-full h-full object-cover"
         />
+        {progress !== undefined && progress < 100 && (
+          <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+            <div className="w-12 h-12 rounded-full border-2 border-white/20 border-t-indigo-500 animate-spin" />
+          </div>
+        )}
       </div>
     ) : (
-      <div className="w-20 h-20 rounded-lg bg-zinc-800 flex items-center justify-center">
-        <File className="w-6 h-6 text-zinc-500" />
+      <div className="w-24 h-24 rounded-xl bg-gradient-to-br from-zinc-800/50 to-zinc-900/50 flex flex-col items-center justify-center ring-1 ring-white/[0.1]">
+        <File className="w-6 h-6 text-indigo-400 mb-1" />
+        <span className="text-[9px] text-zinc-500 uppercase font-medium">
+          {file.name.split('.').pop()}
+        </span>
       </div>
     )}
-    <button
+    <motion.button
       onClick={onRemove}
-      className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+      className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 shadow-lg shadow-red-500/30"
+      whileHover={{ scale: 1.1 }}
+      whileTap={{ scale: 0.9 }}
     >
       <X className="w-3 h-3 text-white" />
-    </button>
-    <p className="text-[10px] text-zinc-500 mt-1 truncate w-20">{file.name}</p>
-  </div>
+    </motion.button>
+    <p className="text-[10px] text-zinc-500 mt-1.5 truncate w-24 text-center">{file.name}</p>
+  </motion.div>
 );
 
-// Reply preview
+// Reply preview with animation
 const ReplyPreview = ({ replyTo, onCancel }) => (
   <motion.div
     initial={{ height: 0, opacity: 0 }}
@@ -43,21 +58,27 @@ const ReplyPreview = ({ replyTo, onCancel }) => (
     exit={{ height: 0, opacity: 0 }}
     className="px-4 pt-3 overflow-hidden"
   >
-    <div className="flex items-center gap-3 px-3 py-2 bg-white/[0.04] rounded-lg border-l-2 border-indigo-500">
+    <div className="flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-indigo-500/10 to-purple-500/5 rounded-xl border-l-2 border-indigo-500">
       <div className="flex-1 min-w-0">
-        <p className="text-xs text-indigo-400 font-medium">
-          Replying to {replyTo.author_name}
+        <p className="text-xs text-indigo-400 font-semibold flex items-center gap-1.5">
+          <span>Replying to</span>
+          <span className="text-white">{replyTo.author_name}</span>
         </p>
-        <p className="text-xs text-zinc-500 truncate">{replyTo.content}</p>
+        <p className="text-xs text-zinc-500 truncate mt-0.5">{replyTo.content}</p>
       </div>
-      <button onClick={onCancel} className="text-zinc-500 hover:text-white">
+      <motion.button 
+        onClick={onCancel} 
+        className="text-zinc-500 hover:text-white p-1.5 hover:bg-white/[0.1] rounded-lg transition-colors"
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.9 }}
+      >
         <X className="w-4 h-4" />
-      </button>
+      </motion.button>
     </div>
   </motion.div>
 );
 
-// Mention suggestions
+// Mention suggestions with glass morphism
 const MentionSuggestions = ({ query, members, onSelect }) => {
   const filtered = members.filter(m => 
     m.user_name?.toLowerCase().includes(query.toLowerCase()) ||
@@ -68,30 +89,55 @@ const MentionSuggestions = ({ query, members, onSelect }) => {
   
   return (
     <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: 10 }}
-      className="absolute bottom-full left-0 right-0 mb-2 mx-4 bg-[#111113] border border-white/[0.08] rounded-lg shadow-xl overflow-hidden"
+      initial={{ opacity: 0, y: 10, scale: 0.95 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, y: 10, scale: 0.95 }}
+      className="absolute bottom-full left-0 right-0 mb-2 mx-4 bg-[#18181b]/95 backdrop-blur-xl border border-white/[0.1] rounded-2xl shadow-2xl shadow-black/40 overflow-hidden"
     >
       <div className="p-2">
-        <p className="text-xs text-zinc-500 uppercase px-2 py-1">Members</p>
-        {filtered.map((member) => (
-          <button
+        <p className="text-[10px] text-zinc-500 uppercase font-semibold tracking-wider px-3 py-2">Members matching "{query}"</p>
+        {filtered.map((member, i) => (
+          <motion.button
             key={member.user_id || member.id}
             onClick={() => onSelect(member)}
-            className="w-full flex items-center gap-2 px-2 py-1.5 rounded hover:bg-white/[0.04] transition-colors"
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/[0.06] transition-colors"
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: i * 0.03 }}
+            whileHover={{ x: 2 }}
           >
-            <Avatar src={member.avatar_url} name={member.display_name || member.user_name} size="xs" />
-            <span className="text-sm text-white">{member.display_name || member.user_name}</span>
-            {member.username && (
-              <span className="text-xs text-zinc-500">@{member.username}</span>
-            )}
-          </button>
+            <Avatar src={member.avatar_url} name={member.display_name || member.user_name} size="sm" />
+            <div className="flex-1 text-left">
+              <span className="text-sm text-white font-medium">{member.display_name || member.user_name}</span>
+              {member.username && (
+                <span className="text-xs text-zinc-500 ml-2">@{member.username}</span>
+              )}
+            </div>
+          </motion.button>
         ))}
       </div>
     </motion.div>
   );
 };
+
+// Action button with tooltip
+const ActionBtn = ({ icon: Icon, tooltip, onClick, active, className }) => (
+  <motion.button
+    onClick={onClick}
+    className={cn(
+      'w-8 h-8 rounded-lg flex items-center justify-center transition-colors',
+      active 
+        ? 'bg-indigo-500/20 text-indigo-400' 
+        : 'text-zinc-500 hover:text-zinc-300 hover:bg-white/[0.06]',
+      className
+    )}
+    whileHover={{ scale: 1.1 }}
+    whileTap={{ scale: 0.9 }}
+    title={tooltip}
+  >
+    <Icon className="w-[18px] h-[18px]" />
+  </motion.button>
+);
 
 export default function MessageComposer({
   channelName,
@@ -109,30 +155,27 @@ export default function MessageComposer({
   const [uploading, setUploading] = useState(false);
   const [mentionQuery, setMentionQuery] = useState(null);
   const [showMentions, setShowMentions] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
   
   const inputRef = useRef(null);
   const fileInputRef = useRef(null);
   const typingTimeoutRef = useRef(null);
 
-  // Focus input on mount and reply
   useEffect(() => {
     if (replyTo) inputRef.current?.focus();
   }, [replyTo]);
 
-  // Handle typing indicator
   const handleTyping = useCallback(() => {
     if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
     onTyping?.();
     typingTimeoutRef.current = setTimeout(() => {}, 3000);
   }, [onTyping]);
 
-  // Handle content change
   const handleChange = (e) => {
     const value = e.target.value;
     setContent(value);
     handleTyping();
     
-    // Check for @mention
     const lastAtIndex = value.lastIndexOf('@');
     if (lastAtIndex !== -1) {
       const textAfterAt = value.slice(lastAtIndex + 1);
@@ -145,7 +188,6 @@ export default function MessageComposer({
     setShowMentions(false);
   };
 
-  // Handle mention selection
   const handleMentionSelect = (member) => {
     const lastAtIndex = content.lastIndexOf('@');
     const newContent = content.slice(0, lastAtIndex) + `@${member.username || member.display_name || member.user_name} `;
@@ -154,38 +196,30 @@ export default function MessageComposer({
     inputRef.current?.focus();
   };
 
-  // Handle file selection
   const handleFileSelect = (e) => {
     const selectedFiles = Array.from(e.target.files || []);
     setFiles(prev => [...prev, ...selectedFiles].slice(0, 10));
   };
 
-  // Remove file
   const removeFile = (index) => {
     setFiles(prev => prev.filter((_, i) => i !== index));
   };
 
-  // Handle send
   const handleSend = async () => {
     if ((!content.trim() && files.length === 0) || uploading) return;
     
     let attachments = [];
     
-    // Upload files
     if (files.length > 0) {
       setUploading(true);
-      try {
-        for (const file of files) {
-          const { file_url } = await base44.integrations.Core.UploadFile({ file });
-          attachments.push({
-            url: file_url,
-            filename: file.name,
-            content_type: file.type,
-            size: file.size,
-          });
-        }
-      } catch (err) {
-        console.error('Upload failed:', err);
+      for (const file of files) {
+        const { file_url } = await base44.integrations.Core.UploadFile({ file });
+        attachments.push({
+          url: file_url,
+          filename: file.name,
+          content_type: file.type,
+          size: file.size,
+        });
       }
       setUploading(false);
     }
@@ -200,13 +234,14 @@ export default function MessageComposer({
     setFiles([]);
   };
 
-  // Handle key press
   const handleKeyDown = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSend();
     }
   };
+
+  const canSend = content.trim() || files.length > 0;
 
   return (
     <div className="relative">
@@ -228,22 +263,42 @@ export default function MessageComposer({
       
       <div className="px-4 pb-4 pt-2">
         {/* File previews */}
-        {files.length > 0 && (
-          <div className="flex flex-wrap gap-2 mb-3 p-3 bg-white/[0.02] rounded-lg">
-            {files.map((file, i) => (
-              <FilePreview key={i} file={file} onRemove={() => removeFile(i)} />
-            ))}
-          </div>
-        )}
+        <AnimatePresence>
+          {files.length > 0 && (
+            <motion.div 
+              className="flex flex-wrap gap-3 mb-4 p-4 bg-gradient-to-r from-white/[0.03] to-transparent rounded-2xl border border-white/[0.06]"
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+            >
+              {files.map((file, i) => (
+                <FilePreview key={i} file={file} onRemove={() => removeFile(i)} />
+              ))}
+            </motion.div>
+          )}
+        </AnimatePresence>
         
-        {/* Input area */}
-        <div className={cn(
-          'flex items-end gap-2 p-2 bg-white/[0.04] rounded-xl border border-white/[0.08]',
-          'focus-within:border-white/[0.12]',
-          disabled && 'opacity-50 pointer-events-none'
-        )}>
+        {/* Input area with glass morphism */}
+        <motion.div 
+          className={cn(
+            'relative flex items-end gap-2 p-2 rounded-2xl border transition-all duration-200',
+            'bg-gradient-to-r from-white/[0.04] to-white/[0.02]',
+            isFocused 
+              ? 'border-indigo-500/30 shadow-lg shadow-indigo-500/10' 
+              : 'border-white/[0.08]',
+            disabled && 'opacity-50 pointer-events-none'
+          )}
+          animate={{ 
+            boxShadow: isFocused ? '0 0 30px rgba(99, 102, 241, 0.1)' : '0 0 0 rgba(99, 102, 241, 0)'
+          }}
+        >
+          {/* Glow effect on focus */}
+          {isFocused && (
+            <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-indigo-500/5 via-purple-500/5 to-indigo-500/5 pointer-events-none" />
+          )}
+          
           {/* Left actions */}
-          <div className="flex items-center gap-0.5 pb-1">
+          <div className="relative flex items-center gap-0.5 pb-1">
             <input
               ref={fileInputRef}
               type="file"
@@ -251,34 +306,31 @@ export default function MessageComposer({
               className="hidden"
               onChange={handleFileSelect}
             />
-            <IconButton
+            <ActionBtn
               icon={Plus}
-              size="sm"
-              variant="ghost"
               tooltip="Attach files"
               onClick={() => fileInputRef.current?.click()}
             />
           </div>
           
           {/* Text input */}
-          <div className="flex-1 min-w-0">
+          <div className="relative flex-1 min-w-0">
             <textarea
               ref={inputRef}
               value={content}
               onChange={handleChange}
               onKeyDown={handleKeyDown}
+              onFocus={() => setIsFocused(true)}
+              onBlur={() => setIsFocused(false)}
               placeholder={`Message ${channelName ? `#${channelName}` : ''}`}
               className={cn(
-                'w-full max-h-40 bg-transparent text-white text-sm resize-none',
+                'w-full max-h-40 bg-transparent text-white text-[15px] resize-none',
                 'placeholder:text-zinc-600 focus:outline-none',
-                'scrollbar-thin'
+                'scrollbar-thin scrollbar-thumb-white/10'
               )}
               rows={1}
               disabled={disabled}
-              style={{
-                height: 'auto',
-                minHeight: '24px',
-              }}
+              style={{ height: 'auto', minHeight: '28px' }}
               onInput={(e) => {
                 e.target.style.height = 'auto';
                 e.target.style.height = Math.min(e.target.scrollHeight, 160) + 'px';
@@ -287,26 +339,42 @@ export default function MessageComposer({
           </div>
           
           {/* Right actions */}
-          <div className="flex items-center gap-0.5 pb-1">
-            <IconButton icon={BarChart3} size="sm" variant="ghost" tooltip="Create Poll" onClick={onCreatePoll} />
-            <IconButton icon={Calendar} size="sm" variant="ghost" tooltip="Schedule Message" onClick={onScheduleMessage} />
-            <IconButton icon={Sticker} size="sm" variant="ghost" tooltip="Stickers" />
-            <IconButton icon={Smile} size="sm" variant="ghost" tooltip="Emoji" />
-            <IconButton icon={Gift} size="sm" variant="ghost" tooltip="GIF" />
+          <div className="relative flex items-center gap-0.5 pb-1">
+            <ActionBtn icon={BarChart3} tooltip="Create Poll" onClick={onCreatePoll} />
+            <ActionBtn icon={Calendar} tooltip="Schedule Message" onClick={onScheduleMessage} />
+            <ActionBtn icon={Sticker} tooltip="Stickers" />
+            <ActionBtn icon={Gift} tooltip="Send GIF" />
+            <ActionBtn icon={Smile} tooltip="Emoji" />
             
-            {/* Send button */}
-            {(content.trim() || files.length > 0) ? (
-              <IconButton
-                icon={Send}
-                size="sm"
-                variant="solid"
-                tooltip="Send"
-                onClick={handleSend}
-                disabled={uploading || disabled}
-              />
-            ) : null}
+            {/* Send button with animation */}
+            <AnimatePresence>
+              {canSend && (
+                <motion.button
+                  initial={{ scale: 0, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0, opacity: 0 }}
+                  onClick={handleSend}
+                  disabled={uploading || disabled}
+                  className={cn(
+                    'w-8 h-8 rounded-xl flex items-center justify-center ml-1',
+                    'bg-gradient-to-r from-indigo-500 to-purple-500',
+                    'hover:from-indigo-400 hover:to-purple-400',
+                    'shadow-lg shadow-indigo-500/30',
+                    'disabled:opacity-50 disabled:cursor-not-allowed'
+                  )}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  {uploading ? (
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  ) : (
+                    <Send className="w-4 h-4 text-white" />
+                  )}
+                </motion.button>
+              )}
+            </AnimatePresence>
           </div>
-        </div>
+        </motion.div>
       </div>
     </div>
   );
