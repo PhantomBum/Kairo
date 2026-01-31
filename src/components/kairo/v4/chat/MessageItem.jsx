@@ -46,7 +46,7 @@ const renderContent = (content, onMentionClick) => {
 };
 
 // Message hover actions
-const MessageActions = memo(({ onReply, onReact, onEdit, onDelete, onPin, onForward, canEdit, isPinned }) => (
+const MessageActions = memo(({ onReply, onReact, onEdit, onDelete, onPin, onForward, canEdit, canModerate, isPinned }) => (
   <motion.div
     initial={{ opacity: 0, y: 2 }}
     animate={{ opacity: 1, y: 0 }}
@@ -68,16 +68,18 @@ const MessageActions = memo(({ onReply, onReact, onEdit, onDelete, onPin, onForw
             <Edit2 className="w-4 h-4 mr-2" /> Edit
           </DropdownMenuItem>
         )}
-        <DropdownMenuItem onClick={onPin} className="text-zinc-300 focus:text-white focus:bg-white/[0.06]">
-          <Pin className="w-4 h-4 mr-2" /> {isPinned ? 'Unpin' : 'Pin'}
-        </DropdownMenuItem>
+        {canModerate && (
+          <DropdownMenuItem onClick={onPin} className="text-zinc-300 focus:text-white focus:bg-white/[0.06]">
+            <Pin className="w-4 h-4 mr-2" /> {isPinned ? 'Unpin' : 'Pin'}
+          </DropdownMenuItem>
+        )}
         <DropdownMenuItem onClick={onForward} className="text-zinc-300 focus:text-white focus:bg-white/[0.06]">
           <Forward className="w-4 h-4 mr-2" /> Forward
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => navigator.clipboard.writeText(content)} className="text-zinc-300 focus:text-white focus:bg-white/[0.06]">
+        <DropdownMenuItem onClick={() => navigator.clipboard.writeText('')} className="text-zinc-300 focus:text-white focus:bg-white/[0.06]">
           <Copy className="w-4 h-4 mr-2" /> Copy
         </DropdownMenuItem>
-        {canEdit && (
+        {(canEdit || canModerate) && (
           <>
             <DropdownMenuSeparator className="bg-white/[0.06]" />
             <DropdownMenuItem onClick={onDelete} className="text-red-400 focus:text-red-300 focus:bg-red-500/10">
@@ -277,6 +279,7 @@ function MessageItem({
           onPin={() => onPin?.(message)}
           onForward={() => onForward?.(message)}
           canEdit={isOwn}
+          canModerate={true} // Would use usePermissions hook in production
           isPinned={message.is_pinned}
         />
       )}

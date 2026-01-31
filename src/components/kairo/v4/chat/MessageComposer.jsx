@@ -2,7 +2,7 @@ import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Plus, Smile, Gift, Image, Send, X, File, 
-  Sticker, AtSign, Mic, StopCircle
+  Sticker, AtSign, Mic, StopCircle, BarChart3, Calendar
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { base44 } from '@/api/base44Client';
@@ -101,6 +101,8 @@ export default function MessageComposer({
   onTyping,
   members = [],
   disabled,
+  onCreatePoll,
+  onScheduleMessage,
 }) {
   const [content, setContent] = useState('');
   const [files, setFiles] = useState([]);
@@ -286,6 +288,8 @@ export default function MessageComposer({
           
           {/* Right actions */}
           <div className="flex items-center gap-0.5 pb-1">
+            <IconButton icon={BarChart3} size="sm" variant="ghost" tooltip="Create Poll" onClick={onCreatePoll} />
+            <IconButton icon={Calendar} size="sm" variant="ghost" tooltip="Schedule Message" onClick={onScheduleMessage} />
             <IconButton icon={Sticker} size="sm" variant="ghost" tooltip="Stickers" />
             <IconButton icon={Smile} size="sm" variant="ghost" tooltip="Emoji" />
             <IconButton icon={Gift} size="sm" variant="ghost" tooltip="GIF" />
