@@ -37,7 +37,7 @@ function ServerIcon({ server, isActive, onClick }) {
           ) : (
             <div className={cn(
               'w-full h-full flex items-center justify-center text-sm font-semibold transition-all duration-200',
-              isActive ? 'bg-indigo-600 text-white' : 'bg-[#2a2a2a] text-zinc-400 group-hover:bg-indigo-600 group-hover:text-white'
+              isActive ? 'bg-[#2a2a2a] text-white' : 'bg-[#1a1a1a] text-zinc-500 group-hover:bg-[#2a2a2a] group-hover:text-white'
             )}>
               {server.name?.charAt(0)?.toUpperCase()}
             </div>
@@ -53,7 +53,7 @@ export default function ServerSidebar({
   onCreateServer, onDiscoverClick, isDMsActive, pendingRequests = 0,
 }) {
   return (
-    <div className="w-[72px] h-full bg-[#111111] flex flex-col items-center py-3 gap-2 flex-shrink-0">
+    <div className="w-[72px] h-full bg-[#0c0c0c] flex flex-col items-center py-3 gap-2 flex-shrink-0">
       {/* Home */}
       <SidebarTooltip label="Home">
         <div className="relative group flex justify-center">
@@ -63,11 +63,11 @@ export default function ServerSidebar({
           )} />
           <button onClick={onDMsClick} className={cn(
             'relative w-12 h-12 flex items-center justify-center transition-all duration-200',
-            isDMsActive ? 'rounded-[16px] bg-indigo-600 text-white' : 'rounded-[24px] bg-[#2a2a2a] text-zinc-400 hover:rounded-[16px] hover:bg-indigo-600 hover:text-white'
+            isDMsActive ? 'rounded-[16px] bg-[#2a2a2a] text-white' : 'rounded-[24px] bg-[#1a1a1a] text-zinc-500 hover:rounded-[16px] hover:bg-[#2a2a2a] hover:text-white'
           )}>
             <Home className="w-5 h-5" />
             {pendingRequests > 0 && (
-              <div className="absolute -bottom-1 -right-1 min-w-[18px] h-[18px] px-1 bg-red-500 rounded-full text-[10px] font-bold text-white flex items-center justify-center border-2 border-[#111111]">
+              <div className="absolute -bottom-1 -right-1 min-w-[18px] h-[18px] px-1 bg-red-500 rounded-full text-[10px] font-bold text-white flex items-center justify-center border-2 border-[#0c0c0c]">
                 {pendingRequests}
               </div>
             )}
@@ -88,13 +88,13 @@ export default function ServerSidebar({
       
       {/* Add server */}
       <SidebarTooltip label="Add a Server">
-        <button onClick={onCreateServer} className="w-12 h-12 rounded-[24px] hover:rounded-[16px] bg-[#2a2a2a] text-emerald-400 hover:bg-emerald-600 hover:text-white flex items-center justify-center transition-all duration-200">
+        <button onClick={onCreateServer} className="w-12 h-12 rounded-[24px] hover:rounded-[16px] bg-[#1a1a1a] text-zinc-500 hover:bg-[#2a2a2a] hover:text-white flex items-center justify-center transition-all duration-200">
           <Plus className="w-5 h-5" />
         </button>
       </SidebarTooltip>
       
       <SidebarTooltip label="Explore Servers">
-        <button onClick={onDiscoverClick} className="w-12 h-12 rounded-[24px] hover:rounded-[16px] bg-[#2a2a2a] text-emerald-400 hover:bg-emerald-600 hover:text-white flex items-center justify-center transition-all duration-200">
+        <button onClick={onDiscoverClick} className="w-12 h-12 rounded-[24px] hover:rounded-[16px] bg-[#1a1a1a] text-zinc-500 hover:bg-[#2a2a2a] hover:text-white flex items-center justify-center transition-all duration-200">
           <Compass className="w-5 h-5" />
         </button>
       </SidebarTooltip>

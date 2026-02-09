@@ -81,7 +81,7 @@ export default function MessageInput({ channelName, replyTo, onCancelReply, onSe
       )}
 
       <div className={cn(
-        'flex items-end gap-1 px-3 py-1.5 bg-[#1e1e1e] rounded-lg border border-white/[0.04]',
+        'flex items-end gap-1 px-3 py-1.5 bg-[#1a1a1a] rounded-lg',
         replyTo && 'rounded-t-none border-t-0'
       )}>
         <input ref={fileRef} type="file" multiple onChange={handleFiles} className="hidden" />

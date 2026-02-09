@@ -122,7 +122,7 @@ function KairoAppContent() {
   };
 
   return (
-    <div className="h-screen w-screen flex bg-[#111111] overflow-hidden">
+    <div className="h-screen w-screen flex bg-[#0c0c0c] overflow-hidden">
       <ServerSidebar
         servers={servers}
         activeServerId={activeServer?.id}
@@ -134,7 +134,7 @@ function KairoAppContent() {
         pendingRequests={incomingRequests.length}
       />
       
-      <div className="flex flex-col w-[240px] flex-shrink-0 bg-[#191919] border-r border-white/[0.04]">
+      <div className="flex flex-col w-[240px] flex-shrink-0 bg-[#141414]">
         {view === 'server' && activeServer ? (
           <ChannelSidebar
             server={activeServer}
@@ -168,7 +168,7 @@ function KairoAppContent() {
         />
       </div>
       
-      <div className="flex-1 flex flex-col min-w-0 bg-[#111111]">
+      <div className="flex-1 flex flex-col min-w-0 bg-[#0c0c0c]">
         {view === 'server' && activeChannel && (
           <ChatHeader channel={activeChannel} memberCount={members.length} showMembers={showMembers}
             onToggleMembers={() => setShowMembers(!showMembers)} onShowSearch={() => {}} onShowPinned={() => {}} />
@@ -177,7 +177,7 @@ function KairoAppContent() {
           <ChatHeader conversation={{ ...activeConversation, current_user_id: user?.id }} onStartCall={() => {}} onStartVideo={() => {}} />
         )}
         {view === 'friends' && (
-          <div className="h-12 px-6 flex items-center border-b border-white/[0.06] bg-[#111111]">
+          <div className="h-12 px-6 flex items-center border-b border-white/[0.06] bg-[#0c0c0c]">
             <span className="font-semibold text-white text-[15px]">Friends</span>
           </div>
         )}

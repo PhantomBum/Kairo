@@ -30,7 +30,7 @@ export default function DMSidebar({ conversations = [], activeConversationId, on
   return (
     <div className="flex-1 flex flex-col min-h-0">
       {/* Header */}
-      <div className="h-12 px-4 flex items-center border-b border-white/[0.04]">
+      <div className="h-12 px-4 flex items-center">
         <span className="font-semibold text-white text-[15px]">Home</span>
       </div>
 
@@ -45,7 +45,7 @@ export default function DMSidebar({ conversations = [], activeConversationId, on
         <div className="relative">
           <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-zinc-600" />
           <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Find or start a conversation"
-            className="w-full h-7 pl-7 pr-2 bg-[#111111] rounded text-xs text-white placeholder:text-zinc-600 focus:outline-none" />
+            className="w-full h-7 pl-7 pr-2 bg-[#0c0c0c] rounded text-xs text-white placeholder:text-zinc-600 focus:outline-none" />
         </div>
       </div>
 
@@ -72,9 +72,9 @@ export default function DMSidebar({ conversations = [], activeConversationId, on
           const avatar = isP1 ? conv.participant_2_avatar : conv.participant_1_avatar;
           
           return (
-            <button key={conv.id} onClick={() => onConversationSelect(conv)}
+            <div key={conv.id} onClick={() => onConversationSelect(conv)}
               className={cn(
-                'w-full flex items-center gap-2.5 px-2 py-1.5 rounded text-left transition-colors group',
+                'w-full flex items-center gap-2.5 px-2 py-1.5 rounded text-left transition-colors group cursor-pointer',
                 activeConversationId === conv.id ? 'bg-white/[0.08] text-white' : 'text-zinc-400 hover:bg-white/[0.04] hover:text-zinc-200'
               )}
             >
@@ -84,7 +84,7 @@ export default function DMSidebar({ conversations = [], activeConversationId, on
                 className="w-4 h-4 rounded flex items-center justify-center text-zinc-600 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity">
                 <X className="w-3 h-3" />
               </button>
-            </button>
+            </div>
           );
         })}
       </div>

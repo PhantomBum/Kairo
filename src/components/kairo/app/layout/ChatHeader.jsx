@@ -28,7 +28,7 @@ export default function ChatHeader({ channel, conversation, memberCount, showMem
       ? { name: conversation.participant_2_name, avatar: conversation.participant_2_avatar }
       : { name: conversation.participant_1_name, avatar: conversation.participant_1_avatar };
     return (
-      <div className="h-12 px-4 flex items-center justify-between border-b border-white/[0.06] bg-[#111111]">
+      <div className="h-12 px-4 flex items-center justify-between border-b border-white/[0.06] bg-[#0c0c0c]">
         <div className="flex items-center gap-2">
           <Avatar src={other.avatar} name={other.name} size="xs" />
           <span className="font-semibold text-white text-[15px]">{other.name}</span>

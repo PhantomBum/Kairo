@@ -97,7 +97,7 @@ export default function MessageItem({ message, showHeader, isOwn, onReply, onEdi
         </div>
 
         {hover && (
-          <div className="absolute -top-3 right-4 flex items-center p-0.5 bg-[#1e1e1e] border border-white/[0.06] rounded shadow-lg z-10">
+          <div className="absolute -top-3 right-4 flex items-center p-0.5 bg-[#1a1a1a] border border-white/[0.06] rounded shadow-lg z-10">
             <button onClick={() => onReact('👍')} className="w-7 h-7 rounded flex items-center justify-center text-zinc-500 hover:text-white hover:bg-white/[0.06] transition-colors">
               <Smile className="w-4 h-4" />
             </button>

@@ -67,7 +67,7 @@ export default function FriendsPanel({ friends = [], incomingRequests = [], outg
   const displayed = activeTab === 'online' ? onlineFriends : friends;
 
   return (
-    <div className="flex-1 flex flex-col bg-[#111111]">
+    <div className="flex-1 flex flex-col bg-[#0c0c0c]">
       {/* Tab bar */}
       <div className="px-4 py-2 flex items-center gap-2 border-b border-white/[0.06]">
         {tabs.map((tab) => (
@@ -90,7 +90,7 @@ export default function FriendsPanel({ friends = [], incomingRequests = [], outg
         <div className="flex-1" />
         
         <button onClick={onAddFriend}
-          className="flex items-center gap-1.5 px-3 h-8 text-sm font-medium bg-emerald-600 hover:bg-emerald-500 text-white rounded transition-colors">
+          className="flex items-center gap-1.5 px-3 h-8 text-sm font-medium bg-[#2a2a2a] hover:bg-[#333] text-white rounded transition-colors">
           <UserPlus className="w-4 h-4" />
           Add Friend
         </button>

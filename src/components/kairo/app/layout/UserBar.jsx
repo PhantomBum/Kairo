@@ -25,7 +25,7 @@ function IconBtn({ icon: Icon, activeIcon: ActiveIcon, label, active, onClick })
 
 export default function UserBar({ profile, isMuted, isDeafened, onToggleMute, onToggleDeafen, onOpenSettings }) {
   return (
-    <div className="h-[52px] px-2 flex items-center gap-2 bg-[#161616] border-t border-white/[0.04]">
+    <div className="h-[52px] px-2 flex items-center gap-2 bg-[#111111]">
       <div className="flex items-center gap-2 flex-1 min-w-0">
         <Avatar src={profile?.avatar_url} name={profile?.display_name} size="sm" status={profile?.status || 'online'} />
         <div className="flex-1 min-w-0">

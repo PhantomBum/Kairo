@@ -34,7 +34,7 @@ export default function MemberSidebar({ members = [], profiles = new Map(), role
   }, [members, profiles]);
 
   return (
-    <div className="w-[240px] h-full bg-[#191919] border-l border-white/[0.04] flex flex-col flex-shrink-0">
+    <div className="w-[240px] h-full bg-[#141414] border-l border-white/[0.06] flex flex-col flex-shrink-0">
       <div className="h-12 px-4 flex items-center border-b border-white/[0.04]">
         <span className="text-sm font-semibold text-zinc-400">Members</span>
         <span className="text-xs text-zinc-600 ml-2">Members {members.length} • Online {online.length}</span>

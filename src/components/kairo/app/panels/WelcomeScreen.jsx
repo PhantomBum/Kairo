@@ -20,7 +20,7 @@ function ActionCard({ icon: Icon, title, description, onClick }) {
 
 export default function WelcomeScreen({ greeting, onCreateServer, onJoinServer, onDiscover }) {
   return (
-    <div className="flex-1 flex items-center justify-center bg-[#111111]">
+    <div className="flex-1 flex items-center justify-center bg-[#0c0c0c]">
       <div className="text-center max-w-lg">
         {/* Logo */}
         <div className="flex items-center justify-center gap-3 mb-6">
