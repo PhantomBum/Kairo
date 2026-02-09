@@ -7,18 +7,18 @@ import { useMessages } from './hooks/useMessages';
 import { useFriends } from './hooks/useFriends';
 import { useConversations, useDMMessages } from './hooks/useConversations';
 
-import ServerRail from './layout/ServerRail';
-import ChannelPanel from './layout/ChannelPanel';
-import DMPanel from './layout/DMPanel';
-import MemberPanel from './layout/MemberPanel';
-import UserPanel from './layout/UserPanel';
-import ChatHeader from './layout/ChatHeader';
+import ServerRail from './layout/ServerRail.jsx';
+import ChannelPanel from './layout/ChannelPanel.jsx';
+import DMPanel from './layout/DMPanel.jsx';
+import MemberPanel from './layout/MemberPanel.jsx';
+import UserPanel from './layout/UserPanel.jsx';
+import ChatHeader from './layout/ChatHeader.jsx';
 
-import ChatMessages from './chat/ChatMessages';
-import ChatInput from './chat/ChatInput';
+import ChatMessages from './chat/ChatMessages.jsx';
+import ChatInput from './chat/ChatInput.jsx';
 
-import FriendsView from './panels/FriendsView';
-import EmptyView from './panels/EmptyView';
+import FriendsView from './panels/FriendsView.jsx';
+import EmptyView from './panels/EmptyView.jsx';
 
 import AddFriendModal from './modals/AddFriendModal';
 import CreateServerModal from './modals/CreateServerModal';
