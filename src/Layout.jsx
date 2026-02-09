@@ -11,28 +11,28 @@ export default function Layout({ children }) {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#0c0c0c]">
+    <div className="min-h-screen" style={{ background: '#0e0e0e' }}>
       <style>{`
         :root {
-            --background: 0 0% 5%;
+            --background: 0 0% 5.5%;
             --foreground: 0 0% 95%;
-            --card: 0 0% 7%;
+            --card: 0 0% 8%;
             --card-foreground: 0 0% 95%;
-            --popover: 0 0% 8%;
+            --popover: 0 0% 10%;
             --popover-foreground: 0 0% 95%;
-            --primary: 0 0% 95%;
+            --primary: 0 0% 100%;
             --primary-foreground: 0 0% 5%;
-            --secondary: 0 0% 10%;
+            --secondary: 0 0% 12%;
             --secondary-foreground: 0 0% 95%;
-            --muted: 0 0% 10%;
-            --muted-foreground: 0 0% 45%;
-            --accent: 0 0% 10%;
+            --muted: 0 0% 12%;
+            --muted-foreground: 0 0% 40%;
+            --accent: 0 0% 12%;
             --accent-foreground: 0 0% 95%;
             --destructive: 0 84% 60%;
             --destructive-foreground: 0 0% 98%;
             --border: 0 0% 14%;
             --input: 0 0% 10%;
-            --ring: 0 0% 40%;
+            --ring: 0 0% 30%;
           }
 
         * {
@@ -40,7 +40,7 @@ export default function Layout({ children }) {
         }
 
         body {
-                  background-color: #0c0c0c;
+                  background-color: #0e0e0e;
           color: hsl(var(--foreground));
           font-feature-settings: "rlig" 1, "calt" 1;
           font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
