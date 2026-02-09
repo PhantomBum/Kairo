@@ -11,28 +11,28 @@ export default function Layout({ children }) {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#0a0a0b]">
+    <div className="min-h-screen bg-[#0c0c0c]">
       <style>{`
         :root {
-            --background: 0 0% 4%;
-            --foreground: 0 0% 98%;
-            --card: 0 0% 5%;
-            --card-foreground: 0 0% 98%;
-            --popover: 0 0% 6%;
-            --popover-foreground: 0 0% 98%;
-            --primary: 160 84% 39%;
-            --primary-foreground: 0 0% 98%;
-            --secondary: 0 0% 8%;
-            --secondary-foreground: 0 0% 98%;
-            --muted: 0 0% 8%;
+            --background: 0 0% 5%;
+            --foreground: 0 0% 95%;
+            --card: 0 0% 7%;
+            --card-foreground: 0 0% 95%;
+            --popover: 0 0% 8%;
+            --popover-foreground: 0 0% 95%;
+            --primary: 0 0% 95%;
+            --primary-foreground: 0 0% 5%;
+            --secondary: 0 0% 10%;
+            --secondary-foreground: 0 0% 95%;
+            --muted: 0 0% 10%;
             --muted-foreground: 0 0% 45%;
-            --accent: 0 0% 8%;
-            --accent-foreground: 0 0% 98%;
+            --accent: 0 0% 10%;
+            --accent-foreground: 0 0% 95%;
             --destructive: 0 84% 60%;
             --destructive-foreground: 0 0% 98%;
-            --border: 0 0% 10%;
-            --input: 0 0% 8%;
-            --ring: 160 84% 39%;
+            --border: 0 0% 14%;
+            --input: 0 0% 10%;
+            --ring: 0 0% 40%;
           }
 
         * {
