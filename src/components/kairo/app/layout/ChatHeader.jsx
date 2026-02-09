@@ -1,64 +1,61 @@
 import React from 'react';
-import { Hash, Volume2, Pin, Users, Search, Bell, Settings } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import Avatar from '../ui/Avatar';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Hash, Users, Pin, Search, Phone, Video } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
-function HBtn({ icon: Icon, label, onClick, active }) {
+function HBtn({ label, onClick, active, children }) {
   return (
     <TooltipProvider delayDuration={0}>
       <Tooltip>
         <TooltipTrigger asChild>
-          <button onClick={onClick} className={cn(
-            'w-8 h-8 rounded flex items-center justify-center transition-colors',
-            active ? 'text-white bg-white/[0.08]' : 'text-zinc-500 hover:text-zinc-200'
-          )}>
-            <Icon className="w-[18px] h-[18px]" />
+          <button onClick={onClick}
+            className="w-8 h-8 flex items-center justify-center rounded transition-colors"
+            style={{ color: active ? '#fff' : '#555' }}>
+            {children}
           </button>
         </TooltipTrigger>
-        <TooltipContent side="bottom" className="bg-[#1a1a1a] border-white/[0.08] text-white text-xs">{label}</TooltipContent>
+        <TooltipContent side="bottom" className="bg-black text-white text-xs border-0 px-2 py-1">
+          {label}
+        </TooltipContent>
       </Tooltip>
     </TooltipProvider>
   );
 }
 
-export default function ChatHeader({ channel, conversation, memberCount, showMembers, onToggleMembers, onShowSearch, onShowPinned, onStartCall, onStartVideo }) {
+export default function ChatHeader({ channel, conversation, memberCount, showMembers, onToggleMembers }) {
   if (conversation) {
-    const other = conversation.participant_1_id === conversation.current_user_id
-      ? { name: conversation.participant_2_name, avatar: conversation.participant_2_avatar }
-      : { name: conversation.participant_1_name, avatar: conversation.participant_1_avatar };
+    const other = conversation.participants?.find(p => p.user_id !== conversation.current_user_id) || conversation.participants?.[0];
     return (
-      <div className="h-12 px-4 flex items-center justify-between border-b border-white/[0.06] bg-[#0c0c0c]">
+      <div className="h-12 px-4 flex items-center justify-between flex-shrink-0" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
         <div className="flex items-center gap-2">
-          <Avatar src={other.avatar} name={other.name} size="xs" />
-          <span className="font-semibold text-white text-[15px]">{other.name}</span>
+          <div className="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-medium" style={{ background: '#222' }}>
+            {other?.avatar ? <img src={other.avatar} className="w-full h-full rounded-full object-cover" /> : (other?.user_name || 'U').charAt(0)}
+          </div>
+          <span className="text-sm font-medium text-white">{other?.user_name || 'User'}</span>
         </div>
-        <div className="flex items-center gap-1">
-          <HBtn icon={Search} label="Search" onClick={onShowSearch} />
-          <HBtn icon={Settings} label="Settings" />
+        <div className="flex items-center">
+          <HBtn label="Voice Call"><Phone className="w-4 h-4" /></HBtn>
+          <HBtn label="Video Call"><Video className="w-4 h-4" /></HBtn>
         </div>
       </div>
     );
   }
 
-  const Icon = channel?.type === 'voice' ? Volume2 : Hash;
   return (
-    <div className="h-12 px-4 flex items-center justify-between border-b border-white/[0.06] bg-[#111111]">
-      <div className="flex items-center gap-2 min-w-0">
-        <Icon className="w-5 h-5 text-zinc-500 flex-shrink-0" />
-        <span className="font-semibold text-white text-[15px] truncate">{channel?.name}</span>
+    <div className="h-12 px-4 flex items-center justify-between flex-shrink-0" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+      <div className="flex items-center gap-2">
+        <Hash className="w-4 h-4 text-zinc-500" />
+        <span className="text-sm font-medium text-white">{channel?.name}</span>
         {channel?.description && (
           <>
-            <div className="w-px h-4 bg-white/[0.08] mx-2" />
-            <span className="text-sm text-zinc-600 truncate">{channel.description}</span>
+            <div className="w-px h-4 mx-1" style={{ background: 'rgba(255,255,255,0.08)' }} />
+            <span className="text-xs text-zinc-500 truncate max-w-[300px]">{channel.description}</span>
           </>
         )}
       </div>
-      <div className="flex items-center gap-1">
-        <HBtn icon={Pin} label="Pinned" onClick={onShowPinned} />
-        <HBtn icon={Search} label="Search" onClick={onShowSearch} />
-        <HBtn icon={Users} label="Members" onClick={onToggleMembers} active={showMembers} />
-        <HBtn icon={Settings} label="Settings" />
+      <div className="flex items-center gap-0.5">
+        <HBtn label="Search"><Search className="w-4 h-4" /></HBtn>
+        <HBtn label="Pinned"><Pin className="w-4 h-4" /></HBtn>
+        <HBtn label="Members" active={showMembers} onClick={onToggleMembers}><Users className="w-4 h-4" /></HBtn>
       </div>
     </div>
   );
