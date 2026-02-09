@@ -40,7 +40,7 @@ export default function Layout({ children }) {
         }
 
         body {
-          background-color: #09090b;
+                  background-color: #0c0c0c;
           color: hsl(var(--foreground));
           font-feature-settings: "rlig" 1, "calt" 1;
           font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;

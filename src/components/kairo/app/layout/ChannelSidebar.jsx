@@ -70,7 +70,7 @@ export default function ChannelSidebar({ server, categories = [], channels = [],
             <ChevronDown className="w-4 h-4 text-zinc-500 flex-shrink-0" />
           </button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="start" className="w-56 bg-[#1a1a1a] border-white/[0.08]">
+        <DropdownMenuContent align="start" className="w-56 bg-[#1a1a1a] border-white/[0.10]">
           <DropdownMenuItem onClick={onInvite} className="gap-2 cursor-pointer text-indigo-400">
             <UserPlus className="w-4 h-4" /> Invite People
           </DropdownMenuItem>
