@@ -75,9 +75,9 @@ export function useDMMessages(conversationId) {
     mutationFn: async ({ content, attachments, senderId, senderName, senderAvatar }) => {
       return base44.entities.DirectMessage.create({
         conversation_id: conversationId,
-        sender_id: senderId,
-        sender_name: senderName,
-        sender_avatar: senderAvatar,
+        author_id: senderId,
+        author_name: senderName,
+        author_avatar: senderAvatar,
         content,
         attachments,
       });
