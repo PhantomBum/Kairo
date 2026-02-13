@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { Plus, Smile, Send, X } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 
-export default function ChatInput({ channelName, replyTo, onCancelReply, onSend }) {
+export default function ChatInput({ channelName, replyTo, onCancelReply, onSend, onTyping }) {
   const [content, setContent] = useState('');
   const [files, setFiles] = useState([]);
   const [uploading, setUploading] = useState(false);
@@ -41,10 +41,20 @@ export default function ChatInput({ channelName, replyTo, onCancelReply, onSend 
     inputRef.current?.focus();
   };
 
+  const typingTimeout = useRef(null);
+
   const handleKey = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSubmit();
+    }
+  };
+
+  const handleChange = (val) => {
+    setContent(val);
+    if (onTyping) {
+      clearTimeout(typingTimeout.current);
+      typingTimeout.current = setTimeout(() => onTyping(), 300);
     }
   };
 
@@ -84,7 +94,7 @@ export default function ChatInput({ channelName, replyTo, onCancelReply, onSend 
         </button>
 
         <div className="flex-1 min-w-0 relative">
-          <textarea ref={inputRef} value={content} onChange={e => setContent(e.target.value)} onKeyDown={handleKey}
+          <textarea ref={inputRef} value={content} onChange={e => handleChange(e.target.value)} onKeyDown={handleKey}
             placeholder={`Message #${channelName}`}
             rows={1}
             className="w-full bg-transparent text-sm text-white placeholder:text-zinc-600 resize-none focus:outline-none leading-6 max-h-32"
