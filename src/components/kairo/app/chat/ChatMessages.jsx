@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { ArrowDown, Hash } from 'lucide-react';
-import ChatBubble from './ChatBubble';
+import { ArrowDown, Hash, MessageSquare } from 'lucide-react';
+import ChatBubble from './ChatBubble.jsx';
 
 function formatDivider(dateStr) {
   const d = new Date(dateStr);
@@ -11,7 +11,7 @@ function formatDivider(dateStr) {
   return d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
 }
 
-export default function ChatMessages({ messages, currentUserId, channelName, isLoading, onReply, onEdit, onDelete, onReact, onPin }) {
+export default function ChatMessages({ messages, currentUserId, channelName, isLoading, onReply, onEdit, onDelete, onReact, onPin, isDM }) {
   const bottomRef = useRef(null);
   const containerRef = useRef(null);
   const [atBottom, setAtBottom] = useState(true);
@@ -44,10 +44,10 @@ export default function ChatMessages({ messages, currentUserId, channelName, isL
         {/* Welcome */}
         <div className="pt-8 pb-4 mb-2" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
           <div className="w-16 h-16 rounded-full flex items-center justify-center mb-3" style={{ background: '#1a1a1a' }}>
-            <Hash className="w-7 h-7 text-zinc-500" />
+            {isDM ? <MessageSquare className="w-7 h-7 text-zinc-500" /> : <Hash className="w-7 h-7 text-zinc-500" />}
           </div>
-          <h2 className="text-2xl font-bold text-white mb-1">Welcome to #{channelName}</h2>
-          <p className="text-sm text-zinc-500">This is the start of #{channelName}.</p>
+          <h2 className="text-2xl font-bold text-white mb-1">{isDM ? channelName : `Welcome to #${channelName}`}</h2>
+          <p className="text-sm text-zinc-500">{isDM ? `This is the beginning of your conversation.` : `This is the start of #${channelName}.`}</p>
         </div>
 
         {messages.map((msg, i) => {
