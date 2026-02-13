@@ -623,8 +623,14 @@ function KairoPageContent() {
   });
 
   const createChannelMutation = useMutation({
-    mutationFn: async (channelData) => base44.entities.Channel.create({ ...channelData, server_id: activeServer.id, position: channels.length }),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['channels', activeServer?.id] })
+    mutationFn: async (channelData) => {
+      const ch = await base44.entities.Channel.create({ ...channelData, server_id: activeServer.id, position: channels.length });
+      return ch;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['channels', activeServer?.id] });
+      setShowCreateChannel(false);
+    }
   });
 
   const sendMessageMutation = useMutation({
