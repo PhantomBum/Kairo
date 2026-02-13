@@ -50,6 +50,20 @@ export function useServers(userId) {
         position: 0,
       });
 
+      const voiceCat = await base44.entities.Category.create({
+        server_id: server.id,
+        name: 'Voice Channels',
+        position: 1,
+      });
+
+      await base44.entities.Channel.create({
+        server_id: server.id,
+        category_id: voiceCat.id,
+        name: 'General',
+        type: 'voice',
+        position: 0,
+      });
+
       await base44.entities.ServerMember.create({
         server_id: server.id,
         user_id: userId,
@@ -75,7 +89,7 @@ export function useServers(userId) {
         server_id: server.id,
         user_id: userId,
       });
-      if (existing.length > 0) throw new Error('Already a member');
+      if (existing.length > 0) return server;
 
       await base44.entities.ServerMember.create({
         server_id: server.id,
@@ -95,18 +109,12 @@ export function useServers(userId) {
     },
   });
 
-  const leaveServer = useMutation({
-    mutationFn: async ({ serverId, userId }) => {
-      const memberships = await base44.entities.ServerMember.filter({
-        server_id: serverId,
-        user_id: userId,
-      });
-      if (memberships.length > 0) {
-        await base44.entities.ServerMember.delete(memberships[0].id);
-      }
+  const createChannel = useMutation({
+    mutationFn: async (channelData) => {
+      return base44.entities.Channel.create(channelData);
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['servers'] });
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['channels', variables.server_id] });
     },
   });
 
@@ -115,7 +123,7 @@ export function useServers(userId) {
     isLoading,
     createServer: createServer.mutateAsync,
     joinServer: joinServer.mutateAsync,
-    leaveServer: leaveServer.mutateAsync,
+    createChannel: createChannel.mutateAsync,
     isCreating: createServer.isPending,
     isJoining: joinServer.isPending,
   };
