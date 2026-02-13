@@ -1,6 +1,7 @@
 import React from 'react';
-import { Home, Plus, Compass, Download } from 'lucide-react';
+import { Home, Plus, Compass } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 
 function Pill({ active, hover }) {
   return (
@@ -14,7 +15,7 @@ function Pill({ active, hover }) {
   );
 }
 
-function RailIcon({ label, active, onClick, children, badge, color }) {
+function RailIcon({ label, active, onClick, children, badge, color, isDragging }) {
   const [hovered, setHovered] = React.useState(false);
   return (
     <TooltipProvider delayDuration={0}>
@@ -26,10 +27,11 @@ function RailIcon({ label, active, onClick, children, badge, color }) {
             <button onClick={onClick}
               className="relative w-[48px] h-[48px] flex items-center justify-center transition-all duration-200 overflow-hidden"
               style={{
-                borderRadius: active || hovered ? 16 : 24,
+                borderRadius: active || hovered || isDragging ? 16 : 24,
                 background: active ? (color || '#fff') : hovered ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.03)',
                 color: active ? (color ? '#fff' : '#000') : hovered ? '#fff' : '#666',
-                boxShadow: active ? '0 4px 12px rgba(0,0,0,0.3)' : 'none',
+                boxShadow: isDragging ? '0 8px 24px rgba(0,0,0,0.6)' : active ? '0 4px 12px rgba(0,0,0,0.3)' : 'none',
+                transform: isDragging ? 'scale(1.08)' : 'scale(1)',
               }}>
               {children}
               {badge > 0 && (
@@ -50,7 +52,16 @@ function RailIcon({ label, active, onClick, children, badge, color }) {
   );
 }
 
-export default function ServerRail({ servers, activeServerId, onServerSelect, onHomeClick, onCreateServer, onDiscover, isHome, pendingRequests }) {
+export default function ServerRail({ servers, activeServerId, onServerSelect, onHomeClick, onCreateServer, onDiscover, isHome, pendingRequests, onReorderServers }) {
+
+  const handleDragEnd = (result) => {
+    if (!result.destination) return;
+    const from = result.source.index;
+    const to = result.destination.index;
+    if (from === to) return;
+    onReorderServers?.(from, to);
+  };
+
   return (
     <div className="w-[72px] h-full flex flex-col items-center py-3 gap-0.5 flex-shrink-0 overflow-y-auto scrollbar-none"
       style={{ background: '#0a0a0a' }}>
@@ -61,17 +72,37 @@ export default function ServerRail({ servers, activeServerId, onServerSelect, on
 
       <div className="w-8 h-[2px] rounded-full my-1.5" style={{ background: 'rgba(255,255,255,0.06)' }} />
 
-      {servers.map(server => (
-        <RailIcon key={server.id} label={server.name} active={activeServerId === server.id} onClick={() => onServerSelect(server)}>
-          {server.icon_url ? (
-            <img src={server.icon_url} alt="" className="w-full h-full object-cover" />
-          ) : (
-            <span className="text-[15px] font-bold" style={{ color: activeServerId === server.id ? '#000' : '#999' }}>
-              {server.name?.charAt(0)?.toUpperCase()}
-            </span>
+      <DragDropContext onDragEnd={handleDragEnd}>
+        <Droppable droppableId="server-rail" direction="vertical">
+          {(provided) => (
+            <div ref={provided.innerRef} {...provided.droppableProps} className="flex flex-col items-center gap-0.5">
+              {servers.map((server, index) => (
+                <Draggable key={server.id} draggableId={server.id} index={index}>
+                  {(provided, snapshot) => (
+                    <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}
+                      style={{ ...provided.draggableProps.style }}>
+                      <RailIcon
+                        label={server.name}
+                        active={activeServerId === server.id}
+                        onClick={() => onServerSelect(server)}
+                        isDragging={snapshot.isDragging}>
+                        {server.icon_url ? (
+                          <img src={server.icon_url} alt="" className="w-full h-full object-cover" />
+                        ) : (
+                          <span className="text-[15px] font-bold" style={{ color: activeServerId === server.id ? '#000' : '#999' }}>
+                            {server.name?.charAt(0)?.toUpperCase()}
+                          </span>
+                        )}
+                      </RailIcon>
+                    </div>
+                  )}
+                </Draggable>
+              ))}
+              {provided.placeholder}
+            </div>
           )}
-        </RailIcon>
-      ))}
+        </Droppable>
+      </DragDropContext>
 
       <div className="w-8 h-[2px] rounded-full my-1.5" style={{ background: 'rgba(255,255,255,0.06)' }} />
 
