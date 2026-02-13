@@ -25,8 +25,8 @@ import AddFriendModal from './modals/AddFriendModal';
 import CreateServerModal from './modals/CreateServerModal';
 import JoinServerModal from './modals/JoinServerModal';
 import SettingsModal from './modals/SettingsModal';
-import CreateChannelModal from './modals/CreateChannelModal';
-import CreateGroupDMModal from './modals/CreateGroupDMModal';
+import CreateChannelModal from './modals/CreateChannelModal.jsx';
+import CreateGroupDMModal from './modals/CreateGroupDMModal.jsx';
 
 import { ProfileProvider, useProfiles } from '@/components/kairo/core/ProfileProvider';
 
