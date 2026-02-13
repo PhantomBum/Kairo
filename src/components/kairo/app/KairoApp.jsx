@@ -271,6 +271,7 @@ function AppContent() {
                   currentUserId={user?.id}
                   channelName={channelLabel}
                   isLoading={isLoadingMessages}
+                  isDM={!!activeConversation}
                   onReply={setReplyTo}
                   onEdit={(msg) => {
                     const c = prompt('Edit message:', msg.content);
@@ -289,7 +290,9 @@ function AppContent() {
                     if (activeConversation) toggleDMReaction({ messageId: msg.id, emoji, userId: user.id, currentReactions: msg.reactions });
                     else toggleReaction({ messageId: msg.id, emoji, userId: user.id, currentReactions: msg.reactions });
                   }}
-                  onPin={(msg) => pinMessage({ messageId: msg.id, isPinned: msg.is_pinned })}
+                  onPin={(msg) => {
+                    if (!activeConversation) pinMessage({ messageId: msg.id, isPinned: msg.is_pinned });
+                  }}
                 />
                 {/* Typing indicator */}
                 {typingUsers.length > 0 && (
