@@ -1,19 +1,24 @@
 import React from 'react';
-import { Users, Search } from 'lucide-react';
+import { Users, Search, Plus } from 'lucide-react';
 
-export default function DMPanel({ conversations, activeConversationId, onSelect, onFriendsClick, currentUserId }) {
+export default function DMPanel({ conversations, activeConversationId, onSelect, onFriendsClick, currentUserId, onCreateGroupDM }) {
   const [search, setSearch] = React.useState('');
 
   const filtered = conversations.filter(c => {
     if (!search) return true;
     const other = c.participants?.find(p => p.user_id !== currentUserId);
-    return other?.user_name?.toLowerCase().includes(search.toLowerCase());
+    return other?.user_name?.toLowerCase().includes(search.toLowerCase()) || c.name?.toLowerCase().includes(search.toLowerCase());
   });
 
   return (
     <div className="flex-1 flex flex-col min-h-0">
-      <div className="h-12 px-4 flex items-center" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+      <div className="h-12 px-4 flex items-center justify-between" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
         <span className="text-[15px] font-semibold text-white">Messages</span>
+        {onCreateGroupDM && (
+          <button onClick={onCreateGroupDM} className="p-1 text-zinc-500 hover:text-white transition-colors" title="New Group DM">
+            <Plus className="w-4 h-4" />
+          </button>
+        )}
       </div>
 
       <div className="px-2 pt-2">
