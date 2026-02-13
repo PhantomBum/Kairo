@@ -17,6 +17,9 @@ import EmptyView from '@/components/kairo/unified/views/EmptyView';
 import ModPanel from '@/components/kairo/unified/views/ModPanel';
 import ServerSettingsView from '@/components/kairo/unified/views/ServerSettingsView';
 import ThreadPanel from '@/components/kairo/unified/views/ThreadPanel';
+import SearchPanel from '@/components/kairo/unified/views/SearchPanel';
+import PinnedPanel from '@/components/kairo/unified/views/PinnedPanel';
+import DiscoverView from '@/components/kairo/unified/views/DiscoverView';
 
 import CreateServerModal from '@/components/kairo/unified/modals/CreateServerModal';
 import JoinServerModal from '@/components/kairo/unified/modals/JoinServerModal';
@@ -32,13 +35,15 @@ export default function AppShell({ currentUser }) {
   const { profiles, getProfile, refreshAllProfiles } = useProfiles();
 
   // Navigation
-  const [view, setView] = useState('dms'); // dms | server | friends | moderation | serverSettings
+  const [view, setView] = useState('dms'); // dms | server | friends | moderation | serverSettings | discover
   const [activeServer, setActiveServer] = useState(null);
   const [activeChannel, setActiveChannel] = useState(null);
   const [activeConversation, setActiveConversation] = useState(null);
   const [showMembers, setShowMembers] = useState(true);
   const [replyTo, setReplyTo] = useState(null);
   const [activeThread, setActiveThread] = useState(null);
+  const [showSearch, setShowSearch] = useState(false);
+  const [showPinned, setShowPinned] = useState(false);
 
   // Audio
   const [isMuted, setIsMuted] = useState(false);
@@ -51,6 +56,9 @@ export default function AppShell({ currentUser }) {
 
   // Inline edit state
   const [editingMessage, setEditingMessage] = useState(null);
+
+  // Typing
+  const [typingUsers, setTypingUsers] = useState([]);
 
   // ─── Data Queries ───
   const { data: profile } = useQuery({
@@ -166,7 +174,7 @@ export default function AppShell({ currentUser }) {
   useEffect(() => {
     if (!activeChannel?.id) return;
     const unsub = base44.entities.Message.subscribe((event) => {
-      if (event.data?.channel_id === activeChannel.id || event.data?.channel_id === activeChannel?.id) {
+      if (event.data?.channel_id === activeChannel.id) {
         qc.invalidateQueries({ queryKey: ['messages', activeChannel.id] });
       }
     });
@@ -182,6 +190,42 @@ export default function AppShell({ currentUser }) {
     });
     return unsub;
   }, [activeConversation?.id]);
+
+  // Typing indicator polling
+  useEffect(() => {
+    const targetId = activeConversation?.id || activeChannel?.id;
+    if (!targetId) { setTypingUsers([]); return; }
+    const poll = async () => {
+      const filter = activeConversation?.id ? { conversation_id: activeConversation.id } : { channel_id: activeChannel.id };
+      const indicators = await base44.entities.TypingIndicator.filter(filter);
+      const now = Date.now();
+      setTypingUsers(indicators.filter(t => t.user_id !== currentUser.id && (now - new Date(t.started_at).getTime()) < 5000));
+    };
+    poll();
+    const interval = setInterval(poll, 2000);
+    return () => clearInterval(interval);
+  }, [activeConversation?.id, activeChannel?.id, currentUser.id]);
+
+  const sendTyping = useCallback(async () => {
+    const target = activeConversation?.id ? { conversation_id: activeConversation.id } : activeChannel?.id ? { channel_id: activeChannel.id } : null;
+    if (!target) return;
+    const existing = await base44.entities.TypingIndicator.filter({ user_id: currentUser.id, ...target });
+    if (existing.length > 0) {
+      await base44.entities.TypingIndicator.update(existing[0].id, { started_at: new Date().toISOString() });
+    } else {
+      await base44.entities.TypingIndicator.create({ user_id: currentUser.id, user_name: profile?.display_name || currentUser.full_name, ...target, started_at: new Date().toISOString() });
+    }
+  }, [currentUser.id, activeConversation?.id, activeChannel?.id, profile?.display_name]);
+
+  // Unread DM badge
+  const unreadDMCount = useMemo(() => {
+    // Simple: count conversations with recent messages
+    return conversations.filter(c => {
+      if (!c.last_message_at) return false;
+      const diff = Date.now() - new Date(c.last_message_at).getTime();
+      return diff < 300000; // 5 min
+    }).length;
+  }, [conversations]);
 
   // Profiles map
   const profilesMap = useMemo(() => {
@@ -352,11 +396,13 @@ export default function AppShell({ currentUser }) {
     setActiveChannel(null);
     setActiveConversation(null);
     setActiveThread(null);
+    setShowSearch(false);
+    setShowPinned(false);
     setView('server');
   };
 
-  const goHome = () => { setActiveServer(null); setActiveChannel(null); setView('dms'); };
-  const goFriends = () => { setActiveConversation(null); setView('friends'); };
+  const goHome = () => { setActiveServer(null); setActiveChannel(null); setShowSearch(false); setShowPinned(false); setView('dms'); };
+  const goFriends = () => { setActiveConversation(null); setShowSearch(false); setShowPinned(false); setView('friends'); };
 
   // Auto-select first text channel
   useEffect(() => {
@@ -365,6 +411,13 @@ export default function AppShell({ currentUser }) {
       if (first) setActiveChannel(first);
     }
   }, [activeServer, channels]);
+
+  // Close side panels when channel changes
+  useEffect(() => {
+    setShowSearch(false);
+    setShowPinned(false);
+    setActiveThread(null);
+  }, [activeChannel?.id, activeConversation?.id]);
 
   const handleSend = async (data) => {
     if (activeConversation) {
@@ -422,6 +475,16 @@ export default function AppShell({ currentUser }) {
       qc.invalidateQueries({ queryKey: ['threads'] });
     }
     setActiveThread(thread);
+    setShowSearch(false);
+    setShowPinned(false);
+  };
+
+  const handleStatusChange = (statusOrObj) => {
+    if (typeof statusOrObj === 'string') {
+      updateProfile.mutate({ status: statusOrObj });
+    } else if (statusOrObj?.custom_status !== undefined) {
+      updateProfile.mutate({ custom_status: statusOrObj.custom_status });
+    }
   };
 
   // Determine what's active
@@ -442,9 +505,9 @@ export default function AppShell({ currentUser }) {
         onServerSelect={selectServer}
         onHomeClick={goHome}
         onCreateServer={() => setModal('create-server')}
-        onDiscover={() => setModal('join-server')}
+        onDiscover={() => setView('discover')}
         isHome={view === 'dms' || view === 'friends'}
-        pendingRequests={incomingRequests.length}
+        pendingRequests={incomingRequests.length + unreadDMCount}
       />
 
       {/* Side Panel */}
@@ -479,12 +542,20 @@ export default function AppShell({ currentUser }) {
           onToggleMute={() => setIsMuted(!isMuted)}
           onToggleDeafen={() => setIsDeafened(!isDeafened)}
           onSettings={() => setModal('settings')}
+          onStatusChange={handleStatusChange}
         />
       </div>
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col min-w-0" style={{ background: '#0e0e0e' }}>
-        {view === 'moderation' && activeServer ? (
+        {view === 'discover' ? (
+          <DiscoverView
+            currentUserId={currentUser.id}
+            onJoin={(code) => joinServer.mutate(code)}
+            isJoining={joinServer.isPending}
+            onBack={goHome}
+          />
+        ) : view === 'moderation' && activeServer ? (
           <ModPanel
             server={activeServer}
             members={members}
@@ -541,6 +612,10 @@ export default function AppShell({ currentUser }) {
               showMembers={showMembers}
               onToggleMembers={() => setShowMembers(!showMembers)}
               pinnedCount={pinnedMessages.length}
+              showSearch={showSearch}
+              onToggleSearch={() => { setShowSearch(!showSearch); setShowPinned(false); setActiveThread(null); }}
+              showPinned={showPinned}
+              onTogglePinned={() => { setShowPinned(!showPinned); setShowSearch(false); setActiveThread(null); }}
             />
             <div className="flex-1 flex min-h-0">
               <div className="flex-1 flex flex-col min-w-0">
@@ -564,14 +639,28 @@ export default function AppShell({ currentUser }) {
                   onEditSave={(msgId, content) => isDM ? editDM(msgId, content) : editMsg(msgId, content)}
                   onEditCancel={() => setEditingMessage(null)}
                 />
+                {/* Typing indicator */}
+                {typingUsers.length > 0 && (
+                  <div className="px-4 pb-1 flex items-center gap-2">
+                    <div className="flex gap-0.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-zinc-400 animate-bounce" style={{ animationDelay: '0ms' }} />
+                      <span className="w-1.5 h-1.5 rounded-full bg-zinc-400 animate-bounce" style={{ animationDelay: '150ms' }} />
+                      <span className="w-1.5 h-1.5 rounded-full bg-zinc-400 animate-bounce" style={{ animationDelay: '300ms' }} />
+                    </div>
+                    <span className="text-xs text-zinc-500">
+                      {typingUsers.map(t => t.user_name).join(', ')} {typingUsers.length === 1 ? 'is' : 'are'} typing...
+                    </span>
+                  </div>
+                )}
                 <ChatInput
                   channelName={channelLabel}
                   replyTo={replyTo}
                   onCancelReply={() => setReplyTo(null)}
                   onSend={handleSend}
+                  onTyping={sendTyping}
                 />
               </div>
-              {view === 'server' && showMembers && (
+              {view === 'server' && showMembers && !showSearch && !showPinned && !activeThread && (
                 <MemberPanel
                   members={members}
                   profilesMap={profilesMap}
@@ -585,6 +674,20 @@ export default function AppShell({ currentUser }) {
                   thread={activeThread}
                   currentUser={{ id: currentUser.id, name: profile?.display_name, avatar: profile?.avatar_url }}
                   onClose={() => setActiveThread(null)}
+                />
+              )}
+              {showSearch && (
+                <SearchPanel
+                  serverId={activeServer?.id}
+                  channelId={activeChannel?.id}
+                  onClose={() => setShowSearch(false)}
+                />
+              )}
+              {showPinned && (
+                <PinnedPanel
+                  messages={pinnedMessages}
+                  onClose={() => setShowPinned(false)}
+                  onUnpin={pinMsg}
                 />
               )}
             </div>
