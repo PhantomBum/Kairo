@@ -1,21 +1,30 @@
 import React, { useState } from 'react';
-import { Hash, Volume2, ChevronDown, ChevronRight, Megaphone, Settings } from 'lucide-react';
+import { Hash, Volume2, ChevronDown, ChevronRight, Megaphone, MessagesSquare, Settings, Plus } from 'lucide-react';
 
 const iconMap = {
   text: Hash,
   voice: Volume2,
   announcement: Megaphone,
+  forum: MessagesSquare,
+  stage: Volume2,
 };
 
-function CategoryGroup({ category, channels, activeChannelId, onChannelClick }) {
+function CategoryGroup({ category, channels, activeChannelId, onChannelClick, onCreateChannel }) {
   const [open, setOpen] = useState(true);
   return (
     <div className="mb-1">
-      <button onClick={() => setOpen(!open)}
-        className="w-full flex items-center gap-0.5 px-1 py-1 text-[11px] font-semibold uppercase tracking-wider text-zinc-500 hover:text-zinc-300 transition-colors">
-        {open ? <ChevronDown className="w-3 h-3" /> : <ChevronRight className="w-3 h-3" />}
-        {category.name}
-      </button>
+      <div className="flex items-center group">
+        <button onClick={() => setOpen(!open)}
+          className="flex-1 flex items-center gap-0.5 px-1 py-1 text-[11px] font-semibold uppercase tracking-wider text-zinc-500 hover:text-zinc-300 transition-colors">
+          {open ? <ChevronDown className="w-3 h-3" /> : <ChevronRight className="w-3 h-3" />}
+          {category.name}
+        </button>
+        {onCreateChannel && (
+          <button onClick={() => onCreateChannel(category.id)} className="opacity-0 group-hover:opacity-100 p-0.5 text-zinc-600 hover:text-zinc-300 transition-all">
+            <Plus className="w-3.5 h-3.5" />
+          </button>
+        )}
+      </div>
       {open && channels.map(ch => {
         const Icon = iconMap[ch.type] || Hash;
         const active = ch.id === activeChannelId;
@@ -35,7 +44,7 @@ function CategoryGroup({ category, channels, activeChannelId, onChannelClick }) 
   );
 }
 
-export default function ChannelPanel({ server, categories, channels, activeChannelId, onChannelClick }) {
+export default function ChannelPanel({ server, categories, channels, activeChannelId, onChannelClick, onCreateChannel }) {
   const grouped = {};
   const uncategorized = [];
   
@@ -79,6 +88,7 @@ export default function ChannelPanel({ server, categories, channels, activeChann
               channels={(grouped[cat.id] || []).sort((a, b) => (a.position || 0) - (b.position || 0))}
               activeChannelId={activeChannelId}
               onChannelClick={onChannelClick}
+              onCreateChannel={onCreateChannel}
             />
           ))}
       </div>
