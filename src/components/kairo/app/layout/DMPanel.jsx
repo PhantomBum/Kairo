@@ -48,16 +48,26 @@ export default function DMPanel({ conversations, activeConversationId, onSelect,
           const active = conv.id === activeConversationId;
           return (
             <div key={conv.id} onClick={() => onSelect(conv)}
-              className="flex items-center gap-2.5 px-2 py-1.5 rounded cursor-pointer transition-colors"
+              className="flex items-center gap-2.5 px-2 py-1.5 rounded cursor-pointer transition-colors group"
               style={{
                 background: active ? 'rgba(255,255,255,0.08)' : 'transparent',
-                color: active ? '#fff' : '#888',
               }}>
-              <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium flex-shrink-0"
-                style={{ background: '#222' }}>
-                {other?.avatar ? <img src={other.avatar} className="w-full h-full rounded-full object-cover" /> : name.charAt(0).toUpperCase()}
+              <div className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-medium flex-shrink-0 overflow-hidden"
+                style={{ background: '#1a1a1a' }}>
+                {conv.type === 'group' ? (
+                  <span className="text-sm">{conv.name?.charAt(0) || 'G'}</span>
+                ) : other?.avatar ? (
+                  <img src={other.avatar} className="w-full h-full object-cover" />
+                ) : (
+                  <span style={{ color: '#888' }}>{name.charAt(0).toUpperCase()}</span>
+                )}
               </div>
-              <span className="text-sm truncate">{name}</span>
+              <div className="flex-1 min-w-0">
+                <span className="text-[13px] truncate block" style={{ color: active ? '#fff' : '#999' }}>{conv.type === 'group' ? conv.name : name}</span>
+                {conv.last_message_preview && (
+                  <span className="text-[11px] text-zinc-600 truncate block">{conv.last_message_preview}</span>
+                )}
+              </div>
             </div>
           );
         })}
