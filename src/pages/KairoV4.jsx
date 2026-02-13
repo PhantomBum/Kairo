@@ -1,72 +1,69 @@
-import React, { useState, useEffect } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { Loader2 } from 'lucide-react';
+import { AnimatePresence } from 'framer-motion';
+import { ProfileProvider, useProfiles } from '@/components/kairo/core/ProfileProvider';
 
-// New V6 App from ground up
-import KairoApp from '@/components/kairo/app/KairoApp';
+import AppShell from '@/components/kairo/unified/AppShell.jsx';
 
-export default function KairoV4Page() {
-  const [isAuthenticated, setIsAuthenticated] = useState(null);
+function KairoInner() {
+  const [isReady, setIsReady] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
 
   useEffect(() => {
-    const checkAuth = async () => {
-      const authed = await base44.auth.isAuthenticated();
-      setIsAuthenticated(authed);
-      if (!authed) {
-        base44.auth.redirectToLogin(window.location.href);
+    const init = async () => {
+      const isAuth = await base44.auth.isAuthenticated();
+      if (!isAuth) {
+        base44.auth.redirectToLogin();
+        return;
       }
-    };
-    checkAuth();
-  }, []);
+      const user = await base44.auth.me();
+      setCurrentUser(user);
 
-  const { data: user, isLoading: userLoading } = useQuery({
-    queryKey: ['currentUser'],
-    queryFn: () => base44.auth.me(),
-    enabled: isAuthenticated === true,
-  });
-
-  const { data: profile, isLoading: profileLoading } = useQuery({
-    queryKey: ['userProfile', user?.email],
-    queryFn: async () => {
+      // Ensure profile exists
       const profiles = await base44.entities.UserProfile.filter({ user_email: user.email });
       if (profiles.length === 0) {
-        // Create profile if doesn't exist
-        return base44.entities.UserProfile.create({
+        await base44.entities.UserProfile.create({
           user_id: user.id,
           user_email: user.email,
           display_name: user.full_name || user.email.split('@')[0],
-          username: user.email.split('@')[0].toLowerCase().replace(/[^a-z0-9]/g, '') + '_' + Math.random().toString(36).substring(2, 6),
+          username: user.email.split('@')[0],
           status: 'online',
           is_online: true,
-          settings: { theme: 'dark', message_display: 'cozy' },
+          badges: [],
+        });
+      } else {
+        await base44.entities.UserProfile.update(profiles[0].id, {
+          status: 'online',
+          is_online: true,
+          last_seen: new Date().toISOString(),
         });
       }
-      // Update online status
-      await base44.entities.UserProfile.update(profiles[0].id, {
-        status: 'online',
-        is_online: true,
-        last_seen: new Date().toISOString(),
-      });
-      return profiles[0];
-    },
-    enabled: !!user?.email,
-  });
+      setIsReady(true);
+    };
+    init();
+  }, []);
 
-  // Loading state
-  if (isAuthenticated === null || userLoading || profileLoading) {
+  if (!isReady || !currentUser) {
     return (
-      <div className="h-screen w-screen bg-[#0a0a0b] flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-indigo-600 to-violet-600 flex items-center justify-center mb-4">
-            <span className="text-2xl font-bold text-white">K</span>
+      <div className="h-screen w-screen flex items-center justify-center" style={{ background: '#0e0e0e' }}>
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: '#1a1a1a' }}>
+            <span className="text-xl font-bold text-white">K</span>
           </div>
-          <Loader2 className="w-6 h-6 text-zinc-500 animate-spin mx-auto" />
-          <p className="text-sm text-zinc-500 mt-3">Loading Kairo...</p>
+          <div className="w-5 h-5 border-2 border-zinc-700 border-t-zinc-400 rounded-full animate-spin" />
         </div>
       </div>
     );
   }
 
-  return <KairoApp />;
+  return <AppShell currentUser={currentUser} />;
+}
+
+export default function KairoV4Page() {
+  return (
+    <ProfileProvider>
+      <KairoInner />
+    </ProfileProvider>
+  );
 }
