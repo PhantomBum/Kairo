@@ -4,7 +4,7 @@ import { base44 } from '@/api/base44Client';
 import { AnimatePresence } from 'framer-motion';
 import { ProfileProvider, useProfiles } from '@/components/kairo/core/ProfileProvider';
 
-import AppShell from '@/components/kairo/unified/AppShell.jsx';
+import AppShell from '@/components/kairo/unified/AppShell';
 
 function KairoInner() {
   const [isReady, setIsReady] = useState(false);

@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { ArrowDown, Hash, MessageSquare } from 'lucide-react';
-import ChatBubble from './ChatBubble.jsx';
+import ChatBubble from '@/components/kairo/unified/chat/ChatBubble';
 
 function formatDivider(dateStr) {
   const d = new Date(dateStr);
