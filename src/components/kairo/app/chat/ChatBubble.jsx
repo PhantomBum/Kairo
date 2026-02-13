@@ -22,6 +22,17 @@ function Reaction({ emoji, count, reacted, onClick }) {
   );
 }
 
+function renderContent(text) {
+  if (!text) return null;
+  const parts = text.split(/(@everyone|@here)/g);
+  return parts.map((part, i) => {
+    if (part === '@everyone' || part === '@here') {
+      return <span key={i} className="px-1 rounded font-medium" style={{ background: 'rgba(250,176,5,0.2)', color: '#fbbf24' }}>{part}</span>;
+    }
+    return <span key={i}>{part}</span>;
+  });
+}
+
 export default function ChatBubble({ message, compact, isOwn, onReply, onEdit, onDelete, onReact, onPin, currentUserId }) {
   const [hovered, setHovered] = useState(false);
 
@@ -32,7 +43,7 @@ export default function ChatBubble({ message, compact, isOwn, onReply, onEdit, o
       <ContextMenuTrigger>
         <div className="relative group"
           onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}
-          style={{ padding: compact ? '1px 0' : '4px 0' }}>
+          style={{ padding: compact ? '2px 8px' : '6px 8px' }}>
           
           {/* Reply preview */}
           {message.reply_preview && (
@@ -48,12 +59,12 @@ export default function ChatBubble({ message, compact, isOwn, onReply, onEdit, o
           <div className="flex items-start gap-3">
             {compact ? (
               <div className="w-10 flex-shrink-0 flex items-center justify-center">
-                <span className="text-[10px] text-zinc-600 opacity-0 group-hover:opacity-100 transition-opacity">
+                <span className="text-[10px] text-zinc-600 opacity-0 group-hover:opacity-100 transition-opacity select-none">
                   {formatTime(message.created_date)}
                 </span>
               </div>
             ) : (
-              <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 text-sm font-medium overflow-hidden"
+              <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 text-[13px] font-semibold overflow-hidden"
                 style={{ background: '#1a1a1a', color: '#888' }}>
                 {message.author_avatar ? (
                   <img src={message.author_avatar} className="w-full h-full object-cover" />
@@ -71,8 +82,9 @@ export default function ChatBubble({ message, compact, isOwn, onReply, onEdit, o
                   {message.is_edited && <span className="text-[10px] text-zinc-600">(edited)</span>}
                 </div>
               )}
-              <div className="text-sm text-zinc-300 leading-relaxed break-words whitespace-pre-wrap">
-                {message.content}
+              <div className={`text-[14px] leading-[1.5] break-words whitespace-pre-wrap ${message.content?.includes('@everyone') ? 'bg-amber-500/10 -mx-1 px-1 py-0.5 rounded border-l-2 border-amber-500/40' : ''}`}
+                style={{ color: '#dbdee1' }}>
+                {renderContent(message.content)}
               </div>
 
               {/* Attachments */}
