@@ -1,17 +1,25 @@
-import React, { useState, useRef } from 'react';
-import { Plus, Smile, Send, X, Gift } from 'lucide-react';
+import React, { useState, useRef, useCallback } from 'react';
+import { Plus, Smile, Send, X, Gift, Image, AtSign } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
+import lodash from 'lodash';
 
-export default function ChatInput({ channelName, replyTo, onCancelReply, onSend }) {
+export default function ChatInput({ channelName, replyTo, onCancelReply, onSend, onTyping }) {
   const [content, setContent] = useState('');
   const [files, setFiles] = useState([]);
   const [uploading, setUploading] = useState(false);
   const [sending, setSending] = useState(false);
   const [showEmoji, setShowEmoji] = useState(false);
+  const [showGif, setShowGif] = useState(false);
   const fileRef = useRef(null);
   const inputRef = useRef(null);
 
-  const emojis = ['😀','😂','❤️','🔥','👍','👎','😭','🎉','🤔','💀','👀','✨','💯','🙏','😎','🥺','🫡','💔','😤','🗿','😈','🤡','💅','🤝'];
+  const emojis = ['😀','😂','❤️','🔥','👍','👎','😭','🎉','🤔','💀','👀','✨','💯','🙏','😎','🥺','🫡','💔','😤','🗿','😈','🤡','💅','🤝','😊','🥳','😴','🤯','💜','🖤','🤍','❄️','⚡','🌈','🎮','🎵','☕','🍕','🏆','💎'];
+
+  // Debounced typing indicator
+  const debouncedTyping = useCallback(
+    lodash.debounce(() => { onTyping?.(); }, 2000, { leading: true, trailing: false }),
+    [onTyping]
+  );
 
   const handleFile = async (e) => {
     const selected = Array.from(e.target.files || []);
@@ -45,10 +53,16 @@ export default function ChatInput({ channelName, replyTo, onCancelReply, onSend 
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSubmit(); }
   };
 
+  const handleChange = (e) => {
+    setContent(e.target.value);
+    debouncedTyping();
+  };
+
   return (
     <div className="px-4 pb-4 flex-shrink-0">
       {replyTo && (
-        <div className="flex items-center gap-2 px-3 py-1.5 mb-1 rounded-t text-xs" style={{ background: '#151515' }}>
+        <div className="flex items-center gap-2 px-3 py-1.5 mb-1 rounded-t-lg text-xs" style={{ background: '#151515', borderLeft: '3px solid #6366f1' }}>
+          <span className="text-indigo-400">↩</span>
           <span className="text-zinc-500">Replying to</span>
           <span className="text-white font-medium">{replyTo.author_name}</span>
           <span className="text-zinc-600 truncate flex-1">{replyTo.content?.slice(0, 50)}</span>
@@ -61,7 +75,7 @@ export default function ChatInput({ channelName, replyTo, onCancelReply, onSend 
           {files.map((f, i) => (
             <div key={i} className="relative group">
               {f.content_type?.startsWith('image/') ? (
-                <img src={f.url} className="w-16 h-16 rounded object-cover" />
+                <img src={f.url} className="w-16 h-16 rounded-lg object-cover" />
               ) : (
                 <div className="px-2 py-1 rounded text-xs text-zinc-400" style={{ background: '#1a1a1a' }}>📎 {f.filename}</div>
               )}
@@ -72,39 +86,50 @@ export default function ChatInput({ channelName, replyTo, onCancelReply, onSend 
         </div>
       )}
 
-      <div className="flex items-end gap-2 px-3 py-2 rounded-lg" style={{ background: '#1a1a1a' }}>
+      <div className="flex items-end gap-2 px-3 py-2 rounded-xl kairo-focus" style={{ background: '#1a1a1a', border: '1px solid rgba(255,255,255,0.04)' }}>
         <input ref={fileRef} type="file" multiple className="hidden" onChange={handleFile} />
-        <button onClick={() => fileRef.current?.click()} className="w-8 h-8 flex items-center justify-center rounded-full flex-shrink-0 transition-colors hover:bg-white/10">
+        <button onClick={() => fileRef.current?.click()} className="w-8 h-8 flex items-center justify-center rounded-lg flex-shrink-0 transition-colors hover:bg-white/10">
           <Plus className="w-4 h-4 text-zinc-500" />
         </button>
 
         <div className="flex-1 min-w-0 relative">
-          <textarea ref={inputRef} value={content} onChange={e => setContent(e.target.value)} onKeyDown={handleKey}
+          <textarea ref={inputRef} value={content} onChange={handleChange} onKeyDown={handleKey}
             placeholder={`Message ${channelName ? (channelName.startsWith('#') ? channelName : `#${channelName}`) : ''}`}
             rows={1}
             className="w-full bg-transparent text-sm text-white placeholder:text-zinc-600 resize-none focus:outline-none leading-6 max-h-32"
             style={{ minHeight: '32px' }} />
         </div>
 
-        <div className="flex items-center gap-1 flex-shrink-0">
+        <div className="flex items-center gap-0.5 flex-shrink-0">
+          {/* Emoji picker */}
           <div className="relative">
-            <button onClick={() => setShowEmoji(!showEmoji)}
-              className="w-8 h-8 flex items-center justify-center rounded-full transition-colors hover:bg-white/10">
+            <button onClick={() => { setShowEmoji(!showEmoji); setShowGif(false); }}
+              className="w-8 h-8 flex items-center justify-center rounded-lg transition-colors hover:bg-white/10">
               <Smile className="w-4 h-4 text-zinc-500" />
             </button>
             {showEmoji && (
-              <div className="absolute bottom-10 right-0 p-2 rounded-lg grid grid-cols-8 gap-1 z-50"
-                style={{ background: '#1a1a1a', border: '1px solid rgba(255,255,255,0.1)' }}>
+              <div className="absolute bottom-10 right-0 p-2 rounded-xl grid grid-cols-8 gap-1 z-50"
+                style={{ background: '#1a1a1a', border: '1px solid rgba(255,255,255,0.1)', boxShadow: '0 8px 32px rgba(0,0,0,0.5)' }}>
+                <div className="col-span-8 text-[10px] text-zinc-500 font-semibold uppercase px-1 pb-1 mb-1" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                  Frequently Used
+                </div>
                 {emojis.map(e => (
-                  <button key={e} onClick={() => { setContent(c => c + e); setShowEmoji(false); }}
-                    className="w-8 h-8 flex items-center justify-center rounded hover:bg-white/10 text-lg">{e}</button>
+                  <button key={e} onClick={() => { setContent(c => c + e); setShowEmoji(false); inputRef.current?.focus(); }}
+                    className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/10 text-lg transition-transform hover:scale-125">{e}</button>
                 ))}
               </div>
             )}
           </div>
+
+          {/* GIF */}
+          <button onClick={() => { setShowGif(!showGif); setShowEmoji(false); }}
+            className="w-8 h-8 flex items-center justify-center rounded-lg transition-colors hover:bg-white/10">
+            <span className="text-[10px] font-bold text-zinc-500">GIF</span>
+          </button>
+
           {(content.trim() || files.length > 0) && (
             <button onClick={handleSubmit} disabled={sending}
-              className="w-8 h-8 flex items-center justify-center rounded-full transition-colors"
+              className="w-8 h-8 flex items-center justify-center rounded-lg transition-all"
               style={{ background: '#fff', color: '#000' }}>
               <Send className="w-3.5 h-3.5" />
             </button>
