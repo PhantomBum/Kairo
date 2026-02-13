@@ -9,7 +9,7 @@ function Pill({ active, hover }) {
   );
 }
 
-function RailIcon({ label, active, onClick, children }) {
+function RailIcon({ label, active, onClick, children, badge }) {
   const [hovered, setHovered] = React.useState(false);
   return (
     <TooltipProvider delayDuration={0}>
@@ -19,13 +19,19 @@ function RailIcon({ label, active, onClick, children }) {
             onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
             <Pill active={active} hover={hovered} />
             <button onClick={onClick}
-              className="w-12 h-12 flex items-center justify-center transition-all duration-200 overflow-hidden"
+              className="relative w-12 h-12 flex items-center justify-center transition-all duration-200 overflow-hidden"
               style={{
                 borderRadius: active || hovered ? 16 : 24,
                 background: active ? '#fff' : '#1a1a1a',
                 color: active ? '#000' : '#666',
               }}>
               {children}
+              {badge > 0 && (
+                <div className="absolute -bottom-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 bg-red-500 rounded-full text-[10px] font-bold text-white flex items-center justify-center"
+                  style={{ border: '3px solid #0e0e0e' }}>
+                  {badge > 99 ? '99+' : badge}
+                </div>
+              )}
             </button>
           </div>
         </TooltipTrigger>
@@ -42,14 +48,8 @@ export default function ServerRail({ servers, activeServerId, onServerSelect, on
     <div className="w-[72px] h-full flex flex-col items-center py-3 gap-1.5 flex-shrink-0 overflow-y-auto scrollbar-none"
       style={{ background: '#0e0e0e' }}>
       
-      <RailIcon label="Home" active={isHome} onClick={onHomeClick}>
+      <RailIcon label="Home" active={isHome} onClick={onHomeClick} badge={pendingRequests}>
         <Home className="w-5 h-5" />
-        {pendingRequests > 0 && (
-          <div className="absolute -bottom-0.5 -right-0.5 w-5 h-5 bg-red-500 rounded-full text-[10px] font-bold text-white flex items-center justify-center"
-            style={{ border: '3px solid #0e0e0e' }}>
-            {pendingRequests}
-          </div>
-        )}
       </RailIcon>
 
       <div className="w-8 h-px my-1" style={{ background: 'rgba(255,255,255,0.08)' }} />
