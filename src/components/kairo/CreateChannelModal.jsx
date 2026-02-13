@@ -47,7 +47,7 @@ export default function CreateChannelModal({
       await onCreate({
         name: channelName.trim().toLowerCase().replace(/\s+/g, '-'),
         type: channelType,
-        category_id: categoryId || null,
+        category_id: (categoryId && categoryId !== 'none') ? categoryId : null,
         is_private: isPrivate
       });
 
@@ -161,7 +161,7 @@ export default function CreateChannelModal({
                   <SelectValue placeholder="No Category" />
                 </SelectTrigger>
                 <SelectContent className="bg-zinc-900 border-zinc-800">
-                  <SelectItem value={null}>No Category</SelectItem>
+                  <SelectItem value="none">No Category</SelectItem>
                   {categories.map((cat) => (
                     <SelectItem key={cat.id} value={cat.id}>
                       {cat.name}
