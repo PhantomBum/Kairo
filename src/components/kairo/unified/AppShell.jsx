@@ -545,6 +545,7 @@ export default function AppShell({ currentUser }) {
         onDiscover={() => setView('discover')}
         isHome={view === 'dms' || view === 'friends'}
         pendingRequests={incomingRequests.length + unreadDMCount}
+        onReorderServers={handleReorderServers}
       />
 
       {/* Side Panel */}
