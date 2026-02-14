@@ -382,6 +382,43 @@ export default function AppShell({ currentUser }) {
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['channels', activeServer?.id] }); setModal(null); },
   });
 
+  // ─── Reorder Handlers ───
+  const handleReorderServers = useCallback((fromIndex, toIndex) => {
+    // Visual reorder only (server order is per-user preference, stored client-side for now)
+    // Could be persisted to UserSettings entity later
+  }, []);
+
+  const handleReorderCategories = useCallback(async (fromIndex, toIndex) => {
+    const sorted = [...categories].sort((a, b) => (a.position || 0) - (b.position || 0));
+    const reordered = [...sorted];
+    const [moved] = reordered.splice(fromIndex, 1);
+    reordered.splice(toIndex, 0, moved);
+    const updates = reordered.map((cat, i) => base44.entities.Category.update(cat.id, { position: i }));
+    await Promise.all(updates);
+    qc.invalidateQueries({ queryKey: ['categories', activeServer?.id] });
+  }, [categories, activeServer?.id]);
+
+  const handleReorderChannels = useCallback(async (channelId, sourceCatDropId, sourceIdx, destCatDropId, destIdx) => {
+    const sourceCatId = sourceCatDropId.replace('channels-', '');
+    const destCatId = destCatDropId.replace('channels-', '');
+    const sourceChannels = channels.filter(c => c.category_id === sourceCatId).sort((a, b) => (a.position || 0) - (b.position || 0));
+    const [moved] = sourceChannels.splice(sourceIdx, 1);
+    if (sourceCatId === destCatId) {
+      sourceChannels.splice(destIdx, 0, moved);
+      const updates = sourceChannels.map((ch, i) => base44.entities.Channel.update(ch.id, { position: i }));
+      await Promise.all(updates);
+    } else {
+      const destChannels = channels.filter(c => c.category_id === destCatId).sort((a, b) => (a.position || 0) - (b.position || 0));
+      destChannels.splice(destIdx, 0, moved);
+      const updates = [
+        ...sourceChannels.map((ch, i) => base44.entities.Channel.update(ch.id, { position: i })),
+        ...destChannels.map((ch, i) => base44.entities.Channel.update(ch.id, { position: i, category_id: destCatId })),
+      ];
+      await Promise.all(updates);
+    }
+    qc.invalidateQueries({ queryKey: ['channels', activeServer?.id] });
+  }, [channels, activeServer?.id]);
+
   const updateProfile = useMutation({
     mutationFn: async (data) => {
       if (!profile?.id) return;
