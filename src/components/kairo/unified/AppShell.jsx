@@ -562,6 +562,8 @@ export default function AppShell({ currentUser }) {
             onModeration={() => setView('moderation')}
             onInvite={() => setModal('invite')}
             isOwner={activeServer?.owner_id === currentUser.id || activeServer?.created_by === currentUser.email}
+            onReorderChannels={handleReorderChannels}
+            onReorderCategories={handleReorderCategories}
           />
         ) : (
           <DMPanel
