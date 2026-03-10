@@ -47,22 +47,13 @@
  *
  * The mainPage value must match a key in the PAGES object exactly.
  */
-import Home from './pages/Home';
-import Kairo from './pages/Kairo';
-import KairoV4 from './pages/KairoV4';
-import Landing from './pages/Landing';
 import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
-    "Home": Home,
-    "Kairo": Kairo,
-    "KairoV4": KairoV4,
-    "Landing": Landing,
 }
 
 export const pagesConfig = {
-    mainPage: "Kairo",
     Pages: PAGES,
     Layout: __Layout,
 };
