@@ -5,15 +5,15 @@ import ModalWrapper from './ModalWrapper';
 
 const PERKS = [
   { icon: Sparkles, label: 'Animated Avatar & Banner', desc: 'Upload GIFs for your profile' },
-  { icon: Palette, label: 'Custom Themes', desc: 'Unlock exclusive color themes' },
+  { icon: Palette, label: '6 Profile Themes', desc: 'Dark, Midnight, Warm, Ocean, Forest, Sunset' },
   { icon: Upload, label: '100MB File Uploads', desc: 'Upload larger files in chat' },
-  { icon: Shield, label: 'Elite Badge', desc: 'Exclusive badge on your profile' },
-  { icon: Zap, label: 'Priority Support', desc: 'Get help faster from the team' },
-  { icon: Star, label: 'Custom Emojis', desc: 'Use emojis anywhere across servers' },
-  { icon: Volume2, label: 'HD Voice', desc: 'Higher quality voice channels' },
+  { icon: Shield, label: 'Elite Badge + All Badges', desc: 'Exclusive badge collection on your profile' },
+  { icon: Zap, label: 'Profile Visitor Count', desc: 'See how many people viewed your profile' },
+  { icon: Star, label: 'Animated Gradient Themes', desc: 'Premium animated profile gradients' },
+  { icon: Volume2, label: 'HD Voice & Video', desc: 'Higher quality voice and video calls' },
   { icon: Gift, label: 'Monthly Credits', desc: '500 credits every month' },
-  { icon: Users, label: 'Larger Group DMs', desc: 'Up to 25 people in group DMs' },
-  { icon: MessageSquare, label: 'Longer Messages', desc: '4000 character message limit' },
+  { icon: Users, label: 'Group DMs up to 25', desc: 'Larger groups with custom icons' },
+  { icon: MessageSquare, label: '4000 Char Messages', desc: 'Extended message character limit' },
   { icon: Image, label: 'Custom Backgrounds', desc: 'Personalize your chat background' },
   { icon: Globe, label: 'Custom Profile URL', desc: 'Get a unique vanity URL' },
 ];
