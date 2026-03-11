@@ -150,7 +150,7 @@ export default function ServerSettingsModal({ onClose, server, currentUserId }) 
             <button onClick={() => uploadImg('banner_url')} className="w-full h-20 rounded-xl overflow-hidden" style={{ background: 'var(--bg-glass)', border: '1px dashed var(--border-light)' }}>
               {server?.banner_url ? <img src={server.banner_url} className="w-full h-full object-cover" /> : <div className="flex items-center justify-center h-full text-[11px]" style={{ color: 'var(--text-muted)' }}>Upload Banner</div>}
             </button>
-            <Toggle on={isPublic} onToggle={() => setIsPublic(!isPublic)} label="Public Server (discoverable)" />
+            <ServerToggle on={isPublic} onToggle={() => setIsPublic(!isPublic)} label="Public Server (discoverable)" />
             <div><ServerLabel>Default Notifications</ServerLabel>
               <select value={serverSettings.default_notifications || 'all'} onChange={e => setServerSettings(s => ({ ...s, default_notifications: e.target.value }))} className="w-full px-3 py-2 rounded-xl text-sm outline-none" style={{ background: 'var(--bg-glass)', color: 'var(--text-primary)', border: '1px solid var(--border)' }}>
                 <option value="all">All Messages</option><option value="mentions">Mentions Only</option><option value="none">Nothing</option>
@@ -202,8 +202,8 @@ export default function ServerSettingsModal({ onClose, server, currentUserId }) 
                         <input type="color" value={r.color} onChange={e => updateRole(r.id, { color: e.target.value })} className="w-8 h-8 rounded-lg cursor-pointer" style={{ background: 'var(--bg-glass)', border: '1px solid var(--border)' }} />
                         <ServerInput value={r.name} onChange={e => updateRole(r.id, { name: e.target.value })} />
                       </div>
-                      <Toggle on={r.hoist} onToggle={() => updateRole(r.id, { hoist: !r.hoist })} label="Display separately in member list" />
-                      <Toggle on={r.mentionable} onToggle={() => updateRole(r.id, { mentionable: !r.mentionable })} label="Allow anyone to mention this role" />
+                      <ServerToggle on={r.hoist} onToggle={() => updateRole(r.id, { hoist: !r.hoist })} label="Display separately in member list" />
+                      <ServerToggle on={r.mentionable} onToggle={() => updateRole(r.id, { mentionable: !r.mentionable })} label="Allow anyone to mention this role" />
                       <button onClick={() => deleteRole(r.id)} className="text-[10px] px-2 py-1 rounded-lg flex items-center gap-1" style={{ color: 'var(--accent-red)' }}>
                         <Trash2 className="w-3 h-3" /> Delete Role
                       </button>
