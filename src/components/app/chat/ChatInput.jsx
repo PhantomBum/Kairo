@@ -1,7 +1,8 @@
 import React, { useState, useRef, useCallback } from 'react';
-import { Plus, Send, X, Smile, Image, FileText, Film } from 'lucide-react';
+import { Plus, Send, X, Smile, Image, FileText, Film, Type } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { colors, radius } from '@/components/app/design/tokens';
+import FormattingToolbar from '@/components/app/features/FormattingToolbar';
 
 const EMOJIS = ['😀','😂','😍','🤔','👍','👎','❤️','🔥','🎉','😎','😢','😡','🙏','💯','✨','🚀','👀','🤝','💀','🎮','🎵','☕','⭐','💜'];
 
@@ -15,6 +16,7 @@ export default function ChatInput({ channelName, replyTo, onCancelReply, onSend,
   const [uploading, setUploading] = useState(false);
   const [showEmoji, setShowEmoji] = useState(false);
   const [dragging, setDragging] = useState(false);
+  const [showFormatting, setShowFormatting] = useState(false);
   const fileRef = useRef(null);
   const inputRef = useRef(null);
   const typingRef = useRef(0);
@@ -117,6 +119,9 @@ export default function ChatInput({ channelName, replyTo, onCancelReply, onSend,
         </div>
       )}
 
+      {/* Formatting toolbar */}
+      {showFormatting && <FormattingToolbar inputRef={inputRef} content={content} setContent={setContent} />}
+
       {/* Main input */}
       <div className="flex items-end gap-2 px-4 py-3 rounded-lg" style={{ background: colors.bg.elevated, border: `1px solid ${colors.border.default}` }}>
         <button onClick={() => fileRef.current?.click()} className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-[rgba(255,255,255,0.06)] flex-shrink-0 mb-0.5 transition-colors">
@@ -134,6 +139,10 @@ export default function ChatInput({ channelName, replyTo, onCancelReply, onSend,
           className="flex-1 bg-transparent text-[15px] outline-none resize-none max-h-[144px]"
           style={{ color: colors.text.primary, lineHeight: '22px' }} rows={1} />
         {nearLimit && <span className="text-[11px] mb-1 flex-shrink-0" style={{ color: charCount > 2000 ? colors.danger : colors.warning }}>{2000 - charCount}</span>}
+        <button onClick={() => setShowFormatting(!showFormatting)} className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-[rgba(255,255,255,0.06)] flex-shrink-0 mb-0.5 transition-colors"
+          title="Formatting">
+          <Type className="w-5 h-5" style={{ color: showFormatting ? colors.text.primary : colors.text.muted }} />
+        </button>
         <button onClick={() => setShowEmoji(!showEmoji)} className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-[rgba(255,255,255,0.06)] flex-shrink-0 mb-0.5 transition-colors">
           <Smile className="w-5 h-5" style={{ color: showEmoji ? colors.text.primary : colors.text.muted }} />
         </button>
