@@ -1,11 +1,11 @@
 import React, { useState, useCallback } from 'react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
-import { Hash, Volume2, Megaphone, Radio, MessageSquare, Lock, ChevronDown, ChevronRight, Plus, Settings, UserPlus, Shield, BarChart3, GripVertical } from 'lucide-react';
+import { Hash, Volume2, Megaphone, Radio, MessageSquare, Lock, ChevronDown, ChevronRight, Plus, Settings, UserPlus, Shield, BarChart3, GripVertical, LayoutGrid } from 'lucide-react';
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuSeparator, ContextMenuTrigger } from '@/components/ui/context-menu';
 import { base44 } from '@/api/base44Client';
 import { colors, radius, shadows } from '@/components/app/design/tokens';
 
-const typeIcons = { text: Hash, voice: Volume2, announcement: Megaphone, stage: Radio, forum: MessageSquare };
+const typeIcons = { text: Hash, voice: Volume2, announcement: Megaphone, stage: Radio, forum: MessageSquare, board: LayoutGrid };
 
 function ChannelItem({ channel, active, onClick, onSettings, isOwner, index }) {
   const Icon = typeIcons[channel.type] || Hash;
