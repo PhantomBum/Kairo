@@ -183,11 +183,12 @@ const MessageBubble = memo(function MessageBubble({ message, compact, isOwn, onR
                     return (
                       <ReactionTooltip key={i} reaction={r}>
                         <button onClick={() => onReact(message, r.emoji)}
-                          className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[12px] k-reaction-pop"
+                          className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] k-reaction-pop"
                           style={{
-                            background: mine ? colors.accent.subtle : colors.bg.elevated,
+                            ...glass.card,
+                            background: mine ? colors.accent.subtle : 'rgba(255,255,255,0.04)',
                             color: mine ? colors.accent.primary : colors.text.muted,
-                            border: `1px solid ${mine ? colors.accent.muted : colors.border.default}`,
+                            border: `1px solid ${mine ? colors.accent.muted : 'rgba(255,255,255,0.06)'}`,
                             transition: 'background 100ms, border-color 100ms',
                           }}>
                           {r.emoji} <span className="font-medium k-count-tick">{r.count}</span>
@@ -197,8 +198,9 @@ const MessageBubble = memo(function MessageBubble({ message, compact, isOwn, onR
                   })}
                 </div>
               )}
-            </div>
-          </div>
+              </div>{/* end glass card */}
+            </div>{/* end flex row */}
+          </div>{/* end bubble wrapper */}
 
           {/* Hover action bar */}
           {hovered && !isEditing && !isDeleted && (
