@@ -20,7 +20,7 @@ function HeaderButton({ icon: Icon, onClick, href, active, badge, title }) {
   );
 }
 
-export default function ChatHeader({ channel, conversation, currentUserId, showMembers, onToggleMembers, isDM, onPinned, pinnedCount, onMediaGallery, onVoiceCall, onVideoCall }) {
+export default function ChatHeader({ channel, conversation, currentUserId, showMembers, onToggleMembers, isDM, onPinned, pinnedCount, onMediaGallery, onVoiceCall, onVideoCall, serverName }) {
   const label = isDM
     ? (conversation?.name || conversation?.participants?.find(p => p.user_id !== currentUserId)?.user_name || 'DM')
     : (channel?.name || '');
@@ -31,12 +31,18 @@ export default function ChatHeader({ channel, conversation, currentUserId, showM
     <div className="h-12 px-4 flex items-center justify-between flex-shrink-0"
       style={{ borderBottom: `1px solid ${colors.border.default}`, background: colors.bg.surface, boxShadow: '0 1px 0 rgba(0,0,0,0.15)' }}>
       <div className="flex items-center gap-2 min-w-0">
+        {!isDM && serverName && (
+          <>
+            <span className="text-[13px] truncate max-w-[120px] hidden lg:inline" style={{ color: colors.text.muted }} title={serverName}>{serverName}</span>
+            <span className="text-[13px] hidden lg:inline" style={{ color: colors.text.disabled }}>›</span>
+          </>
+        )}
         <Icon className="w-5 h-5 flex-shrink-0" style={{ color: colors.text.disabled }} />
-        <h1 className="text-[15px] font-semibold truncate" style={{ color: colors.text.primary }}>{label}</h1>
+        <h1 className="text-[15px] font-semibold truncate" style={{ color: colors.text.primary }} title={label}>{label}</h1>
         {channel?.description && (
           <>
-            <div className="w-px h-5 mx-1 flex-shrink-0" style={{ background: colors.border.light }} />
-            <span className="text-[13px] truncate" style={{ color: colors.text.muted }}>{channel.description}</span>
+            <div className="w-px h-5 mx-1 flex-shrink-0 hidden md:block" style={{ background: colors.border.light }} />
+            <span className="text-[13px] truncate hidden md:inline" style={{ color: colors.text.muted }}>{channel.description}</span>
           </>
         )}
       </div>
