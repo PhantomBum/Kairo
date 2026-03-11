@@ -1,13 +1,15 @@
 import React, { useState, useRef, useCallback } from 'react';
-import { Plus, Send, X, Smile, Image, FileText, Film, Type } from 'lucide-react';
+import { Plus, Send, X, Smile, Image, FileText, Film, Type, Sticker, ImageIcon } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { colors } from '@/components/app/design/tokens';
 import FormattingToolbar from '@/components/app/features/FormattingToolbar';
+import GifPicker from '@/components/app/chat/GifPicker';
+import StickerPicker from '@/components/app/chat/StickerPicker';
+import SlashCommandPicker from '@/components/app/chat/SlashCommandPicker';
 
 const EMOJIS = ['😀','😂','😍','🤔','👍','👎','❤️','🔥','🎉','😎','😢','😡','🙏','💯','✨','🚀','👀','🤝','💀','🎮','🎵','☕','⭐','💜'];
 
-export default function ChatInput({ channelName, channelId, replyTo, onCancelReply, onSend, onTyping, onEditLast }) {
-  // Use channelId for draft key to prevent race conditions between channels with same name
+export default function ChatInput({ channelName, channelId, replyTo, onCancelReply, onSend, onTyping, onEditLast, serverId }) {
   const storageKey = `kairo-draft-${channelId || channelName || 'default'}`;
   const [content, setContent] = useState(() => {
     try { return localStorage.getItem(storageKey) || ''; } catch { return ''; }
@@ -16,23 +18,23 @@ export default function ChatInput({ channelName, channelId, replyTo, onCancelRep
   const [sending, setSending] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [showEmoji, setShowEmoji] = useState(false);
+  const [showGif, setShowGif] = useState(false);
+  const [showSticker, setShowSticker] = useState(false);
   const [dragging, setDragging] = useState(false);
   const [showFormatting, setShowFormatting] = useState(false);
+  const [showSlash, setShowSlash] = useState(false);
+  const [slashFilter, setSlashFilter] = useState('');
   const fileRef = useRef(null);
   const inputRef = useRef(null);
   const typingRef = useRef(0);
 
-  // Persist draft to localStorage
   React.useEffect(() => {
     try { if (content) localStorage.setItem(storageKey, content); else localStorage.removeItem(storageKey); } catch {}
   }, [content, storageKey]);
 
-  // Load draft when channel changes, reset UI state
   React.useEffect(() => {
     try { setContent(localStorage.getItem(storageKey) || ''); } catch { setContent(''); }
-    setShowEmoji(false);
-    setShowFormatting(false);
-    setFiles([]);
+    setShowEmoji(false); setShowFormatting(false); setShowGif(false); setShowSticker(false); setShowSlash(false); setFiles([]);
   }, [storageKey]);
 
   const handleTyping = useCallback(() => {
@@ -51,22 +53,56 @@ export default function ChatInput({ channelName, channelId, replyTo, onCancelRep
     setUploading(false);
   };
 
+  const closePickers = () => { setShowEmoji(false); setShowGif(false); setShowSticker(false); setShowSlash(false); };
+
   const handleSend = async () => {
     const trimmed = content.trim();
     if ((!trimmed && files.length === 0) || sending) return;
     setSending(true);
     await onSend({ content: trimmed, attachments: files.length > 0 ? files : undefined, replyToId: replyTo?.id, replyPreview: replyTo ? { author_name: replyTo.author_name, content: replyTo.content?.slice(0, 80) } : undefined });
-    setContent(''); setFiles([]); setSending(false); setShowEmoji(false); setShowFormatting(false);
+    setContent(''); setFiles([]); setSending(false); closePickers();
     try { localStorage.removeItem(storageKey); } catch {}
     inputRef.current?.focus();
+  };
+
+  const handleContentChange = (val) => {
+    setContent(val);
+    handleTyping();
+    // Slash command detection
+    if (val.startsWith('/')) {
+      setShowSlash(true);
+      setSlashFilter(val.slice(1));
+    } else if (showSlash) {
+      setShowSlash(false);
+    }
+  };
+
+  const handleSlashSelect = (cmd) => {
+    if (!cmd) { setShowSlash(false); return; }
+    const params = cmd.params?.filter(p => p.required).map(p => `[${p.name}]`).join(' ') || '';
+    setContent(`/${cmd.name} ${params}`);
+    setShowSlash(false);
+    inputRef.current?.focus();
+  };
+
+  const handleGifSelect = (url) => {
+    onSend({ content: url, attachments: undefined, replyToId: replyTo?.id, replyPreview: replyTo ? { author_name: replyTo.author_name, content: replyTo.content?.slice(0, 80) } : undefined });
+    closePickers();
+  };
+
+  const handleStickerSelect = (urlOrEmoji) => {
+    onSend({ content: urlOrEmoji, attachments: undefined, replyToId: replyTo?.id });
+    closePickers();
   };
 
   const getIcon = (type) => { if (type?.startsWith('image/')) return Image; if (type?.startsWith('video/')) return Film; return FileText; };
   const charCount = content.length;
   const nearLimit = charCount > 1800;
 
+  const placeholder = replyTo ? `Reply to ${replyTo.author_name}...` : `Message ${channelName ? '#' + channelName : ''}`;
+
   return (
-    <div className="px-4 pb-5 pt-1"
+    <div className="px-4 pb-5 pt-1 relative"
       onDragOver={e => { e.preventDefault(); setDragging(true); }}
       onDragLeave={() => setDragging(false)}
       onDrop={e => { e.preventDefault(); setDragging(false); if (e.dataTransfer.files?.length) uploadFiles(e.dataTransfer.files); }}>
@@ -82,12 +118,22 @@ export default function ChatInput({ channelName, channelId, replyTo, onCancelRep
         </div>
       )}
 
+      {/* Slash command picker */}
+      {showSlash && <SlashCommandPicker filter={slashFilter} onSelect={handleSlashSelect} serverId={serverId} />}
+
+      {/* GIF picker */}
+      {showGif && <GifPicker onSelect={handleGifSelect} onClose={() => setShowGif(false)} />}
+
+      {/* Sticker picker */}
+      {showSticker && <StickerPicker onSelect={handleStickerSelect} onClose={() => setShowSticker(false)} serverId={serverId} />}
+
       {/* Reply bar */}
       {replyTo && (
-        <div className="flex items-center gap-2 px-4 py-2 mb-1 rounded-t-lg" style={{ background: colors.bg.elevated }}>
+        <div className="flex items-center gap-2 px-4 py-2 mb-1 rounded-t-2xl" style={{ background: colors.bg.elevated, borderBottom: `1px solid ${colors.border.default}` }}>
           <div className="w-1 h-5 rounded-full flex-shrink-0" style={{ background: colors.accent.primary }} />
           <span className="text-[13px] flex-1 truncate" style={{ color: colors.text.muted }}>
             Replying to <span className="font-semibold" style={{ color: colors.text.secondary }}>{replyTo.author_name}</span>
+            {replyTo.content && <span className="ml-1.5" style={{ color: colors.text.disabled }}>— {replyTo.content.slice(0, 60)}</span>}
           </span>
           <button onClick={onCancelReply} className="w-6 h-6 flex items-center justify-center rounded hover:bg-[rgba(255,255,255,0.06)]">
             <X className="w-4 h-4" style={{ color: colors.text.muted }} />
@@ -97,28 +143,20 @@ export default function ChatInput({ channelName, channelId, replyTo, onCancelRep
 
       {/* File previews */}
       {files.length > 0 && (
-        <div className="flex gap-2 px-4 py-3 rounded-t-lg flex-wrap" style={{ background: colors.bg.elevated, borderBottom: `1px solid ${colors.border.default}` }}>
+        <div className="flex gap-2 px-4 py-3 rounded-t-2xl flex-wrap" style={{ background: colors.bg.elevated, borderBottom: `1px solid ${colors.border.default}` }}>
           {files.map((f, i) => {
             const FI = getIcon(f.content_type);
-            const isVideo = f.content_type?.startsWith('video/');
             const isImage = f.content_type?.startsWith('image/');
             return (
               <div key={i} className="relative group">
                 {isImage ? <img src={f.url} className="w-20 h-20 rounded-lg object-cover" alt={f.filename} />
-                : isVideo ? (
-                  <div className="w-20 h-20 rounded-lg overflow-hidden relative" style={{ background: colors.bg.overlay }}>
-                    <video src={f.url} className="w-full h-full object-cover" muted preload="metadata" />
-                    <div className="absolute inset-0 flex items-center justify-center bg-black/30">
-                      <Film className="w-5 h-5 text-white" />
+                  : (
+                    <div className="w-20 h-20 rounded-lg flex flex-col items-center justify-center gap-1" style={{ background: colors.bg.overlay }}>
+                      <FI className="w-5 h-5" style={{ color: colors.text.muted }} />
+                      <span className="text-[9px] truncate max-w-[60px] px-1" style={{ color: colors.text.muted }}>{f.filename}</span>
                     </div>
-                  </div>
-                ) : (
-                  <div className="w-20 h-20 rounded-lg flex flex-col items-center justify-center gap-1" style={{ background: colors.bg.overlay }}>
-                    <FI className="w-5 h-5" style={{ color: colors.text.muted }} />
-                    <span className="text-[9px] truncate max-w-[60px] px-1" style={{ color: colors.text.muted }}>{f.filename}</span>
-                  </div>
-                )}
-                <button onClick={() => setFiles(p => p.filter((_,j) => j !== i))}
+                  )}
+                <button onClick={() => setFiles(p => p.filter((_, j) => j !== i))}
                   className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
                   style={{ background: colors.danger, color: '#fff' }}><X className="w-3 h-3" /></button>
               </div>
@@ -139,40 +177,39 @@ export default function ChatInput({ channelName, channelId, replyTo, onCancelRep
       {showFormatting && <FormattingToolbar inputRef={inputRef} content={content} setContent={setContent} />}
 
       {/* Main input */}
-      <div className="flex items-end gap-2 px-4 py-3 rounded-2xl" style={{ background: 'rgba(255,255,255,0.035)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.06)' }}>
+      <div className="flex items-end gap-2 px-4 py-3 rounded-2xl transition-all"
+        style={{ background: 'rgba(255,255,255,0.035)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.06)' }}>
         <button onClick={() => fileRef.current?.click()}
           className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-[rgba(255,255,255,0.06)] flex-shrink-0 mb-0.5"
-          aria-label="Upload file" title="Upload file">
-          <Plus className="w-5 h-5" style={{ color: colors.text.muted }} />
-        </button>
-        <input ref={fileRef} type="file" accept="image/*,video/*,audio/*,.gif,.mp4,.webm,.mov,.mp3,.wav,.ogg,.pdf,.txt,.zip,.rar,.doc,.docx,.xls,.xlsx" onChange={e => { if (e.target.files?.length) uploadFiles(e.target.files); if (fileRef.current) fileRef.current.value = ''; }} className="hidden" multiple aria-hidden="true" />
+          title="Upload file"><Plus className="w-5 h-5" style={{ color: colors.text.muted }} /></button>
+        <input ref={fileRef} type="file" accept="image/*,video/*,audio/*,.gif,.mp4,.webm,.mov,.mp3,.wav,.ogg,.pdf,.txt,.zip,.rar,.doc,.docx,.xls,.xlsx" onChange={e => { if (e.target.files?.length) uploadFiles(e.target.files); if (fileRef.current) fileRef.current.value = ''; }} className="hidden" multiple />
         <textarea ref={inputRef} value={content}
-          onChange={e => { setContent(e.target.value); handleTyping(); }}
+          onChange={e => handleContentChange(e.target.value)}
           onKeyDown={e => {
-            if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); }
+            if (e.key === 'Enter' && !e.shiftKey && !showSlash) { e.preventDefault(); handleSend(); }
             if (e.key === 'ArrowUp' && !content.trim() && onEditLast) { e.preventDefault(); onEditLast(); }
+            if (e.key === 'Escape') { closePickers(); if (replyTo) onCancelReply(); }
           }}
-          placeholder={`Message ${channelName ? '#' + channelName : ''}`}
-          aria-label={`Message ${channelName || 'channel'}`}
+          placeholder={placeholder}
           className="flex-1 bg-transparent text-[14px] outline-none resize-none max-h-[160px] placeholder:text-[13px]"
           style={{ color: colors.text.primary, lineHeight: '22px', caretColor: colors.accent.primary }} rows={1} />
-        {nearLimit && <span className="text-[11px] mb-1 flex-shrink-0 tabular-nums" style={{ color: charCount > 2000 ? colors.danger : colors.warning }} aria-live="polite">{2000 - charCount}</span>}
-        <button onClick={() => setShowFormatting(!showFormatting)}
+        {nearLimit && <span className="text-[11px] mb-1 flex-shrink-0 tabular-nums" style={{ color: charCount > 2000 ? colors.danger : colors.warning }}>{2000 - charCount}</span>}
+        <button onClick={() => { closePickers(); setShowGif(!showGif); }}
           className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-[rgba(255,255,255,0.06)] flex-shrink-0 mb-0.5"
-          title="Formatting" aria-label="Toggle formatting" aria-pressed={showFormatting}>
-          <Type className="w-5 h-5" style={{ color: showFormatting ? colors.text.primary : colors.text.muted }} />
-        </button>
-        <button onClick={() => setShowEmoji(!showEmoji)}
+          title="GIF"><span className="text-[12px] font-bold" style={{ color: showGif ? colors.text.primary : colors.text.muted }}>GIF</span></button>
+        <button onClick={() => { closePickers(); setShowSticker(!showSticker); }}
           className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-[rgba(255,255,255,0.06)] flex-shrink-0 mb-0.5"
-          title="Emoji" aria-label="Toggle emoji picker" aria-pressed={showEmoji}>
-          <Smile className="w-5 h-5" style={{ color: showEmoji ? colors.text.primary : colors.text.muted }} />
-        </button>
+          title="Sticker"><Sticker className="w-5 h-5" style={{ color: showSticker ? colors.text.primary : colors.text.muted }} /></button>
+        <button onClick={() => { closePickers(); setShowFormatting(!showFormatting); }}
+          className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-[rgba(255,255,255,0.06)] flex-shrink-0 mb-0.5"
+          title="Formatting"><Type className="w-5 h-5" style={{ color: showFormatting ? colors.text.primary : colors.text.muted }} /></button>
+        <button onClick={() => { closePickers(); setShowEmoji(!showEmoji); }}
+          className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-[rgba(255,255,255,0.06)] flex-shrink-0 mb-0.5"
+          title="Emoji"><Smile className="w-5 h-5" style={{ color: showEmoji ? colors.text.primary : colors.text.muted }} /></button>
         <button onClick={handleSend} disabled={(!content.trim() && files.length === 0) || sending}
           className="w-8 h-8 flex items-center justify-center rounded-lg flex-shrink-0 mb-0.5 disabled:opacity-20"
           style={{ background: content.trim() || files.length > 0 ? colors.accent.primary : 'transparent', color: content.trim() || files.length > 0 ? '#fff' : colors.text.muted }}
-          aria-label="Send message" title="Send">
-          <Send className="w-[18px] h-[18px]" />
-        </button>
+          title="Send"><Send className="w-[18px] h-[18px]" /></button>
       </div>
     </div>
   );
