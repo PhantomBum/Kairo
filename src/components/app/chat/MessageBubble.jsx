@@ -168,13 +168,14 @@ const MessageBubble = memo(function MessageBubble({ message, compact, isOwn, onR
                     return (
                       <ReactionTooltip key={i} reaction={r}>
                         <button onClick={() => onReact(message, r.emoji)}
-                          className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[12px] transition-all k-reaction-pop"
+                          className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[12px] k-reaction-pop"
                           style={{
                             background: mine ? colors.accent.subtle : colors.bg.elevated,
                             color: mine ? colors.accent.primary : colors.text.muted,
                             border: `1px solid ${mine ? colors.accent.muted : colors.border.default}`,
+                            transition: 'background 100ms, border-color 100ms',
                           }}>
-                          {r.emoji} <span className="font-medium">{r.count}</span>
+                          {r.emoji} <span className="font-medium k-count-tick">{r.count}</span>
                         </button>
                       </ReactionTooltip>
                     );
