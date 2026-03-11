@@ -38,7 +38,6 @@ export default function SettingsModal({ onClose, profile, onUpdate, onLogout, cu
   });
   const [saving, setSaving] = useState(false);
   const set = (k, v) => setForm(p => ({ ...p, [k]: v }));
-  const get = (k) => form[k];
 
   const save = async () => {
     setSaving(true);
