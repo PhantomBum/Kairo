@@ -98,10 +98,10 @@ export default function ServerRailWithContext({ servers, activeServerId, onServe
             <Home className="w-6 h-6" style={{ color: isHome ? colors.text.primary : colors.text.muted }} />
           </RailIcon></div>
         </ContextMenuTrigger>
-        <ContextMenuContent className="w-52 p-1.5 rounded-lg" style={{ background: colors.bg.modal, border: `1px solid ${colors.border.light}`, boxShadow: shadows.strong }}>
-          <ContextMenuItem onClick={onCreateServer} className="text-[13px] gap-2.5 rounded-md px-2.5 py-2" style={{ color: colors.text.secondary }}><Plus className="w-4 h-4 opacity-60" /> Create Server</ContextMenuItem>
-          <ContextMenuItem onClick={onDiscover} className="text-[13px] gap-2.5 rounded-md px-2.5 py-2" style={{ color: colors.text.secondary }}><Compass className="w-4 h-4 opacity-60" /> Join Server</ContextMenuItem>
-          <ContextMenuItem onClick={() => setShowCreateFolder(true)} className="text-[13px] gap-2.5 rounded-md px-2.5 py-2" style={{ color: colors.text.secondary }}><FolderPlus className="w-4 h-4 opacity-60" /> Create Folder</ContextMenuItem>
+        <ContextMenuContent className="w-52 p-1.5 rounded-xl" style={{ background: 'rgba(22,22,32,0.92)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.08)', boxShadow: shadows.strong }}>
+          <ContextMenuItem onClick={onCreateServer} className="text-[13px] gap-2.5 rounded-lg px-2.5 py-2" style={{ color: colors.text.secondary }}><Plus className="w-4 h-4 opacity-60" /> Create Server</ContextMenuItem>
+          <ContextMenuItem onClick={onDiscover} className="text-[13px] gap-2.5 rounded-lg px-2.5 py-2" style={{ color: colors.text.secondary }}><Compass className="w-4 h-4 opacity-60" /> Join Server</ContextMenuItem>
+          <ContextMenuItem onClick={() => setShowCreateFolder(true)} className="text-[13px] gap-2.5 rounded-lg px-2.5 py-2" style={{ color: colors.text.secondary }}><FolderPlus className="w-4 h-4 opacity-60" /> Create Folder</ContextMenuItem>
         </ContextMenuContent>
       </ContextMenu>
 
@@ -125,11 +125,11 @@ export default function ServerRailWithContext({ servers, activeServerId, onServe
                 : <span className="text-[15px] font-semibold select-none" style={{ color: activeServerId === s.id ? '#fff' : colors.text.secondary }}>{s.name?.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()}</span>}
             </ServerRailIcon></div>
           </ContextMenuTrigger>
-          <ContextMenuContent className="w-52 p-1.5 rounded-lg" style={{ background: colors.bg.modal, border: `1px solid ${colors.border.light}`, boxShadow: shadows.strong }}>
-            <ContextMenuItem onClick={() => onServerSelect(s)} className="text-[13px] gap-2.5 rounded-md px-2.5 py-2" style={{ color: colors.text.secondary }}><Settings className="w-4 h-4 opacity-60" /> Server Settings</ContextMenuItem>
-            <ContextMenuItem onClick={() => navigator.clipboard.writeText(s.invite_code || '')} className="text-[13px] gap-2.5 rounded-md px-2.5 py-2" style={{ color: colors.text.secondary }}><Copy className="w-4 h-4 opacity-60" /> Copy Invite Code</ContextMenuItem>
-            <ContextMenuSeparator style={{ background: colors.border.light, margin: '4px 0' }} />
-            <ContextMenuItem onClick={() => onLeaveServer?.(s)} className="text-[13px] gap-2.5 rounded-md px-2.5 py-2" style={{ color: colors.danger }}><LogOut className="w-4 h-4 opacity-60" /> Leave Server</ContextMenuItem>
+          <ContextMenuContent className="w-52 p-1.5 rounded-xl" style={{ background: 'rgba(22,22,32,0.92)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.08)', boxShadow: shadows.strong }}>
+            <ContextMenuItem onClick={() => onServerSelect(s)} className="text-[13px] gap-2.5 rounded-lg px-2.5 py-2" style={{ color: colors.text.secondary }}><Settings className="w-4 h-4 opacity-60" /> Server Settings</ContextMenuItem>
+            <ContextMenuItem onClick={() => navigator.clipboard.writeText(s.invite_code || '')} className="text-[13px] gap-2.5 rounded-lg px-2.5 py-2" style={{ color: colors.text.secondary }}><Copy className="w-4 h-4 opacity-60" /> Copy Invite Code</ContextMenuItem>
+            <ContextMenuSeparator style={{ background: 'rgba(255,255,255,0.06)', margin: '4px 0' }} />
+            <ContextMenuItem onClick={() => onLeaveServer?.(s)} className="text-[13px] gap-2.5 rounded-lg px-2.5 py-2" style={{ color: colors.danger }}><LogOut className="w-4 h-4 opacity-60" /> Leave Server</ContextMenuItem>
           </ContextMenuContent>
         </ContextMenu>
       ))}
