@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
-import { User, Link, Shield, LogOut } from 'lucide-react';
+import { User, Link, Shield, LogOut, Crown, Palette } from 'lucide-react';
 import ModalWrapper from './ModalWrapper';
 
-const TABS = [{ id: 'profile', label: 'Profile', icon: User }, { id: 'social', label: 'Links', icon: Link }, { id: 'privacy', label: 'Privacy', icon: Shield }];
+const TABS = [{ id: 'profile', label: 'Profile', icon: User }, { id: 'social', label: 'Links', icon: Link }, { id: 'privacy', label: 'Privacy', icon: Shield }, { id: 'appearance', label: 'Theme', icon: Palette }];
 
 export default function SettingsModal({ onClose, profile, onUpdate, onLogout }) {
   const [tab, setTab] = useState('profile');
@@ -108,6 +108,35 @@ export default function SettingsModal({ onClose, profile, onUpdate, onLogout }) 
             </div>
             <Toggle label="Read Receipts" k="read_receipts" />
             <Toggle label="Typing Indicators" k="typing_indicators" />
+          </>}
+          {tab === 'appearance' && <>
+            <div>
+              <label className="text-[10px] font-semibold uppercase tracking-[0.08em] block mb-1.5" style={{ color: 'var(--text-muted)', fontFamily: 'monospace' }}>Theme</label>
+              <div className="grid grid-cols-3 gap-2">
+                {[{ id: 'dark', label: 'Dark', bg: '#050505' }, { id: 'amoled', label: 'AMOLED', bg: '#000000' }, { id: 'midnight', label: 'Midnight', bg: '#0a0a1a' }].map(t => (
+                  <button key={t.id} className="p-3 rounded-xl text-center transition-all" style={{ background: 'var(--bg-glass)', border: '1px solid var(--border)' }}>
+                    <div className="w-full h-8 rounded-lg mb-1.5" style={{ background: t.bg }} />
+                    <span className="text-[10px]" style={{ color: 'var(--text-primary)' }}>{t.label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div>
+              <label className="text-[10px] font-semibold uppercase tracking-[0.08em] block mb-1.5" style={{ color: 'var(--text-muted)', fontFamily: 'monospace' }}>Message Display</label>
+              <div className="grid grid-cols-2 gap-2">
+                {[{ id: 'cozy', label: 'Cozy' }, { id: 'compact', label: 'Compact' }].map(t => (
+                  <button key={t.id} className="px-4 py-2.5 rounded-xl text-sm" style={{ background: 'var(--bg-glass)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}>{t.label}</button>
+                ))}
+              </div>
+            </div>
+            <div>
+              <label className="text-[10px] font-semibold uppercase tracking-[0.08em] block mb-1.5" style={{ color: 'var(--text-muted)', fontFamily: 'monospace' }}>Accent Color</label>
+              <div className="flex gap-2">
+                {['#e8e4d9', '#7bc9a4', '#7ba4c9', '#c97b7b', '#a47bc9', '#c9b47b'].map(c => (
+                  <button key={c} className="w-8 h-8 rounded-full" style={{ background: c, border: '2px solid var(--border)' }} />
+                ))}
+              </div>
+            </div>
           </>}
           <button onClick={save} disabled={saving} className="px-5 py-2 rounded-xl text-sm font-medium disabled:opacity-30 transition-all"
             style={{ background: 'var(--text-cream)', color: 'var(--bg-deep)' }}>{saving ? 'Saving...' : 'Save'}</button>
