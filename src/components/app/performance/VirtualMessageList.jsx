@@ -58,23 +58,21 @@ export default function VirtualMessageList({
     return result;
   }, [messages]);
 
-  // Track the last message ID to only auto-scroll when new messages arrive, not on edits
-  const lastMsgIdRef = useRef(null);
+  // Track the last message count to only auto-scroll when new messages arrive, not on edits
   const lastMsgCountRef = useRef(0);
+  const prevAtBottomRef = useRef(true);
   useEffect(() => {
-    const lastMsg = messages[messages.length - 1];
-    const lastId = lastMsg?.id;
     const msgCount = messages.length;
-    // Only auto-scroll when a NEW message arrives (count increased or different last ID), not on updates
-    if (atBottom && (lastId !== lastMsgIdRef.current || msgCount > lastMsgCountRef.current)) {
-      // Use requestAnimationFrame to ensure DOM has updated
+    const isNewMessage = msgCount > lastMsgCountRef.current;
+    // Auto-scroll only when a NEW message arrives AND user was already at bottom
+    if (isNewMessage && prevAtBottomRef.current) {
       requestAnimationFrame(() => {
         bottomRef.current?.scrollIntoView({ behavior: 'auto' });
       });
     }
-    lastMsgIdRef.current = lastId;
     lastMsgCountRef.current = msgCount;
-  }, [messages.length, messages[messages.length - 1]?.id, atBottom]);
+    prevAtBottomRef.current = atBottom;
+  }, [messages.length, atBottom]);
 
   const onScroll = useCallback(() => {
     const el = containerRef.current;
