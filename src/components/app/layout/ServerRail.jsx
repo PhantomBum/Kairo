@@ -1,78 +1,80 @@
 import React, { useState } from 'react';
 import { Home, Plus, Compass } from 'lucide-react';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { motion, AnimatePresence } from 'framer-motion';
 
-function RailIcon({ label, active, onClick, children, badge, accent }) {
+function RailIcon({ active, onClick, tooltip, badge, children, isHome }) {
   const [hovered, setHovered] = useState(false);
   return (
-    <TooltipProvider delayDuration={0}>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <div className="relative flex items-center justify-center py-[3px]"
-            onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
-            {/* Pill indicator */}
-            <div className="absolute left-0 top-1/2 -translate-y-1/2 rounded-r-full"
-              style={{
-                width: active ? 4 : 3,
-                height: active ? 32 : hovered ? 18 : 0,
-                opacity: active || hovered ? 1 : 0,
-                background: 'var(--text-primary)',
-                transition: 'all 200ms cubic-bezier(0.4, 0, 0.2, 1)',
-              }} />
-            <button onClick={onClick}
-              className="relative w-12 h-12 flex items-center justify-center overflow-hidden"
-              style={{
-                borderRadius: active || hovered ? 16 : 24,
-                background: active ? (accent || 'var(--text-primary)') : hovered ? 'var(--bg-hover)' : 'var(--bg-tertiary)',
-                color: active ? (accent ? '#fff' : 'var(--bg)') : hovered ? 'var(--text-primary)' : 'var(--text-muted)',
-                transition: 'all 200ms cubic-bezier(0.4, 0, 0.2, 1)',
-              }}>
-              {children}
-              {badge > 0 && (
-                <div className="absolute -bottom-0.5 -right-0.5 min-w-4 h-4 px-1 rounded-full text-[9px] font-bold text-white flex items-center justify-center"
-                  style={{ background: '#dc2626', border: '2px solid var(--bg)' }}>
-                  {badge > 99 ? '99+' : badge}
-                </div>
-              )}
-            </button>
-          </div>
-        </TooltipTrigger>
-        <TooltipContent side="right" className="text-xs font-medium border-0 px-3 py-1.5"
-          style={{ background: 'var(--bg-tertiary)', color: 'var(--text-primary)', boxShadow: '0 8px 24px rgba(0,0,0,0.5)' }}>
-          {label}
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
+    <div className="relative flex items-center justify-center group" onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
+      {/* Active pill */}
+      <AnimatePresence>
+        {(active || hovered) && (
+          <motion.div initial={{ scaleY: 0 }} animate={{ scaleY: 1 }} exit={{ scaleY: 0 }}
+            className="absolute left-0 w-[3px] rounded-r-full"
+            style={{ height: active ? 28 : 16, background: 'var(--text-cream)', transformOrigin: 'center' }} />
+        )}
+      </AnimatePresence>
+      <button onClick={onClick}
+        className="relative transition-all duration-200"
+        style={{
+          width: 44, height: 44,
+          borderRadius: active || hovered ? 14 : 22,
+          background: active ? 'var(--bg-glass-strong)' : 'var(--bg-glass)',
+          border: `1px solid ${active ? 'var(--border-light)' : 'var(--border)'}`,
+          backdropFilter: 'blur(12px)',
+          boxShadow: active ? '0 0 20px rgba(232,228,217,0.04)' : 'none',
+        }}>
+        {children}
+        {badge > 0 && (
+          <div className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 rounded-full text-[9px] font-bold flex items-center justify-center"
+            style={{ background: 'var(--accent-red)', color: '#fff' }}>{badge > 9 ? '9+' : badge}</div>
+        )}
+      </button>
+      {/* Tooltip */}
+      <AnimatePresence>
+        {hovered && tooltip && (
+          <motion.div initial={{ opacity: 0, x: -4 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -4 }}
+            className="absolute left-[62px] z-50 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap pointer-events-none"
+            style={{ background: 'var(--bg-elevated)', color: 'var(--text-cream)', border: '1px solid var(--border-light)', boxShadow: 'var(--shadow-md)' }}>
+            {tooltip}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   );
 }
 
 export default function ServerRail({ servers, activeServerId, onServerSelect, onHomeClick, onCreateServer, onDiscover, isHome, badge }) {
   return (
-    <div className="w-[72px] h-full flex flex-col items-center py-3 gap-0.5 flex-shrink-0 overflow-y-auto scrollbar-none"
-      style={{ background: 'var(--bg)' }}>
-      <RailIcon label="Home" active={isHome} onClick={onHomeClick} badge={badge}>
-        <Home className="w-5 h-5" />
+    <div className="w-[68px] flex-shrink-0 flex flex-col items-center py-3 gap-2 overflow-y-auto scrollbar-none"
+      style={{ background: 'var(--bg-deep)' }}>
+      {/* Home */}
+      <RailIcon active={isHome} onClick={onHomeClick} tooltip="Home" badge={badge}>
+        <Home className="w-[18px] h-[18px]" style={{ color: isHome ? 'var(--text-cream)' : 'var(--text-muted)' }} />
       </RailIcon>
 
-      <div className="w-8 h-px my-1.5" style={{ background: 'var(--border)' }} />
+      <div className="w-8 h-px my-0.5" style={{ background: 'var(--border)' }} />
 
+      {/* Servers */}
       {servers.map(s => (
-        <RailIcon key={s.id} label={s.name} active={activeServerId === s.id} onClick={() => onServerSelect(s)}>
+        <RailIcon key={s.id} active={activeServerId === s.id} onClick={() => onServerSelect(s)} tooltip={s.name}>
           {s.icon_url ? (
-            <img src={s.icon_url} alt="" className="w-full h-full object-cover" />
+            <img src={s.icon_url} className="w-full h-full rounded-[inherit] object-cover" />
           ) : (
-            <span className="text-sm font-semibold">{s.name?.charAt(0)?.toUpperCase()}</span>
+            <span className="text-[13px] font-semibold" style={{ color: activeServerId === s.id ? 'var(--text-cream)' : 'var(--text-secondary)', fontFamily: 'monospace' }}>
+              {s.name?.slice(0, 2).toUpperCase()}
+            </span>
           )}
         </RailIcon>
       ))}
 
-      <div className="w-8 h-px my-1.5" style={{ background: 'var(--border)' }} />
+      <div className="w-8 h-px my-0.5" style={{ background: 'var(--border)' }} />
 
-      <RailIcon label="Create Server" onClick={onCreateServer} accent="#22c55e">
-        <Plus className="w-5 h-5" />
+      <RailIcon onClick={onCreateServer} tooltip="Create Server">
+        <Plus className="w-[18px] h-[18px]" style={{ color: 'var(--accent-green)' }} />
       </RailIcon>
-      <RailIcon label="Discover" onClick={onDiscover} accent="#6366f1">
-        <Compass className="w-5 h-5" />
+      <RailIcon onClick={onDiscover} tooltip="Join Server">
+        <Compass className="w-[18px] h-[18px]" style={{ color: 'var(--accent-blue)' }} />
       </RailIcon>
     </div>
   );

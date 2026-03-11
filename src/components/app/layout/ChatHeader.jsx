@@ -1,58 +1,38 @@
 import React from 'react';
-import { Hash, Users, Pin, Search, AtSign, Phone, Video, Bell, BellOff } from 'lucide-react';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Hash, Users, Pin, AtSign } from 'lucide-react';
 
-function HBtn({ label, onClick, active, children }) {
-  return (
-    <TooltipProvider delayDuration={0}>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <button onClick={onClick} className="p-1.5 rounded-md transition-colors hover:bg-[var(--bg-hover)]"
-            style={{ color: active ? 'var(--text-primary)' : 'var(--text-muted)' }}>
-            {children}
-          </button>
-        </TooltipTrigger>
-        <TooltipContent side="bottom" className="text-[10px] border-0 px-2 py-1"
-          style={{ background: 'var(--bg-tertiary)', color: 'var(--text-primary)' }}>
-          {label}
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
-  );
-}
-
-export default function ChatHeader({ channel, conversation, currentUserId, memberCount, showMembers, onToggleMembers, isDM, onPinned, pinnedCount }) {
+export default function ChatHeader({ channel, conversation, currentUserId, showMembers, onToggleMembers, isDM, onPinned, pinnedCount }) {
   const label = isDM
     ? (conversation?.name || conversation?.participants?.find(p => p.user_id !== currentUserId)?.user_name || 'DM')
     : (channel?.name || '');
 
   return (
-    <div className="h-12 px-4 flex items-center justify-between flex-shrink-0"
-      style={{ borderBottom: '1px solid var(--border)' }}>
-      <div className="flex items-center gap-2 min-w-0">
-        {!isDM && <Hash className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--text-muted)' }} />}
-        {isDM && <AtSign className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--text-muted)' }} />}
-        <span className="text-[14px] font-semibold truncate" style={{ color: 'var(--text-primary)' }}>{label}</span>
+    <div className="h-12 px-4 flex items-center justify-between flex-shrink-0" style={{ borderBottom: '1px solid var(--border)', background: 'var(--bg-glass)', backdropFilter: 'blur(12px)' }}>
+      <div className="flex items-center gap-2.5 min-w-0">
+        {isDM ? <AtSign className="w-4 h-4 flex-shrink-0 opacity-40" style={{ color: 'var(--text-muted)' }} />
+               : <Hash className="w-4 h-4 flex-shrink-0 opacity-40" style={{ color: 'var(--text-muted)' }} />}
+        <span className="text-[14px] font-semibold truncate" style={{ color: 'var(--text-cream)', fontFamily: 'monospace' }}>{label}</span>
         {channel?.description && (
           <>
-            <div className="w-px h-4 mx-1" style={{ background: 'var(--border)' }} />
-            <span className="text-xs truncate" style={{ color: 'var(--text-muted)' }}>{channel.description}</span>
+            <div className="w-px h-4" style={{ background: 'var(--border-light)' }} />
+            <span className="text-[11px] truncate opacity-50" style={{ color: 'var(--text-secondary)' }}>{channel.description}</span>
           </>
         )}
       </div>
       <div className="flex items-center gap-0.5">
         {!isDM && onPinned && (
-          <HBtn label={`Pinned Messages${pinnedCount ? ` (${pinnedCount})` : ''}`} onClick={onPinned}>
-            <div className="relative">
-              <Pin className="w-4 h-4" />
-              {pinnedCount > 0 && <div className="absolute -top-1 -right-1 w-3 h-3 rounded-full text-[7px] font-bold flex items-center justify-center bg-amber-500 text-black">{pinnedCount}</div>}
-            </div>
-          </HBtn>
+          <button onClick={onPinned} className="relative p-1.5 rounded-md transition-colors hover:bg-[var(--bg-glass-hover)]">
+            <Pin className="w-4 h-4" style={{ color: 'var(--text-muted)' }} />
+            {pinnedCount > 0 && (
+              <div className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 rounded-full text-[8px] font-bold flex items-center justify-center"
+                style={{ background: 'var(--accent-amber)', color: '#000' }}>{pinnedCount}</div>
+            )}
+          </button>
         )}
         {!isDM && (
-          <HBtn label={showMembers ? 'Hide Members' : 'Show Members'} onClick={onToggleMembers} active={showMembers}>
-            <Users className="w-4 h-4" />
-          </HBtn>
+          <button onClick={onToggleMembers} className="p-1.5 rounded-md transition-colors hover:bg-[var(--bg-glass-hover)]">
+            <Users className="w-4 h-4" style={{ color: showMembers ? 'var(--text-cream)' : 'var(--text-muted)' }} />
+          </button>
         )}
       </div>
     </div>
