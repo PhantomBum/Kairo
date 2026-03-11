@@ -3,7 +3,7 @@ import { useQueryClient, useMutation } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { AnimatePresence } from 'framer-motion';
 import { useProfiles } from '@/components/app/providers/ProfileProvider';
-import { useServers, useCategories, useChannels, useMembers, useRoles, useMessages, useDMMessages, useConversations, useFriends, useFriendRequests, useMyProfile } from '@/components/app/hooks/useData';
+import { useServers, useCategories, useChannels, useMembers, useRoles, useMessages, useDMMessages, useConversations, useFriends, useFriendRequests, useBlocked, useMyProfile } from '@/components/app/hooks/useData';
 import { useOptimisticMessages } from '@/components/app/performance/useOptimistic';
 import { useChannelCache } from '@/components/app/performance/useChannelCache';
 import { useSwipeGesture } from '@/components/app/mobile/useSwipeGesture';
