@@ -2,6 +2,7 @@ import React, { useRef, useEffect, useState, useCallback, useMemo } from 'react'
 import { ArrowDown, Hash, MessageSquare } from 'lucide-react';
 import MessageBubble from '@/components/app/chat/MessageBubble';
 import ImageLightbox from '@/components/app/chat/ImageLightbox';
+import ExternalLinkWarning from '@/components/app/shared/ExternalLinkWarning';
 import { AnimatePresence } from 'framer-motion';
 import { colors, shadows } from '@/components/app/design/tokens';
 
@@ -24,6 +25,18 @@ export default function VirtualMessageList({
   const bottomRef = useRef(null);
   const [atBottom, setAtBottom] = useState(true);
   const [lightbox, setLightbox] = useState(null);
+  const [linkWarning, setLinkWarning] = useState(null);
+  const skipLinkWarning = useRef(false);
+
+  // Load link warning preference
+  useEffect(() => {
+    try { skipLinkWarning.current = localStorage.getItem('kairo-skip-link-warn') === 'true'; } catch {}
+  }, []);
+
+  const handleLinkClick = useCallback((url) => {
+    if (skipLinkWarning.current) { window.open(url, '_blank', 'noopener,noreferrer'); return; }
+    setLinkWarning(url);
+  }, []);
 
   const items = useMemo(() => {
     const result = [];
@@ -98,6 +111,7 @@ export default function VirtualMessageList({
                 currentUserId={currentUserId} onProfileClick={onProfileClick}
                 isEditing={editingMessage?.id === msg.id} onEditSave={onEditSave} onEditCancel={onEditCancel}
                 onImageClick={(src, name) => setLightbox({ src, name })}
+                onLinkClick={handleLinkClick}
               />
               {isOptimistic && (
                 <div className="flex items-center gap-1.5 ml-[68px] -mt-0.5 mb-1">
@@ -122,7 +136,20 @@ export default function VirtualMessageList({
         </button>
       )}
 
-      <AnimatePresence>{lightbox && <ImageLightbox src={lightbox.src} filename={lightbox.name} onClose={() => setLightbox(null)} />}</AnimatePresence>
+      <AnimatePresence>
+        {lightbox && <ImageLightbox src={lightbox.src} filename={lightbox.name} onClose={() => setLightbox(null)} />}
+      </AnimatePresence>
+      <AnimatePresence>
+        {linkWarning && (
+          <ExternalLinkWarning url={linkWarning}
+            onCancel={() => setLinkWarning(null)}
+            onConfirm={(dontShowAgain) => {
+              if (dontShowAgain) { try { localStorage.setItem('kairo-skip-link-warn', 'true'); } catch {} skipLinkWarning.current = true; }
+              window.open(linkWarning, '_blank', 'noopener,noreferrer');
+              setLinkWarning(null);
+            }} />
+        )}
+      </AnimatePresence>
     </div>
   );
 }
