@@ -89,16 +89,16 @@ export default function VirtualMessageList({
     <div className="flex-1 relative min-h-0">
       <div ref={containerRef} onScroll={onScroll} className="absolute inset-0 overflow-y-auto pb-2 scrollbar-none k-channel-fade" role="log" aria-label={`Messages in ${channelName}`}>
         {/* Channel welcome */}
-        <div className="px-4 pt-16 pb-6">
-          <div className="w-[68px] h-[68px] rounded-2xl flex items-center justify-center mb-4"
-            style={{ background: colors.accent.subtle }}>
-            {isDM ? <MessageSquare className="w-8 h-8" style={{ color: colors.accent.primary }} /> : <Hash className="w-8 h-8" style={{ color: colors.accent.primary }} />}
+        <div className="px-6 pt-16 pb-8">
+          <div className="w-[64px] h-[64px] rounded-2xl flex items-center justify-center mb-5"
+            style={{ background: `linear-gradient(135deg, ${colors.accent.subtle}, ${colors.accent.muted})` }}>
+            {isDM ? <MessageSquare className="w-7 h-7" style={{ color: colors.accent.primary }} /> : <Hash className="w-7 h-7" style={{ color: colors.accent.primary }} />}
           </div>
-          <h2 className="text-[32px] font-bold mb-2 tracking-tight" style={{ color: colors.text.primary }}>
+          <h2 className="text-[28px] font-bold mb-2 tracking-tight" style={{ color: colors.text.primary }}>
             {isDM ? channelName : `Welcome to #${channelName}`}
           </h2>
-          <p className="text-[15px]" style={{ color: colors.text.muted }}>
-            {isDM ? 'This is the beginning of your conversation.' : `This is the start of the #${channelName} channel.`}
+          <p className="text-[15px] leading-relaxed" style={{ color: colors.text.muted }}>
+            {isDM ? 'This is the very beginning of your conversation.' : `This is the beginning of the #${channelName} channel. Say hello!`}
           </p>
         </div>
 

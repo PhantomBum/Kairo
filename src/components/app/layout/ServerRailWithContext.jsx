@@ -30,7 +30,7 @@ function RailIcon({ active, unread, onClick, tooltip, badge, children }) {
         animate={{ height: active ? 32 : hovered ? 16 : unread ? 8 : 0, y: '-50%', opacity: active || hovered || unread ? 1 : 0 }}
         transition={{ duration: 0.15, ease: [0.4, 0, 0.2, 1] }} style={{ background: colors.text.primary }} />
       <button onClick={onClick} className="relative overflow-hidden flex items-center justify-center"
-        style={{ width: 48, height: 48, borderRadius: active || hovered ? radius.lg : radius.pill, background: active ? colors.accent.primary : colors.bg.elevated, transition: 'border-radius 0.25s cubic-bezier(0.4,0,0.2,1), background 0.25s' }}>
+        style={{ width: 48, height: 48, borderRadius: active || hovered ? radius.lg : radius.pill, background: active ? colors.accent.primary : colors.bg.elevated, transition: 'border-radius 0.2s cubic-bezier(0.4,0,0.2,1), background 0.2s' }}>
         {children}
         {badge > 0 && (
           <div className="absolute -bottom-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full text-[11px] font-bold flex items-center justify-center"
@@ -68,7 +68,7 @@ export default function ServerRailWithContext({ servers, activeServerId, onServe
 
   return (
     <div className="w-[72px] flex-shrink-0 flex flex-col items-center py-3 gap-2 overflow-y-auto scrollbar-none"
-      style={{ background: `linear-gradient(180deg, ${colors.bg.base}, rgba(15,15,19,0.95))` }} role="navigation" aria-label="Server list">
+      style={{ background: colors.bg.base }} role="navigation" aria-label="Server list">
       <ContextMenu>
         <ContextMenuTrigger>
           <div><RailIcon active={isHome} onClick={onHomeClick} tooltip="Direct Messages" badge={badge}>
