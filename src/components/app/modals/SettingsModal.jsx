@@ -129,22 +129,22 @@ export default function SettingsModal({ onClose, profile, onUpdate, onLogout, cu
               style={{ background: profile?.banner_url ? 'transparent' : colors.bg.elevated, border: `1px dashed ${colors.border.light}` }}>
               {profile?.banner_url ? <img src={profile.banner_url} className="w-full h-full object-cover" alt="" /> : <div className="flex items-center justify-center h-full text-[13px]" style={{ color: colors.text.muted }}>Upload Banner</div>}
             </button>
-            <Field label="Display Name" k="display_name" ph="Your Name" />
-            <Field label="Username" k="username" ph="your_handle" />
-            <Field label="About Me" k="bio" ph="Tell people about yourself..." area />
-            <Field label="Pronouns" k="pronouns" ph="they/them" />
+            <SettingsField label="Display Name" value={form.display_name} onChange={v => set('display_name', v)} placeholder="Your Name" />
+            <SettingsField label="Username" value={form.username} onChange={v => set('username', v)} placeholder="your_handle" />
+            <SettingsField label="About Me" value={form.bio} onChange={v => set('bio', v)} placeholder="Tell people about yourself..." area />
+            <SettingsField label="Pronouns" value={form.pronouns} onChange={v => set('pronouns', v)} placeholder="they/them" />
           </>}
 
           {tab === 'social' && <>
             <p className="text-[14px] mb-2" style={{ color: colors.text.muted }}>Add your social profiles and website links.</p>
-            <Field label="Twitter / X" k="twitter" ph="https://twitter.com/you" />
-            <Field label="GitHub" k="github" ph="https://github.com/you" />
-            <Field label="Website" k="website" ph="https://yoursite.com" />
-            <Field label="Instagram" k="instagram" ph="https://instagram.com/you" />
-            <Field label="Spotify" k="spotify" ph="https://open.spotify.com/user/you" />
-            <Field label="TikTok" k="tiktok" ph="https://tiktok.com/@you" />
-            <Field label="LinkedIn" k="linkedin" ph="https://linkedin.com/in/you" />
-            <Field label="Twitch" k="twitch" ph="https://twitch.tv/you" />
+            <SettingsField label="Twitter / X" value={form.twitter} onChange={v => set('twitter', v)} placeholder="https://twitter.com/you" />
+            <SettingsField label="GitHub" value={form.github} onChange={v => set('github', v)} placeholder="https://github.com/you" />
+            <SettingsField label="Website" value={form.website} onChange={v => set('website', v)} placeholder="https://yoursite.com" />
+            <SettingsField label="Instagram" value={form.instagram} onChange={v => set('instagram', v)} placeholder="https://instagram.com/you" />
+            <SettingsField label="Spotify" value={form.spotify} onChange={v => set('spotify', v)} placeholder="https://open.spotify.com/user/you" />
+            <SettingsField label="TikTok" value={form.tiktok} onChange={v => set('tiktok', v)} placeholder="https://tiktok.com/@you" />
+            <SettingsField label="LinkedIn" value={form.linkedin} onChange={v => set('linkedin', v)} placeholder="https://linkedin.com/in/you" />
+            <SettingsField label="Twitch" value={form.twitch} onChange={v => set('twitch', v)} placeholder="https://twitch.tv/you" />
           </>}
 
           {tab === 'privacy' && <>
