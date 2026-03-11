@@ -297,8 +297,10 @@ export default function AppShell({ currentUser }) {
   // Computed
   const isDM = !!activeConv;
   const isVoiceChannel = activeChannel?.type === 'voice' || activeChannel?.type === 'stage';
-  const isInChat = (view === 'server' && activeChannel && !isVoiceChannel) || (view === 'home' && activeConv);
+  const isBoardChannel = activeChannel?.type === 'board';
+  const isInChat = (view === 'server' && activeChannel && !isVoiceChannel && !isBoardChannel) || (view === 'home' && activeConv);
   const isInVoice = view === 'server' && activeChannel && isVoiceChannel;
+  const isInBoard = view === 'server' && activeChannel && isBoardChannel;
   // Merge optimistic messages with real messages
   const baseMsgs = isDM ? dmMessages : messages;
   const currentMsgs = [...baseMsgs, ...optimisticMsgs.filter(m => isDM ? m.conversation_id === activeConv?.id : m.channel_id === activeChannel?.id)];
