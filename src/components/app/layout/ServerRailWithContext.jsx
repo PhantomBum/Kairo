@@ -1,98 +1,121 @@
 import React, { useState } from 'react';
-import { Home, Plus, Compass, Crown, Download, FolderPlus, LogOut, Copy, Settings } from 'lucide-react';
+import { Home, Plus, Compass, Crown, LogOut, Copy, Settings } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuSeparator, ContextMenuTrigger } from '@/components/ui/context-menu';
+import { colors, radius, shadows, animation } from '@/components/app/design/tokens';
 
-function RailIcon({ active, onClick, tooltip, badge, children }) {
+function RailTooltip({ text, visible }) {
+  return (
+    <AnimatePresence>
+      {visible && text && (
+        <motion.div
+          initial={{ opacity: 0, x: -6, scale: 0.95 }}
+          animate={{ opacity: 1, x: 0, scale: 1 }}
+          exit={{ opacity: 0, x: -6, scale: 0.95 }}
+          transition={{ duration: 0.15, ease: [0, 0, 0.2, 1] }}
+          className="absolute left-[64px] z-50 px-3 py-1.5 rounded-lg text-[13px] font-semibold whitespace-nowrap pointer-events-none"
+          style={{ background: colors.bg.modal, color: colors.text.primary, boxShadow: shadows.medium }}>
+          {text}
+          <div className="absolute left-[-4px] top-1/2 -translate-y-1/2 w-2 h-2 rotate-45" style={{ background: colors.bg.modal }} />
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
+
+function RailIcon({ active, unread, onClick, tooltip, badge, children }) {
   const [hovered, setHovered] = useState(false);
   return (
-    <div className="relative flex items-center justify-center group" onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
-      <AnimatePresence>
-        {(active || hovered) && (
-          <motion.div initial={{ scaleY: 0 }} animate={{ scaleY: 1 }} exit={{ scaleY: 0 }}
-            className="absolute left-0 w-[3px] rounded-r-full"
-            style={{ height: active ? 28 : 16, background: 'var(--text-cream)', transformOrigin: 'center' }} />
-        )}
-      </AnimatePresence>
+    <div className="relative flex items-center justify-center" onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
+      {/* Active/hover pill indicator */}
+      <motion.div
+        className="absolute left-0 w-[4px] rounded-r-full"
+        initial={false}
+        animate={{
+          height: active ? 36 : hovered ? 20 : unread ? 8 : 0,
+          opacity: active || hovered || unread ? 1 : 0,
+        }}
+        transition={{ duration: 0.15, ease: [0.4, 0, 0.2, 1] }}
+        style={{ background: colors.text.primary }} />
+
       <button onClick={onClick}
-        className="relative transition-all duration-200"
+        className="relative overflow-hidden flex items-center justify-center"
         style={{
-          width: 44, height: 44,
-          borderRadius: active || hovered ? 14 : 22,
-          background: active ? 'var(--bg-glass-strong)' : 'var(--bg-glass)',
-          border: `1px solid ${active ? 'var(--border-light)' : 'var(--border)'}`,
-          backdropFilter: 'blur(12px)',
-          boxShadow: active ? '0 0 20px rgba(232,228,217,0.04)' : 'none',
+          width: 48, height: 48,
+          borderRadius: active || hovered ? radius.lg : radius.pill,
+          background: active ? colors.accent.primary : colors.bg.elevated,
+          transition: 'border-radius 0.25s cubic-bezier(0.4,0,0.2,1), background 0.25s',
         }}>
         {children}
         {badge > 0 && (
-          <div className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 rounded-full text-[9px] font-bold flex items-center justify-center"
-            style={{ background: 'var(--accent-red)', color: '#fff' }}>{badge > 9 ? '9+' : badge}</div>
+          <div className="absolute -bottom-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full text-[11px] font-bold flex items-center justify-center"
+            style={{ background: colors.danger, color: '#fff', border: `3px solid ${colors.bg.base}` }}>
+            {badge > 99 ? '99+' : badge}
+          </div>
         )}
       </button>
-      <AnimatePresence>
-        {hovered && tooltip && (
-          <motion.div initial={{ opacity: 0, x: -4 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -4 }}
-            className="absolute left-[62px] z-50 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap pointer-events-none"
-            style={{ background: 'var(--bg-elevated)', color: 'var(--text-cream)', border: '1px solid var(--border-light)', boxShadow: 'var(--shadow-md)' }}>
-            {tooltip}
-          </motion.div>
-        )}
-      </AnimatePresence>
+
+      <RailTooltip text={tooltip} visible={hovered} />
     </div>
   );
 }
 
 function ServerDivider() {
-  return <div className="w-8 h-px my-0.5" style={{ background: 'var(--border)' }} />;
+  return <div className="w-8 h-[2px] rounded-full my-1" style={{ background: colors.border.light }} />;
 }
 
-export default function ServerRailWithContext({ servers, activeServerId, onServerSelect, onHomeClick, onCreateServer, onDiscover, onElite, onServerSettings, onLeaveServer, isHome, badge }) {
+export default function ServerRailWithContext({ servers, activeServerId, onServerSelect, onHomeClick, onCreateServer, onDiscover, onElite, onLeaveServer, isHome, badge }) {
   return (
-    <div className="w-[68px] flex-shrink-0 flex flex-col items-center py-3 gap-2 overflow-y-auto scrollbar-none"
-      style={{ background: 'var(--bg-deep)' }}
+    <div className="w-[72px] flex-shrink-0 flex flex-col items-center py-3 gap-2 overflow-y-auto scrollbar-none"
+      style={{ background: colors.bg.base }}
       role="navigation" aria-label="Server list">
+
+      {/* Home */}
       <ContextMenu>
         <ContextMenuTrigger>
-          <div><RailIcon active={isHome} onClick={onHomeClick} tooltip="Home" badge={badge}>
-            <Home className="w-[18px] h-[18px]" style={{ color: isHome ? 'var(--text-cream)' : 'var(--text-muted)' }} />
+          <div><RailIcon active={isHome} onClick={onHomeClick} tooltip="Direct Messages" badge={badge}>
+            <svg width="28" height="20" viewBox="0 0 28 20" fill="none">
+              <path d="M23.02 1.17C21.29 0.37 19.43 -0.12 17.5 0.03C13.5 0.34 10.32 3.13 9.56 6.81C9.46 7.25 9.4 7.72 9.38 8.19C9.38 8.19 3.67 7.28 1.35 11.45C-0.33 14.48 0.53 18.32 3.36 20.42C3.36 20.42 2.9 17.66 4.66 15.55C5.87 14.1 7.82 13.5 9.69 13.88C10.06 15.09 10.71 16.22 11.62 17.15C13.32 18.87 15.69 19.69 18.05 19.37C21.26 18.94 23.7 16.32 24.02 13.08C24.24 10.92 23.51 8.86 22.05 7.37L22.05 7.37C24.76 7.01 26.97 4.94 27.44 2.18L23.02 1.17Z"
+                fill={isHome ? colors.text.primary : colors.text.muted} />
+            </svg>
           </RailIcon></div>
         </ContextMenuTrigger>
-        <ContextMenuContent className="w-48 p-1 rounded-xl" style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-light)', boxShadow: 'var(--shadow-lg)' }}>
-          <ContextMenuItem onClick={onCreateServer} className="text-[12px] gap-2 rounded-lg px-2.5 py-1.5" style={{ color: 'var(--text-secondary)' }}>
-            <Plus className="w-3.5 h-3.5 opacity-50" /> Create Server
+        <ContextMenuContent className="w-52 p-1.5 rounded-lg" style={{ background: colors.bg.modal, border: `1px solid ${colors.border.light}`, boxShadow: shadows.strong }}>
+          <ContextMenuItem onClick={onCreateServer} className="text-[13px] gap-2.5 rounded-md px-2.5 py-2" style={{ color: colors.text.secondary }}>
+            <Plus className="w-4 h-4 opacity-60" /> Create Server
           </ContextMenuItem>
-          <ContextMenuItem onClick={onDiscover} className="text-[12px] gap-2 rounded-lg px-2.5 py-1.5" style={{ color: 'var(--text-secondary)' }}>
-            <Compass className="w-3.5 h-3.5 opacity-50" /> Join Server
+          <ContextMenuItem onClick={onDiscover} className="text-[13px] gap-2.5 rounded-md px-2.5 py-2" style={{ color: colors.text.secondary }}>
+            <Compass className="w-4 h-4 opacity-60" /> Join Server
           </ContextMenuItem>
         </ContextMenuContent>
       </ContextMenu>
 
       <ServerDivider />
 
+      {/* Servers */}
       {servers.map(s => (
         <ContextMenu key={s.id}>
           <ContextMenuTrigger>
             <div><RailIcon active={activeServerId === s.id} onClick={() => onServerSelect(s)} tooltip={s.name}>
               {s.icon_url ? (
-                <img src={s.icon_url} className="w-full h-full rounded-[inherit] object-cover" />
+                <img src={s.icon_url} className="w-full h-full object-cover" style={{ borderRadius: 'inherit' }} alt={s.name} />
               ) : (
-                <span className="text-[13px] font-semibold" style={{ color: activeServerId === s.id ? 'var(--text-cream)' : 'var(--text-secondary)', fontFamily: 'monospace' }}>
-                  {s.name?.slice(0, 2).toUpperCase()}
+                <span className="text-[15px] font-semibold select-none" style={{ color: activeServerId === s.id ? '#fff' : colors.text.secondary }}>
+                  {s.name?.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()}
                 </span>
               )}
             </RailIcon></div>
           </ContextMenuTrigger>
-          <ContextMenuContent className="w-48 p-1 rounded-xl" style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-light)', boxShadow: 'var(--shadow-lg)' }}>
-            <ContextMenuItem onClick={() => { onServerSelect(s); }} className="text-[12px] gap-2 rounded-lg px-2.5 py-1.5" style={{ color: 'var(--text-secondary)' }}>
-              <Settings className="w-3.5 h-3.5 opacity-50" /> Server Settings
+          <ContextMenuContent className="w-52 p-1.5 rounded-lg" style={{ background: colors.bg.modal, border: `1px solid ${colors.border.light}`, boxShadow: shadows.strong }}>
+            <ContextMenuItem onClick={() => onServerSelect(s)} className="text-[13px] gap-2.5 rounded-md px-2.5 py-2" style={{ color: colors.text.secondary }}>
+              <Settings className="w-4 h-4 opacity-60" /> Server Settings
             </ContextMenuItem>
-            <ContextMenuItem onClick={() => navigator.clipboard.writeText(s.invite_code || '')} className="text-[12px] gap-2 rounded-lg px-2.5 py-1.5" style={{ color: 'var(--text-secondary)' }}>
-              <Copy className="w-3.5 h-3.5 opacity-50" /> Copy Invite Code
+            <ContextMenuItem onClick={() => navigator.clipboard.writeText(s.invite_code || '')} className="text-[13px] gap-2.5 rounded-md px-2.5 py-2" style={{ color: colors.text.secondary }}>
+              <Copy className="w-4 h-4 opacity-60" /> Copy Invite Code
             </ContextMenuItem>
-            <ContextMenuSeparator style={{ background: 'var(--border)' }} />
-            <ContextMenuItem onClick={() => onLeaveServer?.(s)} className="text-[12px] gap-2 rounded-lg px-2.5 py-1.5" style={{ color: 'var(--accent-red)' }}>
-              <LogOut className="w-3.5 h-3.5 opacity-50" /> Leave Server
+            <ContextMenuSeparator style={{ background: colors.border.light, margin: '4px 0' }} />
+            <ContextMenuItem onClick={() => onLeaveServer?.(s)} className="text-[13px] gap-2.5 rounded-md px-2.5 py-2" style={{ color: colors.danger }}>
+              <LogOut className="w-4 h-4 opacity-60" /> Leave Server
             </ContextMenuItem>
           </ContextMenuContent>
         </ContextMenu>
@@ -100,17 +123,17 @@ export default function ServerRailWithContext({ servers, activeServerId, onServe
 
       <ServerDivider />
 
-      <RailIcon onClick={onCreateServer} tooltip="Create Server">
-        <Plus className="w-[18px] h-[18px]" style={{ color: 'var(--accent-green)' }} />
+      <RailIcon onClick={onCreateServer} tooltip="Add a Server">
+        <Plus className="w-5 h-5" style={{ color: colors.success }} />
       </RailIcon>
-      <RailIcon onClick={onDiscover} tooltip="Join Server">
-        <Compass className="w-[18px] h-[18px]" style={{ color: 'var(--accent-blue)' }} />
+      <RailIcon onClick={onDiscover} tooltip="Explore Servers">
+        <Compass className="w-5 h-5" style={{ color: colors.success }} />
       </RailIcon>
 
-      <ServerDivider />
+      <div className="flex-1" />
 
       <RailIcon onClick={onElite} tooltip="Kairo Elite">
-        <Crown className="w-[18px] h-[18px]" style={{ color: 'var(--accent-amber)' }} />
+        <Crown className="w-5 h-5" style={{ color: colors.warning }} />
       </RailIcon>
     </div>
   );

@@ -1,10 +1,26 @@
 import React from 'react';
 import { createPageUrl } from '@/utils';
-import { Hash, Volume2, Megaphone, Radio, MessageSquare, HelpCircle, Lock, ListChecks, BookOpen, Ticket, Calendar, Bell, Users, Pin, AtSign, Search, Image, Phone, Video } from 'lucide-react';
+import { Hash, Volume2, Megaphone, Radio, MessageSquare, HelpCircle, Users, Pin, AtSign, Image, Phone, Video } from 'lucide-react';
+import { colors, shadows } from '@/components/app/design/tokens';
 
-const typeIcons = { text: Hash, voice: Volume2, announcement: Megaphone, stage: Radio, forum: MessageSquare, rules: BookOpen, tickets: Ticket, events: Calendar, polls: ListChecks, faq: HelpCircle, alerts: Bell, private: Lock };
+const typeIcons = { text: Hash, voice: Volume2, announcement: Megaphone, stage: Radio, forum: MessageSquare };
 
-export default function ChatHeader({ channel, conversation, currentUserId, showMembers, onToggleMembers, isDM, onPinned, pinnedCount, onSearch, onMediaGallery, onVoiceCall, onVideoCall }) {
+function HeaderButton({ icon: Icon, onClick, href, active, badge, title }) {
+  const Wrapper = href ? 'a' : 'button';
+  const props = href ? { href, title } : { onClick, title };
+  return (
+    <Wrapper {...props} className="w-8 h-8 flex items-center justify-center rounded-md transition-colors hover:bg-[rgba(255,255,255,0.06)] relative"
+      style={{ color: active ? colors.text.primary : colors.text.muted }}>
+      <Icon className="w-[18px] h-[18px]" />
+      {badge > 0 && (
+        <div className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 px-1 rounded-full text-[10px] font-bold flex items-center justify-center"
+          style={{ background: colors.danger, color: '#fff' }}>{badge}</div>
+      )}
+    </Wrapper>
+  );
+}
+
+export default function ChatHeader({ channel, conversation, currentUserId, showMembers, onToggleMembers, isDM, onPinned, pinnedCount, onMediaGallery, onVoiceCall, onVideoCall }) {
   const label = isDM
     ? (conversation?.name || conversation?.participants?.find(p => p.user_id !== currentUserId)?.user_name || 'DM')
     : (channel?.name || '');
@@ -12,56 +28,29 @@ export default function ChatHeader({ channel, conversation, currentUserId, showM
   const Icon = isDM ? AtSign : (typeIcons[channel?.type] || Hash);
 
   return (
-    <div className="h-12 px-4 flex items-center justify-between flex-shrink-0" style={{ borderBottom: '1px solid var(--border)', background: 'var(--bg-glass)', backdropFilter: 'blur(12px)' }}>
-      <div className="flex items-center gap-2.5 min-w-0">
-        <Icon className="w-4 h-4 flex-shrink-0 opacity-40" style={{ color: 'var(--text-muted)' }} />
-        <span className="text-[14px] font-semibold truncate" style={{ color: 'var(--text-cream)', fontFamily: 'monospace' }}>{label}</span>
-        {channel?.type && channel.type !== 'text' && channel.type !== 'voice' && (
-          <span className="text-[9px] px-1.5 py-0.5 rounded-full" style={{ background: 'var(--bg-glass-strong)', color: 'var(--text-muted)' }}>{channel.type}</span>
-        )}
+    <div className="h-12 px-4 flex items-center justify-between flex-shrink-0"
+      style={{ borderBottom: `1px solid ${colors.border.default}`, background: colors.bg.surface, boxShadow: '0 1px 0 rgba(0,0,0,0.15)' }}>
+      <div className="flex items-center gap-2 min-w-0">
+        <Icon className="w-5 h-5 flex-shrink-0" style={{ color: colors.text.disabled }} />
+        <h1 className="text-[15px] font-semibold truncate" style={{ color: colors.text.primary }}>{label}</h1>
         {channel?.description && (
           <>
-            <div className="w-px h-4" style={{ background: 'var(--border-light)' }} />
-            <span className="text-[11px] truncate opacity-50" style={{ color: 'var(--text-secondary)' }}>{channel.description}</span>
+            <div className="w-px h-5 mx-1 flex-shrink-0" style={{ background: colors.border.light }} />
+            <span className="text-[13px] truncate" style={{ color: colors.text.muted }}>{channel.description}</span>
           </>
-        )}
-        {channel?.slow_mode_seconds > 0 && (
-          <span className="text-[8px] px-1.5 rounded-full" style={{ background: 'rgba(201,180,123,0.1)', color: 'var(--accent-amber)' }}>Slow {channel.slow_mode_seconds}s</span>
         )}
       </div>
       <div className="flex items-center gap-0.5">
         {isDM && (
           <>
-            <button onClick={onVoiceCall} className="p-1.5 rounded-md transition-colors hover:bg-[var(--bg-glass-hover)]" title="Voice Call">
-              <Phone className="w-4 h-4" style={{ color: 'var(--text-muted)' }} />
-            </button>
-            <button onClick={onVideoCall} className="p-1.5 rounded-md transition-colors hover:bg-[var(--bg-glass-hover)]" title="Video Call">
-              <Video className="w-4 h-4" style={{ color: 'var(--text-muted)' }} />
-            </button>
+            <HeaderButton icon={Phone} onClick={onVoiceCall} title="Start Voice Call" />
+            <HeaderButton icon={Video} onClick={onVideoCall} title="Start Video Call" />
           </>
         )}
-        {onPinned && (
-          <button onClick={onPinned} className="relative p-1.5 rounded-md transition-colors hover:bg-[var(--bg-glass-hover)]">
-            <Pin className="w-4 h-4" style={{ color: 'var(--text-muted)' }} />
-            {pinnedCount > 0 && (
-              <div className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 rounded-full text-[8px] font-bold flex items-center justify-center"
-                style={{ background: 'var(--accent-amber)', color: '#000' }}>{pinnedCount}</div>
-            )}
-          </button>
-        )}
-        {isDM && onMediaGallery && (
-          <button onClick={onMediaGallery} className="p-1.5 rounded-md transition-colors hover:bg-[var(--bg-glass-hover)]" title="Media Gallery">
-            <Image className="w-4 h-4" style={{ color: 'var(--text-muted)' }} />
-          </button>
-        )}
-        {!isDM && (
-          <button onClick={onToggleMembers} className="p-1.5 rounded-md transition-colors hover:bg-[var(--bg-glass-hover)]">
-            <Users className="w-4 h-4" style={{ color: showMembers ? 'var(--text-cream)' : 'var(--text-muted)' }} />
-          </button>
-        )}
-        <a href={createPageUrl('FAQ')} className="p-1.5 rounded-md transition-colors hover:bg-[var(--bg-glass-hover)]" title="Help & FAQ">
-          <HelpCircle className="w-4 h-4" style={{ color: 'var(--text-muted)' }} />
-        </a>
+        {onPinned && <HeaderButton icon={Pin} onClick={onPinned} badge={pinnedCount} title="Pinned Messages" />}
+        {isDM && onMediaGallery && <HeaderButton icon={Image} onClick={onMediaGallery} title="Media Gallery" />}
+        {!isDM && <HeaderButton icon={Users} onClick={onToggleMembers} active={showMembers} title="Member List" />}
+        <HeaderButton icon={HelpCircle} href={createPageUrl('FAQ')} title="Help & FAQ" />
       </div>
     </div>
   );
