@@ -388,6 +388,9 @@ export default function AppShell({ currentUser }) {
               {isDM && showMediaGallery && <DMMediaGallery messages={currentMsgs} onClose={() => setShowMediaGallery(false)} />}
             </div>
           </>
+        ) : view === 'server' && activeServer && !activeChannel ? (
+          <EmptyView emptyServer serverName={activeServer.name}
+            onCreateChannel={isOwner ? () => { setModalData(categories[0]?.id); setModal('create-channel'); } : undefined} />
         ) : (
           <EmptyView onCreateServer={() => setModal('create-server')} onJoinServer={() => setModal('join-server')} />
         )}
