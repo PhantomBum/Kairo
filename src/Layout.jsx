@@ -135,7 +135,7 @@ export default function Layout({ children }) {
         .glass-active { background: var(--bg-glass-active); }
         .glow-border { box-shadow: inset 0 0 0 1px var(--border-light), var(--shadow-glow); }
 
-        /* Reduced motion — comprehensive disable */
+        /* Reduced motion — every animation snaps to end state instantly, no exceptions */
         @media (prefers-reduced-motion: reduce) {
           *, *::before, *::after {
             animation-duration: 0.01ms !important;
@@ -148,6 +148,10 @@ export default function Layout({ children }) {
             transform: none !important;
           }
           .k-shimmer { animation: none !important; background: var(--k-bg-elevated) !important; }
+          .k-msg-in, .k-fade-in, .k-scale-in, .k-slide-in-right,
+          .k-reaction-pop, .k-dot-in, .k-bounce-in, .k-toast-in,
+          .k-speak-in, .k-speaking-ring { animation: none !important; }
+          .k-msg-delete { animation: none !important; opacity: 0 !important; max-height: 0 !important; overflow: hidden !important; }
         }
 
         /* Mobile safe area */
