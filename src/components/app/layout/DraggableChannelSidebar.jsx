@@ -21,7 +21,7 @@ function ChannelItem({ channel, active, onClick, onSettings, isOwner, index }) {
                   background: snapshot.isDragging ? colors.bg.overlay : active ? colors.accent.subtle : 'transparent',
                   color: active ? colors.text.primary : colors.text.muted,
                   fontWeight: active ? 500 : 400,
-                  transition: 'background 0.15s, color 0.15s',
+                  transition: 'background 150ms cubic-bezier(0.4,0,0.2,1), color 150ms cubic-bezier(0.4,0,0.2,1)',
                 }}>
                 {isOwner && <GripVertical className="w-3 h-3 opacity-0 group-hover:opacity-30 flex-shrink-0" />}
                 <Icon className="w-[18px] h-[18px] flex-shrink-0" style={{ color: active ? colors.accent.primary : colors.text.disabled, transition: 'color 0.15s' }} />
