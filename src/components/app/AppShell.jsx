@@ -385,7 +385,8 @@ export default function AppShell({ currentUser }) {
             <ChatHeader channel={activeChannel} conversation={activeConv} currentUserId={currentUser.id}
               showMembers={showMembers} onToggleMembers={() => setShowMembers(!showMembers)}
               isDM={isDM} onPinned={() => setModal('pinned')} pinnedCount={pinnedCount}
-              onMediaGallery={isDM ? () => setShowMediaGallery(!showMediaGallery) : undefined}
+              onMediaGallery={isDM ? () => setShowMediaGallery(!showMediaGallery) : () => setModal('media-gallery')}
+              onSearch={() => setModal('search')}
               serverName={activeServer?.name} />
             <div className="flex-1 flex min-h-0">
               <div className="flex-1 flex flex-col min-w-0">
