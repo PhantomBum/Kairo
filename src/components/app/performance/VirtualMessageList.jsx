@@ -118,7 +118,7 @@ export default function VirtualMessageList({
           const msg = item.msg;
           const isOptimistic = optimisticIds?.has(msg.id);
           return (
-            <div key={item.key} style={{ opacity: isOptimistic ? 0.6 : 1 }}>
+            <div key={item.key} className="k-msg-in" style={{ opacity: isOptimistic ? 0.6 : 1 }}>
               <MessageBubble
                 message={msg} compact={item.compact} isOwn={msg.author_id === currentUserId}
                 onReply={onReply} onEdit={onEdit} onDelete={onDelete} onReact={onReact} onPin={onPin}
