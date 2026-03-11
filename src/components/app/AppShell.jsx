@@ -84,10 +84,11 @@ export default function AppShell({ currentUser }) {
     const handler = (e) => {
       if (e.ctrlKey && e.shiftKey && e.key === 'M') { e.preventDefault(); setIsMuted(m => !m); }
       if (e.ctrlKey && e.shiftKey && e.key === 'D') { e.preventDefault(); setIsDeafened(d => !d); }
+      if (e.key === 'Escape' && modal) { e.preventDefault(); setModal(null); setProfileUserId(null); setChannelToEdit(null); }
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, []);
+  }, [modal]);
 
   const createServer = useMutation({
     mutationFn: async ({ name, template, icon_url }) => {
