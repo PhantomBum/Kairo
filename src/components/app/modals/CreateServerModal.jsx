@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Upload, Users, Gamepad2, Code, Lock, Mic } from 'lucide-react';
+import { Upload, Users, Gamepad2, Code, Lock, Mic, Briefcase, Calendar } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import ModalWrapper from './ModalWrapper';
 import { colors } from '@/components/app/design/tokens';
@@ -11,6 +11,7 @@ const templates = [
   { id: 'development', label: 'Dev Team', icon: Code },
   { id: 'private', label: 'Private', icon: Lock },
   { id: 'creator', label: 'Creator', icon: Mic },
+  { id: 'event', label: 'Event', icon: Calendar },
 ];
 
 export default function CreateServerModal({ onClose, onCreate, isCreating }) {
