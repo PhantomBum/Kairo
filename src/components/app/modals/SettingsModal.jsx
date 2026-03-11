@@ -1,14 +1,16 @@
 import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { createPageUrl } from '@/utils';
-import { User, Link, Shield, LogOut, Palette, Bell, Volume2, Keyboard, Accessibility, HelpCircle, Crown, ExternalLink } from 'lucide-react';
+import { User, Link, Shield, LogOut, Palette, Bell, Volume2, Keyboard, Accessibility, HelpCircle, Crown, ExternalLink, Gamepad2, Lock, Database } from 'lucide-react';
 import ModalWrapper from './ModalWrapper';
 import { colors } from '@/components/app/design/tokens';
+import SecuritySettings from '@/components/app/features/SecuritySettings';
 
 const TABS = [
   { id: 'profile', label: 'My Account', icon: User },
   { id: 'social', label: 'Connections', icon: Link },
   { id: 'privacy', label: 'Privacy & Safety', icon: Shield },
+  { id: 'security', label: 'Security', icon: Lock },
   { id: 'appearance', label: 'Appearance', icon: Palette },
   { id: 'notifications', label: 'Notifications', icon: Bell },
   { id: 'voice', label: 'Voice & Video', icon: Volume2 },
@@ -16,7 +18,7 @@ const TABS = [
   { id: 'accessibility', label: 'Accessibility', icon: Accessibility },
 ];
 
-export default function SettingsModal({ onClose, profile, onUpdate, onLogout }) {
+export default function SettingsModal({ onClose, profile, onUpdate, onLogout, currentUser }) {
   const [tab, setTab] = useState('profile');
   const [form, setForm] = useState({
     display_name: profile?.display_name || '', username: profile?.username || '', bio: profile?.bio || '', pronouns: profile?.pronouns || '',
@@ -272,6 +274,8 @@ export default function SettingsModal({ onClose, profile, onUpdate, onLogout }) 
               </div>
             ))}
           </>}
+
+          {tab === 'security' && <SecuritySettings profile={profile} currentUser={currentUser || { id: profile?.user_id }} onUpdate={onUpdate} />}
 
           {tab === 'accessibility' && <>
             <Toggle label="Reduced Motion" k="reduced_motion" desc="Minimize animations throughout the app" />
