@@ -59,24 +59,57 @@ export default function Layout({ children }) {
           animation: k-shimmer 1.5s ease-in-out infinite;
         }
 
-        /* Kairo animations — unified timing */
+        /* KAIRO V2 — Purpose-driven animation system */
+        /* Enter: cubic-bezier(0,0,0.2,1) | Exit: cubic-bezier(0.4,0,1,1) | State: cubic-bezier(0.4,0,0.2,1) */
+
+        /* Messages */
+        @keyframes k-msg-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes k-msg-delete { to { opacity: 0; max-height: 0; padding: 0; margin: 0; overflow: hidden; } }
+
+        /* Reactions */
+        @keyframes k-reaction-pop { 0% { transform: scale(0); opacity: 0; } 70% { transform: scale(1.1); } 100% { transform: scale(1); opacity: 1; } }
+        @keyframes k-count-tick { 0% { transform: translateY(0); opacity: 1; } 40% { transform: translateY(-4px); opacity: 0; } 60% { transform: translateY(4px); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
+
+        /* Typing */
+        @keyframes k-typing-dot { 0%, 60%, 100% { transform: translateY(0); opacity: 0.4; } 30% { transform: translateY(-4px); opacity: 1; } }
+
+        /* UI elements */
         @keyframes k-fade-in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes k-scale-in { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+        @keyframes k-scale-in { from { opacity: 0; transform: scale(0.93); } to { opacity: 1; transform: scale(1); } }
         @keyframes k-slide-in-right { from { opacity: 0; transform: translateX(16px); } to { opacity: 1; transform: translateX(0); } }
         @keyframes k-slide-out-right { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(16px); } }
-        @keyframes k-pulse-ring { 0%, 100% { box-shadow: 0 0 0 0 var(--k-status-online); } 50% { box-shadow: 0 0 0 3px transparent; } }
-        @keyframes k-typing-dot { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-4px); } }
-        @keyframes k-reaction-pop { 0% { transform: scale(0.6); opacity: 0; } 60% { transform: scale(1.15); } 100% { transform: scale(1); opacity: 1; } }
-        @keyframes k-click-feedback { 0% { transform: scale(1); } 50% { transform: scale(0.97); } 100% { transform: scale(1); } }
+
+        /* Unread dot */
+        @keyframes k-dot-in { from { transform: scale(0); } to { transform: scale(1); } }
+        @keyframes k-dot-out { from { transform: scale(1); } to { transform: scale(0); } }
+
+        /* Voice */
         @keyframes k-speaking-ring { 0%, 100% { box-shadow: 0 0 0 0 rgba(35,165,90,0.4); } 50% { box-shadow: 0 0 0 3px rgba(35,165,90,0.15); } }
-        .k-fade-in { animation: k-fade-in 0.15s cubic-bezier(0,0,0.2,1); }
-        .k-scale-in { animation: k-scale-in 0.15s cubic-bezier(0,0,0.2,1); }
-        .k-slide-in-right { animation: k-slide-in-right 0.3s cubic-bezier(0,0,0.2,1); }
-        .k-slide-out-right { animation: k-slide-out-right 0.2s cubic-bezier(0.4,0,1,1); }
-        .k-pulse-ring { animation: k-pulse-ring 3s ease-in-out infinite; }
-        .k-reaction-pop { animation: k-reaction-pop 0.15s cubic-bezier(0,0,0.2,1); }
-        .k-click-feedback:active { animation: k-click-feedback 80ms ease-out; }
+        @keyframes k-speak-in { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+
+        /* Toast */
+        @keyframes k-toast-in { from { opacity: 0; transform: translateX(100%); } to { opacity: 1; transform: translateX(0); } }
+        @keyframes k-toast-out { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(100%); } }
+
+        /* Celebrate */
+        @keyframes k-bounce-in { 0% { transform: scale(0); } 60% { transform: scale(1.15); } 80% { transform: scale(0.95); } 100% { transform: scale(1); } }
+
+        /* Utility classes */
+        .k-msg-in { animation: k-msg-in 150ms cubic-bezier(0,0,0.2,1) both; }
+        .k-msg-delete { animation: k-msg-delete 200ms cubic-bezier(0.4,0,0.2,1) forwards; }
+        .k-fade-in { animation: k-fade-in 150ms cubic-bezier(0,0,0.2,1); }
+        .k-scale-in { animation: k-scale-in 150ms cubic-bezier(0,0,0.2,1); }
+        .k-slide-in-right { animation: k-slide-in-right 300ms cubic-bezier(0,0,0.2,1); }
+        .k-slide-out-right { animation: k-slide-out-right 200ms cubic-bezier(0.4,0,1,1); }
+        .k-reaction-pop { animation: k-reaction-pop 200ms cubic-bezier(0,0,0.2,1); }
+        .k-count-tick { animation: k-count-tick 100ms cubic-bezier(0.4,0,0.2,1); }
+        .k-dot-in { animation: k-dot-in 200ms cubic-bezier(0,0,0.2,1); }
+        .k-dot-out { animation: k-dot-out 150ms cubic-bezier(0.4,0,1,1); }
         .k-speaking-ring { animation: k-speaking-ring 1.5s ease-in-out infinite; }
+        .k-speak-in { animation: k-speak-in 100ms cubic-bezier(0,0,0.2,1); }
+        .k-toast-in { animation: k-toast-in 300ms cubic-bezier(0,0,0.2,1); }
+        .k-toast-out { animation: k-toast-out 200ms cubic-bezier(0.4,0,1,1); }
+        .k-bounce-in { animation: k-bounce-in 500ms cubic-bezier(0,0,0.2,1); }
 
         /* Word break for long URLs */
         .break-words { word-break: break-word; overflow-wrap: anywhere; }
