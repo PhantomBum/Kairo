@@ -4,10 +4,10 @@ import { colors, shadows } from '@/components/app/design/tokens';
 import { Users, Calendar, Zap, AlertTriangle, Hash, Volume2 } from 'lucide-react';
 import { createPageUrl } from '@/utils';
 
-function StatPill({ icon: Icon, label, value, color }) {
+function StatPill({ icon: Icon, label, value, color, dot }) {
   return (
     <div className="flex items-center gap-2 px-3 py-2 rounded-lg" style={{ background: colors.bg.elevated, border: `1px solid ${colors.border.default}` }}>
-      {typeof Icon === 'string'
+      {dot
         ? <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ background: color || colors.status.online }} />
         : <Icon className="w-4 h-4 flex-shrink-0" style={{ color: color || colors.text.disabled }} />
       }
@@ -171,7 +171,7 @@ export default function Invite() {
           {/* Stats */}
           <div className="grid grid-cols-2 gap-2 mt-4">
             <StatPill icon={Users} label="Total Members" value={server.member_count || 1} />
-            <StatPill icon="dot" label="Active Now" value="—" color={colors.status.online} />
+            <StatPill icon={Users} label="Active Now" value="—" color={colors.status.online} dot />
             <StatPill icon={Calendar} label="Created" value={createdDate} />
             <StatPill icon={Zap} label="Boost Level" value={server.features?.includes('boost_progress') ? '1' : '0'} color="#f472b6" />
           </div>
