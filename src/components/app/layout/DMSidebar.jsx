@@ -40,8 +40,8 @@ export default function DMSidebar({ conversations, activeId, onSelect, onFriends
   return (
     <div className="flex-1 flex flex-col min-h-0">
       {/* Search header */}
-      <div className="h-12 px-3 flex items-center flex-shrink-0" style={{ borderBottom: `1px solid ${colors.border.default}`, background: colors.bg.surface }}>
-        <div className="flex-1 flex items-center gap-2 px-2.5 py-1.5 rounded-md" style={{ background: colors.bg.base }}>
+      <div className="h-12 px-3 flex items-center flex-shrink-0" style={{ borderBottom: `1px solid ${colors.border.default}` }}>
+        <div className="flex-1 flex items-center gap-2 px-2.5 py-1.5 rounded-lg" style={{ background: colors.bg.base }}>
           <Search className="w-4 h-4 flex-shrink-0" style={{ color: colors.text.disabled }} />
           <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Find or start a conversation"
             className="flex-1 bg-transparent text-[13px] outline-none" style={{ color: colors.text.primary }} />

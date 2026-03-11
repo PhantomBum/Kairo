@@ -371,7 +371,7 @@ export default function AppShell({ currentUser }) {
           isHome={view === 'home' || view === 'friends'} badge={incomingReqs.length}
           currentUserId={currentUser.id} />
 
-        <div className="w-[240px] flex-shrink-0 flex flex-col" style={{ background: `linear-gradient(180deg, ${colors.bg.surface}, ${colors.bg.base}ee)`, borderRight: `1px solid ${colors.border.default}`, transition: 'opacity 100ms cubic-bezier(0.4,0,1,1)' }}>
+        <div className="w-[240px] flex-shrink-0 flex flex-col" style={{ background: colors.bg.surface, borderRight: `1px solid ${colors.border.default}` }}>
           {view === 'server' ? (
             <DraggableChannelSidebar server={activeServer} categories={categories} channels={channels}
               activeId={activeChannel?.id} onSelect={(ch) => { setActiveChannel(ch); setShowMobileSidebar(false); }}

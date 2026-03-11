@@ -131,10 +131,11 @@ export default function DraggableChannelSidebar({ server, categories, channels, 
       {/* Server header with click dropdown */}
       <div className="relative" ref={dropdownRef}>
         <button onClick={() => setDropdownOpen(!dropdownOpen)}
-          className="h-12 px-4 w-full flex items-center justify-between flex-shrink-0 transition-colors"
+          className="h-12 px-4 w-full flex items-center justify-between flex-shrink-0"
           style={{
             borderBottom: `1px solid ${colors.border.default}`,
-            background: dropdownOpen ? colors.bg.elevated : colors.bg.surface,
+            background: dropdownOpen ? colors.bg.elevated : 'transparent',
+            transition: 'background 150ms cubic-bezier(0.4,0,0.2,1)',
           }}>
           <div className="flex items-center gap-2 min-w-0 flex-1">
             {server?.icon_url && <img src={server.icon_url} className="w-5 h-5 rounded-md object-cover flex-shrink-0" alt="" />}
