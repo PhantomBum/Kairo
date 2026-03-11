@@ -11,7 +11,7 @@ import ConnectionBanner from '@/components/app/performance/ConnectionBanner';
 import MobileNav from '@/components/app/mobile/MobileNav';
 import { colors } from '@/components/app/design/tokens';
 
-import ServerRailWithContext from '@/components/app/layout/ServerRailWithContext';
+import ServerSidebar from '@/components/app/sidebar/ServerSidebar';
 import DraggableChannelSidebar from '@/components/app/layout/DraggableChannelSidebar';
 import DMSidebar from '@/components/app/layout/DMSidebar';
 import UserBar from '@/components/app/layout/UserBar';
@@ -365,7 +365,7 @@ export default function AppShell({ currentUser }) {
       <div className={`${showMobileSidebar ? 'flex absolute top-0 left-0 right-0 z-40' : 'hidden'} md:flex md:relative md:top-auto md:left-auto md:right-auto md:z-auto flex-row`}
         style={showMobileSidebar ? { bottom: 56 } : undefined}
         role="navigation" aria-label="Sidebar">
-        <ServerRailWithContext servers={servers} activeServerId={activeServer?.id} onServerSelect={selectServer} onHomeClick={goHome}
+        <ServerSidebar servers={servers} activeServerId={activeServer?.id} onServerSelect={selectServer} onHomeClick={goHome}
           onCreateServer={() => setModal('create-server')} onDiscover={() => setModal('join-server')}
           onElite={() => setModal('elite')} onLeaveServer={leaveServer}
           isHome={view === 'home' || view === 'friends'} badge={incomingReqs.length}
