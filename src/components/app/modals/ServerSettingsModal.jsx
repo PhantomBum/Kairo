@@ -3,6 +3,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Settings, Shield, Users, AlertTriangle, Trash2, Plus, Palette, Bell, Lock, Globe, Eye, Sparkles, Heart, Zap, MessageSquare, Volume2, Calendar, ChevronDown, ChevronRight, BarChart3, Webhook, Link, Copy, Check } from 'lucide-react';
 import ModalWrapper from './ModalWrapper';
+import { ServerLabel, ServerInput, ServerToggle } from './SettingsFormParts';
 
 const TABS = [
   { id: 'overview', label: 'Overview', icon: Settings },
@@ -122,17 +123,6 @@ export default function ServerSettingsModal({ onClose, server, currentUserId }) 
     qc.invalidateQueries({ queryKey: ['servers'] });
     onClose('deleted');
   };
-
-  const Lbl = ({ children }) => <label className="text-[10px] font-semibold uppercase tracking-[0.08em] block mb-1.5" style={{ color: 'var(--text-muted)', fontFamily: 'monospace' }}>{children}</label>;
-  const Inp = ({ value, onChange, ...p }) => <input value={value} onChange={onChange} className="w-full px-3 py-2 rounded-xl text-sm outline-none font-mono" style={{ background: 'var(--bg-glass)', color: 'var(--text-primary)', border: '1px solid var(--border)' }} {...p} />;
-  const Toggle = ({ on, onToggle, label }) => (
-    <div className="flex items-center justify-between py-1.5">
-      <span className="text-[12px]" style={{ color: 'var(--text-primary)' }}>{label}</span>
-      <button onClick={onToggle} className="w-10 h-5 rounded-full relative transition-colors" style={{ background: on ? 'var(--accent-green)' : 'var(--bg-overlay)' }}>
-        <div className="absolute top-0.5 w-4 h-4 rounded-full bg-white transition-transform" style={{ left: on ? 22 : 2 }} />
-      </button>
-    </div>
-  );
 
   return (
     <ModalWrapper title="Server Settings" onClose={onClose} width={680}>
