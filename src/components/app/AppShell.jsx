@@ -350,7 +350,9 @@ export default function AppShell({ currentUser }) {
       </div>
 
       <div className="flex-1 flex flex-col min-w-0 relative" style={{ background: colors.bg.base }} role="main">
-        {view === 'friends' ? (
+        {view === 'spaces' ? (
+          <SpacesView currentUser={currentUser} profile={profile} />
+        ) : view === 'friends' ? (
           <FriendsView friends={friends} incomingRequests={incomingReqs} outgoingRequests={outgoingReqs}
             onAddFriend={() => setModal('add-friend')} onMessage={handleStartDM} onBlock={handleBlock}
             onProfileClick={(id) => { setProfileUserId(id); setModal('profile'); }}
