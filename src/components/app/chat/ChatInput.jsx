@@ -27,9 +27,12 @@ export default function ChatInput({ channelName, channelId, replyTo, onCancelRep
     try { if (content) localStorage.setItem(storageKey, content); else localStorage.removeItem(storageKey); } catch {}
   }, [content, storageKey]);
 
-  // Load draft when channel changes
+  // Load draft when channel changes, reset UI state
   React.useEffect(() => {
     try { setContent(localStorage.getItem(storageKey) || ''); } catch { setContent(''); }
+    setShowEmoji(false);
+    setShowFormatting(false);
+    setFiles([]);
   }, [storageKey]);
 
   const handleTyping = useCallback(() => {
