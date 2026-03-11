@@ -1,6 +1,6 @@
 import React from 'react';
 import { createPageUrl } from '@/utils';
-import { Hash, Volume2, Megaphone, Radio, MessageSquare, HelpCircle, Users, Pin, AtSign, Image, Phone, Video, Search, LayoutGrid } from 'lucide-react';
+import { Hash, Volume2, Megaphone, Radio, MessageSquare, HelpCircle, Users, Pin, AtSign, Image, Phone, Video, Search, LayoutGrid, ShieldAlert } from 'lucide-react';
 import { colors, shadows } from '@/components/app/design/tokens';
 
 const typeIcons = { text: Hash, voice: Volume2, announcement: Megaphone, stage: Radio, forum: MessageSquare, board: LayoutGrid };
@@ -40,6 +40,9 @@ export default function ChatHeader({ channel, conversation, currentUserId, showM
         )}
         <Icon className="w-5 h-5 flex-shrink-0" style={{ color: colors.text.disabled }} />
         <h1 className="text-[15px] font-semibold truncate" style={{ color: colors.text.primary }} title={label}>{label}</h1>
+        {channel?.is_nsfw && (
+          <span className="text-[10px] font-bold px-1.5 py-0.5 rounded flex-shrink-0" style={{ background: 'rgba(242,63,67,0.12)', color: '#f23f43' }}>NSFW</span>
+        )}
         {channel?.description && (
           <>
             <div className="w-px h-5 mx-1 flex-shrink-0 hidden md:block" style={{ background: colors.border.light }} />
