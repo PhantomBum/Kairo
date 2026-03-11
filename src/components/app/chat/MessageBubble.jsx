@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, memo } from 'react';
 import { Reply, Pencil, Trash2, Copy, Pin, PinOff, Bookmark, Link, Flag, Smile } from 'lucide-react';
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuSeparator, ContextMenuTrigger } from '@/components/ui/context-menu';
+import ProgressiveImage from '@/components/app/performance/ProgressiveImage';
 
 function ts(d) { return new Date(d).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }); }
 
@@ -16,7 +17,7 @@ function renderText(text) {
   });
 }
 
-export default function MessageBubble({ message, compact, isOwn, onReply, onEdit, onDelete, onReact, onPin, currentUserId, onProfileClick, isEditing, onEditSave, onEditCancel, onImageClick }) {
+const MessageBubble = memo(function MessageBubble({ message, compact, isOwn, onReply, onEdit, onDelete, onReact, onPin, currentUserId, onProfileClick, isEditing, onEditSave, onEditCancel, onImageClick }) {
   const [hovered, setHovered] = useState(false);
   const [editText, setEditText] = useState(message.content || '');
   const quickEmojis = ['👍', '❤️', '😂', '🔥', '👀'];
@@ -88,7 +89,7 @@ export default function MessageBubble({ message, compact, isOwn, onReply, onEdit
               {message.attachments?.length > 0 && (
                 <div className="flex flex-wrap gap-2 mt-2">
                   {message.attachments.map((a, i) => {
-                    if (a.content_type?.startsWith('image/')) return <img key={i} src={a.url} className="max-w-[380px] max-h-[260px] rounded-xl object-cover cursor-pointer hover:brightness-110 transition-all" style={{ border: '1px solid var(--border)' }} onClick={() => onImageClick?.(a.url, a.filename)} />;
+                    if (a.content_type?.startsWith('image/')) return <ProgressiveImage key={i} src={a.url} alt={a.filename || 'Image attachment'} className="max-w-[380px] max-h-[260px] rounded-xl cursor-pointer hover:brightness-110 transition-all" style={{ border: '1px solid var(--border)' }} onClick={() => onImageClick?.(a.url, a.filename)} />;
                     if (a.content_type?.startsWith('video/')) return <video key={i} src={a.url} controls className="max-w-[380px] max-h-[260px] rounded-xl" style={{ border: '1px solid var(--border)' }} />;
                     if (a.content_type?.startsWith('audio/')) return <audio key={i} src={a.url} controls className="max-w-[300px]" />;
                     return <a key={i} href={a.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-[11px] px-3 py-2 rounded-xl glass hover:bg-[var(--bg-glass-hover)]" style={{ color: 'var(--text-secondary)' }}>📎 {a.filename}</a>;
@@ -148,4 +149,6 @@ export default function MessageBubble({ message, compact, isOwn, onReply, onEdit
       </ContextMenuContent>
     </ContextMenu>
   );
-}
+});
+
+export default MessageBubble;
