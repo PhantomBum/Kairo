@@ -18,13 +18,13 @@ function ChannelItem({ channel, active, onClick, onSettings, isOwner, index }) {
               <button onClick={() => onClick(channel)}
                 className="w-full flex items-center gap-2 px-2 py-[6px] rounded-md text-[14px] group"
                 style={{
-                  background: snapshot.isDragging ? colors.bg.overlay : active ? colors.accent.subtle : 'transparent',
+                  background: snapshot.isDragging ? colors.bg.overlay : active ? colors.accent.muted : 'transparent',
                   color: active ? colors.text.primary : colors.text.muted,
-                  fontWeight: active ? 500 : 400,
+                  fontWeight: active ? 600 : 400,
                   transition: 'background 150ms cubic-bezier(0.4,0,0.2,1), color 150ms cubic-bezier(0.4,0,0.2,1)',
                 }}>
                 {isOwner && <GripVertical className="w-3 h-3 opacity-0 group-hover:opacity-30 flex-shrink-0" />}
-                <Icon className="w-[18px] h-[18px] flex-shrink-0" style={{ color: active ? colors.accent.primary : colors.text.disabled, transition: 'color 150ms cubic-bezier(0.4,0,0.2,1)' }} />
+                <Icon className="w-[18px] h-[18px] flex-shrink-0" style={{ color: active ? colors.accent.hover : colors.text.disabled, transition: 'color 150ms cubic-bezier(0.4,0,0.2,1)' }} />
                 <span className="truncate flex-1 text-left">{channel.name}</span>
                 {channel.is_nsfw && <ShieldAlert className="w-3 h-3 flex-shrink-0" style={{ color: '#f23f43', opacity: 0.6 }} />}
                 {channel.is_private && <Lock className="w-3 h-3 opacity-30" />}
