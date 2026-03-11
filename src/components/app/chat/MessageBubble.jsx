@@ -21,10 +21,17 @@ function isMediaUrl(url) {
 
 function renderText(text, onLinkClick) {
   if (!text) return null;
-  // Split by code blocks first to protect their content, then parse the rest
-  return text.split(/(`[^`]+`)/g).map((segment, si) => {
-    // Code spans — render as-is, never embed links inside
-    if (segment.match(/^`.*`$/)) return <code key={si} className="px-1.5 py-0.5 rounded text-[12px]" style={{ background: colors.bg.overlay, color: colors.accent.primary }}>{segment.slice(1, -1)}</code>;
+  // Split by code blocks (triple and single backtick) first to protect their content
+  return text.split(/(```[\s\S]*?```|`[^`]+`)/g).map((segment, si) => {
+    // Triple-backtick code blocks — render as block, never embed links inside
+    if (segment.startsWith('```') && segment.endsWith('```')) {
+      const inner = segment.slice(3, -3);
+      const firstLine = inner.indexOf('\n');
+      const code = firstLine > -1 ? inner.slice(firstLine + 1) : inner;
+      return <pre key={si} className="px-3 py-2 rounded-lg text-[12px] my-1 overflow-x-auto" style={{ background: colors.bg.overlay, color: colors.accent.primary }}><code>{code}</code></pre>;
+    }
+    // Single-backtick code spans — render as-is, never embed links inside
+    if (segment.match(/^`[^`]+`$/)) return <code key={si} className="px-1.5 py-0.5 rounded text-[12px]" style={{ background: colors.bg.overlay, color: colors.accent.primary }}>{segment.slice(1, -1)}</code>;
     // Non-code segments — parse URLs, mentions, markdown
     return segment.split(/(https?:\/\/[^\s]+|@everyone|@here|\*\*[^*]+\*\*|\*[^*]+\*)/g).map((p, i) => {
       const key = `${si}-${i}`;
