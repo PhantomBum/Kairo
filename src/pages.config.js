@@ -49,12 +49,22 @@
  */
 import Kairo from './pages/Kairo';
 import Status from './pages/Status';
+import FAQ from './pages/FAQ';
+import Elite from './pages/Elite';
+import Support from './pages/Support';
+import BotMarketplace from './pages/BotMarketplace';
+import Developers from './pages/Developers';
 import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
     "Kairo": Kairo,
     "Status": Status,
+    "FAQ": FAQ,
+    "Elite": Elite,
+    "Support": Support,
+    "BotMarketplace": BotMarketplace,
+    "Developers": Developers,
 }
 
 export const pagesConfig = {
