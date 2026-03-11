@@ -1,36 +1,61 @@
-import React from 'react';
-import { Plus, Compass, Bot, Crown, HelpCircle } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Plus, Compass, Bot, Crown, HelpCircle, MessageSquare, Zap } from 'lucide-react';
 import { createPageUrl } from '@/utils';
+import { colors, shadows, radius } from '@/components/app/design/tokens';
+
+function getGreeting() {
+  const h = new Date().getHours();
+  if (h < 12) return { text: 'Good morning', emoji: '☀️' };
+  if (h < 18) return { text: 'Good afternoon', emoji: '🌤️' };
+  return { text: 'Good evening', emoji: '🌙' };
+}
 
 export default function EmptyView({ onCreateServer, onJoinServer }) {
+  const greeting = getGreeting();
+
   return (
-    <div className="flex-1 flex items-center justify-center p-8">
-      <div className="text-center max-w-sm">
-        <div className="w-20 h-20 rounded-3xl glass mx-auto mb-6 flex items-center justify-center" style={{ boxShadow: 'var(--shadow-glow)' }}>
-          <span className="text-3xl font-bold" style={{ color: 'var(--text-faint)', fontFamily: 'monospace' }}>K</span>
+    <div className="flex-1 flex items-center justify-center p-8 relative overflow-hidden">
+      {/* Animated gradient background */}
+      <div className="absolute inset-0 opacity-30" style={{
+        background: `radial-gradient(ellipse 80% 60% at 50% 120%, ${colors.accent.primary}15, transparent), radial-gradient(ellipse 60% 40% at 20% 50%, ${colors.info}08, transparent), radial-gradient(ellipse 60% 40% at 80% 50%, ${colors.accent.primary}06, transparent)`,
+      }} />
+
+      <div className="text-center max-w-md relative z-10 k-fade-in">
+        {/* Logo */}
+        <div className="w-20 h-20 rounded-3xl mx-auto mb-8 flex items-center justify-center"
+          style={{ background: colors.accent.subtle, boxShadow: shadows.glow }}>
+          <span className="text-4xl font-bold" style={{ color: colors.accent.primary }}>K</span>
         </div>
-        <h2 className="text-xl font-bold mb-2" style={{ color: 'var(--text-cream)', fontFamily: 'monospace' }}>Welcome to Kairo</h2>
-        <p className="text-sm mb-8" style={{ color: 'var(--text-muted)' }}>Select a conversation or server to get started.</p>
-        <div className="flex gap-3 justify-center flex-wrap">
-          <button onClick={onCreateServer} className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-all hover:brightness-110"
-            style={{ background: 'var(--text-cream)', color: 'var(--bg-deep)' }}>
-            <Plus className="w-4 h-4" /> Create Server
+
+        {/* Greeting */}
+        <p className="text-[16px] mb-1" style={{ color: colors.text.muted }}>{greeting.emoji} {greeting.text}</p>
+        <h2 className="text-[32px] font-bold mb-3 tracking-tight" style={{ color: colors.text.primary }}>Welcome to Kairo</h2>
+        <p className="text-[15px] mb-10" style={{ color: colors.text.muted }}>Your conversations, communities, and creativity — all in one place.</p>
+
+        {/* Primary actions */}
+        <div className="flex gap-3 justify-center">
+          <button onClick={onCreateServer} className="flex items-center gap-2.5 px-6 py-3 rounded-xl text-[15px] font-semibold transition-all hover:brightness-110 hover:scale-[1.02]"
+            style={{ background: colors.accent.primary, color: '#fff', boxShadow: shadows.glow }}>
+            <Plus className="w-5 h-5" /> Create Server
           </button>
-          <button onClick={onJoinServer} className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-all glass hover:bg-[var(--bg-glass-hover)]"
-            style={{ color: 'var(--text-secondary)' }}>
-            <Compass className="w-4 h-4" /> Join Server
+          <button onClick={onJoinServer} className="flex items-center gap-2.5 px-6 py-3 rounded-xl text-[15px] font-semibold transition-all hover:bg-[rgba(255,255,255,0.06)]"
+            style={{ background: colors.bg.elevated, color: colors.text.secondary, border: `1px solid ${colors.border.light}` }}>
+            <Compass className="w-5 h-5" /> Join Server
           </button>
         </div>
-        <div className="flex gap-3 justify-center mt-4">
-          <a href={createPageUrl('BotMarketplace')} className="flex items-center gap-1.5 text-[11px] px-3 py-1.5 rounded-lg glass hover:bg-[var(--bg-glass-hover)] transition-colors" style={{ color: 'var(--text-muted)' }}>
-            <Bot className="w-3.5 h-3.5" /> Bots
-          </a>
-          <a href={createPageUrl('Elite')} className="flex items-center gap-1.5 text-[11px] px-3 py-1.5 rounded-lg glass hover:bg-[var(--bg-glass-hover)] transition-colors" style={{ color: 'var(--accent-amber)' }}>
-            <Crown className="w-3.5 h-3.5" /> Elite
-          </a>
-          <a href={createPageUrl('FAQ')} className="flex items-center gap-1.5 text-[11px] px-3 py-1.5 rounded-lg glass hover:bg-[var(--bg-glass-hover)] transition-colors" style={{ color: 'var(--text-muted)' }}>
-            <HelpCircle className="w-3.5 h-3.5" /> Help
-          </a>
+
+        {/* Quick links */}
+        <div className="flex gap-2 justify-center mt-8">
+          {[
+            { href: createPageUrl('BotMarketplace'), icon: Bot, label: 'Bots', color: colors.text.muted },
+            { href: createPageUrl('Elite'), icon: Crown, label: 'Elite', color: colors.warning },
+            { href: createPageUrl('FAQ'), icon: HelpCircle, label: 'Help', color: colors.text.muted },
+            { href: createPageUrl('Support'), icon: Zap, label: 'Support', color: colors.text.muted },
+          ].map(link => (
+            <a key={link.label} href={link.href} className="flex items-center gap-1.5 text-[12px] font-medium px-3 py-2 rounded-lg transition-colors hover:bg-[rgba(255,255,255,0.04)]" style={{ color: link.color }}>
+              <link.icon className="w-4 h-4" /> {link.label}
+            </a>
+          ))}
         </div>
       </div>
     </div>
