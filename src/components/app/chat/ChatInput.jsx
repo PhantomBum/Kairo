@@ -5,8 +5,11 @@ import { colors, radius } from '@/components/app/design/tokens';
 
 const EMOJIS = ['😀','😂','😍','🤔','👍','👎','❤️','🔥','🎉','😎','😢','😡','🙏','💯','✨','🚀','👀','🤝','💀','🎮','🎵','☕','⭐','💜'];
 
-export default function ChatInput({ channelName, replyTo, onCancelReply, onSend, onTyping }) {
-  const [content, setContent] = useState('');
+export default function ChatInput({ channelName, replyTo, onCancelReply, onSend, onTyping, onEditLast }) {
+  const storageKey = `kairo-draft-${channelName || 'default'}`;
+  const [content, setContent] = useState(() => {
+    try { return localStorage.getItem(storageKey) || ''; } catch { return ''; }
+  });
   const [files, setFiles] = useState([]);
   const [sending, setSending] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -15,6 +18,16 @@ export default function ChatInput({ channelName, replyTo, onCancelReply, onSend,
   const fileRef = useRef(null);
   const inputRef = useRef(null);
   const typingRef = useRef(0);
+
+  // Persist draft to localStorage
+  React.useEffect(() => {
+    try { if (content) localStorage.setItem(storageKey, content); else localStorage.removeItem(storageKey); } catch {}
+  }, [content, storageKey]);
+
+  // Load draft when channel changes
+  React.useEffect(() => {
+    try { setContent(localStorage.getItem(storageKey) || ''); } catch { setContent(''); }
+  }, [storageKey]);
 
   const handleTyping = useCallback(() => {
     if (Date.now() - typingRef.current > 3000) { typingRef.current = Date.now(); onTyping?.(); }
@@ -37,6 +50,7 @@ export default function ChatInput({ channelName, replyTo, onCancelReply, onSend,
     setSending(true);
     await onSend({ content: content.trim(), attachments: files.length > 0 ? files : undefined, replyToId: replyTo?.id, replyPreview: replyTo ? { author_name: replyTo.author_name, content: replyTo.content?.slice(0, 80) } : undefined });
     setContent(''); setFiles([]); setSending(false); setShowEmoji(false);
+    try { localStorage.removeItem(storageKey); } catch {}
     inputRef.current?.focus();
   };
 
@@ -111,7 +125,10 @@ export default function ChatInput({ channelName, replyTo, onCancelReply, onSend,
         <input ref={fileRef} type="file" onChange={e => { if (e.target.files?.length) uploadFiles(e.target.files); if (fileRef.current) fileRef.current.value = ''; }} className="hidden" multiple />
         <textarea ref={inputRef} value={content}
           onChange={e => { setContent(e.target.value); handleTyping(); }}
-          onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
+          onKeyDown={e => {
+            if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); }
+            if (e.key === 'ArrowUp' && !content.trim() && onEditLast) { e.preventDefault(); onEditLast(); }
+          }}
           placeholder={`Message ${channelName ? '#' + channelName : ''}`}
           aria-label={`Message ${channelName || 'channel'}`}
           className="flex-1 bg-transparent text-[15px] outline-none resize-none max-h-[144px]"
