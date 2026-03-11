@@ -438,6 +438,10 @@ export default function AppShell({ currentUser }) {
           <ChannelSettingsModal onClose={() => { setModal(null); setChannelToEdit(null); }} channel={channelToEdit}
             onDelete={() => { if (activeChannel?.id === channelToEdit.id) setActiveChannel(null); }} />
         )}
+        {modal === 'search' && <AdvancedSearch onClose={() => setModal(null)} servers={servers} currentUserId={currentUser.id} />}
+        {modal === 'media-gallery' && <MediaGallery onClose={() => setModal(null)} messages={currentMsgs} channelName={channelLabel} />}
+        {modal === 'privacy-dashboard' && <PrivacyDashboard onClose={() => setModal(null)} profile={profile} currentUser={currentUser} onUpdate={(d) => updateProfile.mutate(d)} />}
+        {modal === 'activity' && <ActivityStatus onClose={() => setModal(null)} profile={profile} onUpdate={(d) => updateProfile.mutate(d)} />}
       </AnimatePresence>
 
       {/* Mobile bottom nav */}
