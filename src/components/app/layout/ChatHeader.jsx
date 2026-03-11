@@ -1,9 +1,9 @@
 import React from 'react';
-import { Hash, Volume2, Megaphone, Radio, MessageSquare, HelpCircle, Lock, ListChecks, BookOpen, Ticket, Calendar, Bell, Users, Pin, AtSign, Search } from 'lucide-react';
+import { Hash, Volume2, Megaphone, Radio, MessageSquare, HelpCircle, Lock, ListChecks, BookOpen, Ticket, Calendar, Bell, Users, Pin, AtSign, Search, Image, Phone, Video } from 'lucide-react';
 
 const typeIcons = { text: Hash, voice: Volume2, announcement: Megaphone, stage: Radio, forum: MessageSquare, rules: BookOpen, tickets: Ticket, events: Calendar, polls: ListChecks, faq: HelpCircle, alerts: Bell, private: Lock };
 
-export default function ChatHeader({ channel, conversation, currentUserId, showMembers, onToggleMembers, isDM, onPinned, pinnedCount, onSearch }) {
+export default function ChatHeader({ channel, conversation, currentUserId, showMembers, onToggleMembers, isDM, onPinned, pinnedCount, onSearch, onMediaGallery, onVoiceCall, onVideoCall }) {
   const label = isDM
     ? (conversation?.name || conversation?.participants?.find(p => p.user_id !== currentUserId)?.user_name || 'DM')
     : (channel?.name || '');
@@ -29,13 +29,28 @@ export default function ChatHeader({ channel, conversation, currentUserId, showM
         )}
       </div>
       <div className="flex items-center gap-0.5">
-        {!isDM && onPinned && (
+        {isDM && (
+          <>
+            <button onClick={onVoiceCall} className="p-1.5 rounded-md transition-colors hover:bg-[var(--bg-glass-hover)]" title="Voice Call">
+              <Phone className="w-4 h-4" style={{ color: 'var(--text-muted)' }} />
+            </button>
+            <button onClick={onVideoCall} className="p-1.5 rounded-md transition-colors hover:bg-[var(--bg-glass-hover)]" title="Video Call">
+              <Video className="w-4 h-4" style={{ color: 'var(--text-muted)' }} />
+            </button>
+          </>
+        )}
+        {onPinned && (
           <button onClick={onPinned} className="relative p-1.5 rounded-md transition-colors hover:bg-[var(--bg-glass-hover)]">
             <Pin className="w-4 h-4" style={{ color: 'var(--text-muted)' }} />
             {pinnedCount > 0 && (
               <div className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 rounded-full text-[8px] font-bold flex items-center justify-center"
                 style={{ background: 'var(--accent-amber)', color: '#000' }}>{pinnedCount}</div>
             )}
+          </button>
+        )}
+        {isDM && onMediaGallery && (
+          <button onClick={onMediaGallery} className="p-1.5 rounded-md transition-colors hover:bg-[var(--bg-glass-hover)]" title="Media Gallery">
+            <Image className="w-4 h-4" style={{ color: 'var(--text-muted)' }} />
           </button>
         )}
         {!isDM && (
