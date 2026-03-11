@@ -5,6 +5,7 @@ import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuSeparator,
 import { base44 } from '@/api/base44Client';
 import { colors, radius, shadows } from '@/components/app/design/tokens';
 import ServerFoldersRail, { FolderCreateModal } from '@/components/app/features/ServerFolders';
+import ServerRailIcon from './ServerRailIcon';
 
 function RailTooltip({ text, visible }) {
   return (
@@ -97,10 +98,10 @@ export default function ServerRailWithContext({ servers, activeServerId, onServe
       {unfolderedServers.map(s => (
         <ContextMenu key={s.id}>
           <ContextMenuTrigger>
-            <div><RailIcon active={activeServerId === s.id} onClick={() => onServerSelect(s)} tooltip={s.name}>
+            <div><ServerRailIcon server={s} active={activeServerId === s.id} onClick={() => onServerSelect(s)}>
               {s.icon_url ? <img src={s.icon_url} className="w-full h-full object-cover" style={{ borderRadius: 'inherit' }} alt={s.name} />
                 : <span className="text-[15px] font-semibold select-none" style={{ color: activeServerId === s.id ? '#fff' : colors.text.secondary }}>{s.name?.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()}</span>}
-            </RailIcon></div>
+            </ServerRailIcon></div>
           </ContextMenuTrigger>
           <ContextMenuContent className="w-52 p-1.5 rounded-lg" style={{ background: colors.bg.modal, border: `1px solid ${colors.border.light}`, boxShadow: shadows.strong }}>
             <ContextMenuItem onClick={() => onServerSelect(s)} className="text-[13px] gap-2.5 rounded-md px-2.5 py-2" style={{ color: colors.text.secondary }}><Settings className="w-4 h-4 opacity-60" /> Server Settings</ContextMenuItem>
