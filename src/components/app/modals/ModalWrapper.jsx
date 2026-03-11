@@ -4,6 +4,12 @@ import { X } from 'lucide-react';
 import { colors, shadows, radius, animation } from '@/components/app/design/tokens';
 
 export default function ModalWrapper({ title, subtitle, onClose, width = 460, children, danger }) {
+  React.useEffect(() => {
+    const h = (e) => { if (e.key === 'Escape') { e.stopPropagation(); onClose(); } };
+    window.addEventListener('keydown', h);
+    return () => window.removeEventListener('keydown', h);
+  }, [onClose]);
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
