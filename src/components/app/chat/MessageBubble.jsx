@@ -76,10 +76,10 @@ const MessageBubble = memo(function MessageBubble({ message, compact, isOwn, onR
               </button>
             )}
 
-            <div className="flex-1 min-w-0">
+            <div className="flex-1 min-w-0 overflow-hidden">
               {!compact && (
                 <div className="flex items-baseline gap-2 mb-0.5">
-                  <button onClick={() => !isDeleted && onProfileClick?.(message.author_id)} className="text-[14px] font-semibold hover:underline truncate max-w-[200px]" style={{ color: isDeleted ? colors.text.disabled : colors.text.primary, textDecorationColor: colors.text.disabled }} title={authorName}>
+                  <button onClick={() => !isDeleted && onProfileClick?.(message.author_id)} className="text-[14px] font-semibold hover:underline truncate max-w-[180px] inline-block align-bottom" style={{ color: isDeleted ? colors.text.disabled : colors.text.primary, textDecorationColor: colors.text.disabled }} title={authorName}>
                     {authorName}
                   </button>
                   {!isDeleted && message.author_badges?.includes('owner') && <span className="text-[10px] px-1.5 py-0.5 rounded font-semibold flex-shrink-0" style={{ background: `${colors.warning}20`, color: colors.warning }}>OWNER</span>}
@@ -106,7 +106,7 @@ const MessageBubble = memo(function MessageBubble({ message, compact, isOwn, onR
                 </div>
               ) : (
                 <div className="relative">
-                  <div className="text-[15px] leading-[1.375] whitespace-pre-wrap overflow-hidden" style={{ color: colors.text.secondary, maxHeight: isLong && !expanded ? '300px' : 'none', wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
+                  <div className="text-[15px] leading-[1.375] whitespace-pre-wrap overflow-hidden" style={{ color: colors.text.secondary, maxHeight: isLong && !expanded ? '300px' : 'none', wordBreak: 'break-word', overflowWrap: 'anywhere', maxWidth: '100%' }}>
                     {renderText(message.content, onLinkClick)}
                   </div>
                   {isLong && !expanded && (

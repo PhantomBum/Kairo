@@ -85,7 +85,7 @@ export default function AppShell({ currentUser }) {
   const { data: blockedUsers = [] } = useBlocked(currentUser.id);
   const { incoming: incomingReqs, outgoing: outgoingReqs } = useFriendRequests(currentUser.id, currentUser.email);
 
-  useEffect(() => { if (activeServer && channels.length > 0 && !activeChannel) { const first = channels.find(c => c.type === 'text'); if (first) setActiveChannel(first); } }, [activeServer, channels]);
+  useEffect(() => { if (activeServer && channels.length > 0 && !activeChannel) { const first = channels.sort((a, b) => (a.position || 0) - (b.position || 0)).find(c => c.type === 'text'); if (first) setActiveChannel(first); } }, [activeServer, channels]);
   useEffect(() => { setReplyTo(null); setEditingMsg(null); setShowMediaGallery(false); }, [activeChannel?.id, activeConv?.id]);
   // Track channel for cache and prefetch nearby
   useEffect(() => { trackChannel(activeChannel?.id); prefetchNearby(channels, activeChannel?.id); }, [activeChannel?.id, channels]);
@@ -294,19 +294,30 @@ export default function AppShell({ currentUser }) {
     const targetEmail = target.friend_email || target.user_email;
     const targetName = target.friend_name || target.display_name;
     if (!confirm(`Block ${targetName}? They won't be able to DM you or see your status.`)) return;
-    // Remove friendship if exists
+    // Remove all friendships with this user (both directions)
     const existing = friends.find(f => f.friend_id === targetId);
     if (existing) await base44.entities.Friendship.delete(existing.id);
+    // Also check for pending requests from/to this user
+    const pendingFrom = incomingReqs.find(r => r.user_id === targetId || r.friend_id === targetId);
+    if (pendingFrom) await base44.entities.Friendship.delete(pendingFrom.id);
+    const pendingTo = outgoingReqs.find(r => r.friend_id === targetId);
+    if (pendingTo) await base44.entities.Friendship.delete(pendingTo.id);
     await base44.entities.BlockedUser.create({ user_id: currentUser.id, blocked_user_id: targetId, blocked_email: targetEmail, blocked_name: targetName });
     // Immediately invalidate all relevant queries so block takes effect instantly
     qc.invalidateQueries({ queryKey: ['friends'] });
     qc.invalidateQueries({ queryKey: ['blocked'] });
     qc.invalidateQueries({ queryKey: ['conversations'] });
     qc.invalidateQueries({ queryKey: ['incomingRequests'] });
+    qc.invalidateQueries({ queryKey: ['outgoingRequests'] });
     // If currently in a DM with the blocked user, navigate away
     if (activeConv?.participants?.some(p => p.user_id === targetId)) {
       setActiveConv(null);
       setView('home');
+    }
+    // Close profile modal if viewing blocked user
+    if (profileUserId === targetId) {
+      setProfileUserId(null);
+      setModal(null);
     }
   };
 
