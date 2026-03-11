@@ -29,6 +29,7 @@ function FriendRow({ f, onMessage, onRemove, onBlock, onProfileClick, profile })
               {profile?.badges?.includes('premium') && <Sparkles className="w-3.5 h-3.5 flex-shrink-0" style={{ color: colors.warning }} />}
             </div>
             <p className="text-[12px] truncate" style={{ color: colors.text.muted }}>
+              {profile?.pronouns && <span className="mr-1" style={{ color: colors.text.disabled }}>{profile.pronouns} ·</span>}
               {customStatus?.text ? `${customStatus.emoji || ''} ${customStatus.text}` : activity?.name ? `${activity.type || 'Playing'} ${activity.name}` : status}
             </p>
           </div>
