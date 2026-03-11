@@ -1,9 +1,10 @@
-import React, { useState, useCallback, useRef, useEffect } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
-import { Hash, Volume2, Megaphone, Radio, MessageSquare, Lock, ChevronDown, Plus, Settings, UserPlus, Shield, BarChart3, GripVertical, LayoutGrid, X, ShieldAlert, History } from 'lucide-react';
+import { Hash, Volume2, Megaphone, Radio, MessageSquare, Lock, ChevronDown, Plus, Settings, GripVertical, LayoutGrid, ShieldAlert } from 'lucide-react';
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuSeparator, ContextMenuTrigger } from '@/components/ui/context-menu';
 import { base44 } from '@/api/base44Client';
-import { colors, radius, shadows } from '@/components/app/design/tokens';
+import { colors, shadows } from '@/components/app/design/tokens';
+import ServerBannerHeader from './ServerBannerHeader';
 
 const typeIcons = { text: Hash, voice: Volume2, announcement: Megaphone, stage: Radio, forum: MessageSquare, board: LayoutGrid };
 
@@ -94,103 +95,93 @@ export default function DraggableChannelSidebar({ server, categories, channels, 
   const sorted = [...(categories || [])].sort((a, b) => (a.position || 0) - (b.position || 0));
   const catIds = new Set(sorted.map(c => c.id));
   const uncategorized = (channels || []).filter(ch => !ch.category_id || !catIds.has(ch.category_id));
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-  const dropdownRef = useRef(null);
+  const scrollRef = useRef(null);
+  const [scrollY, setScrollY] = useState(0);
 
-  // Reset dropdown when server changes
-  const prevServerId = useRef(server?.id);
-  useEffect(() => {
-    if (server?.id !== prevServerId.current) {
-      setDropdownOpen(false);
-      prevServerId.current = server?.id;
-    }
-  }, [server?.id]);
-
-  useEffect(() => {
-    if (!dropdownOpen) return;
-    const handleClick = (e) => { if (dropdownRef.current && !dropdownRef.current.contains(e.target)) setDropdownOpen(false); };
-    const handleKey = (e) => { if (e.key === 'Escape') setDropdownOpen(false); };
-    document.addEventListener('mousedown', handleClick);
-    document.addEventListener('keydown', handleKey);
-    return () => { document.removeEventListener('mousedown', handleClick); document.removeEventListener('keydown', handleKey); };
-  }, [dropdownOpen]);
+  const handleScroll = useCallback((e) => {
+    setScrollY(e.target.scrollTop);
+  }, []);
 
   const onDragEnd = useCallback(async (result) => {
     if (!result.destination || !isOwner) return;
-    const { destination } = result;
-    const dstCat = destination.droppableId.replace('cat-', '');
-    const chId = result.draggableId;
-    await base44.entities.Channel.update(chId, {
-      category_id: dstCat === 'uncategorized' ? '' : dstCat,
-      position: destination.index,
+    const { source, destination, type, draggableId } = result;
+
+    if (type === 'category') {
+      // Reorder categories
+      const reordered = [...sorted];
+      const [moved] = reordered.splice(source.index, 1);
+      reordered.splice(destination.index, 0, moved);
+      // Update all positions
+      const updates = reordered.map((cat, i) =>
+        base44.entities.Category.update(cat.id, { position: i })
+      );
+      await Promise.all(updates);
+      return;
+    }
+
+    // Channel drag
+    const chId = draggableId;
+    const dstCatRaw = destination.droppableId.replace('cat-', '');
+    const srcCatRaw = source.droppableId.replace('cat-', '');
+    const newCategoryId = dstCatRaw === 'uncategorized' ? '' : dstCatRaw;
+
+    // Get channels in the destination category
+    const dstChannels = dstCatRaw === 'uncategorized'
+      ? uncategorized.filter(c => c.id !== chId)
+      : (channels || []).filter(ch => ch.category_id === dstCatRaw && ch.id !== chId);
+
+    const sortedDst = [...dstChannels].sort((a, b) => (a.position || 0) - (b.position || 0));
+
+    // Insert at destination index
+    sortedDst.splice(destination.index, 0, { id: chId });
+
+    // Batch update all positions in destination
+    const updates = sortedDst.map((ch, i) => {
+      if (ch.id === chId) {
+        return base44.entities.Channel.update(chId, { category_id: newCategoryId, position: i });
+      }
+      return base44.entities.Channel.update(ch.id, { position: i });
     });
-  }, [isOwner]);
+
+    // If moved between categories, also reorder source category
+    if (srcCatRaw !== dstCatRaw) {
+      const srcChannels = srcCatRaw === 'uncategorized'
+        ? uncategorized.filter(c => c.id !== chId)
+        : (channels || []).filter(ch => ch.category_id === srcCatRaw && ch.id !== chId);
+      const sortedSrc = [...srcChannels].sort((a, b) => (a.position || 0) - (b.position || 0));
+      sortedSrc.forEach((ch, i) => {
+        updates.push(base44.entities.Channel.update(ch.id, { position: i }));
+      });
+    }
+
+    await Promise.all(updates);
+  }, [isOwner, sorted, channels, uncategorized]);
 
   return (
     <div className="flex-1 flex flex-col min-h-0">
-      {/* Server header with click dropdown */}
-      <div className="relative" ref={dropdownRef}>
-        <button onClick={() => setDropdownOpen(!dropdownOpen)}
-          className="h-12 px-4 w-full flex items-center justify-between flex-shrink-0"
-          style={{
-            borderBottom: `1px solid ${colors.border.default}`,
-            background: dropdownOpen ? colors.bg.elevated : 'transparent',
-            transition: 'background 150ms cubic-bezier(0.4,0,0.2,1)',
-          }}>
-          <div className="flex items-center gap-2 min-w-0 flex-1">
-            {server?.icon_url && <img src={server.icon_url} className="w-5 h-5 rounded-md object-cover flex-shrink-0" alt="" />}
-            <span className="text-[15px] font-semibold truncate" style={{ color: colors.text.primary }} title={server?.name}>{server?.name}</span>
-          </div>
-          {dropdownOpen
-            ? <X className="w-4 h-4 flex-shrink-0" style={{ color: colors.text.muted }} />
-            : <ChevronDown className="w-4 h-4 flex-shrink-0" style={{ color: colors.text.muted }} />}
-        </button>
+      {/* Banner header */}
+      <ServerBannerHeader
+        server={server}
+        isOwner={isOwner}
+        scrollY={scrollY}
+        onInvite={onInvite}
+        onSettings={onSettings}
+        onAnalytics={onAnalytics}
+        onModPanel={onModPanel}
+        onBackups={onBackups}
+        onAddChannel={() => onAdd(sorted[0]?.id)}
+      />
 
-        {dropdownOpen && (
-          <div className="absolute top-12 left-0 right-0 z-50 p-1.5 k-fade-in"
-            style={{ background: colors.bg.modal, border: `1px solid ${colors.border.light}`, borderRadius: '0 0 12px 12px', boxShadow: shadows.strong }}>
-            <button onClick={() => { onInvite(); setDropdownOpen(false); }}
-              className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md text-[13px] transition-colors hover:bg-[rgba(255,255,255,0.05)]"
-              style={{ color: colors.accent.primary }}>
-              <UserPlus className="w-4 h-4 opacity-70" /> Invite People
-            </button>
-            {isOwner && <>
-              <div className="my-1 h-px" style={{ background: colors.border.light }} />
-              <button onClick={() => { onSettings(); setDropdownOpen(false); }}
-                className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md text-[13px] transition-colors hover:bg-[rgba(255,255,255,0.05)]"
-                style={{ color: colors.text.secondary }}>
-                <Settings className="w-4 h-4 opacity-50" /> Server Settings
-              </button>
-              <button onClick={() => { onAnalytics(); setDropdownOpen(false); }}
-                className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md text-[13px] transition-colors hover:bg-[rgba(255,255,255,0.05)]"
-                style={{ color: colors.text.secondary }}>
-                <BarChart3 className="w-4 h-4 opacity-50" /> Analytics
-              </button>
-              <button onClick={() => { onModPanel(); setDropdownOpen(false); }}
-                className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md text-[13px] transition-colors hover:bg-[rgba(255,255,255,0.05)]"
-                style={{ color: colors.text.secondary }}>
-                <Shield className="w-4 h-4 opacity-50" /> Mod Panel
-              </button>
-              <button onClick={() => { onBackups?.(); setDropdownOpen(false); }}
-                className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md text-[13px] transition-colors hover:bg-[rgba(255,255,255,0.05)]"
-                style={{ color: colors.text.secondary }}>
-                <History className="w-4 h-4 opacity-50" /> Backups
-              </button>
-              <div className="my-1 h-px" style={{ background: colors.border.light }} />
-              <button onClick={() => { onAdd(sorted[0]?.id); setDropdownOpen(false); }}
-                className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md text-[13px] transition-colors hover:bg-[rgba(255,255,255,0.05)]"
-                style={{ color: colors.text.secondary }}>
-                <Plus className="w-4 h-4 opacity-50" /> Create Channel
-              </button>
-            </>}
-          </div>
-        )}
-      </div>
-
+      {/* Channel list */}
       <DragDropContext onDragEnd={onDragEnd}>
         <Droppable droppableId="categories" type="category">
           {(provided) => (
-            <div ref={provided.innerRef} {...provided.droppableProps} className="flex-1 overflow-y-auto scrollbar-none px-2 pb-2">
+            <div
+              ref={(el) => { provided.innerRef(el); scrollRef.current = el; }}
+              {...provided.droppableProps}
+              className="flex-1 overflow-y-auto scrollbar-none px-2 pb-2"
+              onScroll={handleScroll}
+            >
               {uncategorized.length > 0 && (
                 <Droppable droppableId="cat-uncategorized" type="channel">
                   {(dropP) => (
