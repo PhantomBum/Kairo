@@ -171,9 +171,9 @@ export default function AppShell({ currentUser }) {
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['myProfile'] }); refreshProfiles(); },
   });
 
-  const selectServer = (s) => { setActiveServer(s); setActiveChannel(null); setActiveConv(null); setView('server'); setShowMobileSidebar(false); };
-  const goHome = () => { setActiveServer(null); setActiveChannel(null); setView('home'); setShowMobileSidebar(false); };
-  const goFriends = () => { setActiveConv(null); setView('friends'); setShowMobileSidebar(false); };
+  const selectServer = (s) => { setActiveServer(s); setActiveChannel(null); setActiveConv(null); setView('server'); setShowMobileSidebar(false); setReplyTo(null); setEditingMsg(null); setShowMediaGallery(false); };
+  const goHome = () => { setActiveServer(null); setActiveChannel(null); setView('home'); setShowMobileSidebar(false); setReplyTo(null); setEditingMsg(null); };
+  const goFriends = () => { setActiveConv(null); setView('friends'); setShowMobileSidebar(false); setReplyTo(null); setEditingMsg(null); };
 
   const handleSend = async (data) => {
     const optimistic = addOptimistic({
