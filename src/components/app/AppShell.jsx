@@ -40,6 +40,7 @@ import KairoEliteModal from '@/components/app/modals/KairoEliteModal';
 import ModPanelModal from '@/components/app/modals/ModPanelModal';
 import AnalyticsDashboardModal from '@/components/app/modals/AnalyticsDashboardModal';
 import ChannelSettingsModal from '@/components/app/modals/ChannelSettingsModal';
+import ServerBackupsModal from '@/components/app/modals/ServerBackupsModal';
 import AdvancedSearch from '@/components/app/features/AdvancedSearch';
 import MediaGallery from '@/components/app/features/MediaGallery';
 import PrivacyDashboard from '@/components/app/features/PrivacyDashboard';
@@ -334,7 +335,7 @@ export default function AppShell({ currentUser }) {
               activeId={activeChannel?.id} onSelect={(ch) => { setActiveChannel(ch); setShowMobileSidebar(false); }}
               onAdd={(catId) => { setModalData(catId); setModal('create-channel'); }}
               onSettings={() => setModal('server-settings')} onInvite={() => setModal('invite')}
-              onModPanel={() => setModal('mod-panel')} onAnalytics={() => setModal('analytics')}
+              onModPanel={() => setModal('mod-panel')} onAnalytics={() => setModal('analytics')} onBackups={() => setModal('server-backups')}
               onChannelSettings={(ch) => { setChannelToEdit(ch); setModal('channel-settings'); }}
               isOwner={isOwner} />
           ) : (
@@ -446,6 +447,7 @@ export default function AppShell({ currentUser }) {
           <ChannelSettingsModal onClose={() => { setModal(null); setChannelToEdit(null); }} channel={channelToEdit}
             onDelete={() => { if (activeChannel?.id === channelToEdit.id) setActiveChannel(null); }} />
         )}
+        {modal === 'server-backups' && activeServer && <ServerBackupsModal onClose={() => setModal(null)} server={activeServer} currentUser={currentUser} />}
         {modal === 'search' && <AdvancedSearch onClose={() => setModal(null)} servers={servers} currentUserId={currentUser.id} />}
         {modal === 'media-gallery' && <MediaGallery onClose={() => setModal(null)} messages={currentMsgs} channelName={channelLabel} />}
         {modal === 'privacy-dashboard' && <PrivacyDashboard onClose={() => setModal(null)} profile={profile} currentUser={currentUser} onUpdate={(d) => updateProfile.mutate(d)} />}
