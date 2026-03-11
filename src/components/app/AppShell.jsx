@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useQueryClient, useMutation } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { AnimatePresence } from 'framer-motion';
@@ -30,9 +30,8 @@ import StatusPickerModal from '@/components/app/modals/StatusPickerModal';
 
 export default function AppShell({ currentUser }) {
   const qc = useQueryClient();
-  const { profiles, getProfile, refresh: refreshProfiles } = useProfiles();
+  const { getProfile, refresh: refreshProfiles } = useProfiles();
 
-  // Navigation
   const [view, setView] = useState('home');
   const [activeServer, setActiveServer] = useState(null);
   const [activeChannel, setActiveChannel] = useState(null);
@@ -46,7 +45,6 @@ export default function AppShell({ currentUser }) {
   const [isDeafened, setIsDeafened] = useState(false);
   const [profileUserId, setProfileUserId] = useState(null);
 
-  // Data
   const { data: profile } = useMyProfile(currentUser.email);
   const { data: servers = [] } = useServers(currentUser.id, currentUser.email);
   const { data: categories = [] } = useCategories(activeServer?.id);
@@ -59,59 +57,26 @@ export default function AppShell({ currentUser }) {
   const { data: friends = [] } = useFriends(currentUser.id);
   const { incoming: incomingReqs, outgoing: outgoingReqs } = useFriendRequests(currentUser.id, currentUser.email);
 
-  // Real-time subscriptions
-  useEffect(() => {
-    if (!activeChannel?.id) return;
-    return base44.entities.Message.subscribe((e) => {
-      if (e.data?.channel_id === activeChannel.id) qc.invalidateQueries({ queryKey: ['messages', activeChannel.id] });
-    });
-  }, [activeChannel?.id]);
-
-  useEffect(() => {
-    if (!activeConv?.id) return;
-    return base44.entities.DirectMessage.subscribe((e) => {
-      if (e.data?.conversation_id === activeConv.id) qc.invalidateQueries({ queryKey: ['dmMessages', activeConv.id] });
-    });
-  }, [activeConv?.id]);
+  // Realtime
+  useEffect(() => { if (!activeChannel?.id) return; return base44.entities.Message.subscribe(() => qc.invalidateQueries({ queryKey: ['messages', activeChannel.id] })); }, [activeChannel?.id]);
+  useEffect(() => { if (!activeConv?.id) return; return base44.entities.DirectMessage.subscribe(() => qc.invalidateQueries({ queryKey: ['dmMessages', activeConv.id] })); }, [activeConv?.id]);
 
   // Auto-select first text channel
-  useEffect(() => {
-    if (activeServer && channels.length > 0 && !activeChannel) {
-      const first = channels.find(c => c.type === 'text');
-      if (first) setActiveChannel(first);
-    }
-  }, [activeServer, channels]);
-
-  // Reset on context change
+  useEffect(() => { if (activeServer && channels.length > 0 && !activeChannel) { const first = channels.find(c => c.type === 'text'); if (first) setActiveChannel(first); } }, [activeServer, channels]);
   useEffect(() => { setReplyTo(null); setEditingMsg(null); }, [activeChannel?.id, activeConv?.id]);
 
-  // ── Mutations ──
+  // Mutations
   const createServer = useMutation({
     mutationFn: async ({ name, template, icon_url }) => {
       const code = Math.random().toString(36).substring(2, 8).toUpperCase();
       const server = await base44.entities.Server.create({ name, owner_id: currentUser.id, template: template || 'blank', invite_code: code, member_count: 1, icon_url });
       await base44.entities.ServerMember.create({ server_id: server.id, user_id: currentUser.id, user_email: currentUser.email, joined_at: new Date().toISOString(), role_ids: [] });
       await base44.entities.Role.create({ server_id: server.id, name: '@everyone', is_default: true, position: 0, color: '#99AAB5' });
-      // Create default channels based on template
       const cat = await base44.entities.Category.create({ server_id: server.id, name: 'Text Channels', position: 0 });
       await base44.entities.Channel.create({ server_id: server.id, category_id: cat.id, name: 'general', type: 'text', position: 0 });
-      if (template !== 'private') {
-        await base44.entities.Channel.create({ server_id: server.id, category_id: cat.id, name: 'off-topic', type: 'text', position: 1 });
-      }
+      if (template !== 'private' && template !== 'blank') await base44.entities.Channel.create({ server_id: server.id, category_id: cat.id, name: 'off-topic', type: 'text', position: 1 });
       const vCat = await base44.entities.Category.create({ server_id: server.id, name: 'Voice Channels', position: 1 });
       await base44.entities.Channel.create({ server_id: server.id, category_id: vCat.id, name: 'General', type: 'voice', position: 0 });
-      if (template === 'gaming') {
-        await base44.entities.Channel.create({ server_id: server.id, category_id: cat.id, name: 'looking-for-group', type: 'text', position: 2 });
-        await base44.entities.Channel.create({ server_id: server.id, category_id: vCat.id, name: 'Gaming', type: 'voice', position: 1 });
-      }
-      if (template === 'development') {
-        await base44.entities.Channel.create({ server_id: server.id, category_id: cat.id, name: 'bugs', type: 'text', position: 2 });
-        await base44.entities.Channel.create({ server_id: server.id, category_id: cat.id, name: 'pull-requests', type: 'text', position: 3 });
-      }
-      if (template === 'community') {
-        await base44.entities.Channel.create({ server_id: server.id, category_id: cat.id, name: 'introductions', type: 'text', position: 2 });
-        await base44.entities.Channel.create({ server_id: server.id, category_id: cat.id, name: 'announcements', type: 'announcement', position: 3 });
-      }
       return server;
     },
     onSuccess: (server) => { qc.invalidateQueries({ queryKey: ['servers'] }); selectServer(server); setModal(null); },
@@ -168,30 +133,25 @@ export default function AppShell({ currentUser }) {
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['myProfile'] }); refreshProfiles(); },
   });
 
-  // ── Handlers ──
+  // Navigation
   const selectServer = (s) => { setActiveServer(s); setActiveChannel(null); setActiveConv(null); setView('server'); };
   const goHome = () => { setActiveServer(null); setActiveChannel(null); setView('home'); };
   const goFriends = () => { setActiveConv(null); setView('friends'); };
 
-  const handleSend = async (data) => {
-    if (activeConv) await sendDM.mutateAsync(data);
-    else if (activeChannel) await sendMsg.mutateAsync(data);
-  };
+  const handleSend = async (data) => { if (activeConv) await sendDM.mutateAsync(data); else if (activeChannel) await sendMsg.mutateAsync(data); };
 
   const editMsg = useCallback(async (id, content) => {
-    if (activeConv) {
-      await base44.entities.DirectMessage.update(id, { content, is_edited: true });
-    } else {
-      await base44.entities.Message.update(id, { content, is_edited: true, edited_at: new Date().toISOString() });
-    }
+    if (activeConv) await base44.entities.DirectMessage.update(id, { content, is_edited: true });
+    else await base44.entities.Message.update(id, { content, is_edited: true, edited_at: new Date().toISOString() });
     qc.invalidateQueries({ queryKey: activeConv ? ['dmMessages', activeConv.id] : ['messages', activeChannel?.id] });
     setEditingMsg(null);
   }, [activeChannel?.id, activeConv?.id]);
 
   const deleteMsg = useCallback(async (msg) => {
     if (!confirm('Delete this message?')) return;
-    if (activeConv) { await base44.entities.DirectMessage.update(msg.id, { is_deleted: true }); qc.invalidateQueries({ queryKey: ['dmMessages', activeConv?.id] }); }
-    else { await base44.entities.Message.update(msg.id, { is_deleted: true }); qc.invalidateQueries({ queryKey: ['messages', activeChannel?.id] }); }
+    if (activeConv) await base44.entities.DirectMessage.update(msg.id, { is_deleted: true });
+    else await base44.entities.Message.update(msg.id, { is_deleted: true });
+    qc.invalidateQueries({ queryKey: activeConv ? ['dmMessages', activeConv?.id] : ['messages', activeChannel?.id] });
   }, [activeChannel?.id, activeConv?.id]);
 
   const pinMsg = useCallback(async (msg) => {
@@ -207,11 +167,10 @@ export default function AppShell({ currentUser }) {
       const has = existing.users?.includes(currentUser.id);
       if (has) updated = reactions.map(r => r.emoji === emoji ? { ...r, count: r.count - 1, users: r.users.filter(u => u !== currentUser.id) } : r).filter(r => r.count > 0);
       else updated = reactions.map(r => r.emoji === emoji ? { ...r, count: r.count + 1, users: [...(r.users || []), currentUser.id] } : r);
-    } else {
-      updated = [...reactions, { emoji, count: 1, users: [currentUser.id] }];
-    }
-    if (activeConv) { await base44.entities.DirectMessage.update(msg.id, { reactions: updated }); qc.invalidateQueries({ queryKey: ['dmMessages', activeConv?.id] }); }
-    else { await base44.entities.Message.update(msg.id, { reactions: updated }); qc.invalidateQueries({ queryKey: ['messages', activeChannel?.id] }); }
+    } else { updated = [...reactions, { emoji, count: 1, users: [currentUser.id] }]; }
+    if (activeConv) await base44.entities.DirectMessage.update(msg.id, { reactions: updated });
+    else await base44.entities.Message.update(msg.id, { reactions: updated });
+    qc.invalidateQueries({ queryKey: activeConv ? ['dmMessages', activeConv?.id] : ['messages', activeChannel?.id] });
   }, [currentUser.id, activeChannel?.id, activeConv?.id]);
 
   const handleStartDM = async (friend) => {
@@ -224,73 +183,49 @@ export default function AppShell({ currentUser }) {
       ], last_message_at: new Date().toISOString(),
     });
     qc.invalidateQueries({ queryKey: ['conversations'] });
-    setActiveConv(conv);
-    setView('home');
+    setActiveConv(conv); setView('home');
   };
 
   const handleCreateGroupDM = async ({ name, participants }) => {
     const conv = await base44.entities.Conversation.create({
       type: 'group', name,
-      participants: [
-        { user_id: currentUser.id, user_email: currentUser.email, user_name: profile?.display_name, avatar: profile?.avatar_url },
-        ...participants,
-      ],
+      participants: [{ user_id: currentUser.id, user_email: currentUser.email, user_name: profile?.display_name, avatar: profile?.avatar_url }, ...participants],
       owner_id: currentUser.id, last_message_at: new Date().toISOString(),
     });
     qc.invalidateQueries({ queryKey: ['conversations'] });
-    setActiveConv(conv);
-    setView('home');
-    setModal(null);
-  };
-
-  const handleProfileClick = (userId) => {
-    if (userId) { setProfileUserId(userId); setModal('profile'); }
+    setActiveConv(conv); setView('home'); setModal(null);
   };
 
   const handleStatusUpdate = async ({ status, customStatus }) => {
-    if (profile?.id) {
-      await base44.entities.UserProfile.update(profile.id, { status, custom_status: customStatus });
-      qc.invalidateQueries({ queryKey: ['myProfile'] });
-      refreshProfiles();
-    }
+    if (profile?.id) { await base44.entities.UserProfile.update(profile.id, { status, custom_status: customStatus }); qc.invalidateQueries({ queryKey: ['myProfile'] }); refreshProfiles(); }
     setModal(null);
   };
 
-  const handleServerSettingsClose = (result) => {
-    setModal(null);
-    if (result === 'deleted') goHome();
-  };
-
-  // Computed state
+  // Computed
   const isDM = !!activeConv;
   const isInChat = (view === 'server' && activeChannel) || (view === 'home' && activeConv);
   const currentMsgs = isDM ? dmMessages : messages;
   const currentLoading = isDM ? dmLoading : msgsLoading;
-  const channelLabel = isDM
-    ? (activeConv.name || activeConv.participants?.find(p => p.user_id !== currentUser.id)?.user_name || 'DM')
-    : (activeChannel?.name || '');
+  const channelLabel = isDM ? (activeConv.name || activeConv.participants?.find(p => p.user_id !== currentUser.id)?.user_name || 'DM') : (activeChannel?.name || '');
   const pinnedCount = messages.filter(m => m.is_pinned).length;
   const isOwner = activeServer?.owner_id === currentUser.id || activeServer?.created_by === currentUser.email;
-
-  // Profile for modal
-  const profileModalData = profileUserId ? getProfile(profileUserId) : null;
+  const profileModal = profileUserId ? getProfile(profileUserId) : null;
   const profileMember = profileUserId ? members.find(m => m.user_id === profileUserId) : null;
 
   return (
-    <div className="h-screen w-screen flex overflow-hidden" style={{ background: 'var(--bg)' }}>
+    <div className="h-screen w-screen flex overflow-hidden" style={{ background: 'var(--bg-base)' }}>
       {/* Rail */}
       <ServerRail servers={servers} activeServerId={activeServer?.id} onServerSelect={selectServer} onHomeClick={goHome}
         onCreateServer={() => setModal('create-server')} onDiscover={() => setModal('join-server')}
         isHome={view === 'home' || view === 'friends'} badge={incomingReqs.length} />
 
       {/* Sidebar */}
-      <div className="w-[240px] flex-shrink-0 flex flex-col" style={{ background: 'var(--bg-secondary)' }}>
+      <div className="w-[232px] flex-shrink-0 flex flex-col" style={{ background: 'var(--bg-surface)', borderRight: '1px solid var(--border)' }}>
         {view === 'server' ? (
           <ChannelSidebar server={activeServer} categories={categories} channels={channels}
-            activeId={activeChannel?.id} onSelect={(ch) => setActiveChannel(ch)}
+            activeId={activeChannel?.id} onSelect={setActiveChannel}
             onAdd={(catId) => { setModalData(catId); setModal('create-channel'); }}
-            onSettings={() => setModal('server-settings')} onInvite={() => setModal('invite')}
-            isOwner={isOwner} />
+            onSettings={() => setModal('server-settings')} onInvite={() => setModal('invite')} isOwner={isOwner} />
         ) : (
           <DMSidebar conversations={conversations} activeId={activeConv?.id}
             onSelect={(c) => { setActiveConv(c); setView('home'); }}
@@ -302,14 +237,14 @@ export default function AppShell({ currentUser }) {
       </div>
 
       {/* Main */}
-      <div className="flex-1 flex flex-col min-w-0 relative" style={{ background: 'var(--bg)' }}>
+      <div className="flex-1 flex flex-col min-w-0 relative" style={{ background: 'var(--bg-base)' }}>
         {view === 'friends' ? (
           <FriendsView friends={friends} incomingRequests={incomingReqs} outgoingRequests={outgoingReqs}
             onAddFriend={() => setModal('add-friend')} onMessage={handleStartDM}
             onAccept={async (r) => {
               await base44.entities.Friendship.update(r.id, { status: 'accepted' });
-              const senderProfile = getProfile(r.user_id);
-              await base44.entities.Friendship.create({ user_id: r.friend_id || currentUser.id, friend_id: r.user_id, friend_email: r.created_by, friend_name: senderProfile?.display_name || 'User', friend_avatar: senderProfile?.avatar_url, status: 'accepted', initiated_by: r.initiated_by });
+              const sp = getProfile(r.user_id);
+              await base44.entities.Friendship.create({ user_id: r.friend_id || currentUser.id, friend_id: r.user_id, friend_email: r.created_by, friend_name: sp?.display_name || 'User', friend_avatar: sp?.avatar_url, status: 'accepted', initiated_by: r.initiated_by });
               qc.invalidateQueries({ queryKey: ['friends'] }); qc.invalidateQueries({ queryKey: ['incomingRequests'] });
             }}
             onDecline={async (r) => { await base44.entities.Friendship.delete(r.id); qc.invalidateQueries({ queryKey: ['incomingRequests'] }); }}
@@ -317,19 +252,20 @@ export default function AppShell({ currentUser }) {
         ) : isInChat ? (
           <>
             <ChatHeader channel={activeChannel} conversation={activeConv} currentUserId={currentUser.id}
-              memberCount={members.length} showMembers={showMembers} onToggleMembers={() => setShowMembers(!showMembers)}
+              showMembers={showMembers} onToggleMembers={() => setShowMembers(!showMembers)}
               isDM={isDM} onPinned={!isDM ? () => setModal('pinned') : undefined} pinnedCount={pinnedCount} />
             <div className="flex-1 flex min-h-0">
               <div className="flex-1 flex flex-col min-w-0">
                 <MessageList messages={currentMsgs} currentUserId={currentUser.id} channelName={channelLabel}
                   isLoading={currentLoading} isDM={isDM} onReply={setReplyTo} onEdit={setEditingMsg}
                   onDelete={deleteMsg} onReact={reactMsg} onPin={!isDM ? pinMsg : undefined}
-                  onProfileClick={handleProfileClick}
+                  onProfileClick={(id) => { setProfileUserId(id); setModal('profile'); }}
                   editingMessage={editingMsg} onEditSave={editMsg} onEditCancel={() => setEditingMsg(null)} />
                 <ChatInput channelName={channelLabel} replyTo={replyTo} onCancelReply={() => setReplyTo(null)} onSend={handleSend} />
               </div>
               {view === 'server' && showMembers && (
-                <MemberPanel members={members} roles={roles} ownerId={activeServer?.owner_id} onProfileClick={handleProfileClick} />
+                <MemberPanel members={members} roles={roles} ownerId={activeServer?.owner_id}
+                  onProfileClick={(id) => { setProfileUserId(id); setModal('profile'); }} />
               )}
             </div>
           </>
@@ -346,14 +282,11 @@ export default function AppShell({ currentUser }) {
         {modal === 'add-friend' && <AddFriendModal onClose={() => setModal(null)} currentUserId={currentUser.id} />}
         {modal === 'settings' && <SettingsModal onClose={() => setModal(null)} profile={profile} onUpdate={(d) => updateProfile.mutate(d)} onLogout={() => base44.auth.logout()} />}
         {modal === 'invite' && activeServer && <InviteModal onClose={() => setModal(null)} server={activeServer} />}
-        {modal === 'server-settings' && activeServer && <ServerSettingsModal onClose={handleServerSettingsClose} server={activeServer} currentUserId={currentUser.id} />}
-        {modal === 'profile' && profileModalData && (
-          <UserProfileModal onClose={() => { setModal(null); setProfileUserId(null); }} profile={profileModalData} memberData={profileMember} roles={roles}
+        {modal === 'server-settings' && activeServer && <ServerSettingsModal onClose={(r) => { setModal(null); if (r === 'deleted') goHome(); }} server={activeServer} currentUserId={currentUser.id} />}
+        {modal === 'profile' && profileModal && (
+          <UserProfileModal onClose={() => { setModal(null); setProfileUserId(null); }} profile={profileModal} memberData={profileMember} roles={roles}
             isCurrentUser={profileUserId === currentUser.id}
-            onMessage={() => {
-              const friendEntry = friends.find(f => f.friend_id === profileUserId);
-              if (friendEntry) { handleStartDM(friendEntry); setModal(null); setProfileUserId(null); }
-            }} />
+            onMessage={() => { const f = friends.find(x => x.friend_id === profileUserId); if (f) { handleStartDM(f); setModal(null); setProfileUserId(null); } }} />
         )}
         {modal === 'create-group-dm' && <CreateGroupDMModal onClose={() => setModal(null)} friends={friends} onCreate={handleCreateGroupDM} />}
         {modal === 'pinned' && <PinnedMessagesModal onClose={() => setModal(null)} messages={messages} onUnpin={pinMsg} />}
