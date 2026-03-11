@@ -322,9 +322,8 @@ export default function AppShell({ currentUser }) {
         <ServerRailWithContext servers={servers} activeServerId={activeServer?.id} onServerSelect={selectServer} onHomeClick={goHome}
           onCreateServer={() => setModal('create-server')} onDiscover={() => setModal('join-server')}
           onElite={() => setModal('elite')} onLeaveServer={leaveServer}
-          isHome={view === 'home' || view === 'friends' || view === 'spaces'} badge={incomingReqs.length}
-          currentUserId={currentUser.id}
-          onSpaces={() => setView('spaces')} onSearch={() => setModal('search')} />
+          isHome={view === 'home' || view === 'friends'} badge={incomingReqs.length}
+          currentUserId={currentUser.id} />
 
         <div className="w-[240px] flex-shrink-0 flex flex-col" style={{ background: `linear-gradient(180deg, ${colors.bg.surface}, ${colors.bg.base}ee)`, borderRight: `1px solid ${colors.border.default}` }}>
           {view === 'server' ? (
