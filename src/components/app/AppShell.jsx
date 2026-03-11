@@ -318,7 +318,7 @@ export default function AppShell({ currentUser }) {
       <ConnectionBanner />
 
       {/* Desktop: always show. Mobile: show when sidebar toggled */}
-      <div className={`${showMobileSidebar ? 'flex' : 'hidden'} md:flex flex-row absolute md:relative inset-0 z-40 md:z-auto`}>
+      <div className={`${showMobileSidebar ? 'flex' : 'hidden'} md:flex flex-row absolute md:relative inset-0 z-40 md:z-auto`} role="navigation" aria-label="Sidebar">
         <ServerRailWithContext servers={servers} activeServerId={activeServer?.id} onServerSelect={selectServer} onHomeClick={goHome}
           onCreateServer={() => setModal('create-server')} onDiscover={() => setModal('join-server')}
           onElite={() => setModal('elite')} onLeaveServer={leaveServer}
@@ -351,7 +351,7 @@ export default function AppShell({ currentUser }) {
         <div className="flex-1 md:hidden" onClick={() => setShowMobileSidebar(false)} />
       </div>
 
-      <div className="flex-1 flex flex-col min-w-0 relative" style={{ background: colors.bg.base }} role="main">
+      <div className="flex-1 flex flex-col min-w-0 relative k-channel-fade" style={{ background: colors.bg.base }} role="main" key={activeChannel?.id || activeConv?.id || view}>
         {view === 'spaces' ? (
           <SpacesView currentUser={currentUser} profile={profile} />
         ) : view === 'friends' ? (
