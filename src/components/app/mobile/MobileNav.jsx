@@ -12,7 +12,7 @@ const tabs = [
 
 export default function MobileNav({ active, onChange, badge }) {
   return (
-    <nav className="flex items-center justify-around h-14 flex-shrink-0 md:hidden safe-bottom"
+    <nav className="flex items-center justify-around h-14 flex-shrink-0 md:hidden safe-bottom relative z-50"
       style={{ background: colors.bg.base, borderTop: `1px solid ${colors.border.default}` }}
       role="tablist" aria-label="Main navigation">
       {tabs.map(t => {
