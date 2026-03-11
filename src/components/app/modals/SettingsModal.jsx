@@ -115,6 +115,34 @@ export default function SettingsModal({ onClose, profile, onUpdate, onLogout }) 
         {/* Content */}
         <div className="flex-1 overflow-y-auto space-y-4 max-h-[540px] scrollbar-none">
           {tab === 'profile' && <>
+            {/* Profile completion */}
+            {(() => {
+              const checks = [
+                { done: !!profile?.avatar_url, label: 'Add an avatar' },
+                { done: !!profile?.bio, label: 'Write a bio' },
+                { done: !!profile?.social_links && Object.values(profile.social_links).some(v => v), label: 'Connect a social account' },
+                { done: !!profile?.custom_status?.text, label: 'Set a custom status' },
+              ];
+              const done = checks.filter(c => c.done).length;
+              const pct = Math.round((done / checks.length) * 100);
+              if (pct < 100) return (
+                <div className="p-3 rounded-lg mb-2" style={{ background: colors.bg.base, border: `1px solid ${colors.border.default}` }}>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-[12px] font-semibold" style={{ color: colors.text.primary }}>Profile {pct}% complete</span>
+                    <span className="text-[11px]" style={{ color: colors.text.muted }}>{done}/{checks.length}</span>
+                  </div>
+                  <div className="w-full h-1.5 rounded-full overflow-hidden" style={{ background: colors.bg.overlay }}>
+                    <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, background: pct === 100 ? colors.success : colors.accent.primary }} />
+                  </div>
+                  <div className="mt-2 space-y-1">
+                    {checks.filter(c => !c.done).map((c, i) => (
+                      <p key={i} className="text-[11px]" style={{ color: colors.text.muted }}>• {c.label}</p>
+                    ))}
+                  </div>
+                </div>
+              );
+              return null;
+            })()}
             <div className="flex items-center gap-4">
               <button onClick={() => handleFile('avatar_url')} className="relative w-[72px] h-[72px] rounded-full flex items-center justify-center text-xl font-bold overflow-hidden group"
                 style={{ background: colors.bg.overlay, color: colors.text.muted }}>
