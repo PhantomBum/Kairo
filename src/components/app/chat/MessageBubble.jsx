@@ -221,7 +221,7 @@ const MessageBubble = memo(function MessageBubble({ message, compact, isOwn, onR
       </ContextMenuTrigger>
 
       {/* Context menu - only show full actions for non-deleted messages */}
-      <ContextMenuContent className="w-56 p-1.5 rounded-lg" style={{ background: colors.bg.modal, border: `1px solid ${colors.border.light}`, boxShadow: shadows.strong }}>
+      <ContextMenuContent className="w-56 p-1.5 rounded-xl" style={{ background: 'rgba(22,22,32,0.92)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.08)', boxShadow: shadows.strong }}>
         {!isDeleted && <>
           <div className="flex items-center gap-0.5 px-1 py-1 mb-1">
             {['👍', '❤️', '😂', '🔥', '👀', '✨'].map(e => (
