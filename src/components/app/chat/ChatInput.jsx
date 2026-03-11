@@ -1,7 +1,7 @@
 import React, { useState, useRef, useCallback } from 'react';
 import { Plus, Send, X, Smile, Image, FileText, Film, Type } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
-import { colors, radius } from '@/components/app/design/tokens';
+import { colors } from '@/components/app/design/tokens';
 import FormattingToolbar from '@/components/app/features/FormattingToolbar';
 
 const EMOJIS = ['😀','😂','😍','🤔','👍','👎','❤️','🔥','🎉','😎','😢','😡','🙏','💯','✨','🚀','👀','🤝','💀','🎮','🎵','☕','⭐','💜'];
@@ -124,10 +124,12 @@ export default function ChatInput({ channelName, replyTo, onCancelReply, onSend,
 
       {/* Main input */}
       <div className="flex items-end gap-2 px-4 py-3 rounded-lg" style={{ background: colors.bg.elevated, border: `1px solid ${colors.border.default}` }}>
-        <button onClick={() => fileRef.current?.click()} className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-[rgba(255,255,255,0.06)] flex-shrink-0 mb-0.5 transition-colors">
+        <button onClick={() => fileRef.current?.click()}
+          className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-[rgba(255,255,255,0.06)] flex-shrink-0 mb-0.5"
+          aria-label="Upload file" title="Upload file">
           <Plus className="w-5 h-5" style={{ color: colors.text.muted }} />
         </button>
-        <input ref={fileRef} type="file" onChange={e => { if (e.target.files?.length) uploadFiles(e.target.files); if (fileRef.current) fileRef.current.value = ''; }} className="hidden" multiple />
+        <input ref={fileRef} type="file" onChange={e => { if (e.target.files?.length) uploadFiles(e.target.files); if (fileRef.current) fileRef.current.value = ''; }} className="hidden" multiple aria-hidden="true" />
         <textarea ref={inputRef} value={content}
           onChange={e => { setContent(e.target.value); handleTyping(); }}
           onKeyDown={e => {
@@ -138,17 +140,21 @@ export default function ChatInput({ channelName, replyTo, onCancelReply, onSend,
           aria-label={`Message ${channelName || 'channel'}`}
           className="flex-1 bg-transparent text-[15px] outline-none resize-none max-h-[144px]"
           style={{ color: colors.text.primary, lineHeight: '22px' }} rows={1} />
-        {nearLimit && <span className="text-[11px] mb-1 flex-shrink-0" style={{ color: charCount > 2000 ? colors.danger : colors.warning }}>{2000 - charCount}</span>}
-        <button onClick={() => setShowFormatting(!showFormatting)} className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-[rgba(255,255,255,0.06)] flex-shrink-0 mb-0.5 transition-colors"
-          title="Formatting">
+        {nearLimit && <span className="text-[11px] mb-1 flex-shrink-0 tabular-nums" style={{ color: charCount > 2000 ? colors.danger : colors.warning }} aria-live="polite">{2000 - charCount}</span>}
+        <button onClick={() => setShowFormatting(!showFormatting)}
+          className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-[rgba(255,255,255,0.06)] flex-shrink-0 mb-0.5"
+          title="Formatting" aria-label="Toggle formatting" aria-pressed={showFormatting}>
           <Type className="w-5 h-5" style={{ color: showFormatting ? colors.text.primary : colors.text.muted }} />
         </button>
-        <button onClick={() => setShowEmoji(!showEmoji)} className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-[rgba(255,255,255,0.06)] flex-shrink-0 mb-0.5 transition-colors">
+        <button onClick={() => setShowEmoji(!showEmoji)}
+          className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-[rgba(255,255,255,0.06)] flex-shrink-0 mb-0.5"
+          title="Emoji" aria-label="Toggle emoji picker" aria-pressed={showEmoji}>
           <Smile className="w-5 h-5" style={{ color: showEmoji ? colors.text.primary : colors.text.muted }} />
         </button>
         <button onClick={handleSend} disabled={(!content.trim() && files.length === 0) || sending}
-          className="w-8 h-8 flex items-center justify-center rounded-md flex-shrink-0 mb-0.5 disabled:opacity-20 transition-all"
-          style={{ background: content.trim() || files.length > 0 ? colors.accent.primary : 'transparent', color: content.trim() || files.length > 0 ? '#fff' : colors.text.muted, borderRadius: radius.sm }}>
+          className="w-8 h-8 flex items-center justify-center rounded-md flex-shrink-0 mb-0.5 disabled:opacity-20"
+          style={{ background: content.trim() || files.length > 0 ? colors.accent.primary : 'transparent', color: content.trim() || files.length > 0 ? '#fff' : colors.text.muted, borderRadius: '8px' }}
+          aria-label="Send message" title="Send">
           <Send className="w-[18px] h-[18px]" />
         </button>
       </div>
