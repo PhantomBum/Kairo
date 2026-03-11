@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { X, MessageSquare, Globe, Github, Crown, Shield, Star, Zap, Heart, Calendar, Clock, Twitter, Instagram, Music, Gamepad2, UserPlus, Ban, Eye, Sparkles, Award, Moon, Bug, Volume2 } from 'lucide-react';
+import { X, MessageSquare, Globe, Github, Crown, Shield, Star, Zap, Heart, Calendar, Clock, Twitter, Instagram, Music, Gamepad2, UserPlus, Ban, Eye, Sparkles, Award, Moon, Bug, Volume2, Users } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { useProfiles } from '@/components/app/providers/ProfileProvider';
 import ReactMarkdown from 'react-markdown';
@@ -61,9 +61,12 @@ export default function UserProfileModal({ onClose, profile, memberData, roles, 
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(8px)' }} onClick={onClose}>
-      <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }}
-        className="w-[400px] rounded-2xl overflow-hidden" style={{ background: theme.bg, border: `1px solid ${theme.border}`, boxShadow: 'var(--shadow-lg)' }}
+      transition={{ duration: 0.15, ease: [0.4, 0, 0.2, 1] }}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(4px)' }} onClick={onClose}
+      role="dialog" aria-modal="true" aria-label="User profile">
+      <motion.div initial={{ scale: 0.96, opacity: 0, y: 8 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.96, opacity: 0, y: 4 }}
+        transition={{ type: 'spring', damping: 25, stiffness: 350, duration: 0.25 }}
+        className="w-full max-w-[400px] rounded-2xl overflow-hidden" style={{ background: theme.bg, border: `1px solid ${theme.border}`, boxShadow: 'var(--shadow-lg)' }}
         onClick={e => e.stopPropagation()}>
         {/* Banner */}
         <div className="h-28 relative" style={{ background: profile.banner_url ? `url(${profile.banner_url}) center/cover` : `linear-gradient(135deg, ${profile.accent_color || '#1a1a1a'}80, var(--bg-surface))` }}>
@@ -198,7 +201,11 @@ export default function UserProfileModal({ onClose, profile, memberData, roles, 
                   </div>
                 </div>
               ) : (
-                <p className="text-center py-6 text-[11px]" style={{ color: 'var(--text-muted)' }}>No current activity</p>
+                <div className="text-center py-8 k-fade-in">
+                  <Gamepad2 className="w-8 h-8 mx-auto mb-2 opacity-20" style={{ color: 'var(--text-muted)' }} />
+                  <p className="text-[13px] font-medium mb-0.5" style={{ color: 'var(--text-secondary)' }}>No current activity</p>
+                  <p className="text-[11px]" style={{ color: 'var(--text-muted)' }}>When they're playing or listening to something, it'll show here</p>
+                </div>
               )}
             </div>
           )}
@@ -233,7 +240,11 @@ export default function UserProfileModal({ onClose, profile, memberData, roles, 
                 </div>
               )}
               {mutualServers.length === 0 && mutualFriends.length === 0 && (
-                <p className="text-center py-6 text-[11px]" style={{ color: 'var(--text-muted)' }}>No mutual servers or friends</p>
+                <div className="text-center py-8 k-fade-in">
+                  <Users className="w-8 h-8 mx-auto mb-2 opacity-20" style={{ color: 'var(--text-muted)' }} />
+                  <p className="text-[13px] font-medium mb-0.5" style={{ color: 'var(--text-secondary)' }}>No mutual connections</p>
+                  <p className="text-[11px]" style={{ color: 'var(--text-muted)' }}>You don't share any servers or friends yet</p>
+                </div>
               )}
             </div>
           )}
