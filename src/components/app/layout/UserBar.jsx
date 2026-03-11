@@ -1,5 +1,5 @@
 import React from 'react';
-import { Mic, MicOff, Headphones, HeadphoneOff, Settings } from 'lucide-react';
+import { Mic, MicOff, Headphones, Settings } from 'lucide-react';
 import { colors } from '@/components/app/design/tokens';
 
 export default function UserBar({ profile, isMuted, isDeafened, onToggleMute, onToggleDeafen, onSettings, onStatusClick }) {
@@ -33,7 +33,7 @@ export default function UserBar({ profile, isMuted, isDeafened, onToggleMute, on
           {isMuted ? <MicOff className="w-[18px] h-[18px]" style={{ color: colors.danger }} /> : <Mic className="w-[18px] h-[18px]" style={{ color: colors.text.muted }} />}
         </button>
         <button onClick={onToggleDeafen} className="w-8 h-8 flex items-center justify-center rounded-md transition-colors hover:bg-[rgba(255,255,255,0.06)]" title={isDeafened ? 'Undeafen' : 'Deafen'}>
-          {isDeafened ? <HeadphoneOff className="w-[18px] h-[18px]" style={{ color: colors.danger }} /> : <Headphones className="w-[18px] h-[18px]" style={{ color: colors.text.muted }} />}
+          <Headphones className="w-[18px] h-[18px]" style={{ color: isDeafened ? colors.danger : colors.text.muted }} />
         </button>
         <button onClick={onSettings} className="w-8 h-8 flex items-center justify-center rounded-md transition-colors hover:bg-[rgba(255,255,255,0.06)]" title="User Settings">
           <Settings className="w-[18px] h-[18px]" style={{ color: colors.text.muted }} />
