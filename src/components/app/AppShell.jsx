@@ -414,7 +414,7 @@ export default function AppShell({ currentUser }) {
         <div className="flex-1 md:hidden" onClick={() => setShowMobileSidebar(false)} />
       </div>
 
-      <div className="flex-1 flex flex-col min-w-0 relative k-channel-fade" style={{ background: colors.bg.base }} role="main" key={activeChannel?.id || activeConv?.id || view}>
+      <div className="flex-1 flex flex-col min-w-0 relative k-channel-fade" style={{ background: `linear-gradient(180deg, ${colors.bg.base} 0%, rgba(14,14,22,1) 100%)` }} role="main" key={activeChannel?.id || activeConv?.id || view}>
         {view === 'spaces' ? (
           <SpacesView currentUser={currentUser} profile={profile} />
         ) : view === 'friends' ? (
