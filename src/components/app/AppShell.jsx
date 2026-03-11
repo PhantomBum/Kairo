@@ -9,6 +9,7 @@ import { useChannelCache } from '@/components/app/performance/useChannelCache';
 import { useSwipeGesture } from '@/components/app/mobile/useSwipeGesture';
 import ConnectionBanner from '@/components/app/performance/ConnectionBanner';
 import MobileNav from '@/components/app/mobile/MobileNav';
+import { colors } from '@/components/app/design/tokens';
 
 import ServerRailWithContext from '@/components/app/layout/ServerRailWithContext';
 import DraggableChannelSidebar from '@/components/app/layout/DraggableChannelSidebar';
@@ -304,7 +305,7 @@ export default function AppShell({ currentUser }) {
   const isFriendProfile = profileUserId ? friends.some(f => f.friend_id === profileUserId) : false;
 
   return (
-    <div className="h-screen w-screen flex flex-col md:flex-row overflow-hidden" style={{ background: 'var(--bg-base)' }} {...swipeHandlers}>
+    <div className="h-screen w-screen flex flex-col md:flex-row overflow-hidden" style={{ background: colors.bg.base }} {...swipeHandlers}>
       <ConnectionBanner />
 
       {/* Desktop: always show. Mobile: show when sidebar toggled */}
@@ -314,7 +315,7 @@ export default function AppShell({ currentUser }) {
           onElite={() => setModal('elite')} onLeaveServer={leaveServer}
           isHome={view === 'home' || view === 'friends'} badge={incomingReqs.length} />
 
-        <div className="w-[232px] flex-shrink-0 flex flex-col" style={{ background: 'var(--bg-surface)', borderRight: '1px solid var(--border)' }}>
+        <div className="w-[240px] flex-shrink-0 flex flex-col" style={{ background: colors.bg.surface, borderRight: `1px solid ${colors.border.default}` }}>
           {view === 'server' ? (
             <DraggableChannelSidebar server={activeServer} categories={categories} channels={channels}
               activeId={activeChannel?.id} onSelect={(ch) => { setActiveChannel(ch); setShowMobileSidebar(false); }}
@@ -339,7 +340,7 @@ export default function AppShell({ currentUser }) {
         <div className="flex-1 md:hidden" onClick={() => setShowMobileSidebar(false)} />
       </div>
 
-      <div className="flex-1 flex flex-col min-w-0 relative" style={{ background: 'var(--bg-base)' }} role="main">
+      <div className="flex-1 flex flex-col min-w-0 relative" style={{ background: colors.bg.base }} role="main">
         {view === 'friends' ? (
           <FriendsView friends={friends} incomingRequests={incomingReqs} outgoingRequests={outgoingReqs}
             onAddFriend={() => setModal('add-friend')} onMessage={handleStartDM} onBlock={handleBlock}
