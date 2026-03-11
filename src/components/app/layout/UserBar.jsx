@@ -1,5 +1,5 @@
 import React from 'react';
-import { Mic, MicOff, Headphones, Settings } from 'lucide-react';
+import { Mic, MicOff, Headphones, Settings, Ghost } from 'lucide-react';
 import { colors } from '@/components/app/design/tokens';
 
 export default function UserBar({ profile, isMuted, isDeafened, onToggleMute, onToggleDeafen, onSettings, onStatusClick }) {
@@ -9,6 +9,7 @@ export default function UserBar({ profile, isMuted, isDeafened, onToggleMute, on
   const statusColor = colors.status[status] || colors.status.offline;
   const customText = profile?.custom_status?.text;
   const customEmoji = profile?.custom_status?.emoji;
+  const isGhost = profile?.settings?.ghost_mode;
 
   return (
     <div className="px-2 py-2 flex items-center gap-1 flex-shrink-0" style={{ background: colors.bg.base, borderTop: `1px solid ${colors.border.default}` }}>
@@ -19,12 +20,15 @@ export default function UserBar({ profile, isMuted, isDeafened, onToggleMute, on
             {avatar ? <img src={avatar} className="w-full h-full object-cover" alt="" /> : name.charAt(0).toUpperCase()}
           </div>
           <div className="absolute -bottom-0.5 -right-0.5 w-[14px] h-[14px] rounded-full border-[3px]"
-            style={{ background: statusColor, borderColor: colors.bg.base }} />
+            style={{ background: isGhost ? colors.status.invisible : statusColor, borderColor: colors.bg.base }} />
         </div>
         <div className="flex-1 min-w-0 text-left">
-          <div className="text-[13px] font-semibold truncate leading-tight" style={{ color: colors.text.primary }}>{name}</div>
+          <div className="text-[13px] font-semibold truncate leading-tight flex items-center gap-1" style={{ color: colors.text.primary }}>
+            {name}
+            {isGhost && <Ghost className="w-3 h-3 flex-shrink-0" style={{ color: colors.accent.primary, opacity: 0.6 }} />}
+          </div>
           <div className="text-[11px] truncate leading-tight" style={{ color: colors.text.muted }}>
-            {customEmoji ? customEmoji + ' ' : ''}{customText || status}
+            {isGhost ? '👻 Ghost Mode' : (customEmoji ? customEmoji + ' ' : '') + (customText || status)}
           </div>
         </div>
       </button>
