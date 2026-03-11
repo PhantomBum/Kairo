@@ -40,7 +40,7 @@ const MessageBubble = memo(function MessageBubble({ message, compact, isOwn, onR
           style={{
             padding: compact ? '2px 16px 2px 16px' : '4px 16px 4px 16px',
             background: hovered ? 'rgba(255,255,255,0.02)' : message.is_pinned ? `${colors.warning}06` : 'transparent',
-            transition: 'background 0.1s',
+            transition: 'background 0.15s ease-out',
           }}>
 
           {/* Pinned indicator */}
@@ -106,7 +106,7 @@ const MessageBubble = memo(function MessageBubble({ message, compact, isOwn, onR
                 </div>
               ) : (
                 <div className="relative">
-                  <div className="text-[15px] leading-[1.5] break-words whitespace-pre-wrap overflow-hidden" style={{ color: colors.text.secondary, maxHeight: isLong && !expanded ? '300px' : 'none' }}>
+                  <div className="text-[15px] leading-[1.375] break-words whitespace-pre-wrap overflow-hidden" style={{ color: colors.text.secondary, maxHeight: isLong && !expanded ? '300px' : 'none' }}>
                     {renderText(message.content, onLinkClick)}
                   </div>
                   {isLong && !expanded && (
@@ -165,14 +165,15 @@ const MessageBubble = memo(function MessageBubble({ message, compact, isOwn, onR
           {/* Hover action bar */}
           {hovered && !isEditing && !isDeleted && (
             <div className="absolute -top-4 right-4 flex items-center p-[3px] rounded-lg gap-[2px] z-10 k-scale-in"
-              style={{ background: colors.bg.modal, boxShadow: shadows.medium, border: `1px solid ${colors.border.light}` }}>
+              style={{ background: colors.bg.modal, boxShadow: shadows.medium, border: `1px solid ${colors.border.light}` }}
+              role="toolbar" aria-label="Message actions">
               {quickEmojis.map(e => <button key={e} onClick={() => onReact(message, e)} className="w-7 h-7 flex items-center justify-center rounded-md text-sm hover:bg-[rgba(255,255,255,0.06)] transition-colors">{e}</button>)}
               <div className="w-px h-5 mx-0.5" style={{ background: colors.border.default }} />
               <button onClick={() => onReply(message)} className="w-7 h-7 flex items-center justify-center rounded-md hover:bg-[rgba(255,255,255,0.06)]" title="Reply"><Reply className="w-4 h-4" style={{ color: colors.text.muted }} /></button>
               {onPin && <button onClick={() => onPin(message)} className="w-7 h-7 flex items-center justify-center rounded-md hover:bg-[rgba(255,255,255,0.06)]" title={message.is_pinned ? 'Unpin' : 'Pin'}>{message.is_pinned ? <PinOff className="w-3.5 h-3.5" style={{ color: colors.warning }} /> : <Pin className="w-3.5 h-3.5" style={{ color: colors.text.muted }} />}</button>}
               {isOwn && <>
-                <button onClick={() => onEdit(message)} className="w-7 h-7 flex items-center justify-center rounded-md hover:bg-[rgba(255,255,255,0.06)]" title="Edit"><Pencil className="w-3.5 h-3.5" style={{ color: colors.text.muted }} /></button>
-                <button onClick={() => onDelete(message)} className="w-7 h-7 flex items-center justify-center rounded-md hover:bg-[rgba(255,255,255,0.06)]" title="Delete"><Trash2 className="w-3.5 h-3.5" style={{ color: colors.danger }} /></button>
+                <button onClick={() => onEdit(message)} className="w-7 h-7 flex items-center justify-center rounded-md hover:bg-[rgba(255,255,255,0.06)]" title="Edit" aria-label="Edit message"><Pencil className="w-3.5 h-3.5" style={{ color: colors.text.muted }} /></button>
+                <button onClick={() => onDelete(message)} className="w-7 h-7 flex items-center justify-center rounded-md hover:bg-[rgba(255,255,255,0.06)]" title="Delete" aria-label="Delete message"><Trash2 className="w-3.5 h-3.5" style={{ color: colors.danger }} /></button>
               </>}
             </div>
           )}
