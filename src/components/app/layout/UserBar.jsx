@@ -12,8 +12,8 @@ export default function UserBar({ profile, isMuted, isDeafened, onToggleMute, on
   const isGhost = profile?.settings?.ghost_mode;
 
   return (
-    <div className="px-2 py-2 flex items-center gap-1 flex-shrink-0" style={{ background: colors.bg.base, borderTop: `1px solid ${colors.border.default}` }}>
-      <button onClick={onStatusClick} className="flex items-center gap-2.5 flex-1 min-w-0 px-1.5 py-1.5 rounded-md transition-colors hover:bg-[rgba(255,255,255,0.04)]">
+    <div className="px-2 py-2 flex items-center gap-1 flex-shrink-0" style={{ background: colors.bg.base, borderTop: `1px solid ${colors.border.default}` }} role="status" aria-label="User panel">
+      <button onClick={onStatusClick} className="flex items-center gap-2.5 flex-1 min-w-0 px-1.5 py-1.5 rounded-md hover:bg-[rgba(255,255,255,0.04)]" aria-label="Change status">
         <div className="relative flex-shrink-0">
           <div className="w-8 h-8 rounded-full flex items-center justify-center text-[12px] font-semibold overflow-hidden"
             style={{ background: colors.bg.overlay, color: colors.text.muted }}>
@@ -32,14 +32,17 @@ export default function UserBar({ profile, isMuted, isDeafened, onToggleMute, on
           </div>
         </div>
       </button>
-      <div className="flex items-center">
-        <button onClick={onToggleMute} className="w-8 h-8 flex items-center justify-center rounded-md transition-colors hover:bg-[rgba(255,255,255,0.06)]" title={isMuted ? 'Unmute' : 'Mute'}>
+      <div className="flex items-center" role="group" aria-label="Audio controls">
+        <button onClick={onToggleMute} className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-[rgba(255,255,255,0.06)]"
+          title={isMuted ? 'Unmute' : 'Mute'} aria-label={isMuted ? 'Unmute microphone' : 'Mute microphone'} aria-pressed={isMuted}>
           {isMuted ? <MicOff className="w-[18px] h-[18px]" style={{ color: colors.danger }} /> : <Mic className="w-[18px] h-[18px]" style={{ color: colors.text.muted }} />}
         </button>
-        <button onClick={onToggleDeafen} className="w-8 h-8 flex items-center justify-center rounded-md transition-colors hover:bg-[rgba(255,255,255,0.06)]" title={isDeafened ? 'Undeafen' : 'Deafen'}>
+        <button onClick={onToggleDeafen} className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-[rgba(255,255,255,0.06)]"
+          title={isDeafened ? 'Undeafen' : 'Deafen'} aria-label={isDeafened ? 'Undeafen audio' : 'Deafen audio'} aria-pressed={isDeafened}>
           <Headphones className="w-[18px] h-[18px]" style={{ color: isDeafened ? colors.danger : colors.text.muted }} />
         </button>
-        <button onClick={onSettings} className="w-8 h-8 flex items-center justify-center rounded-md transition-colors hover:bg-[rgba(255,255,255,0.06)]" title="User Settings">
+        <button onClick={onSettings} className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-[rgba(255,255,255,0.06)]"
+          title="User Settings" aria-label="User settings">
           <Settings className="w-[18px] h-[18px]" style={{ color: colors.text.muted }} />
         </button>
       </div>

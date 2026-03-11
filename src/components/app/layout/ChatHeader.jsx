@@ -7,14 +7,14 @@ const typeIcons = { text: Hash, voice: Volume2, announcement: Megaphone, stage: 
 
 function HeaderButton({ icon: Icon, onClick, href, active, badge, title }) {
   const Wrapper = href ? 'a' : 'button';
-  const props = href ? { href, title } : { onClick, title };
+  const props = href ? { href, title, 'aria-label': title } : { onClick, title, 'aria-label': title };
   return (
-    <Wrapper {...props} className="w-8 h-8 flex items-center justify-center rounded-md transition-colors hover:bg-[rgba(255,255,255,0.06)] relative"
+    <Wrapper {...props} className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-[rgba(255,255,255,0.06)] relative"
       style={{ color: active ? colors.text.primary : colors.text.muted }}>
       <Icon className="w-[18px] h-[18px]" />
       {badge > 0 && (
         <div className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 px-1 rounded-full text-[10px] font-bold flex items-center justify-center"
-          style={{ background: colors.danger, color: '#fff' }}>{badge}</div>
+          style={{ background: colors.danger, color: '#fff' }} aria-label={`${badge} pinned`}>{badge}</div>
       )}
     </Wrapper>
   );
@@ -29,7 +29,8 @@ export default function ChatHeader({ channel, conversation, currentUserId, showM
 
   return (
     <div className="h-12 px-4 flex items-center justify-between flex-shrink-0"
-      style={{ borderBottom: `1px solid ${colors.border.default}`, background: colors.bg.surface, boxShadow: '0 1px 0 rgba(0,0,0,0.15)' }}>
+      style={{ borderBottom: `1px solid ${colors.border.default}`, background: colors.bg.surface, boxShadow: '0 1px 0 rgba(0,0,0,0.15)' }}
+      role="banner" aria-label={isDM ? `Conversation with ${label}` : `Channel ${label}`}>
       <div className="flex items-center gap-2 min-w-0">
         {!isDM && serverName && (
           <>
