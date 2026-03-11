@@ -29,7 +29,7 @@ export default function ChatHeader({ channel, conversation, currentUserId, showM
 
   return (
     <div className="h-12 px-4 flex items-center justify-between flex-shrink-0"
-      style={{ borderBottom: `1px solid ${colors.border.default}`, background: colors.bg.surface }}
+      style={{ borderBottom: '1px solid rgba(255,255,255,0.04)', background: 'rgba(14,14,20,0.6)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)' }}
       role="banner" aria-label={isDM ? `Conversation with ${label}` : `Channel ${label}`}>
       <div className="flex items-center gap-2.5 min-w-0">
         {!isDM && serverName && (
