@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { Crown, Plus, Compass, FolderPlus, Copy, Settings, LogOut } from 'lucide-react';
 import { AnimatePresence } from 'framer-motion';
