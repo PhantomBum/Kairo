@@ -1,7 +1,8 @@
 import React from 'react';
 import { Plus, Compass, Bot, Crown, HelpCircle, MessageSquare, Zap, Hash, Globe, Search, Shield } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { createPageUrl } from '@/utils';
-import { colors, shadows, radius } from '@/components/app/design/tokens';
+import { colors, shadows } from '@/components/app/design/tokens';
 
 function getGreeting() {
   const h = new Date().getHours();
@@ -16,21 +17,22 @@ export default function EmptyView({ onCreateServer, onJoinServer, emptyServer, s
   if (emptyServer) {
     return (
       <div className="flex-1 flex items-center justify-center p-8">
-        <div className="text-center max-w-sm k-fade-in">
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, ease: [0, 0, 0.2, 1] }}
+          className="text-center max-w-sm">
           <div className="w-16 h-16 rounded-2xl mx-auto mb-6 flex items-center justify-center" style={{ background: colors.accent.subtle }}>
             <Hash className="w-8 h-8" style={{ color: colors.accent.primary }} />
           </div>
           <h2 className="text-[24px] font-bold mb-2 tracking-tight" style={{ color: colors.text.primary }}>No channels yet</h2>
-          <p className="text-[14px] mb-6" style={{ color: colors.text.muted }}>
-            {serverName || 'This server'} doesn't have any channels yet. Create one to start chatting.
+          <p className="text-[14px] leading-relaxed mb-6" style={{ color: colors.text.muted }}>
+            {serverName || 'This server'} is a blank canvas. Create your first channel to start the conversation.
           </p>
           {onCreateChannel && (
-            <button onClick={onCreateChannel} className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-[14px] font-semibold transition-all hover:brightness-110"
+            <button onClick={onCreateChannel} className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-[14px] font-semibold hover:brightness-110"
               style={{ background: colors.accent.primary, color: '#fff' }}>
               <Plus className="w-4 h-4" /> Create Channel
             </button>
           )}
-        </div>
+        </motion.div>
       </div>
     );
   }
@@ -42,7 +44,8 @@ export default function EmptyView({ onCreateServer, onJoinServer, emptyServer, s
         background: `radial-gradient(ellipse 80% 60% at 50% 120%, ${colors.accent.primary}15, transparent), radial-gradient(ellipse 60% 40% at 20% 50%, ${colors.info}08, transparent), radial-gradient(ellipse 60% 40% at 80% 50%, ${colors.accent.primary}06, transparent)`,
       }} />
 
-      <div className="text-center max-w-md relative z-10 k-fade-in">
+      <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, ease: [0, 0, 0.2, 1] }}
+        className="text-center max-w-md relative z-10">
         {/* Logo */}
         <div className="w-20 h-20 rounded-3xl mx-auto mb-8 flex items-center justify-center"
           style={{ background: colors.accent.subtle, boxShadow: shadows.glow }}>
@@ -52,7 +55,7 @@ export default function EmptyView({ onCreateServer, onJoinServer, emptyServer, s
         {/* Greeting */}
         <p className="text-[16px] mb-1" style={{ color: colors.text.muted }}>{greeting.emoji} {greeting.text}</p>
         <h2 className="text-[32px] font-bold mb-3 tracking-tight" style={{ color: colors.text.primary }}>Welcome to Kairo</h2>
-        <p className="text-[15px] mb-10" style={{ color: colors.text.muted }}>Your conversations, communities, and creativity — all in one place.</p>
+        <p className="text-[15px] leading-relaxed mb-10" style={{ color: colors.text.muted }}>Your conversations, communities, and creativity — all in one place.</p>
 
         {/* Primary actions */}
         <div className="flex gap-3 justify-center flex-wrap">
@@ -94,7 +97,7 @@ export default function EmptyView({ onCreateServer, onJoinServer, emptyServer, s
             </div>
           ))}
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }
