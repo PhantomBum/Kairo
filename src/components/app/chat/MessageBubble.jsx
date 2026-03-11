@@ -180,20 +180,22 @@ const MessageBubble = memo(function MessageBubble({ message, compact, isOwn, onR
         </div>
       </ContextMenuTrigger>
 
-      {/* Context menu */}
+      {/* Context menu - only show full actions for non-deleted messages */}
       <ContextMenuContent className="w-56 p-1.5 rounded-lg" style={{ background: colors.bg.modal, border: `1px solid ${colors.border.light}`, boxShadow: shadows.strong }}>
-        <div className="flex items-center gap-0.5 px-1 py-1 mb-1">
-          {['👍', '❤️', '😂', '🔥', '👀', '✨'].map(e => (
-            <button key={e} onClick={() => onReact(message, e)} className="w-8 h-8 flex items-center justify-center rounded-md text-base hover:bg-[rgba(255,255,255,0.06)] transition-colors">{e}</button>
-          ))}
-        </div>
-        <ContextMenuSeparator style={{ background: colors.border.default, margin: '4px 0' }} />
-        <ContextMenuItem onClick={() => onReply(message)} className="text-[13px] gap-2.5 rounded-md px-2.5 py-2" style={{ color: colors.text.secondary }}><Reply className="w-4 h-4 opacity-50" /> Reply</ContextMenuItem>
-        <ContextMenuItem onClick={() => navigator.clipboard.writeText(message.content || '')} className="text-[13px] gap-2.5 rounded-md px-2.5 py-2" style={{ color: colors.text.secondary }}><Copy className="w-4 h-4 opacity-50" /> Copy Text</ContextMenuItem>
+        {!isDeleted && <>
+          <div className="flex items-center gap-0.5 px-1 py-1 mb-1">
+            {['👍', '❤️', '😂', '🔥', '👀', '✨'].map(e => (
+              <button key={e} onClick={() => onReact(message, e)} className="w-8 h-8 flex items-center justify-center rounded-md text-base hover:bg-[rgba(255,255,255,0.06)] transition-colors">{e}</button>
+            ))}
+          </div>
+          <ContextMenuSeparator style={{ background: colors.border.default, margin: '4px 0' }} />
+          <ContextMenuItem onClick={() => onReply(message)} className="text-[13px] gap-2.5 rounded-md px-2.5 py-2" style={{ color: colors.text.secondary }}><Reply className="w-4 h-4 opacity-50" /> Reply</ContextMenuItem>
+          <ContextMenuItem onClick={() => navigator.clipboard.writeText(message.content || '')} className="text-[13px] gap-2.5 rounded-md px-2.5 py-2" style={{ color: colors.text.secondary }}><Copy className="w-4 h-4 opacity-50" /> Copy Text</ContextMenuItem>
+        </>}
         <ContextMenuItem onClick={() => navigator.clipboard.writeText(message.id)} className="text-[13px] gap-2.5 rounded-md px-2.5 py-2" style={{ color: colors.text.secondary }}><Link className="w-4 h-4 opacity-50" /> Copy Message ID</ContextMenuItem>
-        {onPin && <ContextMenuItem onClick={() => onPin(message)} className="text-[13px] gap-2.5 rounded-md px-2.5 py-2" style={{ color: colors.text.secondary }}><Pin className="w-4 h-4 opacity-50" /> {message.is_pinned ? 'Unpin' : 'Pin'}</ContextMenuItem>}
-        <ContextMenuItem onClick={() => onHighlight?.(message)} className="text-[13px] gap-2.5 rounded-md px-2.5 py-2" style={{ color: colors.text.secondary }}><Bookmark className="w-4 h-4 opacity-50" /> Save as Highlight</ContextMenuItem>
-        {isOwn && <>
+        {!isDeleted && onPin && <ContextMenuItem onClick={() => onPin(message)} className="text-[13px] gap-2.5 rounded-md px-2.5 py-2" style={{ color: colors.text.secondary }}><Pin className="w-4 h-4 opacity-50" /> {message.is_pinned ? 'Unpin' : 'Pin'}</ContextMenuItem>}
+        {!isDeleted && <ContextMenuItem onClick={() => onHighlight?.(message)} className="text-[13px] gap-2.5 rounded-md px-2.5 py-2" style={{ color: colors.text.secondary }}><Bookmark className="w-4 h-4 opacity-50" /> Save as Highlight</ContextMenuItem>}
+        {isOwn && !isDeleted && <>
           <ContextMenuSeparator style={{ background: colors.border.default, margin: '4px 0' }} />
           <ContextMenuItem onClick={() => onEdit(message)} className="text-[13px] gap-2.5 rounded-md px-2.5 py-2" style={{ color: colors.text.secondary }}><Pencil className="w-4 h-4 opacity-50" /> Edit</ContextMenuItem>
           <ContextMenuItem onClick={() => onDelete(message)} className="text-[13px] gap-2.5 rounded-md px-2.5 py-2" style={{ color: colors.danger }}><Trash2 className="w-4 h-4 opacity-50" /> Delete</ContextMenuItem>
