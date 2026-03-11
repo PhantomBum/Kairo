@@ -21,17 +21,23 @@ function isMediaUrl(url) {
 
 function renderText(text, onLinkClick) {
   if (!text) return null;
-  return text.split(/(https?:\/\/[^\s]+|@everyone|@here|\*\*[^*]+\*\*|\*[^*]+\*|`[^`]+`)/g).map((p, i) => {
-    if (p.match(/^https?:\/\//)) {
-      const mediaType = isMediaUrl(p);
-      if (mediaType === 'gif' || mediaType === 'image') return <img key={i} src={p} alt="embedded" className="max-w-[400px] max-h-[280px] rounded-xl mt-1" style={{ border: `1px solid ${colors.border.default}` }} loading="lazy" />;
-      return <a key={i} href={p} onClick={e => { if (onLinkClick) { e.preventDefault(); onLinkClick(p); } }} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:no-underline" style={{ color: colors.text.link, wordBreak: 'break-all' }}>{p}</a>;
-    }
-    if (p === '@everyone' || p === '@here') return <span key={i} className="px-1 rounded" style={{ background: `${colors.info}20`, color: colors.info }}>{p}</span>;
-    if (p.match(/^\*\*.*\*\*$/)) return <strong key={i}>{p.slice(2, -2)}</strong>;
-    if (p.match(/^\*.*\*$/)) return <em key={i}>{p.slice(1, -1)}</em>;
-    if (p.match(/^`.*`$/)) return <code key={i} className="px-1.5 py-0.5 rounded text-[12px]" style={{ background: colors.bg.overlay, color: colors.accent.primary }}>{p.slice(1, -1)}</code>;
-    return p;
+  // Split by code blocks first to protect their content, then parse the rest
+  return text.split(/(`[^`]+`)/g).map((segment, si) => {
+    // Code spans — render as-is, never embed links inside
+    if (segment.match(/^`.*`$/)) return <code key={si} className="px-1.5 py-0.5 rounded text-[12px]" style={{ background: colors.bg.overlay, color: colors.accent.primary }}>{segment.slice(1, -1)}</code>;
+    // Non-code segments — parse URLs, mentions, markdown
+    return segment.split(/(https?:\/\/[^\s]+|@everyone|@here|\*\*[^*]+\*\*|\*[^*]+\*)/g).map((p, i) => {
+      const key = `${si}-${i}`;
+      if (p.match(/^https?:\/\//)) {
+        const mediaType = isMediaUrl(p);
+        if (mediaType === 'gif' || mediaType === 'image') return <img key={key} src={p} alt="embedded" className="max-w-[400px] max-h-[280px] rounded-xl mt-1" style={{ border: `1px solid ${colors.border.default}` }} loading="lazy" />;
+        return <a key={key} href={p} onClick={e => { if (onLinkClick) { e.preventDefault(); onLinkClick(p); } }} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:no-underline" style={{ color: colors.text.link, wordBreak: 'break-all' }}>{p}</a>;
+      }
+      if (p === '@everyone' || p === '@here') return <span key={key} className="px-1 rounded" style={{ background: `${colors.info}20`, color: colors.info }}>{p}</span>;
+      if (p.match(/^\*\*.*\*\*$/)) return <strong key={key}>{p.slice(2, -2)}</strong>;
+      if (p.match(/^\*.*\*$/)) return <em key={key}>{p.slice(1, -1)}</em>;
+      return p;
+    });
   });
 }
 
