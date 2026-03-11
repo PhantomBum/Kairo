@@ -326,7 +326,7 @@ export default function AppShell({ currentUser }) {
           currentUserId={currentUser.id}
           onSpaces={() => setView('spaces')} onSearch={() => setModal('search')} />
 
-        <div className="w-[240px] flex-shrink-0 flex flex-col" style={{ background: colors.bg.surface, borderRight: `1px solid ${colors.border.default}` }}>
+        <div className="w-[240px] flex-shrink-0 flex flex-col" style={{ background: `linear-gradient(180deg, ${colors.bg.surface}, ${colors.bg.base}ee)`, borderRight: `1px solid ${colors.border.default}` }}>
           {view === 'server' ? (
             <DraggableChannelSidebar server={activeServer} categories={categories} channels={channels}
               activeId={activeChannel?.id} onSelect={(ch) => { setActiveChannel(ch); setShowMobileSidebar(false); }}
