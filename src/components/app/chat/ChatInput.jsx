@@ -43,7 +43,7 @@ export default function ChatInput({ channelName, channelId, replyTo, onCancelRep
     setUploading(true);
     const results = [];
     for (const f of Array.from(list)) {
-      if (f.size > 25 * 1024 * 1024) continue;
+      if (f.size > 50 * 1024 * 1024) continue;
       const { file_url } = await base44.integrations.Core.UploadFile({ file: f });
       results.push({ url: file_url, filename: f.name, content_type: f.type, size: f.size });
     }
