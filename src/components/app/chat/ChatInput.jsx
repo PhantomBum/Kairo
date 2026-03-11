@@ -52,9 +52,10 @@ export default function ChatInput({ channelName, channelId, replyTo, onCancelRep
   };
 
   const handleSend = async () => {
-    if ((!content.trim() && files.length === 0) || sending) return;
+    const trimmed = content.trim();
+    if ((!trimmed && files.length === 0) || sending) return;
     setSending(true);
-    await onSend({ content: content.trim(), attachments: files.length > 0 ? files : undefined, replyToId: replyTo?.id, replyPreview: replyTo ? { author_name: replyTo.author_name, content: replyTo.content?.slice(0, 80) } : undefined });
+    await onSend({ content: trimmed, attachments: files.length > 0 ? files : undefined, replyToId: replyTo?.id, replyPreview: replyTo ? { author_name: replyTo.author_name, content: replyTo.content?.slice(0, 80) } : undefined });
     setContent(''); setFiles([]); setSending(false); setShowEmoji(false); setShowFormatting(false);
     try { localStorage.removeItem(storageKey); } catch {}
     inputRef.current?.focus();
