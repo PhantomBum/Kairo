@@ -28,7 +28,7 @@ function ChannelItem({ channel, active, onClick, onSettings, isOwner, index }) {
                   transition: 'all 150ms cubic-bezier(0.4,0,0.2,1)',
                 }}>
                 {isOwner && <GripVertical className="w-3 h-3 opacity-0 group-hover:opacity-30 flex-shrink-0" />}
-                <Icon className="w-[18px] h-[18px] flex-shrink-0" style={{ color: active ? colors.accent.hover : colors.text.disabled, transition: 'color 150ms cubic-bezier(0.4,0,0.2,1)' }} />
+                <Icon className="w-[16px] h-[16px] flex-shrink-0" style={{ color: active ? colors.accent.hover : colors.text.disabled, transition: 'color 150ms cubic-bezier(0.4,0,0.2,1)' }} />
                 <span className="truncate flex-1 text-left">{channel.name}</span>
                 {channel.is_nsfw && <ShieldAlert className="w-3 h-3 flex-shrink-0" style={{ color: '#f23f43', opacity: 0.6 }} />}
                 {channel.is_private && <Lock className="w-3 h-3 opacity-30" />}
