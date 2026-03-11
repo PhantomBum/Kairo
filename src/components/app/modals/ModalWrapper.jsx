@@ -58,7 +58,7 @@ export default function ModalWrapper({ title, subtitle, onClose, width = 460, ch
           </button>
         )}
         {/* Body */}
-        <div className="px-6 py-6 overflow-y-auto scrollbar-none" style={{ maxHeight: hideTitle ? 'calc(min(85vh, calc(100vh - 32px)))' : 'calc(min(85vh, calc(100vh - 32px)) - 64px)' }}>
+        <div className={`${hideTitle ? 'px-6 py-6' : 'px-5 py-5'} overflow-y-auto scrollbar-none`} style={{ maxHeight: hideTitle ? 'calc(min(85vh, calc(100vh - 32px)))' : 'calc(min(85vh, calc(100vh - 32px)) - 64px)' }}>
           {children}
         </div>
       </motion.div>
