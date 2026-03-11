@@ -32,7 +32,7 @@ function MemberRow({ member, profile, isOwner, roleColor, onClick }) {
         <div className="absolute -bottom-px -right-px w-[12px] h-[12px] rounded-full border-[2.5px]"
           style={{ background: statusColor, borderColor: colors.bg.surface }} />
       </div>
-      <span className="text-[13px] truncate flex-1 text-left" style={{ color: roleColor || colors.text.secondary, fontWeight: 500 }}>
+      <span className="text-[13px] truncate flex-1 text-left" style={{ color: roleColor || colors.text.secondary, fontWeight: 500 }} title={name}>
         {name}
       </span>
       <div className="flex gap-1 items-center opacity-0 group-hover:opacity-100 transition-opacity">
