@@ -48,7 +48,7 @@ export default function AdvancedSearch({ onClose, servers, currentUserId, onJump
     setSearching(false);
   };
 
-  useEffect(() => { const t = setTimeout(() => { if (query.length >= 2) search(); }, 400); return () => clearTimeout(t); }, [query, filters, serverFilter, sortBy]);
+  useEffect(() => { const t = setTimeout(() => { if (query.length >= 3) search(); }, 400); return () => clearTimeout(t); }, [query, filters, serverFilter, sortBy]);
 
   return (
     <ModalWrapper title="Search" onClose={onClose} width={640}>
@@ -56,8 +56,8 @@ export default function AdvancedSearch({ onClose, servers, currentUserId, onJump
         {/* Search bar */}
         <div className="flex items-center gap-2 px-3 py-2.5 rounded-lg" style={{ background: colors.bg.base, border: `1px solid ${colors.border.default}` }}>
           <Search className="w-5 h-5 flex-shrink-0" style={{ color: colors.text.disabled }} />
-          <input value={query} onChange={e => setQuery(e.target.value)} onKeyDown={e => e.key === 'Enter' && search()}
-            placeholder="Search messages across all servers..." autoFocus
+          <input value={query} onChange={e => setQuery(e.target.value)} onKeyDown={e => e.key === 'Enter' && query.length >= 3 && search()}
+            placeholder="Search messages (min 3 characters)..." autoFocus
             className="flex-1 bg-transparent text-[14px] outline-none" style={{ color: colors.text.primary }} />
           {query && <button onClick={() => { setQuery(''); setResults([]); }}><X className="w-4 h-4" style={{ color: colors.text.muted }} /></button>}
         </div>

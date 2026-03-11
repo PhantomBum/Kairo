@@ -106,8 +106,11 @@ export default function KairoBoards({ channel, serverId }) {
     if (!result.destination) return;
     const cardId = result.draggableId;
     const newColId = result.destination.droppableId;
-    await base44.entities.BoardCard.update(cardId, { column_id: newColId, position: result.destination.index });
-    setCards(prev => prev.map(c => c.id === cardId ? { ...c, column_id: newColId, position: result.destination.index } : c));
+    const newPos = result.destination.index;
+    // Optimistic update — preserve ALL card data, only change column_id and position
+    setCards(prev => prev.map(c => c.id === cardId ? { ...c, column_id: newColId, position: newPos } : c));
+    // Only update the fields that changed to preserve assignees, labels, etc.
+    await base44.entities.BoardCard.update(cardId, { column_id: newColId, position: newPos });
   };
 
   if (loading) return <div className="flex-1 flex items-center justify-center"><div className="w-5 h-5 border-2 rounded-full animate-spin" style={{ borderColor: colors.border.light, borderTopColor: colors.accent.primary }} /></div>;
