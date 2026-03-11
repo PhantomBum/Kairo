@@ -1,4 +1,4 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.6';
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.20';
 import Stripe from 'npm:stripe@14.0.0';
 
 const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY'));
@@ -8,7 +8,8 @@ Deno.serve(async (req) => {
     const base44 = createClientFromRequest(req);
     
     // Get request body
-    const { product_type, price_id, success_url, cancel_url, user_id, server_id } = await req.json();
+    const { product_type, type, price_id, success_url, cancel_url, user_id, server_id } = await req.json();
+    const pType = type || product_type;
     
     // Create checkout session
     const sessionConfig = {
@@ -25,14 +26,14 @@ Deno.serve(async (req) => {
     };
 
     // Handle different product types
-    if (product_type === 'nitro') {
+    if (pType === 'elite_subscription' || pType === 'nitro') {
       // Kairo Premium/Nitro
       sessionConfig.line_items = [{
         price_data: {
           currency: 'usd',
           product_data: {
-            name: 'Kairo Premium',
-            description: 'Custom profiles, animated avatars, higher upload limits, and more',
+            name: 'Kairo Elite',
+            description: 'Animated profiles, custom themes, 100MB uploads, HD voice, monthly credits, and more',
           },
           unit_amount: 999, // $9.99
           recurring: { interval: 'month' },
@@ -40,7 +41,7 @@ Deno.serve(async (req) => {
         quantity: 1,
       }];
       sessionConfig.mode = 'subscription';
-    } else if (product_type === 'boost') {
+    } else if (pType === 'boost') {
       // Server boost
       sessionConfig.line_items = [{
         price_data: {
@@ -55,7 +56,7 @@ Deno.serve(async (req) => {
         quantity: 1,
       }];
       sessionConfig.mode = 'subscription';
-    } else if (product_type === 'credits') {
+    } else if (pType === 'credits') {
       // Kairo credits
       sessionConfig.line_items = [{
         price_data: {
