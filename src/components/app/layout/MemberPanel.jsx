@@ -83,7 +83,7 @@ export default function MemberPanel({ members, roles, ownerId, onProfileClick })
   }
 
   return (
-    <div className="w-[220px] flex-shrink-0 overflow-y-auto scrollbar-none p-3" style={{ borderLeft: '1px solid var(--border)', background: 'var(--bg-surface)' }}>
+    <div className="w-[220px] flex-shrink-0 overflow-y-auto scrollbar-none p-3" style={{ borderLeft: '1px solid var(--border)', background: 'var(--bg-surface)' }} role="complementary" aria-label="Member list">
       {grouped.map((group, gi) => (
         <div key={gi}>
           <div className="text-[10px] font-semibold uppercase tracking-[0.08em] px-1 py-2" style={{ color: group.color || (group.dim ? 'var(--text-faint)' : 'var(--text-muted)') }}>
