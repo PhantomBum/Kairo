@@ -44,13 +44,14 @@ function KairoInner() {
 
   if (loading) {
     return (
-      <div className="h-screen w-screen flex items-center justify-center" style={{ background: 'var(--bg-deep, #050505)' }}>
+      <div className="h-screen w-screen flex items-center justify-center" style={{ background: 'var(--bg-deep, #050505)' }} role="status" aria-label="Loading Kairo">
         <div className="text-center">
           <div className="w-16 h-16 rounded-2xl mx-auto mb-5 flex items-center justify-center"
             style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.04)', backdropFilter: 'blur(20px)', boxShadow: '0 0 40px rgba(232,228,217,0.03)' }}>
             <span className="text-2xl font-bold" style={{ color: 'rgba(232,228,217,0.4)', fontFamily: 'monospace' }}>K</span>
           </div>
-          <div className="w-5 h-5 border-2 rounded-full animate-spin mx-auto" style={{ borderColor: 'rgba(255,255,255,0.04)', borderTopColor: 'rgba(232,228,217,0.3)' }} />
+          <div className="w-5 h-5 border-2 rounded-full animate-spin mx-auto" style={{ borderColor: 'rgba(255,255,255,0.04)', borderTopColor: 'rgba(232,228,217,0.3)' }} aria-hidden="true" />
+          <p className="text-[11px] mt-4" style={{ color: 'rgba(232,228,217,0.2)' }}>Loading...</p>
         </div>
       </div>
     );
