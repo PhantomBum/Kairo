@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { Hash, Volume2, Megaphone, Radio, MessageSquare, HelpCircle, Lock, ListChecks, BookOpen, Ticket, Calendar, Bell } from 'lucide-react';
+import { Hash, Volume2, Megaphone, Radio, MessageSquare, HelpCircle, Lock, ListChecks, BookOpen, Ticket, Calendar, Bell, LayoutGrid } from 'lucide-react';
 import ModalWrapper from './ModalWrapper';
 
 const CHANNEL_TYPES = [
   { id: 'text', label: 'Text', icon: Hash, desc: 'Standard text chat' },
   { id: 'voice', label: 'Voice', icon: Volume2, desc: 'Voice conversation' },
+  { id: 'board', label: 'Board', icon: LayoutGrid, desc: 'Kanban project board' },
   { id: 'announcement', label: 'Announcement', icon: Megaphone, desc: 'Important updates' },
   { id: 'stage', label: 'Stage', icon: Radio, desc: 'Live speaker events' },
   { id: 'forum', label: 'Forum', icon: MessageSquare, desc: 'Organized discussions' },
