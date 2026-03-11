@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
-import { Home, Plus, Compass } from 'lucide-react';
+import { Home, Plus, Compass, Crown, Download } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-function RailIcon({ active, onClick, tooltip, badge, children, isHome }) {
+function RailIcon({ active, onClick, tooltip, badge, children }) {
   const [hovered, setHovered] = useState(false);
   return (
     <div className="relative flex items-center justify-center group" onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
-      {/* Active pill */}
       <AnimatePresence>
         {(active || hovered) && (
           <motion.div initial={{ scaleY: 0 }} animate={{ scaleY: 1 }} exit={{ scaleY: 0 }}
@@ -30,7 +29,6 @@ function RailIcon({ active, onClick, tooltip, badge, children, isHome }) {
             style={{ background: 'var(--accent-red)', color: '#fff' }}>{badge > 9 ? '9+' : badge}</div>
         )}
       </button>
-      {/* Tooltip */}
       <AnimatePresence>
         {hovered && tooltip && (
           <motion.div initial={{ opacity: 0, x: -4 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -4 }}
@@ -44,7 +42,11 @@ function RailIcon({ active, onClick, tooltip, badge, children, isHome }) {
   );
 }
 
-export default function ServerRail({ servers, activeServerId, onServerSelect, onHomeClick, onCreateServer, onDiscover, isHome, badge }) {
+function ServerDivider() {
+  return <div className="w-8 h-px my-0.5" style={{ background: 'var(--border)' }} />;
+}
+
+export default function ServerRail({ servers, activeServerId, onServerSelect, onHomeClick, onCreateServer, onDiscover, onElite, isHome, badge }) {
   return (
     <div className="w-[68px] flex-shrink-0 flex flex-col items-center py-3 gap-2 overflow-y-auto scrollbar-none"
       style={{ background: 'var(--bg-deep)' }}>
@@ -53,7 +55,7 @@ export default function ServerRail({ servers, activeServerId, onServerSelect, on
         <Home className="w-[18px] h-[18px]" style={{ color: isHome ? 'var(--text-cream)' : 'var(--text-muted)' }} />
       </RailIcon>
 
-      <div className="w-8 h-px my-0.5" style={{ background: 'var(--border)' }} />
+      <ServerDivider />
 
       {/* Servers */}
       {servers.map(s => (
@@ -68,13 +70,19 @@ export default function ServerRail({ servers, activeServerId, onServerSelect, on
         </RailIcon>
       ))}
 
-      <div className="w-8 h-px my-0.5" style={{ background: 'var(--border)' }} />
+      <ServerDivider />
 
       <RailIcon onClick={onCreateServer} tooltip="Create Server">
         <Plus className="w-[18px] h-[18px]" style={{ color: 'var(--accent-green)' }} />
       </RailIcon>
       <RailIcon onClick={onDiscover} tooltip="Join Server">
         <Compass className="w-[18px] h-[18px]" style={{ color: 'var(--accent-blue)' }} />
+      </RailIcon>
+
+      <ServerDivider />
+
+      <RailIcon onClick={onElite} tooltip="Kairo Elite">
+        <Crown className="w-[18px] h-[18px]" style={{ color: 'var(--accent-amber)' }} />
       </RailIcon>
     </div>
   );
