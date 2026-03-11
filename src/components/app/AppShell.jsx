@@ -369,11 +369,12 @@ export default function AppShell({ currentUser }) {
               onMediaGallery={isDM ? () => setShowMediaGallery(!showMediaGallery) : undefined} />
             <div className="flex-1 flex min-h-0">
               <div className="flex-1 flex flex-col min-w-0">
-                <MessageList messages={currentMsgs} currentUserId={currentUser.id} channelName={channelLabel}
+                <VirtualMessageList messages={currentMsgs} currentUserId={currentUser.id} channelName={channelLabel}
                   isLoading={currentLoading} isDM={isDM} onReply={setReplyTo} onEdit={setEditingMsg}
                   onDelete={deleteMsg} onReact={reactMsg} onPin={pinMsg}
                   onProfileClick={(id) => { setProfileUserId(id); setModal('profile'); }}
-                  editingMessage={editingMsg} onEditSave={editMsg} onEditCancel={() => setEditingMsg(null)} />
+                  editingMessage={editingMsg} onEditSave={editMsg} onEditCancel={() => setEditingMsg(null)}
+                  optimisticIds={optimisticIds} />
                 <ChatInput channelName={channelLabel} replyTo={replyTo} onCancelReply={() => setReplyTo(null)} onSend={handleSend} />
               </div>
               {view === 'server' && showMembers && <MemberPanel members={members} roles={roles} ownerId={activeServer?.owner_id} onProfileClick={(id) => { setProfileUserId(id); setModal('profile'); }} />}
