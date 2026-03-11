@@ -1,5 +1,5 @@
 import React from 'react';
-import { Plus, Compass, Bot, Crown, HelpCircle, MessageSquare, Zap, Hash } from 'lucide-react';
+import { Plus, Compass, Bot, Crown, HelpCircle, MessageSquare, Zap, Hash, Globe, Search, Shield } from 'lucide-react';
 import { createPageUrl } from '@/utils';
 import { colors, shadows, radius } from '@/components/app/design/tokens';
 
@@ -10,7 +10,7 @@ function getGreeting() {
   return { text: 'Good evening', emoji: '🌙' };
 }
 
-export default function EmptyView({ onCreateServer, onJoinServer, emptyServer, serverName, onCreateChannel }) {
+export default function EmptyView({ onCreateServer, onJoinServer, emptyServer, serverName, onCreateChannel, onSpaces }) {
   const greeting = getGreeting();
 
   if (emptyServer) {
@@ -77,6 +77,21 @@ export default function EmptyView({ onCreateServer, onJoinServer, emptyServer, s
             <a key={link.label} href={link.href} className="flex items-center gap-1.5 text-[12px] font-medium px-3 py-2 rounded-lg transition-colors hover:bg-[rgba(255,255,255,0.04)]" style={{ color: link.color }}>
               <link.icon className="w-4 h-4" /> {link.label}
             </a>
+          ))}
+        </div>
+
+        {/* Kairo exclusive features highlight */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-8 max-w-lg mx-auto text-left">
+          {[
+            { icon: Globe, label: 'Spaces', desc: 'Public communities with posts', color: colors.info },
+            { icon: Shield, label: 'Privacy First', desc: 'Ghost mode & encrypted chats', color: colors.success },
+            { icon: Search, label: 'Global Search', desc: 'Search across all servers', color: colors.accent.primary },
+          ].map(f => (
+            <div key={f.label} className="p-3 rounded-xl" style={{ background: colors.bg.elevated, border: `1px solid ${colors.border.default}` }}>
+              <f.icon className="w-5 h-5 mb-2" style={{ color: f.color }} />
+              <p className="text-[13px] font-semibold" style={{ color: colors.text.primary }}>{f.label}</p>
+              <p className="text-[11px]" style={{ color: colors.text.muted }}>{f.desc}</p>
+            </div>
           ))}
         </div>
       </div>
