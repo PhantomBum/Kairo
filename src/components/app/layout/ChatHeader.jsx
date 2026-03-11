@@ -1,4 +1,5 @@
 import React from 'react';
+import { createPageUrl } from '@/utils';
 import { Hash, Volume2, Megaphone, Radio, MessageSquare, HelpCircle, Lock, ListChecks, BookOpen, Ticket, Calendar, Bell, Users, Pin, AtSign, Search, Image, Phone, Video } from 'lucide-react';
 
 const typeIcons = { text: Hash, voice: Volume2, announcement: Megaphone, stage: Radio, forum: MessageSquare, rules: BookOpen, tickets: Ticket, events: Calendar, polls: ListChecks, faq: HelpCircle, alerts: Bell, private: Lock };
@@ -58,6 +59,9 @@ export default function ChatHeader({ channel, conversation, currentUserId, showM
             <Users className="w-4 h-4" style={{ color: showMembers ? 'var(--text-cream)' : 'var(--text-muted)' }} />
           </button>
         )}
+        <a href={createPageUrl('FAQ')} className="p-1.5 rounded-md transition-colors hover:bg-[var(--bg-glass-hover)]" title="Help & FAQ">
+          <HelpCircle className="w-4 h-4" style={{ color: 'var(--text-muted)' }} />
+        </a>
       </div>
     </div>
   );

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
-import { User, Link, Shield, LogOut, Palette, Bell, Volume2, Keyboard, Accessibility, Monitor } from 'lucide-react';
+import { createPageUrl } from '@/utils';
+import { User, Link, Shield, LogOut, Palette, Bell, Volume2, Keyboard, Accessibility, HelpCircle, Crown, ExternalLink } from 'lucide-react';
 import ModalWrapper from './ModalWrapper';
 
 const TABS = [
@@ -95,6 +96,17 @@ export default function SettingsModal({ onClose, profile, onUpdate, onLogout }) 
               <t.icon className="w-3.5 h-3.5" /> {t.label}
             </button>
           ))}
+          <div className="my-2 h-px" style={{ background: 'var(--border)' }} />
+          <a href={createPageUrl('Elite')} className="w-full flex items-center gap-2 px-2.5 py-2 rounded-xl text-[11px] transition-colors hover:bg-[rgba(201,180,123,0.08)]" style={{ color: 'var(--accent-amber)' }}>
+            <Crown className="w-3.5 h-3.5" /> Elite
+          </a>
+          <div className="my-2 h-px" style={{ background: 'var(--border)' }} />
+          <a href={createPageUrl('FAQ')} className="w-full flex items-center gap-2 px-2.5 py-2 rounded-xl text-[11px] transition-colors hover:bg-[var(--bg-glass-hover)]" style={{ color: 'var(--text-muted)' }}>
+            <HelpCircle className="w-3.5 h-3.5" /> FAQ
+          </a>
+          <a href={createPageUrl('Support')} className="w-full flex items-center gap-2 px-2.5 py-2 rounded-xl text-[11px] transition-colors hover:bg-[var(--bg-glass-hover)]" style={{ color: 'var(--text-muted)' }}>
+            <ExternalLink className="w-3.5 h-3.5" /> Support
+          </a>
           <div className="my-2 h-px" style={{ background: 'var(--border)' }} />
           <button onClick={onLogout} className="w-full flex items-center gap-2 px-2.5 py-2 rounded-xl text-[11px] transition-colors hover:bg-[rgba(201,123,123,0.08)]" style={{ color: 'var(--accent-red)' }}>
             <LogOut className="w-3.5 h-3.5" /> Log Out
