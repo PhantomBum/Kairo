@@ -39,6 +39,12 @@ import KairoEliteModal from '@/components/app/modals/KairoEliteModal';
 import ModPanelModal from '@/components/app/modals/ModPanelModal';
 import AnalyticsDashboardModal from '@/components/app/modals/AnalyticsDashboardModal';
 import ChannelSettingsModal from '@/components/app/modals/ChannelSettingsModal';
+import AdvancedSearch from '@/components/app/features/AdvancedSearch';
+import MediaGallery from '@/components/app/features/MediaGallery';
+import PrivacyDashboard from '@/components/app/features/PrivacyDashboard';
+import ActivityStatus from '@/components/app/features/ActivityStatus';
+import SpacesView from '@/components/app/features/KairoSpaces';
+import KairoBoards from '@/components/app/features/KairoBoards';
 
 export default function AppShell({ currentUser }) {
   const qc = useQueryClient();
