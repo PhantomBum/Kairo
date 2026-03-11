@@ -15,6 +15,7 @@ import MessageList from '@/components/app/chat/MessageList';
 import ChatInput from '@/components/app/chat/ChatInput';
 import FriendsView from '@/components/app/views/FriendsView';
 import EmptyView from '@/components/app/views/EmptyView';
+import VoiceChannelView from '@/components/app/views/VoiceChannelView';
 
 import CreateServerModal from '@/components/app/modals/CreateServerModal';
 import JoinServerModal from '@/components/app/modals/JoinServerModal';
@@ -27,6 +28,8 @@ import UserProfileModal from '@/components/app/modals/UserProfileModal';
 import CreateGroupDMModal from '@/components/app/modals/CreateGroupDMModal';
 import PinnedMessagesModal from '@/components/app/modals/PinnedMessagesModal';
 import StatusPickerModal from '@/components/app/modals/StatusPickerModal';
+import KairoEliteModal from '@/components/app/modals/KairoEliteModal';
+import ModPanelModal from '@/components/app/modals/ModPanelModal';
 
 export default function AppShell({ currentUser }) {
   const qc = useQueryClient();
@@ -203,7 +206,9 @@ export default function AppShell({ currentUser }) {
 
   // Computed
   const isDM = !!activeConv;
-  const isInChat = (view === 'server' && activeChannel) || (view === 'home' && activeConv);
+  const isVoiceChannel = activeChannel?.type === 'voice' || activeChannel?.type === 'stage';
+  const isInChat = (view === 'server' && activeChannel && !isVoiceChannel) || (view === 'home' && activeConv);
+  const isInVoice = view === 'server' && activeChannel && isVoiceChannel;
   const currentMsgs = isDM ? dmMessages : messages;
   const currentLoading = isDM ? dmLoading : msgsLoading;
   const channelLabel = isDM ? (activeConv.name || activeConv.participants?.find(p => p.user_id !== currentUser.id)?.user_name || 'DM') : (activeChannel?.name || '');
@@ -211,12 +216,14 @@ export default function AppShell({ currentUser }) {
   const isOwner = activeServer?.owner_id === currentUser.id || activeServer?.created_by === currentUser.email;
   const profileModal = profileUserId ? getProfile(profileUserId) : null;
   const profileMember = profileUserId ? members.find(m => m.user_id === profileUserId) : null;
+  const hasElite = profile?.badges?.includes('premium') || false;
 
   return (
     <div className="h-screen w-screen flex overflow-hidden" style={{ background: 'var(--bg-base)' }}>
       {/* Rail */}
       <ServerRail servers={servers} activeServerId={activeServer?.id} onServerSelect={selectServer} onHomeClick={goHome}
         onCreateServer={() => setModal('create-server')} onDiscover={() => setModal('join-server')}
+        onElite={() => setModal('elite')}
         isHome={view === 'home' || view === 'friends'} badge={incomingReqs.length} />
 
       {/* Sidebar */}
@@ -225,7 +232,8 @@ export default function AppShell({ currentUser }) {
           <ChannelSidebar server={activeServer} categories={categories} channels={channels}
             activeId={activeChannel?.id} onSelect={setActiveChannel}
             onAdd={(catId) => { setModalData(catId); setModal('create-channel'); }}
-            onSettings={() => setModal('server-settings')} onInvite={() => setModal('invite')} isOwner={isOwner} />
+            onSettings={() => setModal('server-settings')} onInvite={() => setModal('invite')}
+            onModPanel={() => setModal('mod-panel')} isOwner={isOwner} />
         ) : (
           <DMSidebar conversations={conversations} activeId={activeConv?.id}
             onSelect={(c) => { setActiveConv(c); setView('home'); }}
@@ -249,6 +257,19 @@ export default function AppShell({ currentUser }) {
             }}
             onDecline={async (r) => { await base44.entities.Friendship.delete(r.id); qc.invalidateQueries({ queryKey: ['incomingRequests'] }); }}
             onRemove={async (f) => { if (!confirm(`Remove ${f.friend_name}?`)) return; await base44.entities.Friendship.delete(f.id); qc.invalidateQueries({ queryKey: ['friends'] }); }} />
+        ) : isInVoice ? (
+          <>
+            <ChatHeader channel={activeChannel} isDM={false} showMembers={showMembers} onToggleMembers={() => setShowMembers(!showMembers)} />
+            <div className="flex-1 flex min-h-0">
+              <VoiceChannelView channel={activeChannel} currentUser={currentUser} isMuted={isMuted} isDeafened={isDeafened}
+                onToggleMute={() => setIsMuted(!isMuted)} onToggleDeafen={() => setIsDeafened(!isDeafened)}
+                onDisconnect={() => {}} />
+              {showMembers && (
+                <MemberPanel members={members} roles={roles} ownerId={activeServer?.owner_id}
+                  onProfileClick={(id) => { setProfileUserId(id); setModal('profile'); }} />
+              )}
+            </div>
+          </>
         ) : isInChat ? (
           <>
             <ChatHeader channel={activeChannel} conversation={activeConv} currentUserId={currentUser.id}
@@ -291,6 +312,8 @@ export default function AppShell({ currentUser }) {
         {modal === 'create-group-dm' && <CreateGroupDMModal onClose={() => setModal(null)} friends={friends} onCreate={handleCreateGroupDM} />}
         {modal === 'pinned' && <PinnedMessagesModal onClose={() => setModal(null)} messages={messages} onUnpin={pinMsg} />}
         {modal === 'status' && <StatusPickerModal onClose={() => setModal(null)} currentStatus={profile?.status} customStatus={profile?.custom_status} onSave={handleStatusUpdate} />}
+        {modal === 'elite' && <KairoEliteModal onClose={() => setModal(null)} profile={profile} hasElite={hasElite} />}
+        {modal === 'mod-panel' && activeServer && <ModPanelModal onClose={() => setModal(null)} server={activeServer} />}
       </AnimatePresence>
     </div>
   );
