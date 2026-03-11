@@ -114,19 +114,19 @@ export default function Layout({ children }) {
         /* Word break for long URLs */
         .break-words { word-break: break-word; overflow-wrap: anywhere; }
 
-        /* Unified interactive element transitions */
+        /* Unified interactive element transitions — 100ms for hover states */
         button, a, [role="button"], [role="tab"], [role="menuitem"] {
-          transition: background 0.15s ease-out, color 0.15s ease-out, opacity 0.15s ease-out, transform 80ms ease-out, border-color 0.15s ease-out, box-shadow 0.15s ease-out;
+          transition: background 100ms cubic-bezier(0.4,0,0.2,1), color 100ms cubic-bezier(0.4,0,0.2,1), opacity 100ms cubic-bezier(0.4,0,0.2,1), transform 80ms ease-out, border-color 100ms cubic-bezier(0.4,0,0.2,1), box-shadow 100ms cubic-bezier(0.4,0,0.2,1);
         }
         button:active:not(:disabled), [role="button"]:active:not(:disabled), [role="tab"]:active {
           transform: scale(0.98);
         }
 
-        /* Sidebar panel slide */
-        .k-panel-slide { transition: transform 0.2s cubic-bezier(0,0,0.2,1), opacity 0.2s cubic-bezier(0,0,0.2,1); }
+        /* Sidebar panel slide — 200ms for panel transitions */
+        .k-panel-slide { transition: transform 200ms cubic-bezier(0,0,0.2,1), opacity 200ms cubic-bezier(0,0,0.2,1); }
 
-        /* Channel switch fade */
-        .k-channel-fade { animation: k-fade-in 80ms cubic-bezier(0,0,0.2,1); }
+        /* Channel switch — fade out 100ms, fade in 150ms */
+        .k-channel-fade { animation: k-fade-in 150ms cubic-bezier(0,0,0.2,1); }
 
         /* Legacy utility classes */
         .glass { background: var(--bg-glass); backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur)); border: 1px solid var(--border); }
