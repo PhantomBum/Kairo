@@ -22,8 +22,8 @@ function MemberRow({ member, profile, isOwner, roleColor, onClick }) {
 
   return (
     <button onClick={() => onClick?.(member.user_id)}
-      className="w-full flex items-center gap-2.5 px-2 py-1.5 rounded-md transition-colors hover:bg-[rgba(255,255,255,0.04)] group"
-      style={{ opacity: isOnline ? 1 : 0.4 }}>
+      className="w-full flex items-center gap-2.5 px-2 py-1.5 rounded-lg transition-colors hover:bg-[rgba(255,255,255,0.04)] group"
+      style={{ opacity: isOnline ? 1 : 0.45 }}>
       <div className="relative flex-shrink-0">
         <div className="w-8 h-8 rounded-full flex items-center justify-center text-[12px] font-semibold overflow-hidden"
           style={{ background: colors.bg.overlay, color: colors.text.muted }}>
