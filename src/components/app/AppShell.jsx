@@ -42,6 +42,8 @@ import ChannelSettingsModal from '@/components/app/modals/ChannelSettingsModal';
 export default function AppShell({ currentUser }) {
   const qc = useQueryClient();
   const { getProfile, refresh: refreshProfiles } = useProfiles();
+  const { optimisticMsgs, optimisticIds, addOptimistic, confirmOptimistic, revertOptimistic } = useOptimisticMessages();
+  const { trackChannel, prefetchNearby } = useChannelCache();
 
   const [view, setView] = useState('home');
   const [activeServer, setActiveServer] = useState(null);
@@ -49,6 +51,7 @@ export default function AppShell({ currentUser }) {
   const [activeConv, setActiveConv] = useState(null);
   const [showMembers, setShowMembers] = useState(true);
   const [showMediaGallery, setShowMediaGallery] = useState(false);
+  const [showMobileSidebar, setShowMobileSidebar] = useState(false);
   const [replyTo, setReplyTo] = useState(null);
   const [editingMsg, setEditingMsg] = useState(null);
   const [modal, setModal] = useState(null);
@@ -57,6 +60,7 @@ export default function AppShell({ currentUser }) {
   const [isDeafened, setIsDeafened] = useState(false);
   const [profileUserId, setProfileUserId] = useState(null);
   const [channelToEdit, setChannelToEdit] = useState(null);
+  const [mobileTab, setMobileTab] = useState('servers');
 
   const { data: profile } = useMyProfile(currentUser.email);
   const { data: servers = [] } = useServers(currentUser.id, currentUser.email);
