@@ -73,14 +73,14 @@ export default function MemberPanel({ members, roles, ownerId, onProfileClick })
 
   if (!members || members.length === 0) {
     return (
-      <div className="w-[240px] flex-shrink-0 overflow-y-auto scrollbar-none p-3" style={{ borderLeft: `1px solid ${colors.border.default}`, background: colors.bg.surface }}>
+      <div className="w-[240px] flex-shrink-0 overflow-y-auto scrollbar-none p-3 hidden md:block" style={{ borderLeft: `1px solid ${colors.border.default}`, background: colors.bg.surface }}>
         {Array.from({ length: 8 }).map((_, i) => <MemberSkeleton key={i} />)}
       </div>
     );
   }
 
   return (
-    <div className="w-[240px] flex-shrink-0 overflow-y-auto scrollbar-none px-2 pt-4" style={{ borderLeft: `1px solid ${colors.border.default}`, background: colors.bg.surface }} role="complementary" aria-label="Member list">
+    <div className="w-[240px] flex-shrink-0 overflow-y-auto scrollbar-none px-2 pt-4 hidden md:block" style={{ borderLeft: `1px solid ${colors.border.default}`, background: colors.bg.surface }} role="complementary" aria-label="Member list">
       {grouped.map((group, gi) => (
         <div key={gi} className="mb-2">
           <div className="text-[11px] font-semibold uppercase tracking-[0.06em] px-2 py-1.5" style={{ color: group.color || colors.text.muted }}>
