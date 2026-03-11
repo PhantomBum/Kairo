@@ -121,7 +121,7 @@ export default function ServerRailWithContext({ servers, activeServerId, onServe
         <ContextMenu key={s.id}>
           <ContextMenuTrigger>
             <div><ServerRailIcon server={s} active={activeServerId === s.id} onClick={() => onServerSelect(s)}>
-              {s.icon_url ? <img src={s.icon_url} className="w-full h-full object-cover" style={{ borderRadius: 'inherit' }} alt={s.name} />
+              {s.icon_url ? <img src={s.icon_url} className="w-full h-full object-cover absolute inset-0" alt={s.name} />
                 : <span className="text-[15px] font-semibold select-none" style={{ color: activeServerId === s.id ? '#fff' : colors.text.secondary }}>{s.name?.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()}</span>}
             </ServerRailIcon></div>
           </ContextMenuTrigger>
