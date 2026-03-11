@@ -159,8 +159,8 @@ export default function FriendsView({ friends, incomingRequests, outgoingRequest
             )
             : (blocked || []).map(b => (
               <div key={b.id} className="flex items-center gap-3 px-4 py-3 rounded-lg" style={{ background: colors.bg.elevated }}>
-                <Ban className="w-5 h-5" style={{ color: colors.danger }} />
-                <span className="text-[14px] flex-1" style={{ color: colors.text.primary }}>{b.friend_name || b.friend_email}</span>
+                <Ban className="w-5 h-5 flex-shrink-0" style={{ color: colors.danger }} />
+                <span className="text-[14px] flex-1 truncate" style={{ color: colors.text.primary }}>{b.blocked_name || b.blocked_email || 'Blocked User'}</span>
               </div>
             ))}
           </div>
