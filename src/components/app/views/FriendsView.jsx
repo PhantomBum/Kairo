@@ -62,21 +62,27 @@ function FriendRow({ f, onMessage, onRemove, onBlock, onProfileClick, profile })
   );
 }
 
-export default function FriendsView({ friends, incomingRequests, outgoingRequests, onAddFriend, onMessage, onAccept, onDecline, onRemove, onBlock, onProfileClick, blocked = [], suggestedFriends = [] }) {
+export default function FriendsView({ friends, incomingRequests, outgoingRequests, onAddFriend, onMessage, onAccept, onDecline, onRemove, onBlock, onProfileClick, blocked = [] }) {
   const [tab, setTab] = useState('all');
   const [search, setSearch] = useState('');
   const { getProfile } = useProfiles();
 
+  // Build a set of blocked user IDs for filtering
+  const blockedIds = useMemo(() => new Set((blocked || []).map(b => b.blocked_user_id)), [blocked]);
+
   const online = useMemo(() => (friends || []).filter(f => {
+    if (blockedIds.has(f.friend_id)) return false; // Don't show blocked in online
     const p = getProfile(f.friend_id);
     return p?.is_online || p?.status === 'online' || p?.status === 'idle' || p?.status === 'dnd';
-  }), [friends, getProfile]);
+  }), [friends, getProfile, blockedIds]);
 
   const filtered = useMemo(() => {
     let list = tab === 'online' ? online : (friends || []);
+    // Filter out blocked users from all friend views
+    list = list.filter(f => !blockedIds.has(f.friend_id));
     if (search) list = list.filter(f => f.friend_name?.toLowerCase().includes(search.toLowerCase()));
     return list;
-  }, [friends, online, tab, search]);
+  }, [friends, online, tab, search, blockedIds]);
 
   const pendingBadge = incomingRequests.length + outgoingRequests.length;
 

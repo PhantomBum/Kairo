@@ -11,7 +11,7 @@ function fullTs(d) { return new Date(d).toLocaleString('en-US', { weekday: 'long
 function renderText(text, onLinkClick) {
   if (!text) return null;
   return text.split(/(https?:\/\/[^\s]+|@everyone|@here|\*\*[^*]+\*\*|\*[^*]+\*|`[^`]+`)/g).map((p, i) => {
-    if (p.match(/^https?:\/\//)) return <a key={i} href={p} onClick={e => { if (onLinkClick) { e.preventDefault(); onLinkClick(p); } }} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 break-all hover:no-underline" style={{ color: colors.text.link }}>{p}</a>;
+    if (p.match(/^https?:\/\//)) return <a key={i} href={p} onClick={e => { if (onLinkClick) { e.preventDefault(); onLinkClick(p); } }} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:no-underline" style={{ color: colors.text.link, wordBreak: 'break-all' }}>{p}</a>;
     if (p === '@everyone' || p === '@here') return <span key={i} className="px-1 rounded" style={{ background: `${colors.info}20`, color: colors.info }}>{p}</span>;
     if (p.match(/^\*\*.*\*\*$/)) return <strong key={i}>{p.slice(2, -2)}</strong>;
     if (p.match(/^\*.*\*$/)) return <em key={i}>{p.slice(1, -1)}</em>;
