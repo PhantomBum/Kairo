@@ -62,7 +62,7 @@ function CategoryGroup({ category, channels, activeId, onSelect, onAdd, onSettin
         <div ref={provided.innerRef} {...provided.draggableProps} className="mb-1">
           <div {...provided.dragHandleProps}>
             <button onClick={() => setOpen(!open)} className="w-full flex items-center gap-1 px-0.5 pt-4 pb-1 group">
-              {open ? <ChevronDown className="w-3 h-3" style={{ color: colors.text.disabled }} /> : <ChevronRight className="w-3 h-3" style={{ color: colors.text.disabled }} />}
+              <ChevronDown className="w-3 h-3" style={{ color: colors.text.disabled, transform: open ? 'rotate(0deg)' : 'rotate(-90deg)', transition: 'transform 150ms cubic-bezier(0.4,0,0.2,1)' }} />
               <span className="text-[11px] font-semibold uppercase tracking-[0.06em] flex-1 text-left truncate" style={{ color: colors.text.muted }}>{category.name}</span>
               {isOwner && <Plus onClick={e => { e.stopPropagation(); onAdd(category.id); }} className="w-[14px] h-[14px] opacity-0 group-hover:opacity-60 hover:opacity-100 cursor-pointer transition-opacity" style={{ color: colors.text.muted }} />}
             </button>
