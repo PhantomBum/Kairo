@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
-import { Hash, Volume2, Megaphone, Radio, MessageSquare, Lock, ChevronDown, ChevronRight, Plus, Settings, UserPlus, Shield, BarChart3, GripVertical, LayoutGrid, X, ShieldAlert } from 'lucide-react';
+import { Hash, Volume2, Megaphone, Radio, MessageSquare, Lock, ChevronDown, ChevronRight, Plus, Settings, UserPlus, Shield, BarChart3, GripVertical, LayoutGrid, X, ShieldAlert, History } from 'lucide-react';
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuSeparator, ContextMenuTrigger } from '@/components/ui/context-menu';
 import { base44 } from '@/api/base44Client';
 import { colors, radius, shadows } from '@/components/app/design/tokens';
@@ -85,7 +85,7 @@ function CategoryGroup({ category, channels, activeId, onSelect, onAdd, onSettin
   );
 }
 
-export default function DraggableChannelSidebar({ server, categories, channels, activeId, onSelect, onAdd, onSettings, onInvite, onModPanel, onAnalytics, onChannelSettings, isOwner }) {
+export default function DraggableChannelSidebar({ server, categories, channels, activeId, onSelect, onAdd, onSettings, onInvite, onModPanel, onAnalytics, onBackups, onChannelSettings, isOwner }) {
   const sorted = [...(categories || [])].sort((a, b) => (a.position || 0) - (b.position || 0));
   const catIds = new Set(sorted.map(c => c.id));
   const uncategorized = (channels || []).filter(ch => !ch.category_id || !catIds.has(ch.category_id));
@@ -155,6 +155,11 @@ export default function DraggableChannelSidebar({ server, categories, channels, 
                 className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md text-[13px] transition-colors hover:bg-[rgba(255,255,255,0.05)]"
                 style={{ color: colors.text.secondary }}>
                 <Shield className="w-4 h-4 opacity-50" /> Mod Panel
+              </button>
+              <button onClick={() => { onBackups?.(); setDropdownOpen(false); }}
+                className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md text-[13px] transition-colors hover:bg-[rgba(255,255,255,0.05)]"
+                style={{ color: colors.text.secondary }}>
+                <History className="w-4 h-4 opacity-50" /> Backups
               </button>
               <div className="my-1 h-px" style={{ background: colors.border.light }} />
               <button onClick={() => { onAdd(sorted[0]?.id); setDropdownOpen(false); }}
