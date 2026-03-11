@@ -61,7 +61,7 @@ const MessageBubble = memo(function MessageBubble({ message, compact, isOwn, onR
           style={{
             padding: compact ? '2px 16px 2px 16px' : '4px 16px 4px 16px',
             background: hovered ? 'rgba(255,255,255,0.02)' : message.is_pinned ? `${colors.warning}06` : 'transparent',
-            transition: 'background 0.15s ease-out',
+            transition: 'background 100ms cubic-bezier(0.4,0,0.2,1)',
           }}>
 
           {/* Pinned indicator */}
