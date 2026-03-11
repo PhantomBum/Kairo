@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Plus, Compass, Bot, Crown, HelpCircle, MessageSquare, Zap } from 'lucide-react';
 import { createPageUrl } from '@/utils';
 import { colors, shadows, radius } from '@/components/app/design/tokens';
