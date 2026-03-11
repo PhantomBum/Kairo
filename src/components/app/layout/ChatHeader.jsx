@@ -1,9 +1,9 @@
 import React from 'react';
 import { createPageUrl } from '@/utils';
-import { Hash, Volume2, Megaphone, Radio, MessageSquare, HelpCircle, Users, Pin, AtSign, Image, Phone, Video } from 'lucide-react';
+import { Hash, Volume2, Megaphone, Radio, MessageSquare, HelpCircle, Users, Pin, AtSign, Image, Phone, Video, Search, LayoutGrid } from 'lucide-react';
 import { colors, shadows } from '@/components/app/design/tokens';
 
-const typeIcons = { text: Hash, voice: Volume2, announcement: Megaphone, stage: Radio, forum: MessageSquare };
+const typeIcons = { text: Hash, voice: Volume2, announcement: Megaphone, stage: Radio, forum: MessageSquare, board: LayoutGrid };
 
 function HeaderButton({ icon: Icon, onClick, href, active, badge, title }) {
   const Wrapper = href ? 'a' : 'button';
@@ -20,7 +20,7 @@ function HeaderButton({ icon: Icon, onClick, href, active, badge, title }) {
   );
 }
 
-export default function ChatHeader({ channel, conversation, currentUserId, showMembers, onToggleMembers, isDM, onPinned, pinnedCount, onMediaGallery, onVoiceCall, onVideoCall, serverName }) {
+export default function ChatHeader({ channel, conversation, currentUserId, showMembers, onToggleMembers, isDM, onPinned, pinnedCount, onMediaGallery, onVoiceCall, onVideoCall, serverName, onSearch }) {
   const label = isDM
     ? (conversation?.name || conversation?.participants?.find(p => p.user_id !== currentUserId)?.user_name || 'DM')
     : (channel?.name || '');
@@ -54,7 +54,8 @@ export default function ChatHeader({ channel, conversation, currentUserId, showM
           </>
         )}
         {onPinned && <HeaderButton icon={Pin} onClick={onPinned} badge={pinnedCount} title="Pinned Messages" />}
-        {isDM && onMediaGallery && <HeaderButton icon={Image} onClick={onMediaGallery} title="Media Gallery" />}
+        {onMediaGallery && <HeaderButton icon={Image} onClick={onMediaGallery} title="Media Gallery" />}
+        {onSearch && <HeaderButton icon={Search} onClick={onSearch} title="Search" />}
         {!isDM && <HeaderButton icon={Users} onClick={onToggleMembers} active={showMembers} title="Member List" />}
         <HeaderButton icon={HelpCircle} href={createPageUrl('FAQ')} title="Help & FAQ" />
       </div>
