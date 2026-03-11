@@ -55,6 +55,7 @@ import Kairo from './pages/Kairo';
 import Spaces from './pages/Spaces';
 import Status from './pages/Status';
 import Support from './pages/Support';
+import Invite from './pages/Invite';
 import __Layout from './Layout.jsx';
 
 
@@ -67,6 +68,7 @@ export const PAGES = {
     "Spaces": Spaces,
     "Status": Status,
     "Support": Support,
+    "Invite": Invite,
 }
 
 export const pagesConfig = {
