@@ -187,7 +187,7 @@ const MessageBubble = memo(function MessageBubble({ message, compact, isOwn, onR
 
           {/* Hover action bar */}
           {hovered && !isEditing && !isDeleted && (
-            <div className="absolute -top-4 right-4 flex items-center p-[3px] rounded-lg gap-[2px] z-10 k-scale-in"
+            <div className="absolute -top-4 right-4 flex items-center p-[3px] rounded-lg gap-[2px] z-10 k-fade-in"
               style={{ background: colors.bg.modal, boxShadow: shadows.medium, border: `1px solid ${colors.border.light}` }}
               role="toolbar" aria-label="Message actions">
               {quickEmojis.map(e => <button key={e} onClick={() => onReact(message, e)} className="w-7 h-7 flex items-center justify-center rounded-md text-sm hover:bg-[rgba(255,255,255,0.06)] transition-colors">{e}</button>)}
