@@ -1,55 +1,60 @@
 import React, { useState, useMemo } from 'react';
-import { Users, UserPlus, Check, X, MessageSquare, Trash2, Clock, Search, Ban, FolderPlus, Tag, Activity, Sparkles, UserX } from 'lucide-react';
+import { Users, UserPlus, Check, X, MessageSquare, Clock, Search, Ban, Activity, Sparkles, UserX } from 'lucide-react';
 import { useProfiles } from '@/components/app/providers/ProfileProvider';
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuSeparator, ContextMenuTrigger } from '@/components/ui/context-menu';
+import { colors, shadows } from '@/components/app/design/tokens';
 
-const statusColors = { online: '#7bc9a4', idle: '#c9b47b', dnd: '#c97b7b', invisible: '#555248', offline: '#555248' };
 const TABS = ['all', 'online', 'pending', 'blocked', 'activity'];
-const DEFAULT_CATEGORIES = ['Close Friends', 'Gaming', 'Work', 'School'];
 
 function FriendRow({ f, onMessage, onRemove, onBlock, onProfileClick, profile }) {
   const status = profile?.status || 'offline';
+  const statusColor = colors.status[status] || colors.status.offline;
   const customStatus = profile?.custom_status;
   const activity = profile?.rich_presence;
 
   return (
     <ContextMenu>
       <ContextMenuTrigger>
-        <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl group transition-colors hover:bg-[var(--bg-glass)]">
+        <div className="flex items-center gap-3 px-3 py-2.5 rounded-lg group transition-colors hover:bg-[rgba(255,255,255,0.03)]"
+          style={{ borderTop: `1px solid ${colors.border.default}` }}>
           <div className="relative flex-shrink-0">
-            <div className="w-10 h-10 rounded-full flex items-center justify-center text-xs font-medium overflow-hidden" style={{ background: 'var(--bg-glass-strong)', color: 'var(--text-muted)' }}>
-              {f.friend_avatar ? <img src={f.friend_avatar} className="w-full h-full object-cover" /> : (f.friend_name || '?').charAt(0).toUpperCase()}
+            <div className="w-9 h-9 rounded-full flex items-center justify-center text-[13px] font-semibold overflow-hidden" style={{ background: colors.bg.overlay, color: colors.text.muted }}>
+              {f.friend_avatar ? <img src={f.friend_avatar} className="w-full h-full object-cover" alt="" /> : (f.friend_name || '?').charAt(0).toUpperCase()}
             </div>
-            <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-2" style={{ background: statusColors[status], borderColor: 'var(--bg-base)' }} />
+            <div className="absolute -bottom-0.5 -right-0.5 w-[14px] h-[14px] rounded-full border-[3px]" style={{ background: statusColor, borderColor: colors.bg.base }} />
           </div>
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2">
-              <p className="text-[13px] font-medium truncate" style={{ color: 'var(--text-cream)' }}>{f.friend_name}</p>
-              {profile?.badges?.includes('premium') && <Sparkles className="w-3 h-3 flex-shrink-0" style={{ color: 'var(--accent-amber)' }} />}
+            <div className="flex items-center gap-1.5">
+              <p className="text-[14px] font-semibold truncate" style={{ color: colors.text.primary }}>{f.friend_name}</p>
+              {profile?.badges?.includes('premium') && <Sparkles className="w-3.5 h-3.5 flex-shrink-0" style={{ color: colors.warning }} />}
             </div>
-            <p className="text-[10px] truncate" style={{ color: 'var(--text-muted)' }}>
-              {customStatus?.text ? `${customStatus.emoji || ''} ${customStatus.text}` : activity?.name ? `${activity.type || 'Playing'} ${activity.name}` : status === 'offline' && profile?.last_seen ? `Last seen ${new Date(profile.last_seen).toLocaleDateString()}` : status}
+            <p className="text-[12px] truncate" style={{ color: colors.text.muted }}>
+              {customStatus?.text ? `${customStatus.emoji || ''} ${customStatus.text}` : activity?.name ? `${activity.type || 'Playing'} ${activity.name}` : status}
             </p>
           </div>
           <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-            <button onClick={() => onMessage(f)} className="p-2 rounded-lg hover:bg-[var(--bg-glass-hover)]"><MessageSquare className="w-3.5 h-3.5" style={{ color: 'var(--text-muted)' }} /></button>
-            <button onClick={() => onProfileClick?.(f.friend_id)} className="p-2 rounded-lg hover:bg-[var(--bg-glass-hover)]"><Users className="w-3.5 h-3.5" style={{ color: 'var(--text-muted)' }} /></button>
+            <button onClick={() => onMessage(f)} className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-[rgba(255,255,255,0.06)]" style={{ background: colors.bg.elevated }}>
+              <MessageSquare className="w-4 h-4" style={{ color: colors.text.muted }} />
+            </button>
+            <button onClick={() => onProfileClick?.(f.friend_id)} className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-[rgba(255,255,255,0.06)]" style={{ background: colors.bg.elevated }}>
+              <Users className="w-4 h-4" style={{ color: colors.text.muted }} />
+            </button>
           </div>
         </div>
       </ContextMenuTrigger>
-      <ContextMenuContent className="w-48 p-1 rounded-xl" style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-light)', boxShadow: 'var(--shadow-lg)' }}>
-        <ContextMenuItem onClick={() => onMessage(f)} className="text-[12px] gap-2 rounded-lg px-2.5 py-1.5" style={{ color: 'var(--text-secondary)' }}>
-          <MessageSquare className="w-3.5 h-3.5 opacity-50" /> Message
+      <ContextMenuContent className="w-52 p-1.5 rounded-lg" style={{ background: colors.bg.modal, border: `1px solid ${colors.border.light}`, boxShadow: shadows.strong }}>
+        <ContextMenuItem onClick={() => onMessage(f)} className="text-[13px] gap-2.5 rounded-md px-2.5 py-2" style={{ color: colors.text.secondary }}>
+          <MessageSquare className="w-4 h-4 opacity-50" /> Message
         </ContextMenuItem>
-        <ContextMenuItem onClick={() => onProfileClick?.(f.friend_id)} className="text-[12px] gap-2 rounded-lg px-2.5 py-1.5" style={{ color: 'var(--text-secondary)' }}>
-          <Users className="w-3.5 h-3.5 opacity-50" /> View Profile
+        <ContextMenuItem onClick={() => onProfileClick?.(f.friend_id)} className="text-[13px] gap-2.5 rounded-md px-2.5 py-2" style={{ color: colors.text.secondary }}>
+          <Users className="w-4 h-4 opacity-50" /> View Profile
         </ContextMenuItem>
-        <ContextMenuSeparator style={{ background: 'var(--border)' }} />
-        <ContextMenuItem onClick={() => onRemove(f)} className="text-[12px] gap-2 rounded-lg px-2.5 py-1.5" style={{ color: 'var(--accent-red)' }}>
-          <UserX className="w-3.5 h-3.5 opacity-50" /> Remove Friend
+        <ContextMenuSeparator style={{ background: colors.border.light, margin: '4px 0' }} />
+        <ContextMenuItem onClick={() => onRemove(f)} className="text-[13px] gap-2.5 rounded-md px-2.5 py-2" style={{ color: colors.danger }}>
+          <UserX className="w-4 h-4 opacity-50" /> Remove Friend
         </ContextMenuItem>
-        <ContextMenuItem onClick={() => onBlock?.(f)} className="text-[12px] gap-2 rounded-lg px-2.5 py-1.5" style={{ color: 'var(--accent-red)' }}>
-          <Ban className="w-3.5 h-3.5 opacity-50" /> Block
+        <ContextMenuItem onClick={() => onBlock?.(f)} className="text-[13px] gap-2.5 rounded-md px-2.5 py-2" style={{ color: colors.danger }}>
+          <Ban className="w-4 h-4 opacity-50" /> Block
         </ContextMenuItem>
       </ContextMenuContent>
     </ContextMenu>
@@ -77,72 +82,72 @@ export default function FriendsView({ friends, incomingRequests, outgoingRequest
   return (
     <div className="flex-1 flex flex-col">
       {/* Header */}
-      <div className="h-12 px-4 flex items-center gap-3 flex-shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
-        <Users className="w-4 h-4" style={{ color: 'var(--text-muted)' }} />
-        <span className="text-[14px] font-semibold" style={{ color: 'var(--text-cream)', fontFamily: 'monospace' }}>Friends</span>
+      <div className="h-12 px-4 flex items-center gap-3 flex-shrink-0" style={{ borderBottom: `1px solid ${colors.border.default}`, background: colors.bg.surface, boxShadow: '0 1px 0 rgba(0,0,0,0.15)' }}>
+        <Users className="w-5 h-5" style={{ color: colors.text.disabled }} />
+        <span className="text-[15px] font-semibold" style={{ color: colors.text.primary }}>Friends</span>
         <div className="flex gap-0.5 ml-3">
           {TABS.map(t => (
-            <button key={t} onClick={() => setTab(t)} className="px-2.5 py-1 rounded-lg text-[11px] transition-colors capitalize relative"
-              style={{ background: tab === t ? 'var(--bg-glass-active)' : 'transparent', color: tab === t ? 'var(--text-cream)' : 'var(--text-muted)' }}>
+            <button key={t} onClick={() => setTab(t)} className="px-3 py-1 rounded-md text-[13px] font-medium transition-colors capitalize relative"
+              style={{ background: tab === t ? 'rgba(255,255,255,0.06)' : 'transparent', color: tab === t ? colors.text.primary : colors.text.muted }}>
               {t}
               {t === 'pending' && pendingBadge > 0 && (
-                <span className="absolute -top-1 -right-1 min-w-[14px] h-3.5 px-0.5 rounded-full text-[8px] font-bold flex items-center justify-center" style={{ background: 'var(--accent-red)', color: '#fff' }}>{pendingBadge}</span>
+                <span className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 rounded-full text-[10px] font-bold flex items-center justify-center" style={{ background: colors.danger, color: '#fff' }}>{pendingBadge}</span>
               )}
-              {t === 'online' && <span className="ml-1 text-[9px]" style={{ color: 'var(--text-faint)' }}>{online.length}</span>}
+              {t === 'online' && <span className="ml-1 text-[11px]" style={{ color: colors.text.disabled }}>{online.length}</span>}
             </button>
           ))}
         </div>
-        <button onClick={onAddFriend} className="ml-auto px-3 py-1.5 rounded-xl text-[11px] font-medium flex items-center gap-1.5"
-          style={{ background: 'var(--accent-green)', color: '#000' }}>
-          <UserPlus className="w-3 h-3" /> Add Friend
+        <button onClick={onAddFriend} className="ml-auto px-4 py-1.5 rounded-md text-[13px] font-semibold flex items-center gap-2"
+          style={{ background: colors.success, color: '#fff' }}>
+          <UserPlus className="w-4 h-4" /> Add Friend
         </button>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-4 scrollbar-none">
+      <div className="flex-1 overflow-y-auto p-4 scrollbar-none max-w-3xl mx-auto w-full">
         {/* Search */}
-        <div className="flex items-center gap-2 px-3 py-2 rounded-xl mb-4" style={{ background: 'var(--bg-glass)', border: '1px solid var(--border)' }}>
-          <Search className="w-4 h-4" style={{ color: 'var(--text-muted)' }} />
-          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search friends..." className="flex-1 bg-transparent text-sm outline-none placeholder:text-[var(--text-faint)]" style={{ color: 'var(--text-primary)' }} />
+        <div className="flex items-center gap-2.5 px-3 py-2.5 rounded-md mb-5" style={{ background: colors.bg.base }}>
+          <Search className="w-4 h-4" style={{ color: colors.text.disabled }} />
+          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search friends..." className="flex-1 bg-transparent text-[14px] outline-none" style={{ color: colors.text.primary }} />
         </div>
 
+        {/* Pending tab */}
         {tab === 'pending' && (
           <div className="space-y-2">
-            {incomingRequests.length > 0 && <p className="text-[10px] font-semibold uppercase tracking-[0.08em] px-1 pb-1" style={{ color: 'var(--text-muted)', fontFamily: 'monospace' }}>Incoming — {incomingRequests.length}</p>}
+            {incomingRequests.length > 0 && <p className="text-[11px] font-semibold uppercase tracking-[0.06em] px-1 pb-2" style={{ color: colors.text.muted }}>Incoming — {incomingRequests.length}</p>}
             {incomingRequests.map(r => (
-              <div key={r.id} className="flex items-center gap-3 px-3 py-3 rounded-xl" style={{ background: 'var(--bg-glass)' }}>
-                <div className="w-10 h-10 rounded-full flex items-center justify-center text-xs font-medium overflow-hidden" style={{ background: 'var(--bg-glass-strong)', color: 'var(--text-muted)' }}>
-                  {r.friend_avatar ? <img src={r.friend_avatar} className="w-full h-full object-cover" /> : (r.friend_name || r.created_by || '?').charAt(0).toUpperCase()}
+              <div key={r.id} className="flex items-center gap-3 px-4 py-3 rounded-lg" style={{ background: colors.bg.elevated }}>
+                <div className="w-10 h-10 rounded-full flex items-center justify-center text-[13px] font-semibold overflow-hidden" style={{ background: colors.bg.overlay, color: colors.text.muted }}>
+                  {r.friend_avatar ? <img src={r.friend_avatar} className="w-full h-full object-cover" alt="" /> : (r.friend_name || r.created_by || '?').charAt(0).toUpperCase()}
                 </div>
                 <div className="flex-1">
-                  <p className="text-[13px] font-medium" style={{ color: 'var(--text-cream)' }}>{r.friend_name || r.created_by}</p>
-                  <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>Incoming friend request</p>
+                  <p className="text-[14px] font-semibold" style={{ color: colors.text.primary }}>{r.friend_name || r.created_by}</p>
+                  <p className="text-[12px]" style={{ color: colors.text.muted }}>Incoming friend request</p>
                 </div>
-                <button onClick={() => onAccept(r)} className="p-2 rounded-lg hover:bg-[var(--bg-glass-hover)]"><Check className="w-4 h-4" style={{ color: 'var(--accent-green)' }} /></button>
-                <button onClick={() => onDecline(r)} className="p-2 rounded-lg hover:bg-[var(--bg-glass-hover)]"><X className="w-4 h-4" style={{ color: 'var(--accent-red)' }} /></button>
+                <button onClick={() => onAccept(r)} className="w-9 h-9 flex items-center justify-center rounded-full" style={{ background: `${colors.success}20` }}><Check className="w-5 h-5" style={{ color: colors.success }} /></button>
+                <button onClick={() => onDecline(r)} className="w-9 h-9 flex items-center justify-center rounded-full" style={{ background: `${colors.danger}20` }}><X className="w-5 h-5" style={{ color: colors.danger }} /></button>
               </div>
             ))}
-            {outgoingRequests.length > 0 && <p className="text-[10px] font-semibold uppercase tracking-[0.08em] px-1 py-1 mt-3" style={{ color: 'var(--text-muted)', fontFamily: 'monospace' }}>Outgoing — {outgoingRequests.length}</p>}
+            {outgoingRequests.length > 0 && <p className="text-[11px] font-semibold uppercase tracking-[0.06em] px-1 py-2 mt-4" style={{ color: colors.text.muted }}>Outgoing — {outgoingRequests.length}</p>}
             {outgoingRequests.map(r => (
-              <div key={r.id} className="flex items-center gap-3 px-3 py-3 rounded-xl" style={{ background: 'var(--bg-glass)' }}>
-                <div className="w-10 h-10 rounded-full flex items-center justify-center text-xs font-medium overflow-hidden" style={{ background: 'var(--bg-glass-strong)', color: 'var(--text-muted)' }}>
-                  {r.friend_avatar ? <img src={r.friend_avatar} className="w-full h-full object-cover" /> : (r.friend_name || '?').charAt(0).toUpperCase()}
+              <div key={r.id} className="flex items-center gap-3 px-4 py-3 rounded-lg" style={{ background: colors.bg.elevated }}>
+                <div className="w-10 h-10 rounded-full flex items-center justify-center text-[13px] font-semibold overflow-hidden" style={{ background: colors.bg.overlay, color: colors.text.muted }}>
+                  {r.friend_avatar ? <img src={r.friend_avatar} className="w-full h-full object-cover" alt="" /> : (r.friend_name || '?').charAt(0).toUpperCase()}
                 </div>
-                <div className="flex-1"><p className="text-[13px]" style={{ color: 'var(--text-primary)' }}>{r.friend_name}</p><p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>Request sent</p></div>
-                <Clock className="w-3.5 h-3.5" style={{ color: 'var(--text-faint)' }} />
+                <div className="flex-1"><p className="text-[14px]" style={{ color: colors.text.primary }}>{r.friend_name}</p><p className="text-[12px]" style={{ color: colors.text.muted }}>Request sent</p></div>
+                <Clock className="w-4 h-4" style={{ color: colors.text.disabled }} />
               </div>
             ))}
-            {incomingRequests.length === 0 && outgoingRequests.length === 0 && <p className="text-center py-8 text-[12px]" style={{ color: 'var(--text-muted)' }}>No pending requests</p>}
+            {incomingRequests.length === 0 && outgoingRequests.length === 0 && <p className="text-center py-12 text-[14px]" style={{ color: colors.text.muted }}>No pending requests</p>}
           </div>
         )}
 
         {tab === 'blocked' && (
           <div className="space-y-2">
-            {(blocked || []).length === 0 ? (
-              <p className="text-center py-8 text-[12px]" style={{ color: 'var(--text-muted)' }}>No blocked users</p>
-            ) : (blocked || []).map(b => (
-              <div key={b.id} className="flex items-center gap-3 px-3 py-3 rounded-xl" style={{ background: 'var(--bg-glass)' }}>
-                <Ban className="w-4 h-4" style={{ color: 'var(--accent-red)' }} />
-                <span className="text-[13px] flex-1" style={{ color: 'var(--text-primary)' }}>{b.friend_name || b.friend_email}</span>
+            {(blocked || []).length === 0 ? <p className="text-center py-12 text-[14px]" style={{ color: colors.text.muted }}>No blocked users</p>
+            : (blocked || []).map(b => (
+              <div key={b.id} className="flex items-center gap-3 px-4 py-3 rounded-lg" style={{ background: colors.bg.elevated }}>
+                <Ban className="w-5 h-5" style={{ color: colors.danger }} />
+                <span className="text-[14px] flex-1" style={{ color: colors.text.primary }}>{b.friend_name || b.friend_email}</span>
               </div>
             ))}
           </div>
@@ -150,54 +155,35 @@ export default function FriendsView({ friends, incomingRequests, outgoingRequest
 
         {tab === 'activity' && (
           <div className="space-y-3">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.08em] px-1" style={{ color: 'var(--text-muted)', fontFamily: 'monospace' }}>Friend Activity</p>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.06em] px-1" style={{ color: colors.text.muted }}>Friend Activity</p>
             {(friends || []).slice(0, 10).map(f => {
               const p = getProfile(f.friend_id);
               if (!p?.rich_presence?.name && !p?.is_online) return null;
               return (
-                <div key={f.id} className="flex items-center gap-3 px-3 py-2.5 rounded-xl" style={{ background: 'var(--bg-glass)' }}>
-                  <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium overflow-hidden" style={{ background: 'var(--bg-glass-strong)', color: 'var(--text-muted)' }}>
-                    {f.friend_avatar ? <img src={f.friend_avatar} className="w-full h-full object-cover" /> : (f.friend_name || '?').charAt(0).toUpperCase()}
+                <div key={f.id} className="flex items-center gap-3 px-3 py-2.5 rounded-lg" style={{ background: colors.bg.elevated }}>
+                  <div className="w-9 h-9 rounded-full flex items-center justify-center text-[12px] font-semibold overflow-hidden" style={{ background: colors.bg.overlay, color: colors.text.muted }}>
+                    {f.friend_avatar ? <img src={f.friend_avatar} className="w-full h-full object-cover" alt="" /> : (f.friend_name || '?').charAt(0).toUpperCase()}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-[12px] font-medium truncate" style={{ color: 'var(--text-cream)' }}>{f.friend_name}</p>
-                    <p className="text-[10px] truncate" style={{ color: 'var(--text-muted)' }}>
-                      {p?.rich_presence?.name ? `${p.rich_presence.type || 'Playing'} ${p.rich_presence.name}` : 'Online'}
-                    </p>
+                    <p className="text-[13px] font-semibold truncate" style={{ color: colors.text.primary }}>{f.friend_name}</p>
+                    <p className="text-[12px] truncate" style={{ color: colors.text.muted }}>{p?.rich_presence?.name ? `${p.rich_presence.type || 'Playing'} ${p.rich_presence.name}` : 'Online'}</p>
                   </div>
-                  <Activity className="w-3 h-3" style={{ color: 'var(--accent-green)' }} />
+                  <Activity className="w-4 h-4" style={{ color: colors.success }} />
                 </div>
               );
             }).filter(Boolean)}
             {(friends || []).filter(f => { const p = getProfile(f.friend_id); return p?.rich_presence?.name || p?.is_online; }).length === 0 && (
-              <p className="text-center py-8 text-[12px]" style={{ color: 'var(--text-muted)' }}>No active friends right now</p>
+              <p className="text-center py-12 text-[14px]" style={{ color: colors.text.muted }}>No active friends right now</p>
             )}
-
-            {/* Suggested Friends */}
-            {suggestedFriends.length > 0 && <>
-              <p className="text-[10px] font-semibold uppercase tracking-[0.08em] px-1 mt-4" style={{ color: 'var(--text-muted)', fontFamily: 'monospace' }}>Suggested</p>
-              {suggestedFriends.map(s => (
-                <div key={s.id} className="flex items-center gap-3 px-3 py-2.5 rounded-xl" style={{ background: 'var(--bg-glass)' }}>
-                  <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium overflow-hidden" style={{ background: 'var(--bg-glass-strong)', color: 'var(--text-muted)' }}>
-                    {s.avatar_url ? <img src={s.avatar_url} className="w-full h-full object-cover" /> : (s.display_name || '?').charAt(0).toUpperCase()}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[12px] font-medium truncate" style={{ color: 'var(--text-cream)' }}>{s.display_name}</p>
-                    <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>From mutual servers</p>
-                  </div>
-                  <UserPlus className="w-3.5 h-3.5" style={{ color: 'var(--accent-blue)' }} />
-                </div>
-              ))}
-            </>}
           </div>
         )}
 
         {(tab === 'all' || tab === 'online') && (
-          <div className="space-y-1">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.08em] px-1 pb-2" style={{ color: 'var(--text-muted)', fontFamily: 'monospace' }}>
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.06em] px-1 pb-2" style={{ color: colors.text.muted }}>
               {tab === 'online' ? `Online — ${online.length}` : `All Friends — ${filtered.length}`}
             </p>
-            {filtered.length === 0 && <p className="text-center py-8 text-[12px]" style={{ color: 'var(--text-muted)' }}>{tab === 'online' ? 'No friends online' : 'No friends yet. Add some!'}</p>}
+            {filtered.length === 0 && <p className="text-center py-12 text-[14px]" style={{ color: colors.text.muted }}>{tab === 'online' ? 'No friends online' : 'No friends yet. Add some!'}</p>}
             {filtered.map(f => (
               <FriendRow key={f.id} f={f} onMessage={onMessage} onRemove={onRemove} onBlock={onBlock} onProfileClick={onProfileClick} profile={getProfile(f.friend_id)} />
             ))}

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { ProfileProvider } from '@/components/app/providers/ProfileProvider';
 import AppShell from '@/components/app/AppShell';
+import { colors } from '@/components/app/design/tokens';
 
 function KairoInner() {
   const [user, setUser] = useState(null);
@@ -12,7 +13,6 @@ function KairoInner() {
       const isAuth = await base44.auth.isAuthenticated();
       if (!isAuth) { base44.auth.redirectToLogin(); return; }
       const me = await base44.auth.me();
-      // Ensure profile exists
       const profiles = await base44.entities.UserProfile.filter({ user_email: me.email });
       if (profiles.length === 0) {
         await base44.entities.UserProfile.create({
@@ -28,9 +28,7 @@ function KairoInner() {
       setLoading(false);
     };
     init();
-
     return () => {
-      // Set offline on unmount
       const cleanup = async () => {
         const isAuth = await base44.auth.isAuthenticated();
         if (!isAuth) return;
@@ -44,14 +42,14 @@ function KairoInner() {
 
   if (loading) {
     return (
-      <div className="h-screen w-screen flex items-center justify-center" style={{ background: 'var(--bg-deep, #050505)' }} role="status" aria-label="Loading Kairo">
-        <div className="text-center">
-          <div className="w-16 h-16 rounded-2xl mx-auto mb-5 flex items-center justify-center"
-            style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.04)', backdropFilter: 'blur(20px)', boxShadow: '0 0 40px rgba(232,228,217,0.03)' }}>
-            <span className="text-2xl font-bold" style={{ color: 'rgba(232,228,217,0.4)', fontFamily: 'monospace' }}>K</span>
+      <div className="h-screen w-screen flex items-center justify-center" style={{ background: colors.bg.base }} role="status" aria-label="Loading Kairo">
+        <div className="text-center k-fade-in">
+          <div className="w-16 h-16 rounded-2xl mx-auto mb-6 flex items-center justify-center"
+            style={{ background: colors.accent.subtle, boxShadow: `0 0 40px ${colors.accent.primary}15` }}>
+            <span className="text-3xl font-bold" style={{ color: colors.accent.primary }}>K</span>
           </div>
-          <div className="w-5 h-5 border-2 rounded-full animate-spin mx-auto" style={{ borderColor: 'rgba(255,255,255,0.04)', borderTopColor: 'rgba(232,228,217,0.3)' }} aria-hidden="true" />
-          <p className="text-[11px] mt-4" style={{ color: 'rgba(232,228,217,0.2)' }}>Loading...</p>
+          <div className="w-6 h-6 border-2 rounded-full animate-spin mx-auto" style={{ borderColor: colors.border.light, borderTopColor: colors.accent.primary }} />
+          <p className="text-[13px] mt-4" style={{ color: colors.text.muted }}>Loading Kairo...</p>
         </div>
       </div>
     );
