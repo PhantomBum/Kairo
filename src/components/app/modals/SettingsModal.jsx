@@ -160,10 +160,10 @@ export default function SettingsModal({ onClose, profile, onUpdate, onLogout, cu
                 <option value="everyone">Everyone</option><option value="friends_of_friends">Mutual Friends</option><option value="none">Nobody</option>
               </select>
             </div>
-            <Toggle label="Read Receipts" k="read_receipts" desc="Show when you've read messages" />
-            <Toggle label="Typing Indicators" k="typing_indicators" desc="Show when you're typing" />
-            <Toggle label="Ghost Mode" k="ghost_mode" desc="Appear offline to everyone" />
-            <Toggle label="Focus Mode" k="focus_mode" desc="Suppress all notifications" />
+            <SettingsToggle label="Read Receipts" checked={form.read_receipts} onChange={v => set('read_receipts', v)} desc="Show when you've read messages" />
+            <SettingsToggle label="Typing Indicators" checked={form.typing_indicators} onChange={v => set('typing_indicators', v)} desc="Show when you're typing" />
+            <SettingsToggle label="Ghost Mode" checked={form.ghost_mode} onChange={v => set('ghost_mode', v)} desc="Appear offline to everyone" />
+            <SettingsToggle label="Focus Mode" checked={form.focus_mode} onChange={v => set('focus_mode', v)} desc="Suppress all notifications" />
           </>}
 
           {tab === 'appearance' && <>
@@ -200,14 +200,14 @@ export default function SettingsModal({ onClose, profile, onUpdate, onLogout, cu
                 ))}
               </div>
             </div>
-            <Slider label="Font Scaling" k="font_scaling" min={80} max={120} unit="%" />
+            <SettingsSlider label="Font Scaling" value={form.font_scaling} onChange={v => set('font_scaling', v)} min={80} max={120} unit="%" />
           </>}
 
           {tab === 'notifications' && <>
-            <Toggle label="Desktop Notifications" k="desktop_notifs" desc="Show system notifications" />
-            <Toggle label="DM Notifications" k="dm_notifs" desc="Notify for new direct messages" />
-            <Toggle label="Mention Notifications" k="mention_notifs" desc="Notify when you're mentioned" />
-            <Toggle label="Sound Effects" k="sound_notifs" desc="Play notification sounds" />
+            <SettingsToggle label="Desktop Notifications" checked={form.desktop_notifs} onChange={v => set('desktop_notifs', v)} desc="Show system notifications" />
+            <SettingsToggle label="DM Notifications" checked={form.dm_notifs} onChange={v => set('dm_notifs', v)} desc="Notify for new direct messages" />
+            <SettingsToggle label="Mention Notifications" checked={form.mention_notifs} onChange={v => set('mention_notifs', v)} desc="Notify when you're mentioned" />
+            <SettingsToggle label="Sound Effects" checked={form.sound_notifs} onChange={v => set('sound_notifs', v)} desc="Play notification sounds" />
           </>}
 
           {tab === 'voice' && <>
@@ -217,17 +217,17 @@ export default function SettingsModal({ onClose, profile, onUpdate, onLogout, cu
                 <option value="default">Default</option>
               </select>
             </div>
-            <Slider label="Input Volume" k="input_volume" min={0} max={200} unit="%" />
+            <SettingsSlider label="Input Volume" value={form.input_volume} onChange={v => set('input_volume', v)} min={0} max={200} unit="%" />
             <div>
               <label className="text-[11px] font-semibold uppercase tracking-[0.06em] block mb-1.5" style={{ color: colors.text.muted }}>Output Device</label>
               <select value={form.output_device} onChange={e => set('output_device', e.target.value)} className="w-full px-3 py-2.5 rounded-lg text-[14px] outline-none" style={{ background: colors.bg.base, color: colors.text.primary, border: `1px solid ${colors.border.default}` }}>
                 <option value="default">Default</option>
               </select>
             </div>
-            <Slider label="Output Volume" k="output_volume" min={0} max={200} unit="%" />
-            <Toggle label="Noise Suppression" k="noise_suppression" desc="Reduce background noise" />
-            <Toggle label="Echo Cancellation" k="echo_cancellation" desc="Prevent audio feedback" />
-            <Toggle label="Auto Gain Control" k="auto_gain" desc="Normalize microphone volume" />
+            <SettingsSlider label="Output Volume" value={form.output_volume} onChange={v => set('output_volume', v)} min={0} max={200} unit="%" />
+            <SettingsToggle label="Noise Suppression" checked={form.noise_suppression} onChange={v => set('noise_suppression', v)} desc="Reduce background noise" />
+            <SettingsToggle label="Echo Cancellation" checked={form.echo_cancellation} onChange={v => set('echo_cancellation', v)} desc="Prevent audio feedback" />
+            <SettingsToggle label="Auto Gain Control" checked={form.auto_gain} onChange={v => set('auto_gain', v)} desc="Normalize microphone volume" />
           </>}
 
           {tab === 'keybinds' && <>
@@ -250,10 +250,10 @@ export default function SettingsModal({ onClose, profile, onUpdate, onLogout, cu
           {tab === 'security' && <SecuritySettings profile={profile} currentUser={currentUser || { id: profile?.user_id }} onUpdate={onUpdate} />}
 
           {tab === 'accessibility' && <>
-            <Toggle label="Reduced Motion" k="reduced_motion" desc="Minimize animations throughout the app" />
-            <Toggle label="High Contrast" k="high_contrast" desc="Increase contrast for visibility" />
-            <Slider label="Font Scaling" k="font_scaling" min={80} max={150} unit="%" />
-            <Slider label="Color Saturation" k="saturation" min={0} max={200} unit="%" />
+            <SettingsToggle label="Reduced Motion" checked={form.reduced_motion} onChange={v => set('reduced_motion', v)} desc="Minimize animations throughout the app" />
+            <SettingsToggle label="High Contrast" checked={form.high_contrast} onChange={v => set('high_contrast', v)} desc="Increase contrast for visibility" />
+            <SettingsSlider label="Font Scaling" value={form.font_scaling} onChange={v => set('font_scaling', v)} min={80} max={150} unit="%" />
+            <SettingsSlider label="Color Saturation" value={form.saturation} onChange={v => set('saturation', v)} min={0} max={200} unit="%" />
           </>}
 
           <div className="pt-2">
