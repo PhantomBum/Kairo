@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { X } from 'lucide-react';
 import { colors, shadows } from '@/components/app/design/tokens';
 
-export default function ModalWrapper({ title, subtitle, onClose, width = 460, children, danger }) {
+export default function ModalWrapper({ title, subtitle, onClose, width = 460, children, danger, hideTitle }) {
   React.useEffect(() => {
     const h = (e) => { if (e.key === 'Escape') { e.stopPropagation(); onClose(); } };
     window.addEventListener('keydown', h);
@@ -37,19 +37,28 @@ export default function ModalWrapper({ title, subtitle, onClose, width = 460, ch
         }}
         onClick={e => e.stopPropagation()}>
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4" style={{ borderBottom: `1px solid ${colors.border.default}` }}>
-          <div className="min-w-0 flex-1">
-            {title && <h2 className="text-[16px] font-semibold truncate" style={{ color: danger ? colors.danger : colors.text.primary }}>{title}</h2>}
-            {subtitle && <p className="text-[13px] mt-0.5 truncate" style={{ color: colors.text.muted }}>{subtitle}</p>}
+        {!hideTitle && (
+          <div className="flex items-center justify-between px-5 py-4" style={{ borderBottom: `1px solid ${colors.border.default}` }}>
+            <div className="min-w-0 flex-1">
+              {title && <h2 className="text-[16px] font-semibold truncate" style={{ color: danger ? colors.danger : colors.text.primary }}>{title}</h2>}
+              {subtitle && <p className="text-[13px] mt-0.5 truncate" style={{ color: colors.text.muted }}>{subtitle}</p>}
+            </div>
+            <button onClick={onClose}
+              className="w-8 h-8 flex items-center justify-center rounded-md flex-shrink-0 ml-3 hover:bg-[rgba(255,255,255,0.06)]"
+              aria-label="Close dialog">
+              <X className="w-[18px] h-[18px]" style={{ color: colors.text.muted }} />
+            </button>
           </div>
+        )}
+        {hideTitle && (
           <button onClick={onClose}
-            className="w-8 h-8 flex items-center justify-center rounded-md flex-shrink-0 ml-3 hover:bg-[rgba(255,255,255,0.06)]"
+            className="absolute top-3 right-3 z-10 w-8 h-8 flex items-center justify-center rounded-full hover:bg-[rgba(255,255,255,0.1)]"
             aria-label="Close dialog">
-            <X className="w-[18px] h-[18px]" style={{ color: colors.text.muted }} />
+            <X className="w-[18px] h-[18px]" style={{ color: colors.text.primary }} />
           </button>
-        </div>
+        )}
         {/* Body */}
-        <div className="px-5 py-5 overflow-y-auto scrollbar-none" style={{ maxHeight: 'calc(min(85vh, calc(100vh - 32px)) - 64px)' }}>
+        <div className="px-6 py-6 overflow-y-auto scrollbar-none" style={{ maxHeight: hideTitle ? 'calc(min(85vh, calc(100vh - 32px)))' : 'calc(min(85vh, calc(100vh - 32px)) - 64px)' }}>
           {children}
         </div>
       </motion.div>
