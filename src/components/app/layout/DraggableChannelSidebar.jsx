@@ -67,7 +67,12 @@ function CategoryGroup({ category, channels, activeId, onSelect, onAdd, onSettin
               {isOwner && <Plus onClick={e => { e.stopPropagation(); onAdd(category.id); }} className="w-[14px] h-[14px] opacity-0 group-hover:opacity-60 hover:opacity-100 cursor-pointer transition-opacity" style={{ color: colors.text.muted }} />}
             </button>
           </div>
-          {open && (
+          <div style={{
+            overflow: 'hidden',
+            maxHeight: open ? '2000px' : '0px',
+            opacity: open ? 1 : 0,
+            transition: 'max-height 150ms cubic-bezier(0.4,0,0.2,1), opacity 150ms cubic-bezier(0.4,0,0.2,1)',
+          }}>
             <Droppable droppableId={`cat-${category.id}`} type="channel">
               {(dropProvided) => (
                 <div ref={dropProvided.innerRef} {...dropProvided.droppableProps} className="space-y-px min-h-[2px]">
@@ -78,7 +83,7 @@ function CategoryGroup({ category, channels, activeId, onSelect, onAdd, onSettin
                 </div>
               )}
             </Droppable>
-          )}
+          </div>
         </div>
       )}
     </Draggable>
