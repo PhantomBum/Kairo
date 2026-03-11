@@ -92,6 +92,15 @@ export default function DraggableChannelSidebar({ server, categories, channels, 
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
 
+  // Reset dropdown when server changes
+  const prevServerId = useRef(server?.id);
+  useEffect(() => {
+    if (server?.id !== prevServerId.current) {
+      setDropdownOpen(false);
+      prevServerId.current = server?.id;
+    }
+  }, [server?.id]);
+
   useEffect(() => {
     if (!dropdownOpen) return;
     const handleClick = (e) => { if (dropdownRef.current && !dropdownRef.current.contains(e.target)) setDropdownOpen(false); };

@@ -128,14 +128,22 @@ export default function VoiceChannelView({ channel, currentUser, isMuted, isDeaf
   }, [isMuted, isDeafened, agora.joined]);
 
   // Clean up on unmount (leave Agora + remove VoiceState)
+  const channelIdRef = React.useRef(channel?.id);
+  const userIdRef = React.useRef(currentUser?.id);
+  channelIdRef.current = channel?.id;
+  userIdRef.current = currentUser?.id;
   useEffect(() => {
     return () => {
       agora.leave();
-      base44.entities.VoiceState.filter({ channel_id: channel.id, user_id: currentUser.id }).then(states => {
-        states.forEach(s => base44.entities.VoiceState.delete(s.id));
-      });
+      const cId = channelIdRef.current;
+      const uId = userIdRef.current;
+      if (cId && uId) {
+        base44.entities.VoiceState.filter({ channel_id: cId, user_id: uId }).then(states => {
+          states.forEach(s => base44.entities.VoiceState.delete(s.id));
+        });
+      }
     };
-  }, [channel?.id]);
+  }, []);
 
   // Render screen share video from remote users
   useEffect(() => {
