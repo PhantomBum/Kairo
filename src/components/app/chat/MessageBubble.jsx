@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Reply, Pencil, Trash2, Copy, Pin, PinOff } from 'lucide-react';
+import { Reply, Pencil, Trash2, Copy, Pin, PinOff, Bookmark, Link, Flag, Smile } from 'lucide-react';
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuSeparator, ContextMenuTrigger } from '@/components/ui/context-menu';
 
 function ts(d) { return new Date(d).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }); }
@@ -127,14 +127,23 @@ export default function MessageBubble({ message, compact, isOwn, onReply, onEdit
           )}
         </div>
       </ContextMenuTrigger>
-      <ContextMenuContent className="w-44 p-1 rounded-xl" style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-light)', boxShadow: 'var(--shadow-lg)', backdropFilter: 'blur(20px)' }}>
+      <ContextMenuContent className="w-52 p-1 rounded-xl" style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-light)', boxShadow: 'var(--shadow-lg)', backdropFilter: 'blur(20px)' }}>
+        {/* Quick reactions row */}
+        <div className="flex items-center gap-0.5 px-1 py-1 mb-0.5">
+          {['👍', '❤️', '😂', '🔥', '👀', '✨'].map(e => (
+            <button key={e} onClick={() => onReact(message, e)} className="w-7 h-7 flex items-center justify-center rounded-lg text-sm hover:bg-[var(--bg-glass-hover)]">{e}</button>
+          ))}
+        </div>
+        <ContextMenuSeparator style={{ background: 'var(--border)' }} />
         <ContextMenuItem onClick={() => onReply(message)} className="text-[12px] gap-2 rounded-lg px-2.5 py-1.5" style={{ color: 'var(--text-secondary)' }}><Reply className="w-3.5 h-3.5 opacity-50" /> Reply</ContextMenuItem>
-        <ContextMenuItem onClick={() => navigator.clipboard.writeText(message.content)} className="text-[12px] gap-2 rounded-lg px-2.5 py-1.5" style={{ color: 'var(--text-secondary)' }}><Copy className="w-3.5 h-3.5 opacity-50" /> Copy</ContextMenuItem>
+        <ContextMenuItem onClick={() => navigator.clipboard.writeText(message.content || '')} className="text-[12px] gap-2 rounded-lg px-2.5 py-1.5" style={{ color: 'var(--text-secondary)' }}><Copy className="w-3.5 h-3.5 opacity-50" /> Copy Text</ContextMenuItem>
+        <ContextMenuItem onClick={() => navigator.clipboard.writeText(message.id)} className="text-[12px] gap-2 rounded-lg px-2.5 py-1.5" style={{ color: 'var(--text-secondary)' }}><Link className="w-3.5 h-3.5 opacity-50" /> Copy Message ID</ContextMenuItem>
         {onPin && <ContextMenuItem onClick={() => onPin(message)} className="text-[12px] gap-2 rounded-lg px-2.5 py-1.5" style={{ color: 'var(--text-secondary)' }}><Pin className="w-3.5 h-3.5 opacity-50" /> {message.is_pinned ? 'Unpin' : 'Pin'}</ContextMenuItem>}
+        <ContextMenuItem onClick={() => onProfileClick?.(message.author_id)} className="text-[12px] gap-2 rounded-lg px-2.5 py-1.5" style={{ color: 'var(--text-secondary)' }}><Smile className="w-3.5 h-3.5 opacity-50" /> View Profile</ContextMenuItem>
         {isOwn && <>
           <ContextMenuSeparator style={{ background: 'var(--border)' }} />
-          <ContextMenuItem onClick={() => onEdit(message)} className="text-[12px] gap-2 rounded-lg px-2.5 py-1.5" style={{ color: 'var(--text-secondary)' }}><Pencil className="w-3.5 h-3.5 opacity-50" /> Edit</ContextMenuItem>
-          <ContextMenuItem onClick={() => onDelete(message)} className="text-[12px] gap-2 rounded-lg px-2.5 py-1.5" style={{ color: 'var(--accent-red)' }}><Trash2 className="w-3.5 h-3.5 opacity-50" /> Delete</ContextMenuItem>
+          <ContextMenuItem onClick={() => onEdit(message)} className="text-[12px] gap-2 rounded-lg px-2.5 py-1.5" style={{ color: 'var(--text-secondary)' }}><Pencil className="w-3.5 h-3.5 opacity-50" /> Edit Message</ContextMenuItem>
+          <ContextMenuItem onClick={() => onDelete(message)} className="text-[12px] gap-2 rounded-lg px-2.5 py-1.5" style={{ color: 'var(--accent-red)' }}><Trash2 className="w-3.5 h-3.5 opacity-50" /> Delete Message</ContextMenuItem>
         </>}
       </ContextMenuContent>
     </ContextMenu>
