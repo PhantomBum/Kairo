@@ -12,11 +12,11 @@ export default function UserBar({ profile, isMuted, isDeafened, onToggleMute, on
   const isGhost = profile?.settings?.ghost_mode;
 
   return (
-    <div className="px-2 py-1.5 flex items-center gap-1 flex-shrink-0" style={{ background: colors.bg.base, borderTop: `1px solid ${colors.border.default}` }} role="status" aria-label="User panel">
+    <div className="px-2 py-1.5 flex items-center gap-1 flex-shrink-0" style={{ background: 'rgba(8,8,12,0.7)', borderTop: '1px solid rgba(255,255,255,0.04)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)' }} role="status" aria-label="User panel">
       <button onClick={onStatusClick} className="flex items-center gap-2.5 flex-1 min-w-0 px-2 py-2 rounded-lg hover:bg-[rgba(255,255,255,0.04)]" aria-label="Change status">
         <div className="relative flex-shrink-0">
           <div className="w-9 h-9 rounded-full flex items-center justify-center text-[13px] font-semibold overflow-hidden"
-            style={{ background: `linear-gradient(135deg, ${colors.bg.overlay}, ${colors.bg.elevated})`, color: colors.text.muted }}>
+            style={{ background: 'rgba(255,255,255,0.04)', backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.06)', color: colors.text.muted }}>
             {avatar ? <img src={avatar} className="w-full h-full object-cover" alt="" /> : name.charAt(0).toUpperCase()}
           </div>
           <div className="absolute -bottom-0.5 -right-0.5 w-[14px] h-[14px] rounded-full border-[3px]"
