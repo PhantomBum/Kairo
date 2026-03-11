@@ -129,12 +129,13 @@ export default function Layout({ children }) {
         /* Channel switch — fade out 100ms, fade in 150ms */
         .k-channel-fade { animation: k-fade-in 150ms cubic-bezier(0,0,0.2,1); }
 
-        /* Legacy utility classes */
-        .glass { background: var(--bg-glass); backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur)); border: 1px solid var(--border); }
-        .glass-strong { background: var(--bg-glass-strong); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border: 1px solid var(--border-light); }
-        .glass-hover:hover { background: var(--bg-glass-hover); }
-        .glass-active { background: var(--bg-glass-active); }
-        .glow-border { box-shadow: inset 0 0 0 1px var(--border-light), var(--shadow-glow); }
+        /* Kairo glass utility classes */
+        .glass { background: rgba(255,255,255,0.03); backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur)); border: 1px solid rgba(255,255,255,0.06); }
+        .glass-strong { background: rgba(255,255,255,0.06); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border: 1px solid rgba(255,255,255,0.08); }
+        .glass-hover:hover { background: rgba(255,255,255,0.06); }
+        .glass-active { background: rgba(139,92,246,0.1); border-color: rgba(139,92,246,0.2); }
+        .glow-border { box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08), 0 0 24px rgba(139,92,246,0.08); }
+        .k-glass-card { background: rgba(255,255,255,0.035); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; }
 
         /* Reduced motion — every animation snaps to end state instantly, no exceptions */
         @media (prefers-reduced-motion: reduce) {
