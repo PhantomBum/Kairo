@@ -1,6 +1,6 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
-import { Hash, Volume2, Megaphone, Radio, MessageSquare, Lock, ChevronDown, ChevronRight, Plus, Settings, UserPlus, Shield, BarChart3, GripVertical, LayoutGrid } from 'lucide-react';
+import { Hash, Volume2, Megaphone, Radio, MessageSquare, Lock, ChevronDown, ChevronRight, Plus, Settings, UserPlus, Shield, BarChart3, GripVertical, LayoutGrid, X } from 'lucide-react';
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuSeparator, ContextMenuTrigger } from '@/components/ui/context-menu';
 import { base44 } from '@/api/base44Client';
 import { colors, radius, shadows } from '@/components/app/design/tokens';
@@ -88,6 +88,17 @@ export default function DraggableChannelSidebar({ server, categories, channels, 
   const sorted = [...(categories || [])].sort((a, b) => (a.position || 0) - (b.position || 0));
   const catIds = new Set(sorted.map(c => c.id));
   const uncategorized = (channels || []).filter(ch => !ch.category_id || !catIds.has(ch.category_id));
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    if (!dropdownOpen) return;
+    const handleClick = (e) => { if (dropdownRef.current && !dropdownRef.current.contains(e.target)) setDropdownOpen(false); };
+    const handleKey = (e) => { if (e.key === 'Escape') setDropdownOpen(false); };
+    document.addEventListener('mousedown', handleClick);
+    document.addEventListener('keydown', handleKey);
+    return () => { document.removeEventListener('mousedown', handleClick); document.removeEventListener('keydown', handleKey); };
+  }, [dropdownOpen]);
 
   const onDragEnd = useCallback(async (result) => {
     if (!result.destination || !isOwner) return;
@@ -102,40 +113,58 @@ export default function DraggableChannelSidebar({ server, categories, channels, 
 
   return (
     <div className="flex-1 flex flex-col min-h-0">
-      {/* Server header */}
-      <ContextMenu>
-        <ContextMenuTrigger>
-          <button className="h-12 px-4 w-full flex items-center justify-between flex-shrink-0 hover:bg-[rgba(255,255,255,0.02)] transition-colors"
-            style={{ borderBottom: `1px solid ${colors.border.default}`, background: colors.bg.surface }}>
-            <div className="flex items-center gap-2 min-w-0 flex-1">
-              {server?.icon_url && <img src={server.icon_url} className="w-5 h-5 rounded-md object-cover flex-shrink-0" alt="" />}
-              <span className="text-[15px] font-semibold truncate" style={{ color: colors.text.primary }} title={server?.name}>{server?.name}</span>
-            </div>
-            <ChevronDown className="w-4 h-4 flex-shrink-0" style={{ color: colors.text.muted }} />
-          </button>
-        </ContextMenuTrigger>
-        <ContextMenuContent className="w-56 p-1.5 rounded-lg" style={{ background: colors.bg.modal, border: `1px solid ${colors.border.light}`, boxShadow: shadows.strong }}>
-          <ContextMenuItem onClick={onInvite} className="text-[13px] gap-2.5 rounded-md px-2.5 py-2" style={{ color: colors.accent.primary }}>
-            <UserPlus className="w-4 h-4 opacity-70" /> Invite People
-          </ContextMenuItem>
-          {isOwner && <>
-            <ContextMenuSeparator style={{ background: colors.border.light, margin: '4px 0' }} />
-            <ContextMenuItem onClick={onSettings} className="text-[13px] gap-2.5 rounded-md px-2.5 py-2" style={{ color: colors.text.secondary }}>
-              <Settings className="w-4 h-4 opacity-50" /> Server Settings
-            </ContextMenuItem>
-            <ContextMenuItem onClick={onAnalytics} className="text-[13px] gap-2.5 rounded-md px-2.5 py-2" style={{ color: colors.text.secondary }}>
-              <BarChart3 className="w-4 h-4 opacity-50" /> Analytics
-            </ContextMenuItem>
-            <ContextMenuItem onClick={onModPanel} className="text-[13px] gap-2.5 rounded-md px-2.5 py-2" style={{ color: colors.text.secondary }}>
-              <Shield className="w-4 h-4 opacity-50" /> Mod Panel
-            </ContextMenuItem>
-            <ContextMenuSeparator style={{ background: colors.border.light, margin: '4px 0' }} />
-            <ContextMenuItem onClick={() => onAdd(sorted[0]?.id)} className="text-[13px] gap-2.5 rounded-md px-2.5 py-2" style={{ color: colors.text.secondary }}>
-              <Plus className="w-4 h-4 opacity-50" /> Create Channel
-            </ContextMenuItem>
-          </>}
-        </ContextMenuContent>
-      </ContextMenu>
+      {/* Server header with click dropdown */}
+      <div className="relative" ref={dropdownRef}>
+        <button onClick={() => setDropdownOpen(!dropdownOpen)}
+          className="h-12 px-4 w-full flex items-center justify-between flex-shrink-0 transition-colors"
+          style={{
+            borderBottom: `1px solid ${colors.border.default}`,
+            background: dropdownOpen ? colors.bg.elevated : colors.bg.surface,
+          }}>
+          <div className="flex items-center gap-2 min-w-0 flex-1">
+            {server?.icon_url && <img src={server.icon_url} className="w-5 h-5 rounded-md object-cover flex-shrink-0" alt="" />}
+            <span className="text-[15px] font-semibold truncate" style={{ color: colors.text.primary }} title={server?.name}>{server?.name}</span>
+          </div>
+          {dropdownOpen
+            ? <X className="w-4 h-4 flex-shrink-0" style={{ color: colors.text.muted }} />
+            : <ChevronDown className="w-4 h-4 flex-shrink-0" style={{ color: colors.text.muted }} />}
+        </button>
+
+        {dropdownOpen && (
+          <div className="absolute top-12 left-0 right-0 z-50 p-1.5 k-scale-in"
+            style={{ background: colors.bg.modal, border: `1px solid ${colors.border.light}`, borderRadius: '0 0 12px 12px', boxShadow: shadows.strong }}>
+            <button onClick={() => { onInvite(); setDropdownOpen(false); }}
+              className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md text-[13px] transition-colors hover:bg-[rgba(255,255,255,0.05)]"
+              style={{ color: colors.accent.primary }}>
+              <UserPlus className="w-4 h-4 opacity-70" /> Invite People
+            </button>
+            {isOwner && <>
+              <div className="my-1 h-px" style={{ background: colors.border.light }} />
+              <button onClick={() => { onSettings(); setDropdownOpen(false); }}
+                className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md text-[13px] transition-colors hover:bg-[rgba(255,255,255,0.05)]"
+                style={{ color: colors.text.secondary }}>
+                <Settings className="w-4 h-4 opacity-50" /> Server Settings
+              </button>
+              <button onClick={() => { onAnalytics(); setDropdownOpen(false); }}
+                className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md text-[13px] transition-colors hover:bg-[rgba(255,255,255,0.05)]"
+                style={{ color: colors.text.secondary }}>
+                <BarChart3 className="w-4 h-4 opacity-50" /> Analytics
+              </button>
+              <button onClick={() => { onModPanel(); setDropdownOpen(false); }}
+                className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md text-[13px] transition-colors hover:bg-[rgba(255,255,255,0.05)]"
+                style={{ color: colors.text.secondary }}>
+                <Shield className="w-4 h-4 opacity-50" /> Mod Panel
+              </button>
+              <div className="my-1 h-px" style={{ background: colors.border.light }} />
+              <button onClick={() => { onAdd(sorted[0]?.id); setDropdownOpen(false); }}
+                className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md text-[13px] transition-colors hover:bg-[rgba(255,255,255,0.05)]"
+                style={{ color: colors.text.secondary }}>
+                <Plus className="w-4 h-4 opacity-50" /> Create Channel
+              </button>
+            </>}
+          </div>
+        )}
+      </div>
 
       <DragDropContext onDragEnd={onDragEnd}>
         <Droppable droppableId="categories" type="category">
