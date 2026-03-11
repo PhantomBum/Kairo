@@ -15,7 +15,7 @@ export default function ModalWrapper({ title, subtitle, onClose, width = 460, ch
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      transition={{ duration: 0.15, ease: [0.4, 0, 0.2, 1] }}
+      transition={{ duration: 0.25, ease: [0, 0, 0.2, 1] }}
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
       style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(4px)' }}
       onClick={onClose}
@@ -23,10 +23,10 @@ export default function ModalWrapper({ title, subtitle, onClose, width = 460, ch
       aria-modal="true"
       aria-label={title || 'Dialog'}>
       <motion.div
-        initial={{ scale: 0.96, opacity: 0, y: 8 }}
-        animate={{ scale: 1, opacity: 1, y: 0 }}
-        exit={{ scale: 0.96, opacity: 0, y: 4 }}
-        transition={{ type: 'spring', damping: 25, stiffness: 350, duration: 0.25 }}
+        initial={{ scale: 0.93, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.95, opacity: 0 }}
+        transition={{ type: 'spring', damping: 25, stiffness: 350 }}
         className="rounded-xl overflow-hidden w-full"
         style={{
           maxWidth: `min(${width}px, calc(100vw - 32px))`,
