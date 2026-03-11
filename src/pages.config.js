@@ -54,6 +54,7 @@ import Elite from './pages/Elite';
 import Support from './pages/Support';
 import BotMarketplace from './pages/BotMarketplace';
 import Developers from './pages/Developers';
+import Spaces from './pages/Spaces';
 import __Layout from './Layout.jsx';
 
 
@@ -65,6 +66,7 @@ export const PAGES = {
     "Support": Support,
     "BotMarketplace": BotMarketplace,
     "Developers": Developers,
+    "Spaces": Spaces,
 }
 
 export const pagesConfig = {
