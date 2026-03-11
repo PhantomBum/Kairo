@@ -388,6 +388,7 @@ export default function AppShell({ currentUser }) {
           <SpacesView currentUser={currentUser} profile={profile} />
         ) : view === 'friends' ? (
           <FriendsView friends={friends} incomingRequests={incomingReqs} outgoingRequests={outgoingReqs}
+            blocked={blockedUsers}
             onAddFriend={() => setModal('add-friend')} onMessage={handleStartDM} onBlock={handleBlock}
             onProfileClick={(id) => { setProfileUserId(id); setModal('profile'); }}
             onAccept={async (r) => {
