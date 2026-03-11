@@ -259,13 +259,12 @@ export default function SettingsModal({ onClose, profile, onUpdate, onLogout }) 
           {tab === 'keybinds' && <>
             <p className="text-[14px] mb-4" style={{ color: colors.text.muted }}>Keyboard shortcuts for quick navigation.</p>
             {[
-              { keys: 'Ctrl + K', action: 'Quick switcher' },
-              { keys: 'Ctrl + /', action: 'Show all keybinds' },
               { keys: 'Ctrl + Shift + M', action: 'Toggle mute' },
               { keys: 'Ctrl + Shift + D', action: 'Toggle deafen' },
-              { keys: 'Ctrl + E', action: 'Open emoji picker' },
-              { keys: 'Alt + Up/Down', action: 'Switch channels' },
-              { keys: 'Escape', action: 'Close modal / Cancel' },
+              { keys: 'Up Arrow', action: 'Edit last message (when input is empty)' },
+              { keys: 'Shift + Enter', action: 'New line in message' },
+              { keys: 'Enter', action: 'Send message' },
+              { keys: 'Escape', action: 'Close modal or cancel editing' },
             ].map((kb, i) => (
               <div key={i} className="flex items-center justify-between py-2.5" style={{ borderBottom: `1px solid ${colors.border.default}` }}>
                 <span className="text-[14px]" style={{ color: colors.text.primary }}>{kb.action}</span>
