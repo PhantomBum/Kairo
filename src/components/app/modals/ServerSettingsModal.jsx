@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { Settings, Shield, Users, AlertTriangle, Trash2, Plus, Palette, Bell, Lock, Globe, Eye, Sparkles, Heart, Zap, MessageSquare, Volume2, Calendar, ChevronDown, ChevronRight } from 'lucide-react';
+import { Settings, Shield, Users, AlertTriangle, Trash2, Plus, Palette, Bell, Lock, Globe, Eye, Sparkles, Heart, Zap, MessageSquare, Volume2, Calendar, ChevronDown, ChevronRight, BarChart3, Webhook } from 'lucide-react';
 import ModalWrapper from './ModalWrapper';
 
 const TABS = [
@@ -10,6 +10,7 @@ const TABS = [
   { id: 'roles', label: 'Roles', icon: Shield },
   { id: 'members', label: 'Members', icon: Users },
   { id: 'features', label: 'Features', icon: Sparkles },
+  { id: 'integrations', label: 'Integrations', icon: Webhook },
   { id: 'permissions', label: 'Permissions', icon: Lock },
   { id: 'danger', label: 'Danger', icon: AlertTriangle },
 ];
@@ -256,6 +257,32 @@ export default function ServerSettingsModal({ onClose, server, currentUserId }) 
                 </div>
               ))}
               <button onClick={saveOverview} disabled={saving} className="px-5 py-2 rounded-xl text-sm font-medium disabled:opacity-30 mt-2" style={{ background: 'var(--text-cream)', color: 'var(--bg-deep)' }}>Save Features</button>
+            </div>
+          )}
+
+          {tab === 'integrations' && (
+            <div className="space-y-3">
+              <p className="text-[12px] mb-2" style={{ color: 'var(--text-secondary)' }}>Manage server integrations and webhooks.</p>
+              <div className="p-4 rounded-xl" style={{ background: 'var(--bg-glass)', border: '1px solid var(--border)' }}>
+                <div className="flex items-center gap-3 mb-2">
+                  <Webhook className="w-5 h-5" style={{ color: 'var(--accent-purple)' }} />
+                  <div>
+                    <h3 className="text-[13px] font-medium" style={{ color: 'var(--text-cream)' }}>Webhooks</h3>
+                    <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>Create webhooks to post automated messages</p>
+                  </div>
+                </div>
+                <button className="px-4 py-2 rounded-xl text-[12px]" style={{ background: 'var(--bg-glass-strong)', color: 'var(--text-secondary)', border: '1px solid var(--border)' }}>Create Webhook</button>
+              </div>
+              <div className="p-4 rounded-xl" style={{ background: 'var(--bg-glass)', border: '1px solid var(--border)' }}>
+                <div className="flex items-center gap-3 mb-2">
+                  <BarChart3 className="w-5 h-5" style={{ color: 'var(--accent-green)' }} />
+                  <div>
+                    <h3 className="text-[13px] font-medium" style={{ color: 'var(--text-cream)' }}>Server Analytics</h3>
+                    <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>View detailed growth and activity metrics</p>
+                  </div>
+                </div>
+                <p className="text-[11px]" style={{ color: 'var(--text-muted)' }}>Access the full analytics dashboard from the channel sidebar's chart icon.</p>
+              </div>
             </div>
           )}
 
