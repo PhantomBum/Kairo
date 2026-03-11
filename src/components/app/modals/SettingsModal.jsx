@@ -1,179 +1,116 @@
 import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
-import { User, Palette, Shield, Bell, Globe, Link } from 'lucide-react';
+import { User, Link, Shield, LogOut } from 'lucide-react';
 import ModalWrapper from './ModalWrapper';
 
-const TABS = [
-  { id: 'profile', label: 'Profile', icon: User },
-  { id: 'social', label: 'Connections', icon: Link },
-  { id: 'privacy', label: 'Privacy', icon: Shield },
-];
+const TABS = [{ id: 'profile', label: 'Profile', icon: User }, { id: 'social', label: 'Links', icon: Link }, { id: 'privacy', label: 'Privacy', icon: Shield }];
 
 export default function SettingsModal({ onClose, profile, onUpdate, onLogout }) {
   const [tab, setTab] = useState('profile');
-  const [name, setName] = useState(profile?.display_name || '');
-  const [username, setUsername] = useState(profile?.username || '');
-  const [bio, setBio] = useState(profile?.bio || '');
-  const [pronouns, setPronouns] = useState(profile?.pronouns || '');
+  const [form, setForm] = useState({
+    display_name: profile?.display_name || '', username: profile?.username || '', bio: profile?.bio || '', pronouns: profile?.pronouns || '',
+    twitter: profile?.social_links?.twitter || '', github: profile?.social_links?.github || '', website: profile?.social_links?.website || '',
+    instagram: profile?.social_links?.instagram || '', spotify: profile?.social_links?.spotify || '', tiktok: profile?.social_links?.tiktok || '',
+    dm_privacy: profile?.settings?.dm_privacy || 'everyone', friend_requests: profile?.settings?.friend_requests || 'everyone',
+    read_receipts: profile?.settings?.read_receipts !== false, typing_indicators: profile?.settings?.typing_indicators !== false,
+  });
   const [saving, setSaving] = useState(false);
-
-  // Social links
-  const [twitter, setTwitter] = useState(profile?.social_links?.twitter || '');
-  const [github, setGithub] = useState(profile?.social_links?.github || '');
-  const [website, setWebsite] = useState(profile?.social_links?.website || '');
-  const [instagram, setInstagram] = useState(profile?.social_links?.instagram || '');
-  const [spotify, setSpotify] = useState(profile?.social_links?.spotify || '');
-  const [tiktok, setTiktok] = useState(profile?.social_links?.tiktok || '');
-
-  // Privacy
-  const [dmPrivacy, setDmPrivacy] = useState(profile?.settings?.dm_privacy || 'everyone');
-  const [friendReqs, setFriendReqs] = useState(profile?.settings?.friend_requests || 'everyone');
-  const [readReceipts, setReadReceipts] = useState(profile?.settings?.read_receipts !== false);
-  const [typingInd, setTypingInd] = useState(profile?.settings?.typing_indicators !== false);
+  const set = (k, v) => setForm(p => ({ ...p, [k]: v }));
 
   const save = async () => {
     setSaving(true);
     const data = {};
-    if (tab === 'profile') {
-      Object.assign(data, { display_name: name, username, bio, pronouns });
-    } else if (tab === 'social') {
-      data.social_links = { twitter, github, website, instagram, spotify, tiktok };
-    } else if (tab === 'privacy') {
-      data.settings = { ...profile?.settings, dm_privacy: dmPrivacy, friend_requests: friendReqs, read_receipts: readReceipts, typing_indicators: typingInd };
-    }
-    await onUpdate(data);
-    setSaving(false);
+    if (tab === 'profile') Object.assign(data, { display_name: form.display_name, username: form.username, bio: form.bio, pronouns: form.pronouns });
+    else if (tab === 'social') data.social_links = { twitter: form.twitter, github: form.github, website: form.website, instagram: form.instagram, spotify: form.spotify, tiktok: form.tiktok };
+    else if (tab === 'privacy') data.settings = { ...profile?.settings, dm_privacy: form.dm_privacy, friend_requests: form.friend_requests, read_receipts: form.read_receipts, typing_indicators: form.typing_indicators };
+    await onUpdate(data); setSaving(false);
   };
 
-  const handleAvatar = async (e) => {
-    const f = e.target.files?.[0];
-    if (!f) return;
-    const { file_url } = await base44.integrations.Core.UploadFile({ file: f });
-    await onUpdate({ avatar_url: file_url });
+  const handleFile = async (type) => {
+    const input = document.createElement('input'); input.type = 'file'; input.accept = 'image/*';
+    input.onchange = async () => { const f = input.files?.[0]; if (!f) return; const { file_url } = await base44.integrations.Core.UploadFile({ file: f }); await onUpdate({ [type]: file_url }); };
+    input.click();
   };
 
-  const handleBanner = async (e) => {
-    const f = e.target.files?.[0];
-    if (!f) return;
-    const { file_url } = await base44.integrations.Core.UploadFile({ file: f });
-    await onUpdate({ banner_url: file_url });
-  };
-
-  const Field = ({ label, value, onChange, placeholder, type = 'text' }) => (
+  const Field = ({ label, k, ph, area }) => (
     <div>
-      <label className="text-[10px] font-semibold uppercase tracking-wider block mb-1" style={{ color: 'var(--text-muted)' }}>{label}</label>
-      {type === 'textarea' ? (
-        <textarea value={value} onChange={e => onChange(e.target.value)} rows={3} placeholder={placeholder}
-          className="w-full px-3 py-2 rounded-lg text-sm outline-none resize-none"
-          style={{ background: 'var(--bg)', color: 'var(--text-primary)', border: '1px solid var(--border)' }} />
-      ) : (
-        <input value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder}
-          className="w-full px-3 py-2 rounded-lg text-sm outline-none"
-          style={{ background: 'var(--bg)', color: 'var(--text-primary)', border: '1px solid var(--border)' }} />
-      )}
+      <label className="text-[10px] font-semibold uppercase tracking-[0.08em] block mb-1.5" style={{ color: 'var(--text-muted)', fontFamily: 'monospace' }}>{label}</label>
+      {area ? <textarea value={form[k]} onChange={e => set(k, e.target.value)} rows={3} placeholder={ph}
+        className="w-full px-3 py-2 rounded-xl text-sm outline-none resize-none" style={{ background: 'var(--bg-glass)', color: 'var(--text-primary)', border: '1px solid var(--border)' }} />
+      : <input value={form[k]} onChange={e => set(k, e.target.value)} placeholder={ph}
+        className="w-full px-3 py-2 rounded-xl text-sm outline-none" style={{ background: 'var(--bg-glass)', color: 'var(--text-primary)', border: '1px solid var(--border)' }} />}
     </div>
   );
 
-  const Toggle = ({ label, desc, checked, onChange }) => (
+  const Toggle = ({ label, k }) => (
     <div className="flex items-center justify-between py-2">
-      <div>
-        <div className="text-sm" style={{ color: 'var(--text-primary)' }}>{label}</div>
-        {desc && <div className="text-[11px]" style={{ color: 'var(--text-muted)' }}>{desc}</div>}
-      </div>
-      <button onClick={() => onChange(!checked)} className="w-10 h-5 rounded-full transition-colors relative"
-        style={{ background: checked ? '#22c55e' : 'var(--bg-hover)' }}>
-        <div className="absolute top-0.5 w-4 h-4 rounded-full bg-white transition-transform"
-          style={{ left: checked ? 22 : 2 }} />
+      <span className="text-sm" style={{ color: 'var(--text-primary)' }}>{label}</span>
+      <button onClick={() => set(k, !form[k])} className="w-10 h-5 rounded-full transition-colors relative" style={{ background: form[k] ? 'var(--accent-green)' : 'var(--bg-overlay)' }}>
+        <div className="absolute top-0.5 w-4 h-4 rounded-full bg-white transition-transform" style={{ left: form[k] ? 22 : 2 }} />
       </button>
     </div>
   );
 
   return (
-    <ModalWrapper title="Settings" onClose={onClose} width={600}>
-      <div className="flex gap-4 min-h-[420px]">
-        <div className="w-[130px] flex-shrink-0 space-y-0.5">
+    <ModalWrapper title="Settings" onClose={onClose} width={580}>
+      <div className="flex gap-4 min-h-[380px]">
+        <div className="w-[120px] flex-shrink-0 space-y-0.5">
           {TABS.map(t => (
-            <button key={t.id} onClick={() => setTab(t.id)}
-              className="w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-xs transition-colors"
-              style={{ background: tab === t.id ? 'var(--accent-dim)' : 'transparent', color: tab === t.id ? 'var(--text-primary)' : 'var(--text-muted)' }}>
+            <button key={t.id} onClick={() => setTab(t.id)} className="w-full flex items-center gap-2 px-2.5 py-2 rounded-xl text-[12px] transition-colors"
+              style={{ background: tab === t.id ? 'var(--bg-glass-active)' : 'transparent', color: tab === t.id ? 'var(--text-cream)' : 'var(--text-muted)' }}>
               <t.icon className="w-3.5 h-3.5" /> {t.label}
             </button>
           ))}
           <div className="my-2 h-px" style={{ background: 'var(--border)' }} />
-          <button onClick={onLogout} className="w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-xs text-red-400 hover:bg-red-400/10">
-            Log Out
+          <button onClick={onLogout} className="w-full flex items-center gap-2 px-2.5 py-2 rounded-xl text-[12px] transition-colors hover:bg-[rgba(201,123,123,0.08)]" style={{ color: 'var(--accent-red)' }}>
+            <LogOut className="w-3.5 h-3.5" /> Log Out
           </button>
         </div>
-
-        <div className="flex-1 overflow-y-auto max-h-[500px] space-y-4">
-          {tab === 'profile' && (
-            <>
-              <div className="flex items-center gap-4">
-                <div className="relative cursor-pointer" onClick={() => document.getElementById('settings-avatar').click()}>
-                  <div className="w-16 h-16 rounded-full flex items-center justify-center text-lg font-medium overflow-hidden hover:brightness-110"
-                    style={{ background: 'var(--bg-hover)', color: 'var(--text-muted)' }}>
-                    {profile?.avatar_url ? <img src={profile.avatar_url} className="w-full h-full object-cover" /> : (name || 'U').charAt(0).toUpperCase()}
-                  </div>
-                  <div className="absolute inset-0 rounded-full flex items-center justify-center bg-black/40 opacity-0 hover:opacity-100 transition-opacity text-[10px] text-white font-medium">Edit</div>
-                  <input id="settings-avatar" type="file" accept="image/*" onChange={handleAvatar} className="hidden" />
-                </div>
-                <div className="flex-1">
-                  <div className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>{name || 'User'}</div>
-                  <div className="text-[11px]" style={{ color: 'var(--text-muted)' }}>Click avatar to change</div>
-                </div>
-              </div>
-              <div className="h-20 rounded-lg overflow-hidden cursor-pointer relative"
-                style={{ background: profile?.banner_url ? 'transparent' : 'var(--bg)', border: '1px dashed var(--border)' }}
-                onClick={() => document.getElementById('settings-banner').click()}>
-                {profile?.banner_url ? <img src={profile.banner_url} className="w-full h-full object-cover" /> : (
-                  <div className="flex items-center justify-center h-full text-xs" style={{ color: 'var(--text-muted)' }}>Click to upload profile banner</div>
-                )}
-                <input id="settings-banner" type="file" accept="image/*" onChange={handleBanner} className="hidden" />
-              </div>
-              <Field label="Display Name" value={name} onChange={setName} />
-              <Field label="Username" value={username} onChange={setUsername} placeholder="your_username" />
-              <Field label="Bio" value={bio} onChange={setBio} placeholder="Tell others about yourself" type="textarea" />
-              <Field label="Pronouns" value={pronouns} onChange={setPronouns} placeholder="they/them" />
-            </>
-          )}
-
-          {tab === 'social' && (
-            <>
-              <p className="text-xs mb-2" style={{ color: 'var(--text-muted)' }}>Link your social profiles</p>
-              <Field label="Twitter / X" value={twitter} onChange={setTwitter} placeholder="https://twitter.com/you" />
-              <Field label="GitHub" value={github} onChange={setGithub} placeholder="https://github.com/you" />
-              <Field label="Website" value={website} onChange={setWebsite} placeholder="https://yoursite.com" />
-              <Field label="Instagram" value={instagram} onChange={setInstagram} placeholder="https://instagram.com/you" />
-              <Field label="Spotify" value={spotify} onChange={setSpotify} placeholder="https://open.spotify.com/user/you" />
-              <Field label="TikTok" value={tiktok} onChange={setTiktok} placeholder="https://tiktok.com/@you" />
-            </>
-          )}
-
-          {tab === 'privacy' && (
-            <>
-              <div>
-                <label className="text-[10px] font-semibold uppercase tracking-wider block mb-1" style={{ color: 'var(--text-muted)' }}>Who can DM you</label>
-                <select value={dmPrivacy} onChange={e => setDmPrivacy(e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg text-sm outline-none" style={{ background: 'var(--bg)', color: 'var(--text-primary)', border: '1px solid var(--border)' }}>
-                  <option value="everyone">Everyone</option><option value="friends">Friends Only</option><option value="servers">Server Members</option><option value="none">Nobody</option>
-                </select>
-              </div>
-              <div>
-                <label className="text-[10px] font-semibold uppercase tracking-wider block mb-1" style={{ color: 'var(--text-muted)' }}>Friend Requests</label>
-                <select value={friendReqs} onChange={e => setFriendReqs(e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg text-sm outline-none" style={{ background: 'var(--bg)', color: 'var(--text-primary)', border: '1px solid var(--border)' }}>
-                  <option value="everyone">Everyone</option><option value="friends_of_friends">Friends of Friends</option><option value="none">Nobody</option>
-                </select>
-              </div>
-              <Toggle label="Read Receipts" desc="Let others know when you've read messages" checked={readReceipts} onChange={setReadReceipts} />
-              <Toggle label="Typing Indicators" desc="Show when you're typing" checked={typingInd} onChange={setTypingInd} />
-            </>
-          )}
-
-          <button onClick={save} disabled={saving} className="px-4 py-2 rounded-lg text-sm font-medium disabled:opacity-40"
-            style={{ background: 'var(--text-primary)', color: 'var(--bg)' }}>
-            {saving ? 'Saving...' : 'Save Changes'}
-          </button>
+        <div className="flex-1 overflow-y-auto space-y-4 max-h-[460px]">
+          {tab === 'profile' && <>
+            <div className="flex items-center gap-4">
+              <button onClick={() => handleFile('avatar_url')} className="relative w-16 h-16 rounded-full flex items-center justify-center text-lg font-medium overflow-hidden group"
+                style={{ background: 'var(--bg-glass-strong)', color: 'var(--text-muted)', border: '1px solid var(--border)' }}>
+                {profile?.avatar_url ? <img src={profile.avatar_url} className="w-full h-full object-cover" /> : (form.display_name || 'U').charAt(0).toUpperCase()}
+                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity"><span className="text-[9px] text-white">Edit</span></div>
+              </button>
+              <div><p className="text-sm font-medium" style={{ color: 'var(--text-cream)' }}>{form.display_name || 'User'}</p><p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>Click to change avatar</p></div>
+            </div>
+            <button onClick={() => handleFile('banner_url')} className="w-full h-16 rounded-xl overflow-hidden cursor-pointer"
+              style={{ background: profile?.banner_url ? 'transparent' : 'var(--bg-glass)', border: '1px dashed var(--border-light)' }}>
+              {profile?.banner_url ? <img src={profile.banner_url} className="w-full h-full object-cover" /> : <div className="flex items-center justify-center h-full text-[11px]" style={{ color: 'var(--text-muted)' }}>Upload banner</div>}
+            </button>
+            <Field label="Display Name" k="display_name" ph="Your Name" />
+            <Field label="Username" k="username" ph="your_handle" />
+            <Field label="Bio" k="bio" ph="About you..." area />
+            <Field label="Pronouns" k="pronouns" ph="they/them" />
+          </>}
+          {tab === 'social' && <>
+            <Field label="Twitter" k="twitter" ph="https://twitter.com/you" />
+            <Field label="GitHub" k="github" ph="https://github.com/you" />
+            <Field label="Website" k="website" ph="https://yoursite.com" />
+            <Field label="Instagram" k="instagram" ph="https://instagram.com/you" />
+            <Field label="Spotify" k="spotify" ph="https://open.spotify.com/user/you" />
+            <Field label="TikTok" k="tiktok" ph="https://tiktok.com/@you" />
+          </>}
+          {tab === 'privacy' && <>
+            <div>
+              <label className="text-[10px] font-semibold uppercase tracking-[0.08em] block mb-1.5" style={{ color: 'var(--text-muted)', fontFamily: 'monospace' }}>DM Privacy</label>
+              <select value={form.dm_privacy} onChange={e => set('dm_privacy', e.target.value)} className="w-full px-3 py-2 rounded-xl text-sm outline-none" style={{ background: 'var(--bg-glass)', color: 'var(--text-primary)', border: '1px solid var(--border)' }}>
+                <option value="everyone">Everyone</option><option value="friends">Friends Only</option><option value="none">Nobody</option>
+              </select>
+            </div>
+            <div>
+              <label className="text-[10px] font-semibold uppercase tracking-[0.08em] block mb-1.5" style={{ color: 'var(--text-muted)', fontFamily: 'monospace' }}>Friend Requests</label>
+              <select value={form.friend_requests} onChange={e => set('friend_requests', e.target.value)} className="w-full px-3 py-2 rounded-xl text-sm outline-none" style={{ background: 'var(--bg-glass)', color: 'var(--text-primary)', border: '1px solid var(--border)' }}>
+                <option value="everyone">Everyone</option><option value="friends_of_friends">Mutual Friends</option><option value="none">Nobody</option>
+              </select>
+            </div>
+            <Toggle label="Read Receipts" k="read_receipts" />
+            <Toggle label="Typing Indicators" k="typing_indicators" />
+          </>}
+          <button onClick={save} disabled={saving} className="px-5 py-2 rounded-xl text-sm font-medium disabled:opacity-30 transition-all"
+            style={{ background: 'var(--text-cream)', color: 'var(--bg-deep)' }}>{saving ? 'Saving...' : 'Save'}</button>
         </div>
       </div>
     </ModalWrapper>
