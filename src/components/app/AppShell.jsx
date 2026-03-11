@@ -163,7 +163,21 @@ export default function AppShell({ currentUser }) {
   const goHome = () => { setActiveServer(null); setActiveChannel(null); setView('home'); };
   const goFriends = () => { setActiveConv(null); setView('friends'); };
 
-  const handleSend = async (data) => { if (activeConv) await sendDM.mutateAsync(data); else if (activeChannel) await sendMsg.mutateAsync(data); };
+  const handleSend = async (data) => {
+    const optimistic = addOptimistic({
+      author_id: currentUser.id,
+      author_name: profile?.display_name || currentUser.full_name,
+      author_avatar: profile?.avatar_url,
+      content: data.content,
+      attachments: data.attachments,
+      channel_id: activeChannel?.id,
+      conversation_id: activeConv?.id,
+    });
+    if (!optimistic.allowed) return; // Rate limited
+    const payload = { ...data, _tempId: optimistic.tempId };
+    if (activeConv) await sendDM.mutateAsync(payload);
+    else if (activeChannel) await sendMsg.mutateAsync(payload);
+  };
 
   const editMsg = useCallback(async (id, content) => {
     if (activeConv) await base44.entities.DirectMessage.update(id, { content, is_edited: true });
