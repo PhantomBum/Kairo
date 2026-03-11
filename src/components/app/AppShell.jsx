@@ -300,7 +300,8 @@ export default function AppShell({ currentUser }) {
   const isDM = !!activeConv;
   const isVoiceChannel = activeChannel?.type === 'voice' || activeChannel?.type === 'stage';
   const isBoardChannel = activeChannel?.type === 'board';
-  const isInChat = (view === 'server' && activeChannel && !isVoiceChannel && !isBoardChannel) || (view === 'home' && activeConv);
+  const isNsfw = activeChannel?.is_nsfw && !nsfwAccepted.has(activeChannel?.id);
+  const isInChat = (view === 'server' && activeChannel && !isVoiceChannel && !isBoardChannel && !isNsfw) || (view === 'home' && activeConv);
   const isInVoice = view === 'server' && activeChannel && isVoiceChannel;
   const isInBoard = view === 'server' && activeChannel && isBoardChannel;
   // Merge optimistic messages with real messages
@@ -367,6 +368,11 @@ export default function AppShell({ currentUser }) {
             }}
             onDecline={async (r) => { await base44.entities.Friendship.delete(r.id); qc.invalidateQueries({ queryKey: ['incomingRequests'] }); }}
             onRemove={async (f) => { if (!confirm(`Remove ${f.friend_name}?`)) return; await base44.entities.Friendship.delete(f.id); qc.invalidateQueries({ queryKey: ['friends'] }); }} />
+        ) : view === 'server' && isNsfw ? (
+          <>
+            <ChatHeader channel={activeChannel} isDM={false} showMembers={showMembers} onToggleMembers={() => setShowMembers(!showMembers)} serverName={activeServer?.name} />
+            <NSFWGate channelName={activeChannel.name} onAccept={() => setNsfwAccepted(prev => new Set([...prev, activeChannel.id]))} />
+          </>
         ) : isInBoard ? (
           <>
             <ChatHeader channel={activeChannel} isDM={false} showMembers={showMembers} onToggleMembers={() => setShowMembers(!showMembers)} serverName={activeServer?.name} />
