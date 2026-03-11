@@ -247,9 +247,17 @@ export default function AppShell({ currentUser }) {
     setActiveConv(conv); setView('home'); setModal(null);
   };
 
+  const noteToSelfLock = React.useRef(false);
   const handleNoteToSelf = async () => {
-    const existing = conversations.find(c => c.participants?.length === 1 && c.participants[0].user_id === currentUser.id);
+    // Check both by participant length and by name to catch edge cases
+    const existing = conversations.find(c =>
+      (c.participants?.length === 1 && c.participants[0].user_id === currentUser.id) ||
+      (c.name === 'Note to Self' && c.participants?.every(p => p.user_id === currentUser.id))
+    );
     if (existing) { setActiveConv(existing); setView('home'); return; }
+    // Prevent duplicate creation from double-clicks
+    if (noteToSelfLock.current) return;
+    noteToSelfLock.current = true;
     const conv = await base44.entities.Conversation.create({
       type: 'dm', name: 'Note to Self',
       participants: [{ user_id: currentUser.id, user_email: currentUser.email, user_name: profile?.display_name, avatar: profile?.avatar_url }],
@@ -257,6 +265,7 @@ export default function AppShell({ currentUser }) {
     });
     qc.invalidateQueries({ queryKey: ['conversations'] });
     setActiveConv(conv); setView('home');
+    noteToSelfLock.current = false;
   };
 
   const handleStatusUpdate = async ({ status, customStatus }) => {
