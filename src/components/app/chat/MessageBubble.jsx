@@ -4,7 +4,7 @@ import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuSeparator,
 import ImageWithFallback from '@/components/app/shared/ImageWithFallback';
 import ReactionTooltip from '@/components/app/shared/ReactionTooltip';
 import VideoPlayer from '@/components/app/chat/VideoPlayer';
-import { colors, shadows } from '@/components/app/design/tokens';
+import { colors, shadows, glass } from '@/components/app/design/tokens';
 
 function ts(d) { return new Date(d).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }); }
 function fullTs(d) { return new Date(d).toLocaleString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit', second: '2-digit' }); }
@@ -64,60 +64,68 @@ const MessageBubble = memo(function MessageBubble({ message, compact, isOwn, onR
   return (
     <ContextMenu>
       <ContextMenuTrigger>
-        <div className="relative group" onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}
+        <div className={`relative group ${isOwn && !compact ? 'flex justify-end' : ''}`}
+          onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}
           style={{
-            padding: compact ? '2px 16px 2px 16px' : '4px 16px 4px 16px',
-            background: hovered ? 'rgba(255,255,255,0.02)' : message.is_pinned ? `${colors.warning}06` : 'transparent',
-            transition: 'background 100ms cubic-bezier(0.4,0,0.2,1)',
+            padding: compact ? '2px 16px 2px 16px' : '3px 16px 3px 16px',
           }}>
 
           {/* Pinned indicator */}
           {message.is_pinned && !compact && (
-            <div className="flex items-center gap-1 ml-[56px] mb-0.5">
+            <div className={`flex items-center gap-1 mb-1 ${isOwn ? 'justify-end mr-2' : 'ml-[52px]'}`}>
               <Pin className="w-3 h-3" style={{ color: colors.warning }} />
-              <span className="text-[11px] font-medium" style={{ color: colors.warning, opacity: 0.7 }}>Pinned</span>
+              <span className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: colors.warning, opacity: 0.7 }}>Pinned</span>
             </div>
           )}
 
           {/* Reply preview */}
           {message.reply_preview && (
-            <div className="flex items-center gap-2 ml-[56px] mb-0.5 cursor-pointer hover:opacity-80">
-              <div className="w-[3px] h-4 rounded-full flex-shrink-0" style={{ background: colors.accent.primary }} />
-              <span className="text-[12px] truncate" style={{ color: colors.text.muted }}>
+            <div className={`flex items-center gap-2 mb-1 cursor-pointer hover:opacity-80 ${isOwn ? 'justify-end mr-2' : 'ml-[52px]'}`}>
+              <div className="w-[2px] h-3.5 rounded-full flex-shrink-0" style={{ background: colors.accent.primary }} />
+              <span className="text-[11px] truncate" style={{ color: colors.text.muted }}>
                 <span className="font-semibold" style={{ color: colors.text.secondary }}>{message.reply_preview.author_name}</span>
                 {' '}<span>{message.reply_preview.content?.slice(0, 60)}</span>
               </span>
             </div>
           )}
 
-          <div className="flex items-start gap-3">
-            {/* Avatar or timestamp */}
-            {compact ? (
-              <div className="w-10 flex-shrink-0 flex items-center justify-center">
-                <span className="text-[11px] opacity-0 group-hover:opacity-100 tabular-nums select-none" style={{ color: colors.text.disabled }}>{ts(message.created_date)}</span>
-              </div>
-            ) : (
-              <button onClick={() => !isDeleted && onProfileClick?.(message.author_id)}
-                className="w-10 h-10 rounded-full flex items-center justify-center text-[14px] font-semibold flex-shrink-0 overflow-hidden hover:opacity-80 transition-opacity mt-0.5"
-                style={{ background: `linear-gradient(135deg, ${colors.bg.overlay}, ${colors.bg.elevated})`, color: colors.text.muted }}>
-                {isDeleted ? '👻' : message.author_avatar ? <img src={message.author_avatar} className="w-full h-full object-cover" alt="" /> : authorName.charAt(0).toUpperCase()}
-              </button>
-            )}
-
-            <div className="flex-1 min-w-0 overflow-hidden">
-              {!compact && (
-                <div className="flex items-baseline gap-2 mb-0.5">
-                  <button onClick={() => !isDeleted && onProfileClick?.(message.author_id)} className="text-[14px] font-semibold hover:underline truncate max-w-[180px] inline-block align-bottom" style={{ color: isDeleted ? colors.text.disabled : colors.text.primary, textDecorationColor: colors.text.disabled }} title={authorName}>
-                    {authorName}
-                  </button>
-                  {!isDeleted && message.author_badges?.includes('owner') && <span className="text-[10px] px-1.5 py-0.5 rounded font-semibold flex-shrink-0" style={{ background: `${colors.warning}20`, color: colors.warning }}>OWNER</span>}
-                  {!isDeleted && message.author_badges?.includes('admin') && <span className="text-[10px] px-1.5 py-0.5 rounded font-semibold flex-shrink-0" style={{ background: `${colors.info}20`, color: colors.info }}>ADMIN</span>}
-                  <button onClick={() => setShowFullTs(!showFullTs)} className="text-[11px] tabular-nums select-none flex-shrink-0 hover:underline" style={{ color: colors.text.disabled }} title={fullTs(message.created_date)}>
-                    {showFullTs ? fullTs(message.created_date) : ts(message.created_date)}
-                  </button>
-                  {message.is_edited && <span className="text-[11px] flex-shrink-0" style={{ color: colors.text.disabled }}>(edited)</span>}
+          {/* Glass bubble wrapper */}
+          <div className={`${isOwn && !compact ? 'max-w-[75%]' : 'max-w-full'}`}>
+            <div className={`flex items-start gap-2.5 ${isOwn && !compact ? 'flex-row-reverse' : ''}`}>
+              {/* Avatar or timestamp */}
+              {compact ? (
+                <div className="w-10 flex-shrink-0 flex items-center justify-center">
+                  <span className="text-[11px] opacity-0 group-hover:opacity-100 tabular-nums select-none" style={{ color: colors.text.disabled }}>{ts(message.created_date)}</span>
                 </div>
+              ) : (
+                <button onClick={() => !isDeleted && onProfileClick?.(message.author_id)}
+                  className="w-9 h-9 rounded-2xl flex items-center justify-center text-[13px] font-semibold flex-shrink-0 overflow-hidden hover:opacity-80 transition-opacity mt-0.5"
+                  style={{ ...glass.card, color: colors.text.muted }}>
+                  {isDeleted ? '👻' : message.author_avatar ? <img src={message.author_avatar} className="w-full h-full object-cover" alt="" /> : authorName.charAt(0).toUpperCase()}
+                </button>
               )}
+
+              {/* Message content glass card */}
+              <div className="flex-1 min-w-0 overflow-hidden rounded-2xl px-3.5 py-2.5"
+                style={{
+                  ...(isOwn ? glass.bubbleOwn : glass.bubble),
+                  borderRadius: isOwn && !compact ? '20px 20px 6px 20px' : !compact ? '20px 20px 20px 6px' : '12px',
+                  boxShadow: hovered ? shadows.subtle : 'none',
+                  transition: 'box-shadow 150ms ease',
+                }}>
+                {!compact && (
+                  <div className={`flex items-baseline gap-2 mb-0.5 ${isOwn ? 'flex-row-reverse' : ''}`}>
+                    <button onClick={() => !isDeleted && onProfileClick?.(message.author_id)} className="text-[13px] font-semibold hover:underline truncate max-w-[180px] inline-block align-bottom" style={{ color: isDeleted ? colors.text.disabled : isOwn ? colors.accent.hover : colors.text.primary, textDecorationColor: colors.text.disabled }} title={authorName}>
+                      {authorName}
+                    </button>
+                    {!isDeleted && message.author_badges?.includes('owner') && <span className="text-[9px] px-1.5 py-0.5 rounded-full font-bold flex-shrink-0" style={{ background: `${colors.warning}18`, color: colors.warning }}>OWNER</span>}
+                    {!isDeleted && message.author_badges?.includes('admin') && <span className="text-[9px] px-1.5 py-0.5 rounded-full font-bold flex-shrink-0" style={{ background: `${colors.info}18`, color: colors.info }}>ADMIN</span>}
+                    <button onClick={() => setShowFullTs(!showFullTs)} className="text-[10px] tabular-nums select-none flex-shrink-0 hover:underline" style={{ color: colors.text.disabled }} title={fullTs(message.created_date)}>
+                      {showFullTs ? fullTs(message.created_date) : ts(message.created_date)}
+                    </button>
+                    {message.is_edited && <span className="text-[10px] flex-shrink-0" style={{ color: colors.text.disabled }}>(edited)</span>}
+                  </div>
+                )}
 
               {/* Content */}
               {isDeleted ? (
