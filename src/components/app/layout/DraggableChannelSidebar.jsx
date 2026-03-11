@@ -146,7 +146,7 @@ export default function DraggableChannelSidebar({ server, categories, channels, 
         </button>
 
         {dropdownOpen && (
-          <div className="absolute top-12 left-0 right-0 z-50 p-1.5 k-scale-in"
+          <div className="absolute top-12 left-0 right-0 z-50 p-1.5 k-fade-in"
             style={{ background: colors.bg.modal, border: `1px solid ${colors.border.light}`, borderRadius: '0 0 12px 12px', boxShadow: shadows.strong }}>
             <button onClick={() => { onInvite(); setDropdownOpen(false); }}
               className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md text-[13px] transition-colors hover:bg-[rgba(255,255,255,0.05)]"
