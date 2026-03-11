@@ -91,17 +91,17 @@ export const typography = {
 
 export const animation = {
   easing: {
-    enter: 'cubic-bezier(0, 0, 0.2, 1)',
-    exit: 'cubic-bezier(0.4, 0, 1, 1)',
-    standard: 'cubic-bezier(0.4, 0, 0.2, 1)',
+    enter: 'cubic-bezier(0.0, 0.0, 0.2, 1.0)',
+    exit: 'cubic-bezier(0.4, 0.0, 1.0, 1.0)',
+    standard: 'cubic-bezier(0.4, 0.0, 0.2, 1.0)',
     spring: { type: 'spring', damping: 25, stiffness: 350 },
   },
   duration: {
-    instant: 80,
+    hover: 100,
     fast: 150,
-    normal: 250,
-    slow: 400,
-    verySlow: 600,
+    panel: 200,
+    modal: 300,
+    celebrate: 500,
   },
 };
 
