@@ -99,13 +99,24 @@ export default function ChatInput({ channelName, channelId, replyTo, onCancelRep
         <div className="flex gap-2 px-4 py-3 rounded-t-lg flex-wrap" style={{ background: colors.bg.elevated, borderBottom: `1px solid ${colors.border.default}` }}>
           {files.map((f, i) => {
             const FI = getIcon(f.content_type);
+            const isVideo = f.content_type?.startsWith('video/');
+            const isImage = f.content_type?.startsWith('image/');
             return (
               <div key={i} className="relative group">
-                {f.content_type?.startsWith('image/') ? <img src={f.url} className="w-20 h-20 rounded-lg object-cover" alt={f.filename} />
-                : <div className="w-20 h-20 rounded-lg flex flex-col items-center justify-center gap-1" style={{ background: colors.bg.overlay }}>
+                {isImage ? <img src={f.url} className="w-20 h-20 rounded-lg object-cover" alt={f.filename} />
+                : isVideo ? (
+                  <div className="w-20 h-20 rounded-lg overflow-hidden relative" style={{ background: colors.bg.overlay }}>
+                    <video src={f.url} className="w-full h-full object-cover" muted preload="metadata" />
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                      <Film className="w-5 h-5 text-white" />
+                    </div>
+                  </div>
+                ) : (
+                  <div className="w-20 h-20 rounded-lg flex flex-col items-center justify-center gap-1" style={{ background: colors.bg.overlay }}>
                     <FI className="w-5 h-5" style={{ color: colors.text.muted }} />
                     <span className="text-[9px] truncate max-w-[60px] px-1" style={{ color: colors.text.muted }}>{f.filename}</span>
-                  </div>}
+                  </div>
+                )}
                 <button onClick={() => setFiles(p => p.filter((_,j) => j !== i))}
                   className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
                   style={{ background: colors.danger, color: '#fff' }}><X className="w-3 h-3" /></button>
@@ -133,7 +144,7 @@ export default function ChatInput({ channelName, channelId, replyTo, onCancelRep
           aria-label="Upload file" title="Upload file">
           <Plus className="w-5 h-5" style={{ color: colors.text.muted }} />
         </button>
-        <input ref={fileRef} type="file" onChange={e => { if (e.target.files?.length) uploadFiles(e.target.files); if (fileRef.current) fileRef.current.value = ''; }} className="hidden" multiple aria-hidden="true" />
+        <input ref={fileRef} type="file" accept="image/*,video/*,audio/*,.gif,.mp4,.webm,.mov,.mp3,.wav,.ogg,.pdf,.txt,.zip,.rar,.doc,.docx,.xls,.xlsx" onChange={e => { if (e.target.files?.length) uploadFiles(e.target.files); if (fileRef.current) fileRef.current.value = ''; }} className="hidden" multiple aria-hidden="true" />
         <textarea ref={inputRef} value={content}
           onChange={e => { setContent(e.target.value); handleTyping(); }}
           onKeyDown={e => {

@@ -3,6 +3,7 @@ import { Reply, Pencil, Trash2, Copy, Pin, PinOff, Link, Smile, ChevronDown, Che
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuSeparator, ContextMenuTrigger } from '@/components/ui/context-menu';
 import ImageWithFallback from '@/components/app/shared/ImageWithFallback';
 import ReactionTooltip from '@/components/app/shared/ReactionTooltip';
+import VideoPlayer from '@/components/app/chat/VideoPlayer';
 import { colors, shadows } from '@/components/app/design/tokens';
 
 function ts(d) { return new Date(d).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }); }
@@ -130,9 +131,10 @@ const MessageBubble = memo(function MessageBubble({ message, compact, isOwn, onR
               {!isDeleted && message.attachments?.length > 0 && (
                 <div className="flex flex-wrap gap-2 mt-2">
                   {message.attachments.map((a, i) => {
-                    if (a.content_type?.startsWith('image/')) return <ImageWithFallback key={i} src={a.url} alt={a.filename || 'Uploaded image'} className="max-w-[400px] max-h-[280px] rounded-xl cursor-pointer hover:brightness-110 transition-all" style={{ border: `1px solid ${colors.border.default}` }} onClick={() => onImageClick?.(a.url, a.filename)} />;
-                    if (a.content_type?.startsWith('video/')) return <video key={i} src={a.url} controls className="max-w-[400px] rounded-xl" style={{ border: `1px solid ${colors.border.default}` }} />;
-                    if (a.content_type?.startsWith('audio/')) return <audio key={i} src={a.url} controls className="max-w-[300px]" />;
+                    const isGif = a.content_type === 'image/gif' || a.filename?.toLowerCase().endsWith('.gif') || a.url?.toLowerCase().includes('.gif');
+                    if (a.content_type?.startsWith('image/') || isGif) return <ImageWithFallback key={i} src={a.url} alt={a.filename || 'Uploaded image'} className="max-w-[400px] max-h-[280px] rounded-xl cursor-pointer hover:brightness-110 transition-all" style={{ border: `1px solid ${colors.border.default}` }} onClick={() => onImageClick?.(a.url, a.filename)} />;
+                    if (a.content_type?.startsWith('video/') || a.url?.match(/\.(mp4|webm|mov|avi|mkv)(\?|$)/i)) return <VideoPlayer key={i} src={a.url} filename={a.filename} />;
+                    if (a.content_type?.startsWith('audio/') || a.url?.match(/\.(mp3|wav|ogg|flac|aac)(\?|$)/i)) return <audio key={i} src={a.url} controls className="max-w-[300px]" />;
                     return <a key={i} href={a.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-[13px] px-3 py-2 rounded-lg hover:bg-[rgba(255,255,255,0.04)]" style={{ color: colors.text.secondary, background: colors.bg.elevated }}>📎 {a.filename || 'File'}</a>;
                   })}
                 </div>
