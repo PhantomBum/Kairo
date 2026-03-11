@@ -41,6 +41,7 @@ import ModPanelModal from '@/components/app/modals/ModPanelModal';
 import AnalyticsDashboardModal from '@/components/app/modals/AnalyticsDashboardModal';
 import ChannelSettingsModal from '@/components/app/modals/ChannelSettingsModal';
 import ServerBackupsModal from '@/components/app/modals/ServerBackupsModal';
+import InvitePreviewModal from '@/components/app/modals/InvitePreviewModal';
 import AdvancedSearch from '@/components/app/features/AdvancedSearch';
 import MediaGallery from '@/components/app/features/MediaGallery';
 import PrivacyDashboard from '@/components/app/features/PrivacyDashboard';
@@ -71,6 +72,7 @@ export default function AppShell({ currentUser }) {
   const [channelToEdit, setChannelToEdit] = useState(null);
   const [mobileTab, setMobileTab] = useState('servers');
   const [nsfwAccepted, setNsfwAccepted] = useState(new Set());
+  const [inviteCode, setInviteCode] = useState(null);
 
   const { data: profile } = useMyProfile(currentUser.email);
   const { data: servers = [] } = useServers(currentUser.id, currentUser.email);
@@ -99,6 +101,19 @@ export default function AppShell({ currentUser }) {
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
   }, [modal]);
+
+  // Intercept invite links pasted/navigated within the app
+  useEffect(() => {
+    const checkUrl = () => {
+      const path = window.location.pathname + window.location.search;
+      const inviteMatch = path.match(/[?&]code=([A-Za-z0-9]+)/);
+      // Also check hash-based routing
+      const hashMatch = window.location.hash.match(/invite.*[?&]code=([A-Za-z0-9]+)/i);
+      const foundCode = inviteMatch?.[1] || hashMatch?.[1];
+      if (foundCode && !inviteCode) setInviteCode(foundCode);
+    };
+    checkUrl();
+  }, []);
 
   const createServer = useMutation({
     mutationFn: async ({ name, template, icon_url }) => {
@@ -493,6 +508,14 @@ export default function AppShell({ currentUser }) {
         )}
         {modal === 'server-backups' && activeServer && <ServerBackupsModal onClose={() => setModal(null)} server={activeServer} currentUser={currentUser} />}
         {modal === 'search' && <AdvancedSearch onClose={() => setModal(null)} servers={servers} currentUserId={currentUser.id} />}
+        {modal === 'invite-preview' && inviteCode && (
+          <InvitePreviewModal
+            code={inviteCode}
+            currentUser={currentUser}
+            onClose={() => { setModal(null); setInviteCode(null); }}
+            onJoinSuccess={(server) => { setInviteCode(null); setModal(null); qc.invalidateQueries({ queryKey: ['servers'] }); selectServer(server); }}
+          />
+        )}
         {modal === 'media-gallery' && <MediaGallery onClose={() => setModal(null)} messages={currentMsgs} channelName={channelLabel} />}
         {modal === 'privacy-dashboard' && <PrivacyDashboard onClose={() => setModal(null)} profile={profile} currentUser={currentUser} onUpdate={(d) => updateProfile.mutate(d)} />}
         {modal === 'activity' && <ActivityStatus onClose={() => setModal(null)} profile={profile} onUpdate={(d) => updateProfile.mutate(d)} />}
