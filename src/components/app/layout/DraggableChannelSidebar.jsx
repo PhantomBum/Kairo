@@ -117,14 +117,71 @@ export default function DraggableChannelSidebar({ server, categories, channels, 
 
   const onDragEnd = useCallback(async (result) => {
     if (!result.destination || !isOwner) return;
-    const { destination } = result;
-    const dstCat = destination.droppableId.replace('cat-', '');
-    const chId = result.draggableId;
-    await base44.entities.Channel.update(chId, {
-      category_id: dstCat === 'uncategorized' ? '' : dstCat,
-      position: destination.index,
+    const { source, destination, draggableId, type } = result;
+
+    // Skip if dropped in the same spot
+    if (source.droppableId === destination.droppableId && source.index === destination.index) return;
+
+    if (type === 'category') {
+      // Reorder categories
+      const reordered = [...sorted];
+      const [moved] = reordered.splice(source.index, 1);
+      reordered.splice(destination.index, 0, moved);
+      // Update all positions
+      const updates = reordered.map((cat, i) =>
+        base44.entities.Category.update(cat.id, { position: i })
+      );
+      await Promise.all(updates);
+      return;
+    }
+
+    // Channel drag
+    const srcCatId = source.droppableId.replace('cat-', '');
+    const dstCatId = destination.droppableId.replace('cat-', '');
+    const chId = draggableId;
+
+    // Build the destination channel list in new order
+    const dstChannels = (channels || [])
+      .filter(ch => {
+        const catId = ch.category_id || 'uncategorized';
+        return catId === dstCatId;
+      })
+      .sort((a, b) => (a.position || 0) - (b.position || 0));
+
+    // If moving within the same category, remove from current position first
+    if (srcCatId === dstCatId) {
+      const oldIdx = dstChannels.findIndex(ch => ch.id === chId);
+      if (oldIdx !== -1) dstChannels.splice(oldIdx, 1);
+    } else {
+      // Remove from source list — update source positions
+      const srcChannels = (channels || [])
+        .filter(ch => {
+          const catId = ch.category_id || 'uncategorized';
+          return catId === srcCatId && ch.id !== chId;
+        })
+        .sort((a, b) => (a.position || 0) - (b.position || 0));
+      const srcUpdates = srcChannels.map((ch, i) =>
+        base44.entities.Channel.update(ch.id, { position: i })
+      );
+      await Promise.all(srcUpdates);
+    }
+
+    // Insert at destination index
+    const movedChannel = (channels || []).find(ch => ch.id === chId);
+    if (movedChannel) {
+      dstChannels.splice(destination.index, 0, movedChannel);
+    }
+
+    // Update all positions in destination + category assignment for moved channel
+    const dstUpdates = dstChannels.map((ch, i) => {
+      const data = { position: i };
+      if (ch.id === chId) {
+        data.category_id = dstCatId === 'uncategorized' ? '' : dstCatId;
+      }
+      return base44.entities.Channel.update(ch.id, data);
     });
-  }, [isOwner]);
+    await Promise.all(dstUpdates);
+  }, [isOwner, sorted, channels]);
 
   return (
     <div className="flex-1 flex flex-col min-h-0">
