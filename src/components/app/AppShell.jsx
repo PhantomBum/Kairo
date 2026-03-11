@@ -324,9 +324,19 @@ export default function AppShell({ currentUser }) {
   const isInChat = (view === 'server' && activeChannel && !isVoiceChannel && !isBoardChannel && !isNsfw) || (view === 'home' && activeConv);
   const isInVoice = view === 'server' && activeChannel && isVoiceChannel;
   const isInBoard = view === 'server' && activeChannel && isBoardChannel;
-  // Merge optimistic messages with real messages
+  // Merge optimistic messages with real messages, deduplicating content that already arrived
   const baseMsgs = isDM ? dmMessages : messages;
-  const currentMsgs = [...baseMsgs, ...optimisticMsgs.filter(m => isDM ? m.conversation_id === activeConv?.id : m.channel_id === activeChannel?.id)];
+  const filteredOptimistic = optimisticMsgs.filter(m => {
+    // Only show optimistic msgs for current view
+    if (isDM ? m.conversation_id !== activeConv?.id : m.channel_id !== activeChannel?.id) return false;
+    // Remove if a real message with same content from same author arrived (dedup)
+    return !baseMsgs.some(real =>
+      real.author_id === m.author_id &&
+      real.content === m.content &&
+      Math.abs(new Date(real.created_date) - new Date(m.created_date)) < 10000
+    );
+  });
+  const currentMsgs = [...baseMsgs, ...filteredOptimistic];
   const currentLoading = isDM ? dmLoading : msgsLoading;
   const channelLabel = isDM ? (activeConv.name || activeConv.participants?.find(p => p.user_id !== currentUser.id)?.user_name || 'DM') : (activeChannel?.name || '');
   const pinnedCount = isDM ? dmMessages.filter(m => m.is_pinned).length : messages.filter(m => m.is_pinned).length;
