@@ -1,80 +1,70 @@
-// KAIRO DESIGN SYSTEM — Single source of truth for all design tokens
+// KAIRO V2 DESIGN SYSTEM — Refined visual identity
 // Every color, spacing, radius, shadow, animation value must come from here
 
 export const colors = {
-  // Backgrounds
+  // Backgrounds — deeper, more intentional
   bg: {
-    base: '#0f0f13',
-    surface: '#161619',
-    elevated: '#1e1e24',
-    overlay: '#26262e',
-    modal: '#2e2e38',
+    base: '#0c0c10',
+    surface: '#13131a',
+    elevated: '#1a1a24',
+    overlay: '#22222e',
+    modal: '#2a2a38',
+    hover: 'rgba(255,255,255,0.035)',
+    active: 'rgba(255,255,255,0.06)',
   },
-  // Accent
+  // Accent — Kairo's signature purple, more saturated
   accent: {
-    primary: '#7c5cbf',
-    hover: '#8f6fd4',
-    active: '#6a4aad',
-    subtle: 'rgba(124,92,191,0.09)',
-    muted: 'rgba(124,92,191,0.18)',
+    primary: '#8b5cf6',
+    hover: '#a78bfa',
+    active: '#7c3aed',
+    subtle: 'rgba(139,92,246,0.08)',
+    muted: 'rgba(139,92,246,0.16)',
+    glow: 'rgba(139,92,246,0.12)',
   },
   // Status
   status: {
-    online: '#23a55a',
-    idle: '#f0b232',
-    dnd: '#f23f43',
-    offline: '#80848e',
-    invisible: '#80848e',
+    online: '#22c55e',
+    idle: '#eab308',
+    dnd: '#ef4444',
+    offline: '#6b7280',
+    invisible: '#6b7280',
   },
   // Semantic
-  danger: '#f23f43',
-  warning: '#f0b232',
-  success: '#23a55a',
-  info: '#5865f2',
-  // Text
+  danger: '#ef4444',
+  warning: '#eab308',
+  success: '#22c55e',
+  info: '#6366f1',
+  // Text — better contrast hierarchy
   text: {
-    primary: '#f2f3f5',
-    secondary: '#b5bac1',
-    muted: '#80848e',
-    disabled: '#4e5058',
-    link: '#00a8fc',
+    primary: '#f8fafc',
+    secondary: '#cbd5e1',
+    muted: '#94a3b8',
+    disabled: '#475569',
+    link: '#38bdf8',
   },
   // Borders
   border: {
     default: 'rgba(255,255,255,0.06)',
     light: 'rgba(255,255,255,0.1)',
-    strong: 'rgba(255,255,255,0.14)',
+    strong: 'rgba(255,255,255,0.16)',
   },
 };
 
 export const spacing = {
-  0: '0px',
-  1: '4px',
-  2: '8px',
-  3: '12px',
-  4: '16px',
-  5: '20px',
-  6: '24px',
-  8: '32px',
-  10: '40px',
-  12: '48px',
-  16: '64px',
+  0: '0px', 1: '4px', 2: '8px', 3: '12px', 4: '16px',
+  5: '20px', 6: '24px', 8: '32px', 10: '40px', 12: '48px', 16: '64px',
 };
 
 export const radius = {
-  xs: '4px',
-  sm: '8px',
-  md: '12px',
-  lg: '16px',
-  xl: '24px',
-  pill: '9999px',
+  xs: '4px', sm: '8px', md: '12px', lg: '16px', xl: '24px', pill: '9999px',
 };
 
 export const shadows = {
-  subtle: '0 1px 4px rgba(0,0,0,0.2), 0 0 1px rgba(0,0,0,0.1)',
-  medium: '0 4px 16px rgba(0,0,0,0.3), 0 0 1px rgba(0,0,0,0.1)',
-  strong: '0 8px 32px rgba(0,0,0,0.45), 0 0 1px rgba(0,0,0,0.15)',
-  glow: '0 0 24px rgba(124,92,191,0.15)',
+  subtle: '0 1px 4px rgba(0,0,0,0.25), 0 0 1px rgba(0,0,0,0.12)',
+  medium: '0 4px 16px rgba(0,0,0,0.35), 0 0 1px rgba(0,0,0,0.12)',
+  strong: '0 8px 32px rgba(0,0,0,0.5), 0 0 1px rgba(0,0,0,0.18)',
+  glow: '0 0 24px rgba(139,92,246,0.12)',
+  accentGlow: '0 0 20px rgba(139,92,246,0.25), 0 0 60px rgba(139,92,246,0.08)',
 };
 
 export const typography = {
@@ -106,7 +96,6 @@ export const animation = {
 };
 
 // CSS custom properties string to inject
-// Includes backwards-compatible aliases for old variable names
 export const cssVariables = `
   --k-bg-base: ${colors.bg.base};
   --k-bg-surface: ${colors.bg.surface};
@@ -145,7 +134,7 @@ export const cssVariables = `
   --k-radius-xl: ${radius.xl};
   --k-radius-pill: ${radius.pill};
 
-  /* Backwards-compatible aliases for legacy components */
+  /* Backwards-compatible aliases */
   --bg-deep: ${colors.bg.base};
   --bg-base: ${colors.bg.base};
   --bg-surface: ${colors.bg.surface};
