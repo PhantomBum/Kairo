@@ -106,7 +106,7 @@ const MessageBubble = memo(function MessageBubble({ message, compact, isOwn, onR
                 </div>
               ) : (
                 <div className="relative">
-                  <div className="text-[15px] leading-[1.375] break-words whitespace-pre-wrap overflow-hidden" style={{ color: colors.text.secondary, maxHeight: isLong && !expanded ? '300px' : 'none' }}>
+                  <div className="text-[15px] leading-[1.375] whitespace-pre-wrap overflow-hidden" style={{ color: colors.text.secondary, maxHeight: isLong && !expanded ? '300px' : 'none', wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
                     {renderText(message.content, onLinkClick)}
                   </div>
                   {isLong && !expanded && (
