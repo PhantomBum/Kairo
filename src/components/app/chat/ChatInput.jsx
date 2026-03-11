@@ -6,8 +6,9 @@ import FormattingToolbar from '@/components/app/features/FormattingToolbar';
 
 const EMOJIS = ['😀','😂','😍','🤔','👍','👎','❤️','🔥','🎉','😎','😢','😡','🙏','💯','✨','🚀','👀','🤝','💀','🎮','🎵','☕','⭐','💜'];
 
-export default function ChatInput({ channelName, replyTo, onCancelReply, onSend, onTyping, onEditLast }) {
-  const storageKey = `kairo-draft-${channelName || 'default'}`;
+export default function ChatInput({ channelName, channelId, replyTo, onCancelReply, onSend, onTyping, onEditLast }) {
+  // Use channelId for draft key to prevent race conditions between channels with same name
+  const storageKey = `kairo-draft-${channelId || channelName || 'default'}`;
   const [content, setContent] = useState(() => {
     try { return localStorage.getItem(storageKey) || ''; } catch { return ''; }
   });
