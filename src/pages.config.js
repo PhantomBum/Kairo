@@ -47,25 +47,25 @@
  *
  * The mainPage value must match a key in the PAGES object exactly.
  */
-import Kairo from './pages/Kairo';
-import Status from './pages/Status';
-import FAQ from './pages/FAQ';
-import Elite from './pages/Elite';
-import Support from './pages/Support';
 import BotMarketplace from './pages/BotMarketplace';
 import Developers from './pages/Developers';
+import Elite from './pages/Elite';
+import FAQ from './pages/FAQ';
+import Kairo from './pages/Kairo';
+import Status from './pages/Status';
+import Support from './pages/Support';
 import Spaces from './pages/Spaces';
 import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
-    "Kairo": Kairo,
-    "Status": Status,
-    "FAQ": FAQ,
-    "Elite": Elite,
-    "Support": Support,
     "BotMarketplace": BotMarketplace,
     "Developers": Developers,
+    "Elite": Elite,
+    "FAQ": FAQ,
+    "Kairo": Kairo,
+    "Status": Status,
+    "Support": Support,
     "Spaces": Spaces,
 }
 

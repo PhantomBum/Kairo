@@ -59,19 +59,41 @@ export default function Layout({ children }) {
           animation: k-shimmer 1.5s ease-in-out infinite;
         }
 
-        /* Kairo animations */
+        /* Kairo animations — unified timing */
         @keyframes k-fade-in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes k-scale-in { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        @keyframes k-scale-in { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+        @keyframes k-slide-in-right { from { opacity: 0; transform: translateX(16px); } to { opacity: 1; transform: translateX(0); } }
+        @keyframes k-slide-out-right { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(16px); } }
         @keyframes k-pulse-ring { 0%, 100% { box-shadow: 0 0 0 0 var(--k-status-online); } 50% { box-shadow: 0 0 0 3px transparent; } }
         @keyframes k-typing-dot { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-4px); } }
-        @keyframes k-reaction-pop { 0% { transform: scale(0.5); opacity: 0; } 50% { transform: scale(1.3); } 100% { transform: scale(1); opacity: 1; } }
-        .k-fade-in { animation: k-fade-in 0.25s cubic-bezier(0,0,0.2,1); }
-        .k-scale-in { animation: k-scale-in 0.25s cubic-bezier(0,0,0.2,1); }
+        @keyframes k-reaction-pop { 0% { transform: scale(0.6); opacity: 0; } 60% { transform: scale(1.15); } 100% { transform: scale(1); opacity: 1; } }
+        @keyframes k-click-feedback { 0% { transform: scale(1); } 50% { transform: scale(0.97); } 100% { transform: scale(1); } }
+        @keyframes k-speaking-ring { 0%, 100% { box-shadow: 0 0 0 0 rgba(35,165,90,0.4); } 50% { box-shadow: 0 0 0 3px rgba(35,165,90,0.15); } }
+        .k-fade-in { animation: k-fade-in 0.15s cubic-bezier(0,0,0.2,1); }
+        .k-scale-in { animation: k-scale-in 0.15s cubic-bezier(0,0,0.2,1); }
+        .k-slide-in-right { animation: k-slide-in-right 0.3s cubic-bezier(0,0,0.2,1); }
+        .k-slide-out-right { animation: k-slide-out-right 0.2s cubic-bezier(0.4,0,1,1); }
         .k-pulse-ring { animation: k-pulse-ring 3s ease-in-out infinite; }
-        .k-reaction-pop { animation: k-reaction-pop 0.3s cubic-bezier(0,0,0.2,1); }
+        .k-reaction-pop { animation: k-reaction-pop 0.15s cubic-bezier(0,0,0.2,1); }
+        .k-click-feedback:active { animation: k-click-feedback 80ms ease-out; }
+        .k-speaking-ring { animation: k-speaking-ring 1.5s ease-in-out infinite; }
 
         /* Word break for long URLs */
         .break-words { word-break: break-word; overflow-wrap: anywhere; }
+
+        /* Unified interactive element transitions */
+        button, a, [role="button"], [role="tab"], [role="menuitem"] {
+          transition: background 0.15s ease-out, color 0.15s ease-out, opacity 0.15s ease-out, transform 80ms ease-out, border-color 0.15s ease-out, box-shadow 0.15s ease-out;
+        }
+        button:active:not(:disabled), [role="button"]:active:not(:disabled), [role="tab"]:active {
+          transform: scale(0.98);
+        }
+
+        /* Sidebar panel slide */
+        .k-panel-slide { transition: transform 0.2s cubic-bezier(0,0,0.2,1), opacity 0.2s cubic-bezier(0,0,0.2,1); }
+
+        /* Channel switch fade */
+        .k-channel-fade { animation: k-fade-in 80ms cubic-bezier(0,0,0.2,1); }
 
         /* Legacy utility classes */
         .glass { background: var(--bg-glass); backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur)); border: 1px solid var(--border); }
@@ -80,14 +102,19 @@ export default function Layout({ children }) {
         .glass-active { background: var(--bg-glass-active); }
         .glow-border { box-shadow: inset 0 0 0 1px var(--border-light), var(--shadow-glow); }
 
-        /* Reduced motion */
+        /* Reduced motion — comprehensive disable */
         @media (prefers-reduced-motion: reduce) {
           *, *::before, *::after {
             animation-duration: 0.01ms !important;
+            animation-delay: 0ms !important;
             animation-iteration-count: 1 !important;
             transition-duration: 0.01ms !important;
             scroll-behavior: auto !important;
           }
+          button:active:not(:disabled), [role="button"]:active:not(:disabled), [role="tab"]:active {
+            transform: none !important;
+          }
+          .k-shimmer { animation: none !important; background: var(--k-bg-elevated) !important; }
         }
 
         /* Mobile safe area */
