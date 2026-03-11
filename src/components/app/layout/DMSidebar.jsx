@@ -117,9 +117,14 @@ export default function DMSidebar({ conversations, activeId, onSelect, onFriends
           );
         })}
         {filtered.length === 0 && (
-          <div className="text-center py-12">
-            <MessageSquare className="w-10 h-10 mx-auto mb-3 opacity-20" style={{ color: colors.text.disabled }} />
-            <p className="text-[13px]" style={{ color: colors.text.muted }}>No conversations yet</p>
+          <div className="text-center py-12 px-4 k-fade-in">
+            <MessageSquare className="w-10 h-10 mx-auto mb-3" style={{ color: colors.text.disabled, opacity: 0.3 }} />
+            <p className="text-[14px] font-medium mb-1" style={{ color: colors.text.secondary }}>
+              {search ? 'No results found' : 'No conversations yet'}
+            </p>
+            <p className="text-[12px] leading-relaxed" style={{ color: colors.text.muted }}>
+              {search ? 'Try a different search term' : 'Start a conversation with friends or create a group chat'}
+            </p>
           </div>
         )}
       </div>

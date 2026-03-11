@@ -23,7 +23,10 @@ export default function MobileNav({ active, onChange, badge }) {
             className="flex flex-col items-center justify-center gap-0.5 py-1.5 px-3 relative"
             role="tab" aria-selected={isActive} aria-label={t.label}
             style={{ minWidth: 48, minHeight: 44 }}>
-            <Icon className="w-5 h-5" style={{ color: isActive ? colors.text.primary : colors.text.muted }} />
+            <div className="relative">
+              <Icon className="w-5 h-5" style={{ color: isActive ? colors.text.primary : colors.text.muted }} />
+              {isActive && <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full" style={{ background: colors.accent.primary }} />}
+            </div>
             <span className="text-[10px] font-medium" style={{ color: isActive ? colors.text.primary : colors.text.disabled }}>{t.label}</span>
             {t.id === 'notifications' && badge > 0 && (
               <div className="absolute top-0.5 right-2 min-w-[16px] h-4 px-1 rounded-full text-[10px] font-bold flex items-center justify-center"

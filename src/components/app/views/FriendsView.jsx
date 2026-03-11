@@ -138,13 +138,25 @@ export default function FriendsView({ friends, incomingRequests, outgoingRequest
                 <Clock className="w-4 h-4" style={{ color: colors.text.disabled }} />
               </div>
             ))}
-            {incomingRequests.length === 0 && outgoingRequests.length === 0 && <p className="text-center py-12 text-[14px]" style={{ color: colors.text.muted }}>No pending requests</p>}
+            {incomingRequests.length === 0 && outgoingRequests.length === 0 && (
+              <div className="text-center py-16 k-fade-in">
+                <Clock className="w-10 h-10 mx-auto mb-3" style={{ color: colors.text.disabled, opacity: 0.3 }} />
+                <p className="text-[14px] font-medium mb-1" style={{ color: colors.text.secondary }}>No pending requests</p>
+                <p className="text-[12px] leading-relaxed" style={{ color: colors.text.muted }}>Friend requests you send or receive will show up here</p>
+              </div>
+            )}
           </div>
         )}
 
         {tab === 'blocked' && (
           <div className="space-y-2">
-            {(blocked || []).length === 0 ? <p className="text-center py-12 text-[14px]" style={{ color: colors.text.muted }}>No blocked users</p>
+            {(blocked || []).length === 0 ? (
+              <div className="text-center py-16 k-fade-in">
+                <Ban className="w-10 h-10 mx-auto mb-3" style={{ color: colors.text.disabled, opacity: 0.3 }} />
+                <p className="text-[14px] font-medium mb-1" style={{ color: colors.text.secondary }}>No blocked users</p>
+                <p className="text-[12px] leading-relaxed" style={{ color: colors.text.muted }}>Users you block won't be able to message you or see your status</p>
+              </div>
+            )
             : (blocked || []).map(b => (
               <div key={b.id} className="flex items-center gap-3 px-4 py-3 rounded-lg" style={{ background: colors.bg.elevated }}>
                 <Ban className="w-5 h-5" style={{ color: colors.danger }} />
@@ -174,7 +186,11 @@ export default function FriendsView({ friends, incomingRequests, outgoingRequest
               );
             }).filter(Boolean)}
             {(friends || []).filter(f => { const p = getProfile(f.friend_id); return p?.rich_presence?.name || p?.is_online; }).length === 0 && (
-              <p className="text-center py-12 text-[14px]" style={{ color: colors.text.muted }}>No active friends right now</p>
+              <div className="text-center py-16 k-fade-in">
+                <Activity className="w-10 h-10 mx-auto mb-3" style={{ color: colors.text.disabled, opacity: 0.3 }} />
+                <p className="text-[14px] font-medium mb-1" style={{ color: colors.text.secondary }}>No active friends right now</p>
+                <p className="text-[12px] leading-relaxed" style={{ color: colors.text.muted }}>When friends are online or playing something, they'll appear here</p>
+              </div>
             )}
           </div>
         )}
@@ -184,7 +200,23 @@ export default function FriendsView({ friends, incomingRequests, outgoingRequest
             <p className="text-[11px] font-semibold uppercase tracking-[0.06em] px-1 pb-2" style={{ color: colors.text.muted }}>
               {tab === 'online' ? `Online — ${online.length}` : `All Friends — ${filtered.length}`}
             </p>
-            {filtered.length === 0 && <p className="text-center py-12 text-[14px]" style={{ color: colors.text.muted }}>{tab === 'online' ? 'No friends online' : 'No friends yet. Add some!'}</p>}
+            {filtered.length === 0 && (
+              <div className="text-center py-16 k-fade-in">
+                <Users className="w-10 h-10 mx-auto mb-3" style={{ color: colors.text.disabled, opacity: 0.3 }} />
+                <p className="text-[14px] font-medium mb-1" style={{ color: colors.text.secondary }}>
+                  {tab === 'online' ? 'No friends online' : 'No friends yet'}
+                </p>
+                <p className="text-[12px] leading-relaxed mb-4" style={{ color: colors.text.muted }}>
+                  {tab === 'online' ? 'Your online friends will appear here' : 'Add friends to start chatting and hanging out'}
+                </p>
+                {tab === 'all' && (
+                  <button onClick={onAddFriend} className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-[13px] font-semibold"
+                    style={{ background: colors.success, color: '#fff' }}>
+                    <UserPlus className="w-4 h-4" /> Add Your First Friend
+                  </button>
+                )}
+              </div>
+            )}
             {filtered.map(f => (
               <FriendRow key={f.id} f={f} onMessage={onMessage} onRemove={onRemove} onBlock={onBlock} onProfileClick={onProfileClick} profile={getProfile(f.friend_id)} />
             ))}
