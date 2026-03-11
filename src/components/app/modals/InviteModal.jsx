@@ -51,17 +51,6 @@ export default function InviteModal({ onClose, server }) {
     setGenerating(false);
   };
 
-  const SelectField = ({ label, value, onChange, options }) => (
-    <div>
-      <label className="text-[11px] font-semibold uppercase tracking-[0.06em] block mb-1.5" style={{ color: colors.text.muted }}>{label}</label>
-      <select value={value === null ? '' : value} onChange={e => onChange(e.target.value === '' ? null : Number(e.target.value))}
-        className="w-full px-3 py-2 rounded-lg text-[13px] outline-none appearance-none cursor-pointer"
-        style={{ background: colors.bg.base, color: colors.text.primary, border: `1px solid ${colors.border.default}` }}>
-        {options.map((o, i) => <option key={i} value={o.value === null ? '' : o.value}>{o.label}</option>)}
-      </select>
-    </div>
-  );
-
   return (
     <ModalWrapper title="Invite People" subtitle={`Share this link to invite friends to ${server?.name}`} onClose={onClose} width={440}>
       <div className="space-y-5">
@@ -83,8 +72,22 @@ export default function InviteModal({ onClose, server }) {
 
         {/* Settings row */}
         <div className="grid grid-cols-2 gap-3">
-          <SelectField label="Expire After" value={expiry} onChange={setExpiry} options={EXPIRY_OPTIONS} />
-          <SelectField label="Max Uses" value={maxUses} onChange={setMaxUses} options={MAX_USES_OPTIONS} />
+          <div>
+            <label className="text-[11px] font-semibold uppercase tracking-[0.06em] block mb-1.5" style={{ color: colors.text.muted }}>Expire After</label>
+            <select value={expiry === null ? '' : expiry} onChange={e => setExpiry(e.target.value === '' ? null : Number(e.target.value))}
+              className="w-full px-3 py-2 rounded-lg text-[13px] outline-none appearance-none cursor-pointer"
+              style={{ background: colors.bg.base, color: colors.text.primary, border: `1px solid ${colors.border.default}` }}>
+              {EXPIRY_OPTIONS.map((o, i) => <option key={i} value={o.value === null ? '' : o.value}>{o.label}</option>)}
+            </select>
+          </div>
+          <div>
+            <label className="text-[11px] font-semibold uppercase tracking-[0.06em] block mb-1.5" style={{ color: colors.text.muted }}>Max Uses</label>
+            <select value={maxUses === null ? '' : maxUses} onChange={e => setMaxUses(e.target.value === '' ? null : Number(e.target.value))}
+              className="w-full px-3 py-2 rounded-lg text-[13px] outline-none appearance-none cursor-pointer"
+              style={{ background: colors.bg.base, color: colors.text.primary, border: `1px solid ${colors.border.default}` }}>
+              {MAX_USES_OPTIONS.map((o, i) => <option key={i} value={o.value === null ? '' : o.value}>{o.label}</option>)}
+            </select>
+          </div>
         </div>
 
         {/* Generate new */}
