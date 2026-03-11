@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Home, Plus, Compass, Crown, LogOut, Copy, Settings, FolderPlus, Globe, Search } from 'lucide-react';
+import { Home, Plus, Compass, Crown, LogOut, Copy, Settings, FolderPlus } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuSeparator, ContextMenuTrigger } from '@/components/ui/context-menu';
 import { base44 } from '@/api/base44Client';
@@ -44,7 +44,7 @@ function RailIcon({ active, unread, onClick, tooltip, badge, children }) {
 
 function ServerDivider() { return <div className="w-8 h-[2px] rounded-full my-1" style={{ background: colors.border.light }} />; }
 
-export default function ServerRailWithContext({ servers, activeServerId, onServerSelect, onHomeClick, onCreateServer, onDiscover, onElite, onLeaveServer, isHome, badge, currentUserId, onSpaces, onSearch }) {
+export default function ServerRailWithContext({ servers, activeServerId, onServerSelect, onHomeClick, onCreateServer, onDiscover, onElite, onLeaveServer, isHome, badge, currentUserId }) {
   const [folders, setFolders] = useState([]);
   const [showCreateFolder, setShowCreateFolder] = useState(false);
 
@@ -113,13 +113,11 @@ export default function ServerRailWithContext({ servers, activeServerId, onServe
 
       <ServerDivider />
 
-      <RailIcon onClick={onCreateServer} tooltip="Add a Server"><Plus className="w-5 h-5" style={{ color: colors.accent.primary }} /></RailIcon>
-      <RailIcon onClick={onDiscover} tooltip="Explore Servers"><Compass className="w-5 h-5" style={{ color: colors.success }} /></RailIcon>
-      <RailIcon onClick={onSpaces} tooltip="Kairo Spaces"><Globe className="w-5 h-5" style={{ color: colors.info }} /></RailIcon>
-      <RailIcon onClick={onSearch} tooltip="Search"><Search className="w-5 h-5" style={{ color: colors.text.muted }} /></RailIcon>
+      <RailIcon onClick={onCreateServer} tooltip="Add a Server"><Plus className="w-5 h-5" style={{ color: colors.text.muted }} /></RailIcon>
+      <RailIcon onClick={onDiscover} tooltip="Explore Servers"><Compass className="w-5 h-5" style={{ color: colors.text.muted }} /></RailIcon>
 
       <div className="flex-1" />
-      <RailIcon onClick={onElite} tooltip="Kairo Elite"><Crown className="w-5 h-5" style={{ color: colors.warning }} /></RailIcon>
+      <RailIcon onClick={onElite} tooltip="Kairo Elite"><Crown className="w-5 h-5" style={{ color: colors.text.muted }} /></RailIcon>
 
       <AnimatePresence>{showCreateFolder && <FolderCreateModal onClose={() => setShowCreateFolder(false)} onCreate={createFolder} />}</AnimatePresence>
     </div>
