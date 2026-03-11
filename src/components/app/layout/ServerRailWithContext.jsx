@@ -3,7 +3,7 @@ import { Home, Plus, Compass, Crown, LogOut, Copy, Settings, FolderPlus } from '
 import { motion, AnimatePresence } from 'framer-motion';
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuSeparator, ContextMenuTrigger } from '@/components/ui/context-menu';
 import { base44 } from '@/api/base44Client';
-import { colors, radius, shadows } from '@/components/app/design/tokens';
+import { colors, radius, shadows, glass } from '@/components/app/design/tokens';
 import ServerFoldersRail, { FolderCreateModal } from '@/components/app/features/ServerFolders';
 import ServerRailIcon from './ServerRailIcon';
 
@@ -27,23 +27,45 @@ function RailIcon({ active, unread, onClick, tooltip, badge, children }) {
   const [hovered, setHovered] = useState(false);
   return (
     <div className="relative flex items-center justify-center" onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
-      <motion.div className="absolute left-0 top-1/2 w-[3px] rounded-r-full" initial={false}
-        animate={{ height: active ? 32 : hovered ? 16 : unread ? 8 : 0, y: '-50%', opacity: active || hovered || unread ? 1 : 0 }}
-        transition={{ duration: 0.15, ease: [0.4, 0, 0.2, 1] }} style={{ background: colors.text.primary }} />
-      <button onClick={onClick} className="relative overflow-hidden flex items-center justify-center"
-        style={{ width: 48, height: 48, borderRadius: active || hovered ? radius.lg : radius.pill, background: active ? colors.accent.primary : colors.bg.elevated, transition: 'border-radius 0.2s cubic-bezier(0.4,0,0.2,1), background 0.2s' }}>
+      {/* Kairo: floating glow indicator instead of Discord's left pill */}
+      <motion.div className="absolute -left-0.5 top-1/2 rounded-full" initial={false}
+        animate={{
+          width: active ? 4 : 3,
+          height: active ? 28 : hovered ? 14 : unread ? 6 : 0,
+          y: '-50%',
+          opacity: active || hovered || unread ? 1 : 0,
+          boxShadow: active ? `0 0 8px ${colors.accent.primary}` : 'none',
+        }}
+        transition={{ duration: 0.2, ease: [0, 0, 0.2, 1] }}
+        style={{ background: active ? colors.accent.primary : colors.text.primary }} />
+      <motion.button onClick={onClick}
+        className="relative overflow-hidden flex items-center justify-center"
+        animate={{ scale: hovered && !active ? 1.06 : 1 }}
+        transition={{ duration: 0.15 }}
+        style={{
+          width: 48, height: 48,
+          borderRadius: active ? 14 : hovered ? 16 : 22,
+          ...glass.rail,
+          background: active
+            ? `linear-gradient(135deg, ${colors.accent.primary}, ${colors.accent.active})`
+            : hovered ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.03)',
+          boxShadow: active ? shadows.accentGlow : hovered ? shadows.glow : 'none',
+          transition: 'border-radius 0.25s cubic-bezier(0,0,0.2,1), background 0.2s, box-shadow 0.2s',
+        }}>
         {children}
         {badge > 0 && (
-          <div className="absolute -bottom-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full text-[11px] font-bold flex items-center justify-center"
-            style={{ background: colors.danger, color: '#fff', border: `3px solid ${colors.bg.base}` }}>{badge > 99 ? '99+' : badge}</div>
+          <div className="absolute -bottom-0.5 -right-0.5 min-w-[16px] h-[16px] px-1 rounded-full text-[10px] font-bold flex items-center justify-center"
+            style={{ background: colors.danger, color: '#fff', boxShadow: '0 0 8px rgba(239,68,68,0.4)' }}>{badge > 99 ? '99+' : badge}</div>
         )}
-      </button>
+      </motion.button>
       <RailTooltip text={tooltip} visible={hovered} />
     </div>
   );
 }
 
-function ServerDivider() { return <div className="w-8 h-[2px] rounded-full my-1" style={{ background: colors.border.light }} />; }
+function ServerDivider() {
+  return <div className="w-6 h-[1px] rounded-full my-1.5" style={{ background: 'linear-gradient(90deg, transparent, rgba(139,92,246,0.2), transparent)' }} />;
+}
 
 export default function ServerRailWithContext({ servers, activeServerId, onServerSelect, onHomeClick, onCreateServer, onDiscover, onElite, onLeaveServer, isHome, badge, currentUserId }) {
   const [folders, setFolders] = useState([]);
@@ -68,8 +90,8 @@ export default function ServerRailWithContext({ servers, activeServerId, onServe
   };
 
   return (
-    <div className="w-[72px] flex-shrink-0 flex flex-col items-center py-3 gap-2 overflow-y-auto scrollbar-none"
-      style={{ background: colors.bg.base }} role="navigation" aria-label="Server list">
+    <div className="w-[72px] flex-shrink-0 flex flex-col items-center py-3 gap-1.5 overflow-y-auto scrollbar-none"
+      style={{ background: 'rgba(8,8,12,0.85)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)', borderRight: '1px solid rgba(255,255,255,0.04)' }} role="navigation" aria-label="Server list">
       <ContextMenu>
         <ContextMenuTrigger>
           <div><RailIcon active={isHome} onClick={onHomeClick} tooltip="Direct Messages" badge={badge}>
