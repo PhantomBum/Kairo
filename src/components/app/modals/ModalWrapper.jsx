@@ -27,7 +27,7 @@ export default function ModalWrapper({ title, subtitle, onClose, width = 460, ch
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.95, opacity: 0 }}
         transition={{ type: 'spring', damping: 25, stiffness: 350 }}
-        className="rounded-xl overflow-hidden w-full"
+        className="rounded-xl overflow-hidden w-full relative"
         style={{
           maxWidth: `min(${width}px, calc(100vw - 32px))`,
           maxHeight: 'min(85vh, calc(100vh - 32px))',
