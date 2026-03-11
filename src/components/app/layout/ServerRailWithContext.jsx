@@ -50,7 +50,8 @@ function ServerDivider() {
 export default function ServerRailWithContext({ servers, activeServerId, onServerSelect, onHomeClick, onCreateServer, onDiscover, onElite, onServerSettings, onLeaveServer, isHome, badge }) {
   return (
     <div className="w-[68px] flex-shrink-0 flex flex-col items-center py-3 gap-2 overflow-y-auto scrollbar-none"
-      style={{ background: 'var(--bg-deep)' }}>
+      style={{ background: 'var(--bg-deep)' }}
+      role="navigation" aria-label="Server list">
       <ContextMenu>
         <ContextMenuTrigger>
           <div><RailIcon active={isHome} onClick={onHomeClick} tooltip="Home" badge={badge}>
