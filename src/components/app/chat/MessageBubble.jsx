@@ -1,15 +1,17 @@
 import React, { useState, memo } from 'react';
-import { Reply, Pencil, Trash2, Copy, Pin, PinOff, Link, Smile } from 'lucide-react';
+import { Reply, Pencil, Trash2, Copy, Pin, PinOff, Link, Smile, ChevronDown, ChevronUp } from 'lucide-react';
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuSeparator, ContextMenuTrigger } from '@/components/ui/context-menu';
-import ProgressiveImage from '@/components/app/performance/ProgressiveImage';
+import ImageWithFallback from '@/components/app/shared/ImageWithFallback';
+import ReactionTooltip from '@/components/app/shared/ReactionTooltip';
 import { colors, shadows } from '@/components/app/design/tokens';
 
 function ts(d) { return new Date(d).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }); }
+function fullTs(d) { return new Date(d).toLocaleString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit', second: '2-digit' }); }
 
-function renderText(text) {
+function renderText(text, onLinkClick) {
   if (!text) return null;
   return text.split(/(https?:\/\/[^\s]+|@everyone|@here|\*\*[^*]+\*\*|\*[^*]+\*|`[^`]+`)/g).map((p, i) => {
-    if (p.match(/^https?:\/\//)) return <a key={i} href={p} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 break-all hover:no-underline" style={{ color: colors.text.link }}>{p}</a>;
+    if (p.match(/^https?:\/\//)) return <a key={i} href={p} onClick={e => { if (onLinkClick) { e.preventDefault(); onLinkClick(p); } }} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 break-all hover:no-underline" style={{ color: colors.text.link }}>{p}</a>;
     if (p === '@everyone' || p === '@here') return <span key={i} className="px-1 rounded" style={{ background: `${colors.info}20`, color: colors.info }}>{p}</span>;
     if (p.match(/^\*\*.*\*\*$/)) return <strong key={i}>{p.slice(2, -2)}</strong>;
     if (p.match(/^\*.*\*$/)) return <em key={i}>{p.slice(1, -1)}</em>;
@@ -18,11 +20,18 @@ function renderText(text) {
   });
 }
 
-const MessageBubble = memo(function MessageBubble({ message, compact, isOwn, onReply, onEdit, onDelete, onReact, onPin, currentUserId, onProfileClick, isEditing, onEditSave, onEditCancel, onImageClick }) {
+const MAX_LINES = 20;
+
+const MessageBubble = memo(function MessageBubble({ message, compact, isOwn, onReply, onEdit, onDelete, onReact, onPin, currentUserId, onProfileClick, isEditing, onEditSave, onEditCancel, onImageClick, onLinkClick }) {
   const [hovered, setHovered] = useState(false);
   const [editText, setEditText] = useState(message.content || '');
+  const [expanded, setExpanded] = useState(false);
+  const [showFullTs, setShowFullTs] = useState(false);
   const quickEmojis = ['👍', '❤️', '😂', '🔥', '👀'];
   const saveFn = () => { if (editText.trim() && editText !== message.content) onEditSave(message.id, editText.trim()); else onEditCancel(); };
+  const isLong = (message.content || '').split('\n').length > MAX_LINES || (message.content || '').length > 1500;
+  const isDeleted = message.is_deleted;
+  const authorName = isDeleted ? 'Deleted User' : (message.author_name || 'User');
 
   return (
     <ContextMenu>
@@ -60,68 +69,92 @@ const MessageBubble = memo(function MessageBubble({ message, compact, isOwn, onR
                 <span className="text-[11px] opacity-0 group-hover:opacity-100 tabular-nums select-none" style={{ color: colors.text.disabled }}>{ts(message.created_date)}</span>
               </div>
             ) : (
-              <button onClick={() => onProfileClick?.(message.author_id)}
+              <button onClick={() => !isDeleted && onProfileClick?.(message.author_id)}
                 className="w-10 h-10 rounded-full flex items-center justify-center text-[14px] font-semibold flex-shrink-0 overflow-hidden hover:opacity-80 transition-opacity mt-0.5"
                 style={{ background: colors.bg.overlay, color: colors.text.muted }}>
-                {message.author_avatar ? <img src={message.author_avatar} className="w-full h-full object-cover" alt="" /> : (message.author_name || 'U').charAt(0).toUpperCase()}
+                {isDeleted ? '👻' : message.author_avatar ? <img src={message.author_avatar} className="w-full h-full object-cover" alt="" /> : authorName.charAt(0).toUpperCase()}
               </button>
             )}
 
             <div className="flex-1 min-w-0">
               {!compact && (
                 <div className="flex items-baseline gap-2 mb-0.5">
-                  <button onClick={() => onProfileClick?.(message.author_id)} className="text-[14px] font-semibold hover:underline" style={{ color: colors.text.primary, textDecorationColor: colors.text.disabled }}>
-                    {message.author_name || 'User'}
+                  <button onClick={() => !isDeleted && onProfileClick?.(message.author_id)} className="text-[14px] font-semibold hover:underline truncate max-w-[200px]" style={{ color: isDeleted ? colors.text.disabled : colors.text.primary, textDecorationColor: colors.text.disabled }} title={authorName}>
+                    {authorName}
                   </button>
-                  {message.author_badges?.includes('owner') && <span className="text-[10px] px-1.5 py-0.5 rounded font-semibold" style={{ background: `${colors.warning}20`, color: colors.warning }}>OWNER</span>}
-                  {message.author_badges?.includes('admin') && <span className="text-[10px] px-1.5 py-0.5 rounded font-semibold" style={{ background: `${colors.info}20`, color: colors.info }}>ADMIN</span>}
-                  <span className="text-[11px] tabular-nums select-none" style={{ color: colors.text.disabled }}>{ts(message.created_date)}</span>
-                  {message.is_edited && <span className="text-[11px]" style={{ color: colors.text.disabled }}>(edited)</span>}
+                  {!isDeleted && message.author_badges?.includes('owner') && <span className="text-[10px] px-1.5 py-0.5 rounded font-semibold flex-shrink-0" style={{ background: `${colors.warning}20`, color: colors.warning }}>OWNER</span>}
+                  {!isDeleted && message.author_badges?.includes('admin') && <span className="text-[10px] px-1.5 py-0.5 rounded font-semibold flex-shrink-0" style={{ background: `${colors.info}20`, color: colors.info }}>ADMIN</span>}
+                  <button onClick={() => setShowFullTs(!showFullTs)} className="text-[11px] tabular-nums select-none flex-shrink-0 hover:underline" style={{ color: colors.text.disabled }} title={fullTs(message.created_date)}>
+                    {showFullTs ? fullTs(message.created_date) : ts(message.created_date)}
+                  </button>
+                  {message.is_edited && <span className="text-[11px] flex-shrink-0" style={{ color: colors.text.disabled }}>(edited)</span>}
                 </div>
               )}
 
               {/* Content */}
-              {isEditing ? (
+              {isDeleted ? (
+                <div className="text-[14px] italic" style={{ color: colors.text.disabled }}>This message was deleted.</div>
+              ) : isEditing ? (
                 <div>
                   <textarea value={editText} onChange={e => setEditText(e.target.value)}
                     onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); saveFn(); } if (e.key === 'Escape') onEditCancel(); }}
                     className="w-full text-[14px] rounded-lg px-3 py-2 outline-none resize-none" style={{ background: colors.bg.elevated, color: colors.text.primary, border: `1px solid ${colors.accent.primary}` }}
                     rows={2} autoFocus />
                   <div className="text-[11px] mt-1" style={{ color: colors.text.disabled }}>
-                    escape to <button onClick={onEditCancel} className="underline" style={{ color: colors.text.link }}>cancel</button> · enter to <button onClick={saveFn} className="underline" style={{ color: colors.text.link }}>save</button>
+                    Escape to <button onClick={onEditCancel} className="underline" style={{ color: colors.text.link }}>cancel</button> · Enter to <button onClick={saveFn} className="underline" style={{ color: colors.text.link }}>save</button>
                   </div>
                 </div>
               ) : (
-                <div className="text-[15px] leading-[1.5] break-words whitespace-pre-wrap" style={{ color: colors.text.secondary }}>{renderText(message.content)}</div>
+                <div className="relative">
+                  <div className="text-[15px] leading-[1.5] break-words whitespace-pre-wrap overflow-hidden" style={{ color: colors.text.secondary, maxHeight: isLong && !expanded ? '300px' : 'none' }}>
+                    {renderText(message.content, onLinkClick)}
+                  </div>
+                  {isLong && !expanded && (
+                    <div className="pt-1">
+                      <button onClick={() => setExpanded(true)} className="flex items-center gap-1 text-[13px] font-medium hover:underline" style={{ color: colors.text.link }}>
+                        <ChevronDown className="w-3.5 h-3.5" /> Read more
+                      </button>
+                    </div>
+                  )}
+                  {isLong && expanded && (
+                    <div className="pt-1">
+                      <button onClick={() => setExpanded(false)} className="flex items-center gap-1 text-[13px] font-medium hover:underline" style={{ color: colors.text.link }}>
+                        <ChevronUp className="w-3.5 h-3.5" /> Show less
+                      </button>
+                    </div>
+                  )}
+                </div>
               )}
 
               {/* Attachments */}
-              {message.attachments?.length > 0 && (
+              {!isDeleted && message.attachments?.length > 0 && (
                 <div className="flex flex-wrap gap-2 mt-2">
                   {message.attachments.map((a, i) => {
-                    if (a.content_type?.startsWith('image/')) return <ProgressiveImage key={i} src={a.url} alt={a.filename} className="max-w-[400px] max-h-[280px] rounded-xl cursor-pointer hover:brightness-110 transition-all" style={{ border: `1px solid ${colors.border.default}` }} onClick={() => onImageClick?.(a.url, a.filename)} />;
+                    if (a.content_type?.startsWith('image/')) return <ImageWithFallback key={i} src={a.url} alt={a.filename || 'Uploaded image'} className="max-w-[400px] max-h-[280px] rounded-xl cursor-pointer hover:brightness-110 transition-all" style={{ border: `1px solid ${colors.border.default}` }} onClick={() => onImageClick?.(a.url, a.filename)} />;
                     if (a.content_type?.startsWith('video/')) return <video key={i} src={a.url} controls className="max-w-[400px] rounded-xl" style={{ border: `1px solid ${colors.border.default}` }} />;
                     if (a.content_type?.startsWith('audio/')) return <audio key={i} src={a.url} controls className="max-w-[300px]" />;
-                    return <a key={i} href={a.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-[13px] px-3 py-2 rounded-lg hover:bg-[rgba(255,255,255,0.04)]" style={{ color: colors.text.secondary, background: colors.bg.elevated }}>📎 {a.filename}</a>;
+                    return <a key={i} href={a.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-[13px] px-3 py-2 rounded-lg hover:bg-[rgba(255,255,255,0.04)]" style={{ color: colors.text.secondary, background: colors.bg.elevated }}>📎 {a.filename || 'File'}</a>;
                   })}
                 </div>
               )}
 
               {/* Reactions */}
-              {message.reactions?.length > 0 && (
+              {!isDeleted && message.reactions?.length > 0 && (
                 <div className="flex flex-wrap gap-1 mt-2">
                   {message.reactions.map((r, i) => {
                     const mine = r.users?.includes(currentUserId);
                     return (
-                      <button key={i} onClick={() => onReact(message, r.emoji)}
-                        className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[12px] transition-all k-reaction-pop"
-                        style={{
-                          background: mine ? colors.accent.subtle : colors.bg.elevated,
-                          color: mine ? colors.accent.primary : colors.text.muted,
-                          border: `1px solid ${mine ? colors.accent.muted : colors.border.default}`,
-                        }}>
-                        {r.emoji} <span className="font-medium">{r.count}</span>
-                      </button>
+                      <ReactionTooltip key={i} reaction={r}>
+                        <button onClick={() => onReact(message, r.emoji)}
+                          className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[12px] transition-all k-reaction-pop"
+                          style={{
+                            background: mine ? colors.accent.subtle : colors.bg.elevated,
+                            color: mine ? colors.accent.primary : colors.text.muted,
+                            border: `1px solid ${mine ? colors.accent.muted : colors.border.default}`,
+                          }}>
+                          {r.emoji} <span className="font-medium">{r.count}</span>
+                        </button>
+                      </ReactionTooltip>
                     );
                   })}
                 </div>
@@ -130,7 +163,7 @@ const MessageBubble = memo(function MessageBubble({ message, compact, isOwn, onR
           </div>
 
           {/* Hover action bar */}
-          {hovered && !isEditing && (
+          {hovered && !isEditing && !isDeleted && (
             <div className="absolute -top-4 right-4 flex items-center p-[3px] rounded-lg gap-[2px] z-10 k-scale-in"
               style={{ background: colors.bg.modal, boxShadow: shadows.medium, border: `1px solid ${colors.border.light}` }}>
               {quickEmojis.map(e => <button key={e} onClick={() => onReact(message, e)} className="w-7 h-7 flex items-center justify-center rounded-md text-sm hover:bg-[rgba(255,255,255,0.06)] transition-colors">{e}</button>)}
