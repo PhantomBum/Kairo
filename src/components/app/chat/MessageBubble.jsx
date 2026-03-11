@@ -198,9 +198,9 @@ const MessageBubble = memo(function MessageBubble({ message, compact, isOwn, onR
                   })}
                 </div>
               )}
-              </div>{/* end glass card */}
-            </div>{/* end flex row */}
-          </div>{/* end bubble wrapper */}
+              </div>
+            </div>
+          </div>
 
           {/* Hover action bar */}
           {hovered && !isEditing && !isDeleted && (
