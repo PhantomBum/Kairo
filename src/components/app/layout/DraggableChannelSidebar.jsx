@@ -3,7 +3,7 @@ import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { Hash, Volume2, Megaphone, Radio, MessageSquare, Lock, ChevronDown, Plus, Settings, GripVertical, LayoutGrid, ShieldAlert } from 'lucide-react';
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuSeparator, ContextMenuTrigger } from '@/components/ui/context-menu';
 import { base44 } from '@/api/base44Client';
-import { colors, shadows } from '@/components/app/design/tokens';
+import { colors, shadows, glass } from '@/components/app/design/tokens';
 import ServerBannerHeader from './ServerBannerHeader';
 
 const typeIcons = { text: Hash, voice: Volume2, announcement: Megaphone, stage: Radio, forum: MessageSquare, board: LayoutGrid };
@@ -17,12 +17,15 @@ function ChannelItem({ channel, active, onClick, onSettings, isOwner, index }) {
           <ContextMenu>
             <ContextMenuTrigger>
               <button onClick={() => onClick(channel)}
-                className="w-full flex items-center gap-2 px-2 py-[6px] rounded-md text-[14px] group"
+                className="w-full flex items-center gap-2.5 px-2.5 py-[7px] rounded-xl text-[13px] group"
                 style={{
-                  background: snapshot.isDragging ? colors.bg.overlay : active ? colors.accent.muted : 'transparent',
+                  ...(active ? glass.active : {}),
+                  background: snapshot.isDragging ? 'rgba(255,255,255,0.06)' : active ? 'rgba(139,92,246,0.1)' : 'transparent',
+                  border: active ? '1px solid rgba(139,92,246,0.18)' : '1px solid transparent',
                   color: active ? colors.text.primary : colors.text.muted,
                   fontWeight: active ? 600 : 400,
-                  transition: 'background 150ms cubic-bezier(0.4,0,0.2,1), color 150ms cubic-bezier(0.4,0,0.2,1)',
+                  boxShadow: active ? '0 0 12px rgba(139,92,246,0.08)' : 'none',
+                  transition: 'all 150ms cubic-bezier(0.4,0,0.2,1)',
                 }}>
                 {isOwner && <GripVertical className="w-3 h-3 opacity-0 group-hover:opacity-30 flex-shrink-0" />}
                 <Icon className="w-[18px] h-[18px] flex-shrink-0" style={{ color: active ? colors.accent.hover : colors.text.disabled, transition: 'color 150ms cubic-bezier(0.4,0,0.2,1)' }} />
@@ -62,10 +65,10 @@ function CategoryGroup({ category, channels, activeId, onSelect, onAdd, onSettin
       {(provided) => (
         <div ref={provided.innerRef} {...provided.draggableProps} className="mb-1">
           <div {...provided.dragHandleProps}>
-            <button onClick={() => setOpen(!open)} className="w-full flex items-center gap-1 px-0.5 pt-4 pb-1 group">
-              <ChevronDown className="w-3 h-3" style={{ color: colors.text.disabled, transform: open ? 'rotate(0deg)' : 'rotate(-90deg)', transition: 'transform 150ms cubic-bezier(0.4,0,0.2,1)' }} />
-              <span className="text-[11px] font-semibold uppercase tracking-[0.06em] flex-1 text-left truncate" style={{ color: colors.text.muted }}>{category.name}</span>
-              {isOwner && <Plus onClick={e => { e.stopPropagation(); onAdd(category.id); }} className="w-[14px] h-[14px] opacity-0 group-hover:opacity-60 hover:opacity-100 cursor-pointer transition-opacity" style={{ color: colors.text.muted }} />}
+            <button onClick={() => setOpen(!open)} className="w-full flex items-center gap-1.5 px-1 pt-4 pb-1.5 group">
+              <ChevronDown className="w-3 h-3" style={{ color: colors.text.disabled, transform: open ? 'rotate(0deg)' : 'rotate(-90deg)', transition: 'transform 200ms cubic-bezier(0,0,0.2,1)' }} />
+              <span className="text-[10px] font-bold uppercase tracking-[0.08em] flex-1 text-left truncate" style={{ color: colors.text.disabled, letterSpacing: '0.08em' }}>{category.name}</span>
+              {isOwner && <Plus onClick={e => { e.stopPropagation(); onAdd(category.id); }} className="w-[14px] h-[14px] opacity-0 group-hover:opacity-50 hover:opacity-100 cursor-pointer transition-opacity" style={{ color: colors.accent.hover }} />}
             </button>
           </div>
           <div style={{
