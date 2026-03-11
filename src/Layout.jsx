@@ -8,8 +8,10 @@ export default function Layout({ children }) {
   }, []);
 
   return (
-    <div className="min-h-screen" style={{ background: '#050505' }}>
+    <div className="min-h-screen" style={{ background: '#050505' }} lang="en">
       <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
         :root {
           --bg-deep: #050505;
           --bg-base: #0a0a0a;
@@ -74,7 +76,22 @@ export default function Layout({ children }) {
         .animate-fade-in { animation: fade-in 0.2s ease-out; }
         .animate-pulse-soft { animation: pulse-soft 2s ease-in-out infinite; }
         @media (prefers-reduced-motion: reduce) {
-          * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+          *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+        }
+        /* Focus visible for keyboard nav */
+        :focus-visible { outline: 2px solid var(--accent-blue); outline-offset: 2px; }
+        :focus:not(:focus-visible) { outline: none; }
+        /* Mobile safe area */
+        @supports (padding-bottom: env(safe-area-inset-bottom)) {
+          .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
+        }
+        /* Touch targets minimum */
+        @media (pointer: coarse) {
+          button, a, [role="button"] { min-height: 44px; min-width: 44px; }
+        }
+        /* High contrast mode */
+        @media (forced-colors: active) {
+          * { forced-color-adjust: auto; }
         }
       `}</style>
       {children}
