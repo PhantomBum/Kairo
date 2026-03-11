@@ -46,9 +46,10 @@ function MemberRow({ member, profile, isOwner, roleColor, onClick }) {
 export default function MemberPanel({ members, roles, ownerId, onProfileClick }) {
   const { getProfile } = useProfiles();
 
-  const enriched = useMemo(() => (members || []).map(m => ({
-    ...m, profile: getProfile(m.user_id) || getProfile(m.user_email),
-  })), [members, getProfile]);
+  const enriched = useMemo(() => (members || []).map(m => {
+    const p = getProfile(m.user_id) || getProfile(m.user_email);
+    return { ...m, profile: p || { status: 'offline', is_online: false } };
+  }), [members, getProfile]);
 
   const hoistedRoles = useMemo(() => (roles || []).filter(r => r.hoist && !r.is_default).sort((a,b) => (b.position||0) - (a.position||0)), [roles]);
 
