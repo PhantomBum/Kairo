@@ -412,6 +412,16 @@ export default function AppShell({ currentUser }) {
             onDelete={() => { if (activeChannel?.id === channelToEdit.id) setActiveChannel(null); }} />
         )}
       </AnimatePresence>
+
+      {/* Mobile bottom nav */}
+      <MobileNav active={mobileTab} badge={incomingReqs.length}
+        onChange={(tab) => {
+          setMobileTab(tab);
+          if (tab === 'servers') setShowMobileSidebar(true);
+          else if (tab === 'dms') { goHome(); setShowMobileSidebar(true); }
+          else if (tab === 'explore') setModal('join-server');
+          else if (tab === 'profile') setModal('settings');
+        }} />
     </div>
   );
 }
