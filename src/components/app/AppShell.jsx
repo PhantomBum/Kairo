@@ -107,10 +107,12 @@ export default function AppShell({ currentUser }) {
     const checkUrl = () => {
       const path = window.location.pathname + window.location.search;
       const inviteMatch = path.match(/[?&]code=([A-Za-z0-9]+)/);
-      // Also check hash-based routing
       const hashMatch = window.location.hash.match(/invite.*[?&]code=([A-Za-z0-9]+)/i);
       const foundCode = inviteMatch?.[1] || hashMatch?.[1];
-      if (foundCode && !inviteCode) setInviteCode(foundCode);
+      if (foundCode && !inviteCode) {
+        setInviteCode(foundCode);
+        setModal('invite-preview');
+      }
     };
     checkUrl();
   }, []);
