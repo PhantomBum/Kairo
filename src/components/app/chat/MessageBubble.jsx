@@ -9,10 +9,24 @@ import { colors, shadows } from '@/components/app/design/tokens';
 function ts(d) { return new Date(d).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }); }
 function fullTs(d) { return new Date(d).toLocaleString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit', second: '2-digit' }); }
 
+function isMediaUrl(url) {
+  if (!url) return null;
+  const lower = url.toLowerCase();
+  if (lower.match(/\.(gif)(\?|$)/)) return 'gif';
+  if (lower.match(/\.(mp4|webm|mov)(\?|$)/)) return 'video';
+  if (lower.match(/\.(png|jpg|jpeg|webp|avif|bmp)(\?|$)/)) return 'image';
+  if (lower.includes('tenor.com/') || lower.includes('giphy.com/')) return 'gif';
+  return null;
+}
+
 function renderText(text, onLinkClick) {
   if (!text) return null;
   return text.split(/(https?:\/\/[^\s]+|@everyone|@here|\*\*[^*]+\*\*|\*[^*]+\*|`[^`]+`)/g).map((p, i) => {
-    if (p.match(/^https?:\/\//)) return <a key={i} href={p} onClick={e => { if (onLinkClick) { e.preventDefault(); onLinkClick(p); } }} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:no-underline" style={{ color: colors.text.link, wordBreak: 'break-all' }}>{p}</a>;
+    if (p.match(/^https?:\/\//)) {
+      const mediaType = isMediaUrl(p);
+      if (mediaType === 'gif' || mediaType === 'image') return <img key={i} src={p} alt="embedded" className="max-w-[400px] max-h-[280px] rounded-xl mt-1" style={{ border: `1px solid ${colors.border.default}` }} loading="lazy" />;
+      return <a key={i} href={p} onClick={e => { if (onLinkClick) { e.preventDefault(); onLinkClick(p); } }} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:no-underline" style={{ color: colors.text.link, wordBreak: 'break-all' }}>{p}</a>;
+    }
     if (p === '@everyone' || p === '@here') return <span key={i} className="px-1 rounded" style={{ background: `${colors.info}20`, color: colors.info }}>{p}</span>;
     if (p.match(/^\*\*.*\*\*$/)) return <strong key={i}>{p.slice(2, -2)}</strong>;
     if (p.match(/^\*.*\*$/)) return <em key={i}>{p.slice(1, -1)}</em>;
