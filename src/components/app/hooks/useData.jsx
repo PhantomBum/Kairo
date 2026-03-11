@@ -64,12 +64,25 @@ export function useMessages(channelId) {
   const qc = useQueryClient();
   // Debounce invalidation to prevent duplicate real-time events
   const debounceRef = useRef(null);
+  // Track seen event IDs to prevent duplicate processing on reconnection
+  const seenEventsRef = useRef(new Set());
 
   useEffect(() => {
     if (!channelId) return;
+    // Reset seen events on channel change
+    seenEventsRef.current = new Set();
     const unsub = base44.entities.Message.subscribe((event) => {
       // Only invalidate if this event is for our channel
       if (event.data?.channel_id && event.data.channel_id !== channelId) return;
+      // Deduplicate events (handles reconnection replay)
+      const eventKey = `${event.type}_${event.id}_${event.data?.updated_date || event.data?.created_date || ''}`;
+      if (seenEventsRef.current.has(eventKey)) return;
+      seenEventsRef.current.add(eventKey);
+      // Keep seen set bounded
+      if (seenEventsRef.current.size > 500) {
+        const arr = [...seenEventsRef.current];
+        seenEventsRef.current = new Set(arr.slice(-250));
+      }
       if (debounceRef.current) clearTimeout(debounceRef.current);
       debounceRef.current = setTimeout(() => {
         qc.invalidateQueries({ queryKey: ['messages', channelId] });
@@ -95,11 +108,20 @@ export function useMessages(channelId) {
 export function useDMMessages(conversationId) {
   const qc = useQueryClient();
   const debounceRef = useRef(null);
+  const seenEventsRef = useRef(new Set());
 
   useEffect(() => {
     if (!conversationId) return;
+    seenEventsRef.current = new Set();
     const unsub = base44.entities.DirectMessage.subscribe((event) => {
       if (event.data?.conversation_id && event.data.conversation_id !== conversationId) return;
+      const eventKey = `${event.type}_${event.id}_${event.data?.updated_date || event.data?.created_date || ''}`;
+      if (seenEventsRef.current.has(eventKey)) return;
+      seenEventsRef.current.add(eventKey);
+      if (seenEventsRef.current.size > 500) {
+        const arr = [...seenEventsRef.current];
+        seenEventsRef.current = new Set(arr.slice(-250));
+      }
       if (debounceRef.current) clearTimeout(debounceRef.current);
       debounceRef.current = setTimeout(() => {
         qc.invalidateQueries({ queryKey: ['dmMessages', conversationId] });
@@ -125,22 +147,30 @@ export function useDMMessages(conversationId) {
 // ── Conversations with real-time sync (group name/icon updates) ──
 export function useConversations(userEmail, userId) {
   const qc = useQueryClient();
+  const debounceRef = useRef(null);
 
   useEffect(() => {
     if (!userEmail) return;
     const unsub = base44.entities.Conversation.subscribe(() => {
-      qc.invalidateQueries({ queryKey: ['conversations', userEmail] });
+      // Debounce to prevent rapid re-fetches when multiple events arrive
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+      debounceRef.current = setTimeout(() => {
+        qc.invalidateQueries({ queryKey: ['conversations', userEmail] });
+      }, 300);
     });
-    return unsub;
+    return () => { unsub(); if (debounceRef.current) clearTimeout(debounceRef.current); };
   }, [userEmail, qc]);
 
   // Also listen for new DMs to refresh conversation order
   useEffect(() => {
     if (!userEmail) return;
     const unsub = base44.entities.DirectMessage.subscribe(() => {
-      qc.invalidateQueries({ queryKey: ['conversations', userEmail] });
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+      debounceRef.current = setTimeout(() => {
+        qc.invalidateQueries({ queryKey: ['conversations', userEmail] });
+      }, 300);
     });
-    return unsub;
+    return () => { unsub(); if (debounceRef.current) clearTimeout(debounceRef.current); };
   }, [userEmail, qc]);
 
   return useQuery({
@@ -181,8 +211,11 @@ export function useFriendRequests(userId, userEmail) {
   useEffect(() => {
     if (!userId) return;
     const unsub = base44.entities.Friendship.subscribe(() => {
+      // Immediately invalidate both incoming and outgoing so requests show in real-time
       qc.invalidateQueries({ queryKey: ['incomingRequests', userId] });
       qc.invalidateQueries({ queryKey: ['outgoingRequests', userId] });
+      // Also refresh friends list in case a request was accepted
+      qc.invalidateQueries({ queryKey: ['friends', userId] });
     });
     return unsub;
   }, [userId, qc]);
@@ -194,13 +227,15 @@ export function useFriendRequests(userId, userEmail) {
       return all.filter(f => f.friend_id === userId || f.friend_email === userEmail);
     },
     enabled: !!userId,
-    staleTime: 15000,
+    staleTime: 5000, // Reduced from 15s for more responsive updates
+    refetchOnWindowFocus: true,
   });
   const outgoing = useQuery({
     queryKey: ['outgoingRequests', userId],
     queryFn: () => base44.entities.Friendship.filter({ user_id: userId, status: 'pending' }),
     enabled: !!userId,
-    staleTime: 15000,
+    staleTime: 5000,
+    refetchOnWindowFocus: true,
   });
   return { incoming: incoming.data || [], outgoing: outgoing.data || [] };
 }
@@ -213,6 +248,9 @@ export function useBlocked(userId) {
     if (!userId) return;
     const unsub = base44.entities.BlockedUser.subscribe(() => {
       qc.invalidateQueries({ queryKey: ['blocked', userId] });
+      // Also refresh conversations and friends when block list changes
+      qc.invalidateQueries({ queryKey: ['conversations'] });
+      qc.invalidateQueries({ queryKey: ['friends', userId] });
     });
     return unsub;
   }, [userId, qc]);
@@ -221,7 +259,7 @@ export function useBlocked(userId) {
     queryKey: ['blocked', userId],
     queryFn: () => base44.entities.BlockedUser.filter({ user_id: userId }),
     enabled: !!userId,
-    staleTime: 60000,
+    staleTime: 30000,
   });
 }
 
