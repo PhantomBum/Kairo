@@ -99,7 +99,7 @@ const MessageBubble = memo(function MessageBubble({ message, compact, isOwn, onR
             ) : (
               <button onClick={() => !isDeleted && onProfileClick?.(message.author_id)}
                 className="w-10 h-10 rounded-full flex items-center justify-center text-[14px] font-semibold flex-shrink-0 overflow-hidden hover:opacity-80 transition-opacity mt-0.5"
-                style={{ background: colors.bg.overlay, color: colors.text.muted }}>
+                style={{ background: `linear-gradient(135deg, ${colors.bg.overlay}, ${colors.bg.elevated})`, color: colors.text.muted }}>
                 {isDeleted ? '👻' : message.author_avatar ? <img src={message.author_avatar} className="w-full h-full object-cover" alt="" /> : authorName.charAt(0).toUpperCase()}
               </button>
             )}
@@ -134,7 +134,7 @@ const MessageBubble = memo(function MessageBubble({ message, compact, isOwn, onR
                 </div>
               ) : (
                 <div className="relative">
-                  <div className="text-[15px] leading-[1.375] whitespace-pre-wrap overflow-hidden" style={{ color: colors.text.secondary, maxHeight: isLong && !expanded ? '300px' : 'none', wordBreak: 'break-word', overflowWrap: 'anywhere', maxWidth: '100%' }}>
+                  <div className="text-[15px] leading-[1.45] whitespace-pre-wrap overflow-hidden" style={{ color: colors.text.secondary, maxHeight: isLong && !expanded ? '300px' : 'none', wordBreak: 'break-word', overflowWrap: 'anywhere', maxWidth: '100%' }}>
                     {renderText(message.content, onLinkClick)}
                   </div>
                   {isLong && !expanded && (
