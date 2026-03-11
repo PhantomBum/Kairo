@@ -102,6 +102,7 @@ export default function ChatInput({ channelName, replyTo, onCancelReply, onSend,
           onChange={e => { setContent(e.target.value); handleTyping(); }}
           onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
           placeholder={`Message ${channelName ? '#' + channelName : ''}`}
+          aria-label={`Message ${channelName || 'channel'}`}
           className="flex-1 bg-transparent text-[13px] outline-none resize-none max-h-32 placeholder:text-[var(--text-faint)]"
           style={{ color: 'var(--text-primary)' }} rows={1} />
         <button onClick={() => setShowEmoji(!showEmoji)} className="p-1 rounded-lg hover:bg-[var(--bg-glass-hover)] flex-shrink-0 mb-0.5">
