@@ -52,9 +52,9 @@ import Developers from './pages/Developers';
 import Elite from './pages/Elite';
 import FAQ from './pages/FAQ';
 import Kairo from './pages/Kairo';
+import Spaces from './pages/Spaces';
 import Status from './pages/Status';
 import Support from './pages/Support';
-import Spaces from './pages/Spaces';
 import __Layout from './Layout.jsx';
 
 
@@ -64,9 +64,9 @@ export const PAGES = {
     "Elite": Elite,
     "FAQ": FAQ,
     "Kairo": Kairo,
+    "Spaces": Spaces,
     "Status": Status,
     "Support": Support,
-    "Spaces": Spaces,
 }
 
 export const pagesConfig = {
