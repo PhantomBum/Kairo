@@ -117,9 +117,9 @@ export default function UserProfileModal({ onClose, profile, memberData, roles, 
         {/* Info */}
         <div className="px-4 pt-2 pb-1">
           <h3 className="text-xl font-bold" style={{ color: 'var(--text-cream)' }}>{profile.display_name || profile.username}</h3>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             {profile.username && <p className="text-[12px] font-mono" style={{ color: 'var(--text-secondary)' }}>@{profile.username}</p>}
-            {profile.pronouns && <span className="text-[10px] px-1.5 py-0.5 rounded-full" style={{ background: 'var(--bg-glass)', color: 'var(--text-muted)' }}>{profile.pronouns}</span>}
+            {profile.pronouns && <span className="text-[10px] px-1.5 py-0.5 rounded-full flex-shrink-0" style={{ background: 'var(--bg-glass)', color: 'var(--text-muted)' }}>{profile.pronouns}</span>}
           </div>
           <p className="text-[11px] mt-1 flex items-center gap-1" style={{ color: statusColors[profile.status || 'offline'] }}>
             {profile.custom_status?.emoji ? profile.custom_status.emoji + ' ' : ''}{profile.custom_status?.text || statusLabels[profile.status || 'offline']}
