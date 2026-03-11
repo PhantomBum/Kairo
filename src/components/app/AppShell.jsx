@@ -82,6 +82,7 @@ export default function AppShell({ currentUser }) {
   const { data: dmMessages = [], isLoading: dmLoading } = useDMMessages(activeConv?.id);
   const { data: conversations = [] } = useConversations(currentUser.email, currentUser.id);
   const { data: friends = [] } = useFriends(currentUser.id);
+  const { data: blockedUsers = [] } = useBlocked(currentUser.id);
   const { incoming: incomingReqs, outgoing: outgoingReqs } = useFriendRequests(currentUser.id, currentUser.email);
 
   useEffect(() => { if (activeServer && channels.length > 0 && !activeChannel) { const first = channels.find(c => c.type === 'text'); if (first) setActiveChannel(first); } }, [activeServer, channels]);
