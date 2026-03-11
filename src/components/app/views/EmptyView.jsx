@@ -1,5 +1,5 @@
 import React from 'react';
-import { Plus, Compass, Bot, Crown, HelpCircle, MessageSquare, Zap } from 'lucide-react';
+import { Plus, Compass, Bot, Crown, HelpCircle, MessageSquare, Zap, Hash } from 'lucide-react';
 import { createPageUrl } from '@/utils';
 import { colors, shadows, radius } from '@/components/app/design/tokens';
 
@@ -10,8 +10,30 @@ function getGreeting() {
   return { text: 'Good evening', emoji: '🌙' };
 }
 
-export default function EmptyView({ onCreateServer, onJoinServer }) {
+export default function EmptyView({ onCreateServer, onJoinServer, emptyServer, serverName, onCreateChannel }) {
   const greeting = getGreeting();
+
+  if (emptyServer) {
+    return (
+      <div className="flex-1 flex items-center justify-center p-8">
+        <div className="text-center max-w-sm k-fade-in">
+          <div className="w-16 h-16 rounded-2xl mx-auto mb-6 flex items-center justify-center" style={{ background: colors.accent.subtle }}>
+            <Hash className="w-8 h-8" style={{ color: colors.accent.primary }} />
+          </div>
+          <h2 className="text-[24px] font-bold mb-2 tracking-tight" style={{ color: colors.text.primary }}>No channels yet</h2>
+          <p className="text-[14px] mb-6" style={{ color: colors.text.muted }}>
+            {serverName || 'This server'} doesn't have any channels yet. Create one to start chatting.
+          </p>
+          {onCreateChannel && (
+            <button onClick={onCreateChannel} className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-[14px] font-semibold transition-all hover:brightness-110"
+              style={{ background: colors.accent.primary, color: '#fff' }}>
+              <Plus className="w-4 h-4" /> Create Channel
+            </button>
+          )}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex-1 flex items-center justify-center p-8 relative overflow-hidden">
@@ -33,7 +55,7 @@ export default function EmptyView({ onCreateServer, onJoinServer }) {
         <p className="text-[15px] mb-10" style={{ color: colors.text.muted }}>Your conversations, communities, and creativity — all in one place.</p>
 
         {/* Primary actions */}
-        <div className="flex gap-3 justify-center">
+        <div className="flex gap-3 justify-center flex-wrap">
           <button onClick={onCreateServer} className="flex items-center gap-2.5 px-6 py-3 rounded-xl text-[15px] font-semibold transition-all hover:brightness-110 hover:scale-[1.02]"
             style={{ background: colors.accent.primary, color: '#fff', boxShadow: shadows.glow }}>
             <Plus className="w-5 h-5" /> Create Server
@@ -45,7 +67,7 @@ export default function EmptyView({ onCreateServer, onJoinServer }) {
         </div>
 
         {/* Quick links */}
-        <div className="flex gap-2 justify-center mt-8">
+        <div className="flex gap-2 justify-center mt-8 flex-wrap">
           {[
             { href: createPageUrl('BotMarketplace'), icon: Bot, label: 'Bots', color: colors.text.muted },
             { href: createPageUrl('Elite'), icon: Crown, label: 'Elite', color: colors.warning },
