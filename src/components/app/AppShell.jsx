@@ -122,25 +122,31 @@ export default function AppShell({ currentUser }) {
   });
 
   const sendMsg = useMutation({
-    mutationFn: async ({ content, attachments, replyToId, replyPreview }) => base44.entities.Message.create({
-      channel_id: activeChannel.id, server_id: activeServer.id, author_id: currentUser.id,
-      author_name: profile?.display_name || currentUser.full_name, author_avatar: profile?.avatar_url,
-      author_badges: profile?.badges || [], content, attachments,
-      type: replyToId ? 'reply' : 'default', reply_to_id: replyToId, reply_preview: replyPreview,
-    }),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['messages', activeChannel?.id] }); setReplyTo(null); },
+    mutationFn: async ({ content, attachments, replyToId, replyPreview, _tempId }) => {
+      const msg = await base44.entities.Message.create({
+        channel_id: activeChannel.id, server_id: activeServer.id, author_id: currentUser.id,
+        author_name: profile?.display_name || currentUser.full_name, author_avatar: profile?.avatar_url,
+        author_badges: profile?.badges || [], content, attachments,
+        type: replyToId ? 'reply' : 'default', reply_to_id: replyToId, reply_preview: replyPreview,
+      });
+      return { msg, _tempId };
+    },
+    onSuccess: ({ _tempId }) => { if (_tempId) confirmOptimistic(_tempId); qc.invalidateQueries({ queryKey: ['messages', activeChannel?.id] }); setReplyTo(null); },
+    onError: (_, vars) => { if (vars._tempId) revertOptimistic(vars._tempId); },
   });
 
   const sendDM = useMutation({
-    mutationFn: async ({ content, attachments, replyToId }) => {
+    mutationFn: async ({ content, attachments, replyToId, _tempId }) => {
       await base44.entities.Conversation.update(activeConv.id, { last_message_at: new Date().toISOString(), last_message_preview: content?.slice(0, 50) });
-      return base44.entities.DirectMessage.create({
+      const msg = await base44.entities.DirectMessage.create({
         conversation_id: activeConv.id, author_id: currentUser.id,
         author_name: profile?.display_name || currentUser.full_name, author_avatar: profile?.avatar_url,
         content, attachments, type: replyToId ? 'reply' : 'default', reply_to_id: replyToId,
       });
+      return { msg, _tempId };
     },
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['dmMessages', activeConv?.id] }); qc.invalidateQueries({ queryKey: ['conversations'] }); setReplyTo(null); },
+    onSuccess: ({ _tempId }) => { if (_tempId) confirmOptimistic(_tempId); qc.invalidateQueries({ queryKey: ['dmMessages', activeConv?.id] }); qc.invalidateQueries({ queryKey: ['conversations'] }); setReplyTo(null); },
+    onError: (_, vars) => { if (vars._tempId) revertOptimistic(vars._tempId); },
   });
 
   const createChannel = useMutation({
