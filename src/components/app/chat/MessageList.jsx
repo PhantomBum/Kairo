@@ -1,6 +1,8 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { ArrowDown, Hash, MessageSquare } from 'lucide-react';
+import { AnimatePresence } from 'framer-motion';
 import MessageBubble from '@/components/app/chat/MessageBubble';
+import ImageLightbox from '@/components/app/chat/ImageLightbox';
 
 function dateDivider(d) {
   const date = new Date(d);
@@ -11,10 +13,11 @@ function dateDivider(d) {
   return date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
 }
 
-export default function MessageList({ messages, currentUserId, channelName, isLoading, isDM, onReply, onEdit, onDelete, onReact, onProfileClick, editingMessage, onEditSave, onEditCancel }) {
+export default function MessageList({ messages, currentUserId, channelName, isLoading, isDM, onReply, onEdit, onDelete, onReact, onPin, onProfileClick, editingMessage, onEditSave, onEditCancel }) {
   const bottomRef = useRef(null);
   const containerRef = useRef(null);
   const [atBottom, setAtBottom] = useState(true);
+  const [lightbox, setLightbox] = useState(null);
 
   useEffect(() => {
     if (atBottom) bottomRef.current?.scrollIntoView({ behavior: 'auto' });
@@ -76,9 +79,10 @@ export default function MessageList({ messages, currentUserId, channelName, isLo
               {divider}
               <MessageBubble
                 message={msg} compact={!divider && compact} isOwn={msg.author_id === currentUserId}
-                onReply={onReply} onEdit={onEdit} onDelete={onDelete} onReact={onReact}
+                onReply={onReply} onEdit={onEdit} onDelete={onDelete} onReact={onReact} onPin={onPin}
                 currentUserId={currentUserId} onProfileClick={onProfileClick}
                 isEditing={editingMessage?.id === msg.id} onEditSave={onEditSave} onEditCancel={onEditCancel}
+                onImageClick={(src, name) => setLightbox({ src, name })}
               />
             </React.Fragment>
           );
@@ -94,6 +98,11 @@ export default function MessageList({ messages, currentUserId, channelName, isLo
           <span className="text-xs" style={{ color: 'var(--text-muted)' }}>New messages</span>
         </button>
       )}
+
+      {/* Image lightbox */}
+      <AnimatePresence>
+        {lightbox && <ImageLightbox src={lightbox.src} filename={lightbox.name} onClose={() => setLightbox(null)} />}
+      </AnimatePresence>
     </div>
   );
 }

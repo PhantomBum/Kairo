@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { Reply, Smile, Pencil, Trash2, Copy, MoreHorizontal } from 'lucide-react';
+import { Reply, Pencil, Trash2, Copy, Pin, PinOff, Forward } from 'lucide-react';
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuSeparator, ContextMenuTrigger } from '@/components/ui/context-menu';
 
 function formatTime(d) { return new Date(d).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }); }
 
-export default function MessageBubble({ message, compact, isOwn, onReply, onEdit, onDelete, onReact, currentUserId, onProfileClick, isEditing, onEditSave, onEditCancel }) {
+export default function MessageBubble({ message, compact, isOwn, onReply, onEdit, onDelete, onReact, onPin, currentUserId, onProfileClick, isEditing, onEditSave, onEditCancel, onImageClick }) {
   const [hovered, setHovered] = useState(false);
   const [editContent, setEditContent] = useState(message.content || '');
   const quickEmojis = ['👍', '❤️', '😂', '🔥', '👀'];
@@ -14,11 +14,33 @@ export default function MessageBubble({ message, compact, isOwn, onReply, onEdit
     else onEditCancel();
   };
 
+  const renderContent = (text) => {
+    if (!text) return null;
+    // Parse URLs, mentions, bold, italic
+    const parts = text.split(/(https?:\/\/[^\s]+|@everyone|@here|\*\*[^*]+\*\*|\*[^*]+\*|`[^`]+`)/g);
+    return parts.map((part, i) => {
+      if (part.match(/^https?:\/\//)) return <a key={i} href={part} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline break-all">{part}</a>;
+      if (part === '@everyone' || part === '@here') return <span key={i} className="px-1 rounded" style={{ background: 'rgba(99,102,241,0.15)', color: '#818cf8' }}>{part}</span>;
+      if (part.match(/^\*\*.*\*\*$/)) return <strong key={i}>{part.slice(2, -2)}</strong>;
+      if (part.match(/^\*.*\*$/)) return <em key={i}>{part.slice(1, -1)}</em>;
+      if (part.match(/^`.*`$/)) return <code key={i} className="px-1 py-0.5 rounded text-[12px]" style={{ background: 'var(--bg-tertiary)', color: '#e879f9' }}>{part.slice(1, -1)}</code>;
+      return part;
+    });
+  };
+
   return (
     <ContextMenu>
       <ContextMenuTrigger>
         <div className="relative group" onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}
-          style={{ padding: compact ? '1px 16px' : '6px 16px', background: hovered ? 'rgba(255,255,255,0.015)' : 'transparent' }}>
+          style={{ padding: compact ? '1px 16px' : '6px 16px', background: hovered ? 'rgba(255,255,255,0.015)' : message.is_pinned ? 'rgba(234,179,8,0.03)' : 'transparent' }}>
+
+          {/* Pin indicator */}
+          {message.is_pinned && !compact && (
+            <div className="flex items-center gap-1 ml-[52px] mb-0.5">
+              <Pin className="w-2.5 h-2.5 text-amber-500" />
+              <span className="text-[10px] text-amber-500/70">Pinned</span>
+            </div>
+          )}
 
           {/* Reply line */}
           {message.reply_preview && (
@@ -53,6 +75,9 @@ export default function MessageBubble({ message, compact, isOwn, onReply, onEdit
                     onClick={() => onProfileClick?.(message.author_id)}>
                     {message.author_name || 'User'}
                   </span>
+                  {/* Badges */}
+                  {message.author_badges?.includes('owner') && <span className="text-[9px] px-1 rounded bg-amber-500/20 text-amber-400">OWNER</span>}
+                  {message.author_badges?.includes('admin') && <span className="text-[9px] px-1 rounded bg-blue-500/20 text-blue-400">ADMIN</span>}
                   <span className="text-[10px] tabular-nums" style={{ color: 'var(--text-muted)' }}>{formatTime(message.created_date)}</span>
                   {message.is_edited && <span className="text-[9px] italic" style={{ color: 'var(--text-muted)' }}>(edited)</span>}
                 </div>
@@ -71,23 +96,33 @@ export default function MessageBubble({ message, compact, isOwn, onReply, onEdit
                 </div>
               ) : (
                 <div className="text-[13px] leading-relaxed break-words whitespace-pre-wrap" style={{ color: 'var(--text-primary)' }}>
-                  {message.content}
+                  {renderContent(message.content)}
                 </div>
               )}
 
               {/* Attachments */}
               {message.attachments?.length > 0 && (
                 <div className="flex flex-wrap gap-2 mt-2">
-                  {message.attachments.map((a, i) =>
-                    a.content_type?.startsWith('image/') ? (
-                      <img key={i} src={a.url} className="max-w-[400px] max-h-[280px] rounded-lg object-cover" />
-                    ) : (
+                  {message.attachments.map((a, i) => {
+                    if (a.content_type?.startsWith('image/')) {
+                      return <img key={i} src={a.url} className="max-w-[400px] max-h-[280px] rounded-lg object-cover cursor-pointer hover:brightness-110 transition-all"
+                        onClick={() => onImageClick?.(a.url, a.filename)} />;
+                    }
+                    if (a.content_type?.startsWith('video/')) {
+                      return <video key={i} src={a.url} controls className="max-w-[400px] max-h-[280px] rounded-lg" />;
+                    }
+                    if (a.content_type?.startsWith('audio/')) {
+                      return <audio key={i} src={a.url} controls className="max-w-[300px]" />;
+                    }
+                    return (
                       <a key={i} href={a.url} target="_blank" rel="noopener noreferrer"
-                        className="text-xs px-3 py-2 rounded-lg" style={{ background: 'var(--bg)', color: 'var(--text-secondary)', border: '1px solid var(--border)' }}>
+                        className="flex items-center gap-2 text-xs px-3 py-2 rounded-lg hover:brightness-110"
+                        style={{ background: 'var(--bg)', color: 'var(--text-secondary)', border: '1px solid var(--border)' }}>
                         📎 {a.filename}
+                        {a.size && <span style={{ color: 'var(--text-muted)' }}>({(a.size / 1024).toFixed(0)}KB)</span>}
                       </a>
-                    )
-                  )}
+                    );
+                  })}
                 </div>
               )}
 
@@ -96,7 +131,7 @@ export default function MessageBubble({ message, compact, isOwn, onReply, onEdit
                 <div className="flex flex-wrap gap-1 mt-1.5">
                   {message.reactions.map((r, i) => (
                     <button key={i} onClick={() => onReact(message, r.emoji)}
-                      className="flex items-center gap-1 px-2 py-0.5 rounded text-[11px]"
+                      className="flex items-center gap-1 px-2 py-0.5 rounded text-[11px] transition-colors"
                       style={{
                         background: r.users?.includes(currentUserId) ? 'rgba(99,102,241,0.15)' : 'var(--bg)',
                         color: r.users?.includes(currentUserId) ? '#818cf8' : 'var(--text-muted)',
@@ -119,13 +154,23 @@ export default function MessageBubble({ message, compact, isOwn, onReply, onEdit
                   className="w-7 h-7 flex items-center justify-center rounded text-sm hover:bg-[var(--bg-hover)]">{e}</button>
               ))}
               <div className="w-px h-5 mx-0.5" style={{ background: 'var(--border)' }} />
-              <button onClick={() => onReply(message)} className="w-7 h-7 flex items-center justify-center rounded hover:bg-[var(--bg-hover)]">
+              <button onClick={() => onReply(message)} className="w-7 h-7 flex items-center justify-center rounded hover:bg-[var(--bg-hover)]" title="Reply">
                 <Reply className="w-3.5 h-3.5" style={{ color: 'var(--text-muted)' }} />
               </button>
-              {isOwn && (
-                <button onClick={() => onEdit(message)} className="w-7 h-7 flex items-center justify-center rounded hover:bg-[var(--bg-hover)]">
-                  <Pencil className="w-3 h-3" style={{ color: 'var(--text-muted)' }} />
+              {onPin && (
+                <button onClick={() => onPin(message)} className="w-7 h-7 flex items-center justify-center rounded hover:bg-[var(--bg-hover)]" title={message.is_pinned ? 'Unpin' : 'Pin'}>
+                  {message.is_pinned ? <PinOff className="w-3 h-3 text-amber-500" /> : <Pin className="w-3 h-3" style={{ color: 'var(--text-muted)' }} />}
                 </button>
+              )}
+              {isOwn && (
+                <>
+                  <button onClick={() => onEdit(message)} className="w-7 h-7 flex items-center justify-center rounded hover:bg-[var(--bg-hover)]" title="Edit">
+                    <Pencil className="w-3 h-3" style={{ color: 'var(--text-muted)' }} />
+                  </button>
+                  <button onClick={() => onDelete(message)} className="w-7 h-7 flex items-center justify-center rounded hover:bg-[var(--bg-hover)]" title="Delete">
+                    <Trash2 className="w-3 h-3 text-red-400" />
+                  </button>
+                </>
               )}
             </div>
           )}
@@ -137,8 +182,13 @@ export default function MessageBubble({ message, compact, isOwn, onReply, onEdit
           <Reply className="w-3.5 h-3.5 opacity-60" /> Reply
         </ContextMenuItem>
         <ContextMenuItem onClick={() => navigator.clipboard.writeText(message.content)} className="text-[12px] gap-2.5 rounded px-2.5 py-1.5" style={{ color: 'var(--text-secondary)' }}>
-          <Copy className="w-3.5 h-3.5 opacity-60" /> Copy
+          <Copy className="w-3.5 h-3.5 opacity-60" /> Copy Text
         </ContextMenuItem>
+        {onPin && (
+          <ContextMenuItem onClick={() => onPin(message)} className="text-[12px] gap-2.5 rounded px-2.5 py-1.5" style={{ color: 'var(--text-secondary)' }}>
+            <Pin className="w-3.5 h-3.5 opacity-60" /> {message.is_pinned ? 'Unpin' : 'Pin Message'}
+          </ContextMenuItem>
+        )}
         {isOwn && (
           <>
             <ContextMenuSeparator style={{ background: 'var(--border)' }} />
