@@ -367,7 +367,8 @@ export default function AppShell({ currentUser }) {
             <ChatHeader channel={activeChannel} conversation={activeConv} currentUserId={currentUser.id}
               showMembers={showMembers} onToggleMembers={() => setShowMembers(!showMembers)}
               isDM={isDM} onPinned={() => setModal('pinned')} pinnedCount={pinnedCount}
-              onMediaGallery={isDM ? () => setShowMediaGallery(!showMediaGallery) : undefined} />
+              onMediaGallery={isDM ? () => setShowMediaGallery(!showMediaGallery) : undefined}
+              serverName={activeServer?.name} />
             <div className="flex-1 flex min-h-0">
               <div className="flex-1 flex flex-col min-w-0">
                 <VirtualMessageList messages={currentMsgs} currentUserId={currentUser.id} channelName={channelLabel}
@@ -376,7 +377,11 @@ export default function AppShell({ currentUser }) {
                   onProfileClick={(id) => { setProfileUserId(id); setModal('profile'); }}
                   editingMessage={editingMsg} onEditSave={editMsg} onEditCancel={() => setEditingMsg(null)}
                   optimisticIds={optimisticIds} />
-                <ChatInput channelName={channelLabel} replyTo={replyTo} onCancelReply={() => setReplyTo(null)} onSend={handleSend} />
+                <ChatInput channelName={channelLabel} replyTo={replyTo} onCancelReply={() => setReplyTo(null)} onSend={handleSend}
+                  onEditLast={() => {
+                    const myMsgs = currentMsgs.filter(m => m.author_id === currentUser.id && !m.is_deleted);
+                    if (myMsgs.length > 0) setEditingMsg(myMsgs[myMsgs.length - 1]);
+                  }} />
               </div>
               {view === 'server' && showMembers && <MemberPanel members={members} roles={roles} ownerId={activeServer?.owner_id} onProfileClick={(id) => { setProfileUserId(id); setModal('profile'); }} />}
               {isDM && showMediaGallery && <DMMediaGallery messages={currentMsgs} onClose={() => setShowMediaGallery(false)} />}
