@@ -143,25 +143,25 @@ export default function ServerSettingsModal({ onClose, server, currentUserId }) 
                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity"><span className="text-[8px] text-white">Edit</span></div>
               </button>
               <div className="flex-1 space-y-3">
-                <div><Lbl>Name</Lbl><Inp value={name} onChange={e => setName(e.target.value)} /></div>
+                <div><ServerLabel>Name</ServerLabel><ServerInput value={name} onChange={e => setName(e.target.value)} /></div>
               </div>
             </div>
-            <div><Lbl>Description</Lbl><textarea value={desc} onChange={e => setDesc(e.target.value)} rows={3} className="w-full px-3 py-2 rounded-xl text-sm outline-none resize-none" style={{ background: 'var(--bg-glass)', color: 'var(--text-primary)', border: '1px solid var(--border)' }} /></div>
+            <div><ServerLabel>Description</ServerLabel><textarea value={desc} onChange={e => setDesc(e.target.value)} rows={3} className="w-full px-3 py-2 rounded-xl text-sm outline-none resize-none" style={{ background: 'var(--bg-glass)', color: 'var(--text-primary)', border: '1px solid var(--border)' }} /></div>
             <button onClick={() => uploadImg('banner_url')} className="w-full h-20 rounded-xl overflow-hidden" style={{ background: 'var(--bg-glass)', border: '1px dashed var(--border-light)' }}>
               {server?.banner_url ? <img src={server.banner_url} className="w-full h-full object-cover" /> : <div className="flex items-center justify-center h-full text-[11px]" style={{ color: 'var(--text-muted)' }}>Upload Banner</div>}
             </button>
             <Toggle on={isPublic} onToggle={() => setIsPublic(!isPublic)} label="Public Server (discoverable)" />
-            <div><Lbl>Default Notifications</Lbl>
+            <div><ServerLabel>Default Notifications</ServerLabel>
               <select value={serverSettings.default_notifications || 'all'} onChange={e => setServerSettings(s => ({ ...s, default_notifications: e.target.value }))} className="w-full px-3 py-2 rounded-xl text-sm outline-none" style={{ background: 'var(--bg-glass)', color: 'var(--text-primary)', border: '1px solid var(--border)' }}>
                 <option value="all">All Messages</option><option value="mentions">Mentions Only</option><option value="none">Nothing</option>
               </select>
             </div>
-            <div><Lbl>Verification Level</Lbl>
+            <div><ServerLabel>Verification Level</ServerLabel>
               <select value={serverSettings.verification_level || 'none'} onChange={e => setServerSettings(s => ({ ...s, verification_level: e.target.value }))} className="w-full px-3 py-2 rounded-xl text-sm outline-none" style={{ background: 'var(--bg-glass)', color: 'var(--text-primary)', border: '1px solid var(--border)' }}>
                 <option value="none">None</option><option value="low">Low (verified email)</option><option value="medium">Medium (5 min wait)</option><option value="high">High (10 min + server member)</option>
               </select>
             </div>
-            <div><Lbl>Content Filter</Lbl>
+            <div><ServerLabel>Content Filter</ServerLabel>
               <select value={serverSettings.content_filter || 'disabled'} onChange={e => setServerSettings(s => ({ ...s, content_filter: e.target.value }))} className="w-full px-3 py-2 rounded-xl text-sm outline-none" style={{ background: 'var(--bg-glass)', color: 'var(--text-primary)', border: '1px solid var(--border)' }}>
                 <option value="disabled">Disabled</option><option value="members_without_roles">Scan unverified members</option><option value="all_members">Scan all</option>
               </select>
@@ -170,7 +170,7 @@ export default function ServerSettingsModal({ onClose, server, currentUserId }) 
           </>}
 
           {tab === 'appearance' && <>
-            <div><Lbl>Banner Color</Lbl>
+            <div><ServerLabel>Banner Color</ServerLabel>
               <div className="flex gap-2 items-center">
                 <input type="color" value={bannerColor} onChange={e => setBannerColor(e.target.value)} className="w-10 h-10 rounded-xl cursor-pointer" style={{ background: 'var(--bg-glass)', border: '1px solid var(--border)' }} />
                 <span className="text-sm font-mono" style={{ color: 'var(--text-secondary)' }}>{bannerColor}</span>
@@ -184,7 +184,7 @@ export default function ServerSettingsModal({ onClose, server, currentUserId }) 
 
           {tab === 'roles' && <>
             <div className="flex gap-2">
-              <Inp value={newRole} onChange={e => setNewRole(e.target.value)} placeholder="Role name" />
+              <ServerInput value={newRole} onChange={e => setNewRole(e.target.value)} placeholder="Role name" />
               <input type="color" value={newRoleColor} onChange={e => setNewRoleColor(e.target.value)} className="w-10 h-10 rounded-xl cursor-pointer flex-shrink-0" style={{ background: 'var(--bg-glass)', border: '1px solid var(--border)' }} />
               <button onClick={addRole} className="px-4 rounded-xl flex-shrink-0" style={{ background: 'var(--text-cream)', color: 'var(--bg-deep)' }}><Plus className="w-4 h-4" /></button>
             </div>
@@ -200,7 +200,7 @@ export default function ServerSettingsModal({ onClose, server, currentUserId }) 
                     <div className="px-3 pb-3 space-y-2" style={{ borderTop: '1px solid var(--border)' }}>
                       <div className="flex gap-2 mt-2">
                         <input type="color" value={r.color} onChange={e => updateRole(r.id, { color: e.target.value })} className="w-8 h-8 rounded-lg cursor-pointer" style={{ background: 'var(--bg-glass)', border: '1px solid var(--border)' }} />
-                        <Inp value={r.name} onChange={e => updateRole(r.id, { name: e.target.value })} />
+                        <ServerInput value={r.name} onChange={e => updateRole(r.id, { name: e.target.value })} />
                       </div>
                       <Toggle on={r.hoist} onToggle={() => updateRole(r.id, { hoist: !r.hoist })} label="Display separately in member list" />
                       <Toggle on={r.mentionable} onToggle={() => updateRole(r.id, { mentionable: !r.mentionable })} label="Allow anyone to mention this role" />
