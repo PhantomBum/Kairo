@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { ProfileProvider } from '@/components/app/providers/ProfileProvider';
+import ErrorBoundary from '@/components/app/shared/ErrorBoundary';
 import AppShell from '@/components/app/AppShell';
 import { colors } from '@/components/app/design/tokens';
 
@@ -60,8 +61,10 @@ function KairoInner() {
 
 export default function Kairo() {
   return (
-    <ProfileProvider>
-      <KairoInner />
-    </ProfileProvider>
+    <ErrorBoundary>
+      <ProfileProvider>
+        <KairoInner />
+      </ProfileProvider>
+    </ErrorBoundary>
   );
 }
