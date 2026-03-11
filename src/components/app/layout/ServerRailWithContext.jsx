@@ -74,10 +74,7 @@ export default function ServerRailWithContext({ servers, activeServerId, onServe
       <ContextMenu>
         <ContextMenuTrigger>
           <div><RailIcon active={isHome} onClick={onHomeClick} tooltip="Direct Messages" badge={badge}>
-            <svg width="28" height="20" viewBox="0 0 28 20" fill="none">
-              <path d="M23.02 1.17C21.29 0.37 19.43 -0.12 17.5 0.03C13.5 0.34 10.32 3.13 9.56 6.81C9.46 7.25 9.4 7.72 9.38 8.19C9.38 8.19 3.67 7.28 1.35 11.45C-0.33 14.48 0.53 18.32 3.36 20.42C3.36 20.42 2.9 17.66 4.66 15.55C5.87 14.1 7.82 13.5 9.69 13.88C10.06 15.09 10.71 16.22 11.62 17.15C13.32 18.87 15.69 19.69 18.05 19.37C21.26 18.94 23.7 16.32 24.02 13.08C24.24 10.92 23.51 8.86 22.05 7.37L22.05 7.37C24.76 7.01 26.97 4.94 27.44 2.18L23.02 1.17Z"
-                fill={isHome ? colors.text.primary : colors.text.muted} />
-            </svg>
+            <Home className="w-6 h-6" style={{ color: isHome ? colors.text.primary : colors.text.muted }} />
           </RailIcon></div>
         </ContextMenuTrigger>
         <ContextMenuContent className="w-52 p-1.5 rounded-lg" style={{ background: colors.bg.modal, border: `1px solid ${colors.border.light}`, boxShadow: shadows.strong }}>
