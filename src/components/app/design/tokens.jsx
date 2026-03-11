@@ -106,6 +106,7 @@ export const animation = {
 };
 
 // CSS custom properties string to inject
+// Includes backwards-compatible aliases for old variable names
 export const cssVariables = `
   --k-bg-base: ${colors.bg.base};
   --k-bg-surface: ${colors.bg.surface};
@@ -143,4 +144,41 @@ export const cssVariables = `
   --k-radius-lg: ${radius.lg};
   --k-radius-xl: ${radius.xl};
   --k-radius-pill: ${radius.pill};
+
+  /* Backwards-compatible aliases for legacy components */
+  --bg-deep: ${colors.bg.base};
+  --bg-base: ${colors.bg.base};
+  --bg-surface: ${colors.bg.surface};
+  --bg-elevated: ${colors.bg.elevated};
+  --bg-overlay: ${colors.bg.overlay};
+  --bg-glass: rgba(255,255,255,0.03);
+  --bg-glass-hover: rgba(255,255,255,0.05);
+  --bg-glass-active: rgba(255,255,255,0.07);
+  --bg-glass-strong: rgba(255,255,255,0.08);
+  --text-cream: ${colors.text.primary};
+  --text-primary: ${colors.text.primary};
+  --text-secondary: ${colors.text.secondary};
+  --text-muted: ${colors.text.muted};
+  --text-faint: ${colors.text.disabled};
+  --accent: ${colors.accent.primary};
+  --accent-warm: ${colors.warning};
+  --accent-blue: ${colors.info};
+  --accent-green: ${colors.success};
+  --accent-red: ${colors.danger};
+  --accent-purple: ${colors.accent.primary};
+  --accent-amber: ${colors.warning};
+  --accent-glow: ${colors.accent.subtle};
+  --border: ${colors.border.default};
+  --border-light: ${colors.border.light};
+  --border-glow: ${colors.border.strong};
+  --glass-blur: 20px;
+  --radius-sm: ${radius.sm};
+  --radius-md: ${radius.md};
+  --radius-lg: ${radius.lg};
+  --radius-xl: ${radius.xl};
+  --radius-full: ${radius.pill};
+  --shadow-sm: ${shadows.subtle};
+  --shadow-md: ${shadows.medium};
+  --shadow-lg: ${shadows.strong};
+  --shadow-glow: ${shadows.glow};
 `;
