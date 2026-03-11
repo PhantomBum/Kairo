@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Search, Users, Plus, MessageSquare } from 'lucide-react';
+import { Search, Users, Plus, MessageSquare, Volume2, BellOff, Trash2, Copy } from 'lucide-react';
+import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuSeparator, ContextMenuTrigger } from '@/components/ui/context-menu';
 
 export default function DMSidebar({ conversations, activeId, onSelect, onFriends, onCreateGroup, currentUserId }) {
   const [search, setSearch] = useState('');
@@ -19,7 +20,6 @@ export default function DMSidebar({ conversations, activeId, onSelect, onFriends
 
   return (
     <div className="flex-1 flex flex-col min-h-0">
-      {/* Header */}
       <div className="h-12 px-3 flex items-center flex-shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
         <div className="flex-1 flex items-center gap-2 px-2.5 py-1.5 rounded-lg" style={{ background: 'var(--bg-glass)', border: '1px solid var(--border)' }}>
           <Search className="w-3.5 h-3.5" style={{ color: 'var(--text-muted)' }} />
@@ -27,7 +27,6 @@ export default function DMSidebar({ conversations, activeId, onSelect, onFriends
             className="flex-1 bg-transparent text-xs outline-none placeholder:text-[var(--text-faint)]" style={{ color: 'var(--text-primary)' }} />
         </div>
       </div>
-      {/* Actions */}
       <div className="p-2 space-y-px">
         <button onClick={onFriends} className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-[13px] transition-colors hover:bg-[var(--bg-glass-hover)]"
           style={{ color: 'var(--text-secondary)' }}>
@@ -38,31 +37,45 @@ export default function DMSidebar({ conversations, activeId, onSelect, onFriends
           <Plus className="w-4 h-4 opacity-50" /> New Group
         </button>
       </div>
-      {/* Label */}
       <div className="px-3 py-1">
         <span className="text-[10px] font-semibold uppercase tracking-[0.08em]" style={{ color: 'var(--text-muted)' }}>Direct Messages</span>
       </div>
-      {/* List */}
       <div className="flex-1 overflow-y-auto scrollbar-none px-2 space-y-px">
         {filtered.map(c => {
           const label = getLabel(c);
           const avatar = getAvatar(c);
           const active = activeId === c.id;
           return (
-            <button key={c.id} onClick={() => onSelect(c)}
-              className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg transition-all duration-150"
-              style={{ background: active ? 'var(--bg-glass-active)' : 'transparent' }}>
-              <div className="w-8 h-8 rounded-full flex items-center justify-center text-[11px] font-medium flex-shrink-0 overflow-hidden"
-                style={{ background: 'var(--bg-glass-strong)', color: 'var(--text-muted)' }}>
-                {avatar ? <img src={avatar} className="w-full h-full object-cover" /> : label.charAt(0).toUpperCase()}
-              </div>
-              <div className="flex-1 min-w-0 text-left">
-                <div className="text-[13px] truncate" style={{ color: active ? 'var(--text-cream)' : 'var(--text-primary)' }}>{label}</div>
-                {c.last_message_preview && (
-                  <div className="text-[11px] truncate" style={{ color: 'var(--text-muted)' }}>{c.last_message_preview}</div>
-                )}
-              </div>
-            </button>
+            <ContextMenu key={c.id}>
+              <ContextMenuTrigger>
+                <button onClick={() => onSelect(c)}
+                  className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg transition-all duration-150"
+                  style={{ background: active ? 'var(--bg-glass-active)' : 'transparent' }}>
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center text-[11px] font-medium flex-shrink-0 overflow-hidden"
+                    style={{ background: 'var(--bg-glass-strong)', color: 'var(--text-muted)' }}>
+                    {avatar ? <img src={avatar} className="w-full h-full object-cover" /> : label.charAt(0).toUpperCase()}
+                  </div>
+                  <div className="flex-1 min-w-0 text-left">
+                    <div className="text-[13px] truncate" style={{ color: active ? 'var(--text-cream)' : 'var(--text-primary)' }}>{label}</div>
+                    {c.last_message_preview && (
+                      <div className="text-[11px] truncate" style={{ color: 'var(--text-muted)' }}>{c.last_message_preview}</div>
+                    )}
+                  </div>
+                </button>
+              </ContextMenuTrigger>
+              <ContextMenuContent className="w-48 p-1 rounded-xl" style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-light)', boxShadow: 'var(--shadow-lg)' }}>
+                <ContextMenuItem onClick={() => onSelect(c)} className="text-[12px] gap-2 rounded-lg px-2.5 py-1.5" style={{ color: 'var(--text-secondary)' }}>
+                  <MessageSquare className="w-3.5 h-3.5 opacity-50" /> Open Conversation
+                </ContextMenuItem>
+                <ContextMenuItem onClick={() => navigator.clipboard.writeText(c.id)} className="text-[12px] gap-2 rounded-lg px-2.5 py-1.5" style={{ color: 'var(--text-secondary)' }}>
+                  <Copy className="w-3.5 h-3.5 opacity-50" /> Copy Conversation ID
+                </ContextMenuItem>
+                <ContextMenuSeparator style={{ background: 'var(--border)' }} />
+                <ContextMenuItem className="text-[12px] gap-2 rounded-lg px-2.5 py-1.5" style={{ color: 'var(--text-secondary)' }}>
+                  <BellOff className="w-3.5 h-3.5 opacity-50" /> Mute Conversation
+                </ContextMenuItem>
+              </ContextMenuContent>
+            </ContextMenu>
           );
         })}
         {filtered.length === 0 && (
