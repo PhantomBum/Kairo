@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { Settings, Shield, Users, AlertTriangle, Trash2, Plus, Palette, Bell, Lock, Globe, Eye, Sparkles, Heart, Zap, MessageSquare, Volume2, Calendar, ChevronDown, ChevronRight, BarChart3, Webhook } from 'lucide-react';
+import { Settings, Shield, Users, AlertTriangle, Trash2, Plus, Palette, Bell, Lock, Globe, Eye, Sparkles, Heart, Zap, MessageSquare, Volume2, Calendar, ChevronDown, ChevronRight, BarChart3, Webhook, Link, Copy, Check } from 'lucide-react';
 import ModalWrapper from './ModalWrapper';
 
 const TABS = [
@@ -9,6 +9,7 @@ const TABS = [
   { id: 'appearance', label: 'Appearance', icon: Palette },
   { id: 'roles', label: 'Roles', icon: Shield },
   { id: 'members', label: 'Members', icon: Users },
+  { id: 'invites', label: 'Invites', icon: Link },
   { id: 'features', label: 'Features', icon: Sparkles },
   { id: 'integrations', label: 'Integrations', icon: Webhook },
   { id: 'permissions', label: 'Permissions', icon: Lock },
@@ -67,6 +68,7 @@ export default function ServerSettingsModal({ onClose, server, currentUserId }) 
   const [serverSettings, setServerSettings] = useState(server?.settings || {});
   const [bannerColor, setBannerColor] = useState(server?.banner_color || '#5865F2');
   const [isPublic, setIsPublic] = useState(server?.is_public || false);
+  const [copiedCode, setCopiedCode] = useState(null);
 
   useEffect(() => {
     if (!server?.id) return;
@@ -240,6 +242,36 @@ export default function ServerSettingsModal({ onClose, server, currentUserId }) 
               </div>
             ))}
           </div>}
+
+          {tab === 'invites' && (
+            <div className="space-y-3">
+              <p className="text-[12px] mb-2" style={{ color: 'var(--text-secondary)' }}>Active invite links for this server.</p>
+              <div className="p-4 rounded-xl" style={{ background: 'var(--bg-glass)', border: '1px solid var(--border)' }}>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-[11px] font-semibold uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>Current Invite</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="flex-1 text-[13px] font-mono px-3 py-2 rounded-lg truncate" style={{ background: 'var(--bg-base)', color: 'var(--text-primary)', border: '1px solid var(--border)' }}>
+                    {window.location.origin}/invite/{server?.invite_code}
+                  </div>
+                  <button onClick={() => { navigator.clipboard.writeText(`${window.location.origin}/invite/${server?.invite_code}`); setCopiedCode('main'); setTimeout(() => setCopiedCode(null), 2000); }}
+                    className="px-3 py-2 rounded-lg flex-shrink-0" style={{ background: copiedCode === 'main' ? 'var(--accent-green)' : 'var(--accent)', color: '#fff' }}>
+                    {copiedCode === 'main' ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                  </button>
+                </div>
+                <div className="flex items-center gap-4 mt-2 text-[11px]" style={{ color: 'var(--text-muted)' }}>
+                  <span>Code: <span className="font-mono font-bold" style={{ color: 'var(--text-primary)' }}>{server?.invite_code}</span></span>
+                  <span>Created by server owner</span>
+                  <span>Never expires</span>
+                </div>
+              </div>
+              <div className="p-3 rounded-xl" style={{ background: 'var(--bg-glass)', border: '1px solid var(--border)' }}>
+                <p className="text-[11px]" style={{ color: 'var(--text-muted)' }}>
+                  To generate a new invite code (revoking the current one), use the Invite People option in the server dropdown menu.
+                </p>
+              </div>
+            </div>
+          )}
 
           {tab === 'features' && (
             <div className="space-y-2">
