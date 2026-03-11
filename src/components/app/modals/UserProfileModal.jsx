@@ -85,7 +85,7 @@ export default function UserProfileModal({ onClose, profile, memberData, roles, 
           <div className="relative">
             <div className={`w-[88px] h-[88px] rounded-full flex items-center justify-center text-3xl font-medium overflow-hidden ${hasElite ? 'ring-2 ring-offset-2' : ''}`}
               style={{ background: 'var(--bg-surface)', color: 'var(--text-muted)', border: `5px solid ${theme.bg}`, ringColor: '#c9b47b', ringOffsetColor: theme.bg }}>
-              {profile.avatar_url ? <img src={profile.avatar_url} className="w-full h-full object-cover" /> : (profile.display_name || 'U').charAt(0).toUpperCase()}
+              {profile.avatar_url ? <img src={profile.avatar_url} className="w-full h-full object-cover" alt={`${profile.display_name || 'User'}'s avatar`} /> : (profile.display_name || 'U').charAt(0).toUpperCase()}
             </div>
             <div className="absolute bottom-1 right-1 w-5 h-5 rounded-full" style={{ background: statusColors[profile.status || 'offline'], border: `3px solid ${theme.bg}` }} />
           </div>
@@ -187,7 +187,7 @@ export default function UserProfileModal({ onClose, profile, memberData, roles, 
                 <div className="p-3 rounded-xl" style={{ background: 'var(--bg-glass)' }}>
                   <p className="text-[10px] uppercase mb-1.5" style={{ color: 'var(--text-muted)' }}>{profile.rich_presence.type || 'Playing'}</p>
                   <div className="flex items-center gap-3">
-                    {profile.rich_presence.large_image && <img src={profile.rich_presence.large_image} className="w-14 h-14 rounded-xl" />}
+                    {profile.rich_presence.large_image && <img src={profile.rich_presence.large_image} className="w-14 h-14 rounded-xl" alt={profile.rich_presence.name || 'Activity'} />}
                     <div>
                       <p className="text-[13px] font-medium" style={{ color: 'var(--text-cream)' }}>{profile.rich_presence.name}</p>
                       {profile.rich_presence.details && <p className="text-[11px]" style={{ color: 'var(--text-secondary)' }}>{profile.rich_presence.details}</p>}
