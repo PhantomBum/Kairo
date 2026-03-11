@@ -62,13 +62,23 @@ export function useRoles(serverId) {
 // ── Messages with real-time subscriptions ──
 export function useMessages(channelId) {
   const qc = useQueryClient();
+  // Debounce invalidation to prevent duplicate real-time events
+  const debounceRef = useRef(null);
 
   useEffect(() => {
     if (!channelId) return;
     const unsub = base44.entities.Message.subscribe((event) => {
-      qc.invalidateQueries({ queryKey: ['messages', channelId] });
+      // Only invalidate if this event is for our channel
+      if (event.data?.channel_id && event.data.channel_id !== channelId) return;
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+      debounceRef.current = setTimeout(() => {
+        qc.invalidateQueries({ queryKey: ['messages', channelId] });
+      }, 200);
     });
-    return unsub;
+    return () => {
+      unsub();
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
   }, [channelId, qc]);
 
   return useQuery({
@@ -84,13 +94,21 @@ export function useMessages(channelId) {
 
 export function useDMMessages(conversationId) {
   const qc = useQueryClient();
+  const debounceRef = useRef(null);
 
   useEffect(() => {
     if (!conversationId) return;
     const unsub = base44.entities.DirectMessage.subscribe((event) => {
-      qc.invalidateQueries({ queryKey: ['dmMessages', conversationId] });
+      if (event.data?.conversation_id && event.data.conversation_id !== conversationId) return;
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+      debounceRef.current = setTimeout(() => {
+        qc.invalidateQueries({ queryKey: ['dmMessages', conversationId] });
+      }, 200);
     });
-    return unsub;
+    return () => {
+      unsub();
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
   }, [conversationId, qc]);
 
   return useQuery({
@@ -104,13 +122,22 @@ export function useDMMessages(conversationId) {
   });
 }
 
-// ── Conversations ──
+// ── Conversations with real-time sync (group name/icon updates) ──
 export function useConversations(userEmail, userId) {
   const qc = useQueryClient();
 
   useEffect(() => {
     if (!userEmail) return;
     const unsub = base44.entities.Conversation.subscribe(() => {
+      qc.invalidateQueries({ queryKey: ['conversations', userEmail] });
+    });
+    return unsub;
+  }, [userEmail, qc]);
+
+  // Also listen for new DMs to refresh conversation order
+  useEffect(() => {
+    if (!userEmail) return;
+    const unsub = base44.entities.DirectMessage.subscribe(() => {
       qc.invalidateQueries({ queryKey: ['conversations', userEmail] });
     });
     return unsub;
@@ -127,8 +154,18 @@ export function useConversations(userEmail, userId) {
   });
 }
 
-// ── Friends ──
+// ── Friends with real-time subscription ──
 export function useFriends(userId) {
+  const qc = useQueryClient();
+
+  useEffect(() => {
+    if (!userId) return;
+    const unsub = base44.entities.Friendship.subscribe(() => {
+      qc.invalidateQueries({ queryKey: ['friends', userId] });
+    });
+    return unsub;
+  }, [userId, qc]);
+
   return useQuery({
     queryKey: ['friends', userId],
     queryFn: () => base44.entities.Friendship.filter({ user_id: userId, status: 'accepted' }),
@@ -138,6 +175,18 @@ export function useFriends(userId) {
 }
 
 export function useFriendRequests(userId, userEmail) {
+  const qc = useQueryClient();
+
+  // Real-time subscription for friend requests — appear without refresh
+  useEffect(() => {
+    if (!userId) return;
+    const unsub = base44.entities.Friendship.subscribe(() => {
+      qc.invalidateQueries({ queryKey: ['incomingRequests', userId] });
+      qc.invalidateQueries({ queryKey: ['outgoingRequests', userId] });
+    });
+    return unsub;
+  }, [userId, qc]);
+
   const incoming = useQuery({
     queryKey: ['incomingRequests', userId],
     queryFn: async () => {
@@ -158,6 +207,16 @@ export function useFriendRequests(userId, userEmail) {
 
 // ── Blocked ──
 export function useBlocked(userId) {
+  const qc = useQueryClient();
+
+  useEffect(() => {
+    if (!userId) return;
+    const unsub = base44.entities.BlockedUser.subscribe(() => {
+      qc.invalidateQueries({ queryKey: ['blocked', userId] });
+    });
+    return unsub;
+  }, [userId, qc]);
+
   return useQuery({
     queryKey: ['blocked', userId],
     queryFn: () => base44.entities.BlockedUser.filter({ user_id: userId }),
