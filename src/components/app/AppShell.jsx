@@ -362,8 +362,8 @@ export default function AppShell({ currentUser }) {
       <ConnectionBanner />
 
       {/* Desktop: always show. Mobile: show when sidebar toggled */}
-      <div className={`${showMobileSidebar ? 'flex' : 'hidden'} md:flex flex-row z-40 md:z-auto`}
-        style={showMobileSidebar ? { position: 'absolute', top: 0, left: 0, right: 0, bottom: 56 } : undefined}
+      <div className={`${showMobileSidebar ? 'flex absolute inset-0 z-40' : 'hidden'} md:flex md:relative md:inset-auto md:z-auto flex-row`}
+        style={showMobileSidebar ? { bottom: 56 } : undefined}
         role="navigation" aria-label="Sidebar">
         <ServerRailWithContext servers={servers} activeServerId={activeServer?.id} onServerSelect={selectServer} onHomeClick={goHome}
           onCreateServer={() => setModal('create-server')} onDiscover={() => setModal('join-server')}
