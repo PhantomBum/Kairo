@@ -67,6 +67,17 @@ export const shadows = {
   accentGlow: '0 0 20px rgba(139,92,246,0.25), 0 0 60px rgba(139,92,246,0.08)',
 };
 
+// Kairo glass styles — reusable frosted glass surfaces
+export const glass = {
+  rail: { background: 'rgba(255,255,255,0.03)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)', border: '1px solid rgba(255,255,255,0.06)' },
+  surface: { background: 'rgba(255,255,255,0.04)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', border: '1px solid rgba(255,255,255,0.06)' },
+  card: { background: 'rgba(255,255,255,0.035)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.05)' },
+  hover: { background: 'rgba(255,255,255,0.06)' },
+  active: { background: 'rgba(139,92,246,0.12)', border: '1px solid rgba(139,92,246,0.2)' },
+  bubble: { background: 'rgba(255,255,255,0.04)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.06)' },
+  bubbleOwn: { background: 'rgba(139,92,246,0.1)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', border: '1px solid rgba(139,92,246,0.18)' },
+};
+
 export const typography = {
   caption: { size: '11px', weight: 400, lineHeight: '16px', letterSpacing: '0.02em' },
   small: { size: '12px', weight: 400, lineHeight: '16px', letterSpacing: '0' },
