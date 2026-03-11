@@ -280,12 +280,20 @@ export default function AppShell({ currentUser }) {
     qc.invalidateQueries({ queryKey: ['friends'] });
   };
 
+  // Swipe gestures for mobile
+  const swipeHandlers = useSwipeGesture({
+    onSwipeRight: () => setShowMobileSidebar(true),
+    onSwipeLeft: () => { setShowMobileSidebar(false); if (!isDM) setShowMembers(true); },
+  });
+
   // Computed
   const isDM = !!activeConv;
   const isVoiceChannel = activeChannel?.type === 'voice' || activeChannel?.type === 'stage';
   const isInChat = (view === 'server' && activeChannel && !isVoiceChannel) || (view === 'home' && activeConv);
   const isInVoice = view === 'server' && activeChannel && isVoiceChannel;
-  const currentMsgs = isDM ? dmMessages : messages;
+  // Merge optimistic messages with real messages
+  const baseMsgs = isDM ? dmMessages : messages;
+  const currentMsgs = [...baseMsgs, ...optimisticMsgs.filter(m => isDM ? m.conversation_id === activeConv?.id : m.channel_id === activeChannel?.id)];
   const currentLoading = isDM ? dmLoading : msgsLoading;
   const channelLabel = isDM ? (activeConv.name || activeConv.participants?.find(p => p.user_id !== currentUser.id)?.user_name || 'DM') : (activeChannel?.name || '');
   const pinnedCount = isDM ? dmMessages.filter(m => m.is_pinned).length : messages.filter(m => m.is_pinned).length;
