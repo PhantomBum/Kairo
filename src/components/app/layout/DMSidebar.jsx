@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { Search, Users, Plus, MessageSquare, BellOff, Copy, Bookmark, Pin, X } from 'lucide-react';
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuSeparator, ContextMenuTrigger } from '@/components/ui/context-menu';
-import { colors, shadows } from '@/components/app/design/tokens';
+import { colors, shadows, glass } from '@/components/app/design/tokens';
 import { useProfiles } from '@/components/app/providers/ProfileProvider';
 
 export default function DMSidebar({ conversations, activeId, onSelect, onFriends, onCreateGroup, onNoteToSelf, currentUserId, incomingRequestCount = 0, blockedUserIds = [] }) {
@@ -40,8 +40,8 @@ export default function DMSidebar({ conversations, activeId, onSelect, onFriends
   return (
     <div className="flex-1 flex flex-col min-h-0">
       {/* Search header */}
-      <div className="h-12 px-3 flex items-center flex-shrink-0" style={{ borderBottom: `1px solid ${colors.border.default}` }}>
-        <div className="flex-1 flex items-center gap-2 px-2.5 py-1.5 rounded-lg" style={{ background: colors.bg.base }}>
+      <div className="h-12 px-3 flex items-center flex-shrink-0" style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+        <div className="flex-1 flex items-center gap-2 px-2.5 py-1.5 rounded-xl" style={{ ...glass.card }}>
           <Search className="w-4 h-4 flex-shrink-0" style={{ color: colors.text.disabled }} />
           <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Find or start a conversation"
             className="flex-1 bg-transparent text-[13px] outline-none" style={{ color: colors.text.primary }} />
@@ -50,26 +50,26 @@ export default function DMSidebar({ conversations, activeId, onSelect, onFriends
 
       {/* Quick actions */}
       <div className="px-2 pt-2 pb-1 space-y-px">
-        <button onClick={onFriends} className="w-full flex items-center gap-3 px-2.5 py-2 rounded-md text-[14px] transition-colors hover:bg-[rgba(255,255,255,0.04)] relative"
+        <button onClick={onFriends} className="w-full flex items-center gap-3 px-2.5 py-2 rounded-xl text-[13px] transition-colors hover:bg-[rgba(255,255,255,0.04)] relative"
           style={{ color: colors.text.secondary, fontWeight: 500 }}>
-          <Users className="w-5 h-5" style={{ color: colors.text.disabled }} /> Friends
+          <Users className="w-4.5 h-4.5" style={{ color: colors.text.disabled }} /> Friends
           {incomingRequestCount > 0 && (
             <span className="absolute right-2 min-w-[18px] h-[18px] px-1 rounded-full text-[11px] font-bold flex items-center justify-center" style={{ background: colors.danger, color: '#fff' }}>{incomingRequestCount}</span>
           )}
         </button>
-        <button onClick={onCreateGroup} className="w-full flex items-center gap-3 px-2.5 py-2 rounded-md text-[14px] transition-colors hover:bg-[rgba(255,255,255,0.04)]"
+        <button onClick={onCreateGroup} className="w-full flex items-center gap-3 px-2.5 py-2 rounded-xl text-[13px] transition-colors hover:bg-[rgba(255,255,255,0.04)]"
           style={{ color: colors.text.secondary, fontWeight: 500 }}>
-          <Plus className="w-5 h-5" style={{ color: colors.text.disabled }} /> New Group
+          <Plus className="w-4.5 h-4.5" style={{ color: colors.text.disabled }} /> New Group
         </button>
-        <button onClick={onNoteToSelf} className="w-full flex items-center gap-3 px-2.5 py-2 rounded-md text-[14px] transition-colors hover:bg-[rgba(255,255,255,0.04)]"
+        <button onClick={onNoteToSelf} className="w-full flex items-center gap-3 px-2.5 py-2 rounded-xl text-[13px] transition-colors hover:bg-[rgba(255,255,255,0.04)]"
           style={{ color: colors.text.secondary, fontWeight: 500 }}>
-          <Bookmark className="w-5 h-5" style={{ color: colors.text.disabled }} /> Note to Self
+          <Bookmark className="w-4.5 h-4.5" style={{ color: colors.text.disabled }} /> Note to Self
         </button>
       </div>
 
       {/* Label */}
       <div className="px-4 pt-4 pb-1">
-        <span className="text-[11px] font-semibold uppercase tracking-[0.06em]" style={{ color: colors.text.muted }}>Direct Messages</span>
+        <span className="text-[10px] font-bold uppercase tracking-[0.08em]" style={{ color: colors.text.disabled }}>Direct Messages</span>
       </div>
 
       {/* Conversation list */}
@@ -85,8 +85,12 @@ export default function DMSidebar({ conversations, activeId, onSelect, onFriends
             <ContextMenu key={c.id}>
               <ContextMenuTrigger>
                 <button onClick={() => onSelect(c)}
-                  className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md transition-all group relative"
-                  style={{ background: active ? 'rgba(255,255,255,0.06)' : 'transparent' }}>
+                  className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl transition-all group relative"
+                  style={{
+                    background: active ? 'rgba(139,92,246,0.1)' : 'transparent',
+                    border: active ? '1px solid rgba(139,92,246,0.18)' : '1px solid transparent',
+                    boxShadow: active ? '0 0 10px rgba(139,92,246,0.06)' : 'none',
+                  }}>
                   <div className="relative flex-shrink-0">
                     <div className="w-8 h-8 rounded-full flex items-center justify-center text-[12px] font-semibold overflow-hidden"
                       style={{ background: colors.bg.overlay, color: colors.text.muted }}>
@@ -107,7 +111,7 @@ export default function DMSidebar({ conversations, activeId, onSelect, onFriends
                   </div>
                 </button>
               </ContextMenuTrigger>
-              <ContextMenuContent className="w-52 p-1.5 rounded-lg" style={{ background: colors.bg.modal, border: `1px solid ${colors.border.light}`, boxShadow: shadows.strong }}>
+              <ContextMenuContent className="w-52 p-1.5 rounded-xl" style={{ background: 'rgba(22,22,32,0.92)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.08)', boxShadow: shadows.strong }}>
                 <ContextMenuItem onClick={() => onSelect(c)} className="text-[13px] gap-2.5 rounded-md px-2.5 py-2" style={{ color: colors.text.secondary }}>
                   <MessageSquare className="w-4 h-4 opacity-50" /> Open
                 </ContextMenuItem>
