@@ -23,6 +23,7 @@ import FriendsView from '@/components/app/views/FriendsView';
 import EmptyView from '@/components/app/views/EmptyView';
 import VoiceChannelView from '@/components/app/views/VoiceChannelView';
 import DMMediaGallery from '@/components/app/views/DMMediaGallery';
+import NSFWGate from '@/components/app/shared/NSFWGate';
 
 import CreateServerModal from '@/components/app/modals/CreateServerModal';
 import JoinServerModal from '@/components/app/modals/JoinServerModal';
@@ -68,6 +69,7 @@ export default function AppShell({ currentUser }) {
   const [profileUserId, setProfileUserId] = useState(null);
   const [channelToEdit, setChannelToEdit] = useState(null);
   const [mobileTab, setMobileTab] = useState('servers');
+  const [nsfwAccepted, setNsfwAccepted] = useState(new Set());
 
   const { data: profile } = useMyProfile(currentUser.email);
   const { data: servers = [] } = useServers(currentUser.id, currentUser.email);
