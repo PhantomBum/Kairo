@@ -74,10 +74,10 @@ export default function AppShell({ currentUser }) {
   const { data: friends = [] } = useFriends(currentUser.id);
   const { incoming: incomingReqs, outgoing: outgoingReqs } = useFriendRequests(currentUser.id, currentUser.email);
 
-  useEffect(() => { if (!activeChannel?.id) return; return base44.entities.Message.subscribe(() => qc.invalidateQueries({ queryKey: ['messages', activeChannel.id] })); }, [activeChannel?.id]);
-  useEffect(() => { if (!activeConv?.id) return; return base44.entities.DirectMessage.subscribe(() => qc.invalidateQueries({ queryKey: ['dmMessages', activeConv.id] })); }, [activeConv?.id]);
   useEffect(() => { if (activeServer && channels.length > 0 && !activeChannel) { const first = channels.find(c => c.type === 'text'); if (first) setActiveChannel(first); } }, [activeServer, channels]);
   useEffect(() => { setReplyTo(null); setEditingMsg(null); setShowMediaGallery(false); }, [activeChannel?.id, activeConv?.id]);
+  // Track channel for cache and prefetch nearby
+  useEffect(() => { trackChannel(activeChannel?.id); prefetchNearby(channels, activeChannel?.id); }, [activeChannel?.id, channels]);
 
   useEffect(() => {
     const handler = (e) => {
