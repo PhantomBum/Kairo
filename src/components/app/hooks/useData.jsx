@@ -117,6 +117,15 @@ export function useFriendRequests(userId, userEmail) {
   return { incoming: incoming.data || [], outgoing: outgoing.data || [] };
 }
 
+// ── Blocked ──
+export function useBlocked(userId) {
+  return useQuery({
+    queryKey: ['blocked', userId],
+    queryFn: () => base44.entities.BlockedUser.filter({ user_id: userId }),
+    enabled: !!userId,
+  });
+}
+
 // ── Profile ──
 export function useMyProfile(email) {
   return useQuery({
