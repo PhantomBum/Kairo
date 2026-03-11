@@ -70,6 +70,9 @@ export default function Layout({ children }) {
         .k-pulse-ring { animation: k-pulse-ring 3s ease-in-out infinite; }
         .k-reaction-pop { animation: k-reaction-pop 0.3s cubic-bezier(0,0,0.2,1); }
 
+        /* Word break for long URLs */
+        .break-words { word-break: break-word; overflow-wrap: anywhere; }
+
         /* Legacy utility classes */
         .glass { background: var(--bg-glass); backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur)); border: 1px solid var(--border); }
         .glass-strong { background: var(--bg-glass-strong); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border: 1px solid var(--border-light); }
