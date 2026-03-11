@@ -139,7 +139,7 @@ export default function ChatInput({ channelName, channelId, replyTo, onCancelRep
       {showFormatting && <FormattingToolbar inputRef={inputRef} content={content} setContent={setContent} />}
 
       {/* Main input */}
-      <div className="flex items-end gap-2 px-4 py-3 rounded-xl" style={{ background: colors.bg.elevated, border: `1px solid ${colors.border.default}` }}>
+      <div className="flex items-end gap-2 px-4 py-3 rounded-2xl" style={{ background: 'rgba(255,255,255,0.035)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.06)' }}>
         <button onClick={() => fileRef.current?.click()}
           className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-[rgba(255,255,255,0.06)] flex-shrink-0 mb-0.5"
           aria-label="Upload file" title="Upload file">
@@ -154,7 +154,7 @@ export default function ChatInput({ channelName, channelId, replyTo, onCancelRep
           }}
           placeholder={`Message ${channelName ? '#' + channelName : ''}`}
           aria-label={`Message ${channelName || 'channel'}`}
-          className="flex-1 bg-transparent text-[15px] outline-none resize-none max-h-[160px] placeholder:text-[14px]"
+          className="flex-1 bg-transparent text-[14px] outline-none resize-none max-h-[160px] placeholder:text-[13px]"
           style={{ color: colors.text.primary, lineHeight: '22px', caretColor: colors.accent.primary }} rows={1} />
         {nearLimit && <span className="text-[11px] mb-1 flex-shrink-0 tabular-nums" style={{ color: charCount > 2000 ? colors.danger : colors.warning }} aria-live="polite">{2000 - charCount}</span>}
         <button onClick={() => setShowFormatting(!showFormatting)}
