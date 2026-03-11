@@ -50,8 +50,12 @@ export default function ChannelSettingsModal({ onClose, channel, onDelete }) {
             style={{ background: 'var(--bg-glass)', color: 'var(--text-primary)', border: '1px solid var(--border)' }} />
         </div>
 
-        <ServerToggle on={priv} onToggle={() => setPriv(!priv)} label="Private Channel" icon={Lock} desc="Only selected roles/members can view" />
-        <ServerToggle on={nsfw} onToggle={() => setNsfw(!nsfw)} label="Age-Restricted (NSFW)" icon={Shield} desc="Users must confirm age to access" />
+        <div className="px-3 py-2.5 rounded-xl" style={{ background: 'var(--bg-glass)' }}>
+          <ServerToggle on={priv} onToggle={() => setPriv(!priv)} label="Private Channel" icon={Lock} desc="Only selected roles/members can view" />
+        </div>
+        <div className="px-3 py-2.5 rounded-xl" style={{ background: 'var(--bg-glass)' }}>
+          <ServerToggle on={nsfw} onToggle={() => setNsfw(!nsfw)} label="Age-Restricted (NSFW)" icon={Shield} desc="Users must confirm age to access" />
+        </div>
 
         {!isVoice && (
           <div>
