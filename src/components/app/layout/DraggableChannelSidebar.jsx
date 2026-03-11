@@ -109,7 +109,7 @@ export default function DraggableChannelSidebar({ server, categories, channels, 
             style={{ borderBottom: `1px solid ${colors.border.default}`, background: colors.bg.surface }}>
             <div className="flex items-center gap-2 min-w-0 flex-1">
               {server?.icon_url && <img src={server.icon_url} className="w-5 h-5 rounded-md object-cover flex-shrink-0" alt="" />}
-              <span className="text-[15px] font-semibold truncate" style={{ color: colors.text.primary }}>{server?.name}</span>
+              <span className="text-[15px] font-semibold truncate" style={{ color: colors.text.primary }} title={server?.name}>{server?.name}</span>
             </div>
             <ChevronDown className="w-4 h-4 flex-shrink-0" style={{ color: colors.text.muted }} />
           </button>
