@@ -4,9 +4,10 @@ import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuSeparator,
 import { colors, shadows } from '@/components/app/design/tokens';
 import { useProfiles } from '@/components/app/providers/ProfileProvider';
 
-export default function DMSidebar({ conversations, activeId, onSelect, onFriends, onCreateGroup, onNoteToSelf, currentUserId, incomingRequestCount = 0 }) {
+export default function DMSidebar({ conversations, activeId, onSelect, onFriends, onCreateGroup, onNoteToSelf, currentUserId, incomingRequestCount = 0, blockedUserIds = [] }) {
   const [search, setSearch] = useState('');
   const { getProfile } = useProfiles();
+  const blockedSet = React.useMemo(() => new Set(blockedUserIds), [blockedUserIds]);
 
   const getLabel = (c) => {
     if (c.name) return c.name;
@@ -26,7 +27,15 @@ export default function DMSidebar({ conversations, activeId, onSelect, onFriends
   };
   const isGroup = (c) => c.type === 'group' && c.participants?.length > 2;
 
-  const filtered = (conversations || []).filter(c => !search || getLabel(c).toLowerCase().includes(search.toLowerCase()));
+  const filtered = (conversations || []).filter(c => {
+    // Filter out conversations with blocked users (except group DMs)
+    if (c.type !== 'group' && blockedSet.size > 0) {
+      const other = c.participants?.find(p => p.user_id !== currentUserId);
+      if (other && blockedSet.has(other.user_id)) return false;
+    }
+    if (search && !getLabel(c).toLowerCase().includes(search.toLowerCase())) return false;
+    return true;
+  });
 
   return (
     <div className="flex-1 flex flex-col min-h-0">

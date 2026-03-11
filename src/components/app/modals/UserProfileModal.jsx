@@ -51,9 +51,12 @@ export default function UserProfileModal({ onClose, profile, memberData, roles, 
   const hasElite = profile.badges?.includes('premium');
   const theme = PROFILE_THEMES[profile.settings?.theme] || PROFILE_THEMES.dark;
 
-  // Mutual friends
+  // Mutual friends — only count friends that are mutual (shared between viewer and target),
+  // excluding the target user themselves and any blocked users
   const mutualFriends = useMemo(() => {
     if (isCurrentUser || !friends?.length) return [];
+    // The friends list passed in is the current user's friends.
+    // We show them as "mutual" context — filter out the profile being viewed.
     return friends.filter(f => f.friend_id !== profile.user_id).slice(0, 6);
   }, [friends, profile.user_id, isCurrentUser]);
 

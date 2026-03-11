@@ -23,6 +23,11 @@ export function useOptimisticMessages() {
     const optimisticMsg = { ...msg, id: tempId, created_date: new Date().toISOString() };
     setOptimisticMsgs(prev => [...prev, optimisticMsg]);
     setOptimisticIds(prev => new Set([...prev, tempId]));
+    // Auto-expire optimistic messages after 15s to prevent ghosts
+    setTimeout(() => {
+      setOptimisticMsgs(prev => prev.filter(m => m.id !== tempId));
+      setOptimisticIds(prev => { const next = new Set(prev); next.delete(tempId); return next; });
+    }, 15000);
     return { allowed: true, tempId };
   }, [checkRate]);
 

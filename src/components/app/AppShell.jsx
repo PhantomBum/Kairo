@@ -372,7 +372,8 @@ export default function AppShell({ currentUser }) {
               onSelect={(c) => { setActiveConv(c); setView('home'); setShowMobileSidebar(false); }}
               onFriends={goFriends} onCreateGroup={() => setModal('create-group-dm')}
               onNoteToSelf={handleNoteToSelf}
-              currentUserId={currentUser.id} incomingRequestCount={incomingReqs.length} />
+              currentUserId={currentUser.id} incomingRequestCount={incomingReqs.length}
+              blockedUserIds={(blockedUsers || []).map(b => b.blocked_user_id)} />
           )}
           <UserBar profile={profile} isMuted={isMuted} isDeafened={isDeafened}
             onToggleMute={() => setIsMuted(!isMuted)} onToggleDeafen={() => setIsDeafened(!isDeafened)}

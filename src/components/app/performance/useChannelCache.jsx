@@ -11,7 +11,9 @@ export function useChannelCache() {
   const trackChannel = useCallback((channelId) => {
     if (!channelId) return;
     recentChannels.current = [channelId, ...recentChannels.current.filter(id => id !== channelId)].slice(0, MAX_CACHED_CHANNELS);
-  }, []);
+    // Invalidate stale cache for the channel being switched to, so we don't show outdated messages
+    qc.invalidateQueries({ queryKey: ['messages', channelId] });
+  }, [qc]);
 
   // Pre-fetch adjacent channels when switching
   const prefetchNearby = useCallback(async (channels, currentId) => {
