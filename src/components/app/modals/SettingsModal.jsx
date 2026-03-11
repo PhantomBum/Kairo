@@ -108,6 +108,9 @@ export default function SettingsModal({ onClose, profile, onUpdate, onLogout, cu
           <a href={createPageUrl('Support')} className="w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px] font-medium transition-colors hover:bg-[rgba(255,255,255,0.04)]" style={{ color: colors.text.muted }}>
             <ExternalLink className="w-4 h-4" /> Support
           </a>
+          <button onClick={() => setTab('privacy')} className="w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px] font-medium transition-colors hover:bg-[rgba(255,255,255,0.04)]" style={{ color: colors.text.muted }}>
+            <Database className="w-4 h-4" /> Privacy Dashboard
+          </button>
           <div className="my-3 h-px" style={{ background: colors.border.default }} />
           <button onClick={onLogout} className="w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px] font-medium transition-colors hover:bg-[rgba(242,63,67,0.08)]" style={{ color: colors.danger }}>
             <LogOut className="w-4 h-4" /> Log Out
