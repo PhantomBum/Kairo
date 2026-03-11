@@ -16,6 +16,7 @@ import ChatInput from '@/components/app/chat/ChatInput';
 import FriendsView from '@/components/app/views/FriendsView';
 import EmptyView from '@/components/app/views/EmptyView';
 import VoiceChannelView from '@/components/app/views/VoiceChannelView';
+import DMMediaGallery from '@/components/app/views/DMMediaGallery';
 
 import CreateServerModal from '@/components/app/modals/CreateServerModal';
 import JoinServerModal from '@/components/app/modals/JoinServerModal';
@@ -42,6 +43,7 @@ export default function AppShell({ currentUser }) {
   const [activeChannel, setActiveChannel] = useState(null);
   const [activeConv, setActiveConv] = useState(null);
   const [showMembers, setShowMembers] = useState(true);
+  const [showMediaGallery, setShowMediaGallery] = useState(false);
   const [replyTo, setReplyTo] = useState(null);
   const [editingMsg, setEditingMsg] = useState(null);
   const [modal, setModal] = useState(null);
@@ -63,15 +65,11 @@ export default function AppShell({ currentUser }) {
   const { data: friends = [] } = useFriends(currentUser.id);
   const { incoming: incomingReqs, outgoing: outgoingReqs } = useFriendRequests(currentUser.id, currentUser.email);
 
-  // Realtime
   useEffect(() => { if (!activeChannel?.id) return; return base44.entities.Message.subscribe(() => qc.invalidateQueries({ queryKey: ['messages', activeChannel.id] })); }, [activeChannel?.id]);
   useEffect(() => { if (!activeConv?.id) return; return base44.entities.DirectMessage.subscribe(() => qc.invalidateQueries({ queryKey: ['dmMessages', activeConv.id] })); }, [activeConv?.id]);
-
-  // Auto-select first text channel
   useEffect(() => { if (activeServer && channels.length > 0 && !activeChannel) { const first = channels.find(c => c.type === 'text'); if (first) setActiveChannel(first); } }, [activeServer, channels]);
-  useEffect(() => { setReplyTo(null); setEditingMsg(null); }, [activeChannel?.id, activeConv?.id]);
+  useEffect(() => { setReplyTo(null); setEditingMsg(null); setShowMediaGallery(false); }, [activeChannel?.id, activeConv?.id]);
 
-  // Keyboard shortcuts
   useEffect(() => {
     const handler = (e) => {
       if (e.ctrlKey && e.shiftKey && e.key === 'M') { e.preventDefault(); setIsMuted(m => !m); }
@@ -81,7 +79,6 @@ export default function AppShell({ currentUser }) {
     return () => window.removeEventListener('keydown', handler);
   }, []);
 
-  // Mutations
   const createServer = useMutation({
     mutationFn: async ({ name, template, icon_url }) => {
       const code = Math.random().toString(36).substring(2, 8).toUpperCase();
@@ -116,14 +113,12 @@ export default function AppShell({ currentUser }) {
   });
 
   const sendMsg = useMutation({
-    mutationFn: async ({ content, attachments, replyToId, replyPreview }) => {
-      return base44.entities.Message.create({
-        channel_id: activeChannel.id, server_id: activeServer.id, author_id: currentUser.id,
-        author_name: profile?.display_name || currentUser.full_name, author_avatar: profile?.avatar_url,
-        author_badges: profile?.badges || [], content, attachments,
-        type: replyToId ? 'reply' : 'default', reply_to_id: replyToId, reply_preview: replyPreview,
-      });
-    },
+    mutationFn: async ({ content, attachments, replyToId, replyPreview }) => base44.entities.Message.create({
+      channel_id: activeChannel.id, server_id: activeServer.id, author_id: currentUser.id,
+      author_name: profile?.display_name || currentUser.full_name, author_avatar: profile?.avatar_url,
+      author_badges: profile?.badges || [], content, attachments,
+      type: replyToId ? 'reply' : 'default', reply_to_id: replyToId, reply_preview: replyPreview,
+    }),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['messages', activeChannel?.id] }); setReplyTo(null); },
   });
 
@@ -149,7 +144,6 @@ export default function AppShell({ currentUser }) {
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['myProfile'] }); refreshProfiles(); },
   });
 
-  // Navigation
   const selectServer = (s) => { setActiveServer(s); setActiveChannel(null); setActiveConv(null); setView('server'); };
   const goHome = () => { setActiveServer(null); setActiveChannel(null); setView('home'); };
   const goFriends = () => { setActiveConv(null); setView('friends'); };
@@ -171,9 +165,9 @@ export default function AppShell({ currentUser }) {
   }, [activeChannel?.id, activeConv?.id]);
 
   const pinMsg = useCallback(async (msg) => {
-    await base44.entities.Message.update(msg.id, { is_pinned: !msg.is_pinned });
-    qc.invalidateQueries({ queryKey: ['messages', activeChannel?.id] });
-  }, [activeChannel?.id]);
+    if (activeConv) { await base44.entities.DirectMessage.update(msg.id, { is_pinned: !msg.is_pinned }); qc.invalidateQueries({ queryKey: ['dmMessages', activeConv?.id] }); }
+    else { await base44.entities.Message.update(msg.id, { is_pinned: !msg.is_pinned }); qc.invalidateQueries({ queryKey: ['messages', activeChannel?.id] }); }
+  }, [activeChannel?.id, activeConv?.id]);
 
   const reactMsg = useCallback(async (msg, emoji) => {
     const reactions = msg.reactions || [];
@@ -202,14 +196,26 @@ export default function AppShell({ currentUser }) {
     setActiveConv(conv); setView('home');
   };
 
-  const handleCreateGroupDM = async ({ name, participants }) => {
+  const handleCreateGroupDM = async ({ name, participants, icon_url }) => {
     const conv = await base44.entities.Conversation.create({
-      type: 'group', name,
+      type: 'group', name, icon_url,
       participants: [{ user_id: currentUser.id, user_email: currentUser.email, user_name: profile?.display_name, avatar: profile?.avatar_url }, ...participants],
       owner_id: currentUser.id, last_message_at: new Date().toISOString(),
     });
     qc.invalidateQueries({ queryKey: ['conversations'] });
     setActiveConv(conv); setView('home'); setModal(null);
+  };
+
+  const handleNoteToSelf = async () => {
+    const existing = conversations.find(c => c.participants?.length === 1 && c.participants[0].user_id === currentUser.id);
+    if (existing) { setActiveConv(existing); setView('home'); return; }
+    const conv = await base44.entities.Conversation.create({
+      type: 'dm', name: 'Note to Self',
+      participants: [{ user_id: currentUser.id, user_email: currentUser.email, user_name: profile?.display_name, avatar: profile?.avatar_url }],
+      last_message_at: new Date().toISOString(),
+    });
+    qc.invalidateQueries({ queryKey: ['conversations'] });
+    setActiveConv(conv); setView('home');
   };
 
   const handleStatusUpdate = async ({ status, customStatus }) => {
@@ -218,13 +224,31 @@ export default function AppShell({ currentUser }) {
   };
 
   const leaveServer = async (server) => {
-    if (server.owner_id === currentUser.id) { alert("You can't leave a server you own. Transfer ownership or delete it."); return; }
+    if (server.owner_id === currentUser.id) { alert("You can't leave a server you own."); return; }
     if (!confirm(`Leave ${server.name}?`)) return;
     const mems = await base44.entities.ServerMember.filter({ server_id: server.id, user_id: currentUser.id });
     for (const m of mems) await base44.entities.ServerMember.delete(m.id);
     await base44.entities.Server.update(server.id, { member_count: Math.max(1, (server.member_count || 1) - 1) });
     qc.invalidateQueries({ queryKey: ['servers'] }); qc.invalidateQueries({ queryKey: ['members'] });
     if (activeServer?.id === server.id) goHome();
+  };
+
+  const handleAddFriendFromProfile = async (targetProfile) => {
+    await base44.entities.Friendship.create({ user_id: currentUser.id, friend_id: targetProfile.user_id, friend_email: targetProfile.user_email, friend_name: targetProfile.display_name, friend_avatar: targetProfile.avatar_url, status: 'pending', initiated_by: currentUser.id });
+    qc.invalidateQueries({ queryKey: ['outgoingRequests'] });
+    setModal(null); setProfileUserId(null);
+  };
+
+  const handleBlock = async (target) => {
+    const targetId = target.friend_id || target.user_id;
+    const targetEmail = target.friend_email || target.user_email;
+    const targetName = target.friend_name || target.display_name;
+    if (!confirm(`Block ${targetName}? They won't be able to DM you or see your status.`)) return;
+    // Remove friendship if exists
+    const existing = friends.find(f => f.friend_id === targetId);
+    if (existing) await base44.entities.Friendship.delete(existing.id);
+    await base44.entities.BlockedUser.create({ user_id: currentUser.id, blocked_user_id: targetId, blocked_email: targetEmail, blocked_name: targetName });
+    qc.invalidateQueries({ queryKey: ['friends'] });
   };
 
   // Computed
@@ -235,21 +259,20 @@ export default function AppShell({ currentUser }) {
   const currentMsgs = isDM ? dmMessages : messages;
   const currentLoading = isDM ? dmLoading : msgsLoading;
   const channelLabel = isDM ? (activeConv.name || activeConv.participants?.find(p => p.user_id !== currentUser.id)?.user_name || 'DM') : (activeChannel?.name || '');
-  const pinnedCount = messages.filter(m => m.is_pinned).length;
+  const pinnedCount = isDM ? dmMessages.filter(m => m.is_pinned).length : messages.filter(m => m.is_pinned).length;
   const isOwner = activeServer?.owner_id === currentUser.id || activeServer?.created_by === currentUser.email;
   const profileModal = profileUserId ? getProfile(profileUserId) : null;
   const profileMember = profileUserId ? members.find(m => m.user_id === profileUserId) : null;
   const hasElite = profile?.badges?.includes('premium') || false;
+  const isFriendProfile = profileUserId ? friends.some(f => f.friend_id === profileUserId) : false;
 
   return (
     <div className="h-screen w-screen flex overflow-hidden" style={{ background: 'var(--bg-base)' }}>
-      {/* Rail */}
       <ServerRailWithContext servers={servers} activeServerId={activeServer?.id} onServerSelect={selectServer} onHomeClick={goHome}
         onCreateServer={() => setModal('create-server')} onDiscover={() => setModal('join-server')}
         onElite={() => setModal('elite')} onLeaveServer={leaveServer}
         isHome={view === 'home' || view === 'friends'} badge={incomingReqs.length} />
 
-      {/* Sidebar */}
       <div className="w-[232px] flex-shrink-0 flex flex-col" style={{ background: 'var(--bg-surface)', borderRight: '1px solid var(--border)' }}>
         {view === 'server' ? (
           <DraggableChannelSidebar server={activeServer} categories={categories} channels={channels}
@@ -262,18 +285,20 @@ export default function AppShell({ currentUser }) {
         ) : (
           <DMSidebar conversations={conversations} activeId={activeConv?.id}
             onSelect={(c) => { setActiveConv(c); setView('home'); }}
-            onFriends={goFriends} onCreateGroup={() => setModal('create-group-dm')} currentUserId={currentUser.id} />
+            onFriends={goFriends} onCreateGroup={() => setModal('create-group-dm')}
+            onNoteToSelf={handleNoteToSelf}
+            currentUserId={currentUser.id} incomingRequestCount={incomingReqs.length} />
         )}
         <UserBar profile={profile} isMuted={isMuted} isDeafened={isDeafened}
           onToggleMute={() => setIsMuted(!isMuted)} onToggleDeafen={() => setIsDeafened(!isDeafened)}
           onSettings={() => setModal('settings')} onStatusClick={() => setModal('status')} />
       </div>
 
-      {/* Main */}
       <div className="flex-1 flex flex-col min-w-0 relative" style={{ background: 'var(--bg-base)' }}>
         {view === 'friends' ? (
           <FriendsView friends={friends} incomingRequests={incomingReqs} outgoingRequests={outgoingReqs}
-            onAddFriend={() => setModal('add-friend')} onMessage={handleStartDM}
+            onAddFriend={() => setModal('add-friend')} onMessage={handleStartDM} onBlock={handleBlock}
+            onProfileClick={(id) => { setProfileUserId(id); setModal('profile'); }}
             onAccept={async (r) => {
               await base44.entities.Friendship.update(r.id, { status: 'accepted' });
               const sp = getProfile(r.user_id);
@@ -287,32 +312,27 @@ export default function AppShell({ currentUser }) {
             <ChatHeader channel={activeChannel} isDM={false} showMembers={showMembers} onToggleMembers={() => setShowMembers(!showMembers)} />
             <div className="flex-1 flex min-h-0">
               <VoiceChannelView channel={activeChannel} currentUser={currentUser} isMuted={isMuted} isDeafened={isDeafened}
-                onToggleMute={() => setIsMuted(!isMuted)} onToggleDeafen={() => setIsDeafened(!isDeafened)}
-                onDisconnect={() => {}} />
-              {showMembers && (
-                <MemberPanel members={members} roles={roles} ownerId={activeServer?.owner_id}
-                  onProfileClick={(id) => { setProfileUserId(id); setModal('profile'); }} />
-              )}
+                onToggleMute={() => setIsMuted(!isMuted)} onToggleDeafen={() => setIsDeafened(!isDeafened)} onDisconnect={() => {}} />
+              {showMembers && <MemberPanel members={members} roles={roles} ownerId={activeServer?.owner_id} onProfileClick={(id) => { setProfileUserId(id); setModal('profile'); }} />}
             </div>
           </>
         ) : isInChat ? (
           <>
             <ChatHeader channel={activeChannel} conversation={activeConv} currentUserId={currentUser.id}
               showMembers={showMembers} onToggleMembers={() => setShowMembers(!showMembers)}
-              isDM={isDM} onPinned={!isDM ? () => setModal('pinned') : undefined} pinnedCount={pinnedCount} />
+              isDM={isDM} onPinned={() => setModal('pinned')} pinnedCount={pinnedCount}
+              onMediaGallery={isDM ? () => setShowMediaGallery(!showMediaGallery) : undefined} />
             <div className="flex-1 flex min-h-0">
               <div className="flex-1 flex flex-col min-w-0">
                 <MessageList messages={currentMsgs} currentUserId={currentUser.id} channelName={channelLabel}
                   isLoading={currentLoading} isDM={isDM} onReply={setReplyTo} onEdit={setEditingMsg}
-                  onDelete={deleteMsg} onReact={reactMsg} onPin={!isDM ? pinMsg : undefined}
+                  onDelete={deleteMsg} onReact={reactMsg} onPin={pinMsg}
                   onProfileClick={(id) => { setProfileUserId(id); setModal('profile'); }}
                   editingMessage={editingMsg} onEditSave={editMsg} onEditCancel={() => setEditingMsg(null)} />
                 <ChatInput channelName={channelLabel} replyTo={replyTo} onCancelReply={() => setReplyTo(null)} onSend={handleSend} />
               </div>
-              {view === 'server' && showMembers && (
-                <MemberPanel members={members} roles={roles} ownerId={activeServer?.owner_id}
-                  onProfileClick={(id) => { setProfileUserId(id); setModal('profile'); }} />
-              )}
+              {view === 'server' && showMembers && <MemberPanel members={members} roles={roles} ownerId={activeServer?.owner_id} onProfileClick={(id) => { setProfileUserId(id); setModal('profile'); }} />}
+              {isDM && showMediaGallery && <DMMediaGallery messages={currentMsgs} onClose={() => setShowMediaGallery(false)} />}
             </div>
           </>
         ) : (
@@ -320,7 +340,6 @@ export default function AppShell({ currentUser }) {
         )}
       </div>
 
-      {/* Modals */}
       <AnimatePresence>
         {modal === 'create-server' && <CreateServerModal onClose={() => setModal(null)} onCreate={(d) => createServer.mutate(d)} isCreating={createServer.isPending} />}
         {modal === 'join-server' && <JoinServerModal onClose={() => setModal(null)} onJoin={(c) => joinServer.mutate(c)} isJoining={joinServer.isPending} />}
@@ -331,11 +350,13 @@ export default function AppShell({ currentUser }) {
         {modal === 'server-settings' && activeServer && <ServerSettingsModal onClose={(r) => { setModal(null); if (r === 'deleted') goHome(); }} server={activeServer} currentUserId={currentUser.id} />}
         {modal === 'profile' && profileModal && (
           <UserProfileModal onClose={() => { setModal(null); setProfileUserId(null); }} profile={profileModal} memberData={profileMember} roles={roles}
-            isCurrentUser={profileUserId === currentUser.id}
-            onMessage={() => { const f = friends.find(x => x.friend_id === profileUserId); if (f) { handleStartDM(f); setModal(null); setProfileUserId(null); } }} />
+            isCurrentUser={profileUserId === currentUser.id} friends={friends} mutualServers={servers.slice(0, 5)}
+            onMessage={isFriendProfile ? () => { const f = friends.find(x => x.friend_id === profileUserId); if (f) { handleStartDM(f); setModal(null); setProfileUserId(null); } } : undefined}
+            onAddFriend={!isFriendProfile && profileUserId !== currentUser.id ? handleAddFriendFromProfile : undefined}
+            onBlock={handleBlock} />
         )}
         {modal === 'create-group-dm' && <CreateGroupDMModal onClose={() => setModal(null)} friends={friends} onCreate={handleCreateGroupDM} />}
-        {modal === 'pinned' && <PinnedMessagesModal onClose={() => setModal(null)} messages={messages} onUnpin={pinMsg} />}
+        {modal === 'pinned' && <PinnedMessagesModal onClose={() => setModal(null)} messages={currentMsgs.filter(m => m.is_pinned)} onUnpin={pinMsg} />}
         {modal === 'status' && <StatusPickerModal onClose={() => setModal(null)} currentStatus={profile?.status} customStatus={profile?.custom_status} onSave={handleStatusUpdate} />}
         {modal === 'elite' && <KairoEliteModal onClose={() => setModal(null)} profile={profile} hasElite={hasElite} />}
         {modal === 'mod-panel' && activeServer && <ModPanelModal onClose={() => setModal(null)} server={activeServer} />}
