@@ -366,6 +366,11 @@ export default function AppShell({ currentUser }) {
             }}
             onDecline={async (r) => { await base44.entities.Friendship.delete(r.id); qc.invalidateQueries({ queryKey: ['incomingRequests'] }); }}
             onRemove={async (f) => { if (!confirm(`Remove ${f.friend_name}?`)) return; await base44.entities.Friendship.delete(f.id); qc.invalidateQueries({ queryKey: ['friends'] }); }} />
+        ) : isInBoard ? (
+          <>
+            <ChatHeader channel={activeChannel} isDM={false} showMembers={showMembers} onToggleMembers={() => setShowMembers(!showMembers)} serverName={activeServer?.name} />
+            <KairoBoards channel={activeChannel} serverId={activeServer?.id} />
+          </>
         ) : isInVoice ? (
           <>
             <ChatHeader channel={activeChannel} isDM={false} showMembers={showMembers} onToggleMembers={() => setShowMembers(!showMembers)} serverName={activeServer?.name} />
