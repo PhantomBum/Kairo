@@ -304,34 +304,42 @@ export default function AppShell({ currentUser }) {
   const isFriendProfile = profileUserId ? friends.some(f => f.friend_id === profileUserId) : false;
 
   return (
-    <div className="h-screen w-screen flex overflow-hidden" style={{ background: 'var(--bg-base)' }}>
-      <ServerRailWithContext servers={servers} activeServerId={activeServer?.id} onServerSelect={selectServer} onHomeClick={goHome}
-        onCreateServer={() => setModal('create-server')} onDiscover={() => setModal('join-server')}
-        onElite={() => setModal('elite')} onLeaveServer={leaveServer}
-        isHome={view === 'home' || view === 'friends'} badge={incomingReqs.length} />
+    <div className="h-screen w-screen flex flex-col md:flex-row overflow-hidden" style={{ background: 'var(--bg-base)' }} {...swipeHandlers}>
+      <ConnectionBanner />
 
-      <div className="w-[232px] flex-shrink-0 flex flex-col" style={{ background: 'var(--bg-surface)', borderRight: '1px solid var(--border)' }}>
-        {view === 'server' ? (
-          <DraggableChannelSidebar server={activeServer} categories={categories} channels={channels}
-            activeId={activeChannel?.id} onSelect={setActiveChannel}
-            onAdd={(catId) => { setModalData(catId); setModal('create-channel'); }}
-            onSettings={() => setModal('server-settings')} onInvite={() => setModal('invite')}
-            onModPanel={() => setModal('mod-panel')} onAnalytics={() => setModal('analytics')}
-            onChannelSettings={(ch) => { setChannelToEdit(ch); setModal('channel-settings'); }}
-            isOwner={isOwner} />
-        ) : (
-          <DMSidebar conversations={conversations} activeId={activeConv?.id}
-            onSelect={(c) => { setActiveConv(c); setView('home'); }}
-            onFriends={goFriends} onCreateGroup={() => setModal('create-group-dm')}
-            onNoteToSelf={handleNoteToSelf}
-            currentUserId={currentUser.id} incomingRequestCount={incomingReqs.length} />
-        )}
-        <UserBar profile={profile} isMuted={isMuted} isDeafened={isDeafened}
-          onToggleMute={() => setIsMuted(!isMuted)} onToggleDeafen={() => setIsDeafened(!isDeafened)}
-          onSettings={() => setModal('settings')} onStatusClick={() => setModal('status')} />
+      {/* Desktop: always show. Mobile: show when sidebar toggled */}
+      <div className={`${showMobileSidebar ? 'flex' : 'hidden'} md:flex flex-row absolute md:relative inset-0 z-40 md:z-auto`}>
+        <ServerRailWithContext servers={servers} activeServerId={activeServer?.id} onServerSelect={selectServer} onHomeClick={goHome}
+          onCreateServer={() => setModal('create-server')} onDiscover={() => setModal('join-server')}
+          onElite={() => setModal('elite')} onLeaveServer={leaveServer}
+          isHome={view === 'home' || view === 'friends'} badge={incomingReqs.length} />
+
+        <div className="w-[232px] flex-shrink-0 flex flex-col" style={{ background: 'var(--bg-surface)', borderRight: '1px solid var(--border)' }}>
+          {view === 'server' ? (
+            <DraggableChannelSidebar server={activeServer} categories={categories} channels={channels}
+              activeId={activeChannel?.id} onSelect={(ch) => { setActiveChannel(ch); setShowMobileSidebar(false); }}
+              onAdd={(catId) => { setModalData(catId); setModal('create-channel'); }}
+              onSettings={() => setModal('server-settings')} onInvite={() => setModal('invite')}
+              onModPanel={() => setModal('mod-panel')} onAnalytics={() => setModal('analytics')}
+              onChannelSettings={(ch) => { setChannelToEdit(ch); setModal('channel-settings'); }}
+              isOwner={isOwner} />
+          ) : (
+            <DMSidebar conversations={conversations} activeId={activeConv?.id}
+              onSelect={(c) => { setActiveConv(c); setView('home'); setShowMobileSidebar(false); }}
+              onFriends={goFriends} onCreateGroup={() => setModal('create-group-dm')}
+              onNoteToSelf={handleNoteToSelf}
+              currentUserId={currentUser.id} incomingRequestCount={incomingReqs.length} />
+          )}
+          <UserBar profile={profile} isMuted={isMuted} isDeafened={isDeafened}
+            onToggleMute={() => setIsMuted(!isMuted)} onToggleDeafen={() => setIsDeafened(!isDeafened)}
+            onSettings={() => setModal('settings')} onStatusClick={() => setModal('status')} />
+        </div>
+
+        {/* Mobile overlay backdrop */}
+        <div className="flex-1 md:hidden" onClick={() => setShowMobileSidebar(false)} />
       </div>
 
-      <div className="flex-1 flex flex-col min-w-0 relative" style={{ background: 'var(--bg-base)' }}>
+      <div className="flex-1 flex flex-col min-w-0 relative" style={{ background: 'var(--bg-base)' }} role="main">
         {view === 'friends' ? (
           <FriendsView friends={friends} incomingRequests={incomingReqs} outgoingRequests={outgoingReqs}
             onAddFriend={() => setModal('add-friend')} onMessage={handleStartDM} onBlock={handleBlock}
