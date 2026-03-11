@@ -5,8 +5,8 @@ import { AnimatePresence } from 'framer-motion';
 import { useProfiles } from '@/components/app/providers/ProfileProvider';
 import { useServers, useCategories, useChannels, useMembers, useRoles, useMessages, useDMMessages, useConversations, useFriends, useFriendRequests, useMyProfile } from '@/components/app/hooks/useData';
 
-import ServerRail from '@/components/app/layout/ServerRail';
-import ChannelSidebar from '@/components/app/layout/ChannelSidebar';
+import ServerRailWithContext from '@/components/app/layout/ServerRailWithContext';
+import DraggableChannelSidebar from '@/components/app/layout/DraggableChannelSidebar';
 import DMSidebar from '@/components/app/layout/DMSidebar';
 import UserBar from '@/components/app/layout/UserBar';
 import ChatHeader from '@/components/app/layout/ChatHeader';
@@ -30,6 +30,8 @@ import PinnedMessagesModal from '@/components/app/modals/PinnedMessagesModal';
 import StatusPickerModal from '@/components/app/modals/StatusPickerModal';
 import KairoEliteModal from '@/components/app/modals/KairoEliteModal';
 import ModPanelModal from '@/components/app/modals/ModPanelModal';
+import AnalyticsDashboardModal from '@/components/app/modals/AnalyticsDashboardModal';
+import ChannelSettingsModal from '@/components/app/modals/ChannelSettingsModal';
 
 export default function AppShell({ currentUser }) {
   const qc = useQueryClient();
@@ -47,6 +49,7 @@ export default function AppShell({ currentUser }) {
   const [isMuted, setIsMuted] = useState(false);
   const [isDeafened, setIsDeafened] = useState(false);
   const [profileUserId, setProfileUserId] = useState(null);
+  const [channelToEdit, setChannelToEdit] = useState(null);
 
   const { data: profile } = useMyProfile(currentUser.email);
   const { data: servers = [] } = useServers(currentUser.id, currentUser.email);
@@ -67,6 +70,16 @@ export default function AppShell({ currentUser }) {
   // Auto-select first text channel
   useEffect(() => { if (activeServer && channels.length > 0 && !activeChannel) { const first = channels.find(c => c.type === 'text'); if (first) setActiveChannel(first); } }, [activeServer, channels]);
   useEffect(() => { setReplyTo(null); setEditingMsg(null); }, [activeChannel?.id, activeConv?.id]);
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handler = (e) => {
+      if (e.ctrlKey && e.shiftKey && e.key === 'M') { e.preventDefault(); setIsMuted(m => !m); }
+      if (e.ctrlKey && e.shiftKey && e.key === 'D') { e.preventDefault(); setIsDeafened(d => !d); }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, []);
 
   // Mutations
   const createServer = useMutation({
@@ -204,6 +217,16 @@ export default function AppShell({ currentUser }) {
     setModal(null);
   };
 
+  const leaveServer = async (server) => {
+    if (server.owner_id === currentUser.id) { alert("You can't leave a server you own. Transfer ownership or delete it."); return; }
+    if (!confirm(`Leave ${server.name}?`)) return;
+    const mems = await base44.entities.ServerMember.filter({ server_id: server.id, user_id: currentUser.id });
+    for (const m of mems) await base44.entities.ServerMember.delete(m.id);
+    await base44.entities.Server.update(server.id, { member_count: Math.max(1, (server.member_count || 1) - 1) });
+    qc.invalidateQueries({ queryKey: ['servers'] }); qc.invalidateQueries({ queryKey: ['members'] });
+    if (activeServer?.id === server.id) goHome();
+  };
+
   // Computed
   const isDM = !!activeConv;
   const isVoiceChannel = activeChannel?.type === 'voice' || activeChannel?.type === 'stage';
@@ -221,19 +244,21 @@ export default function AppShell({ currentUser }) {
   return (
     <div className="h-screen w-screen flex overflow-hidden" style={{ background: 'var(--bg-base)' }}>
       {/* Rail */}
-      <ServerRail servers={servers} activeServerId={activeServer?.id} onServerSelect={selectServer} onHomeClick={goHome}
+      <ServerRailWithContext servers={servers} activeServerId={activeServer?.id} onServerSelect={selectServer} onHomeClick={goHome}
         onCreateServer={() => setModal('create-server')} onDiscover={() => setModal('join-server')}
-        onElite={() => setModal('elite')}
+        onElite={() => setModal('elite')} onLeaveServer={leaveServer}
         isHome={view === 'home' || view === 'friends'} badge={incomingReqs.length} />
 
       {/* Sidebar */}
       <div className="w-[232px] flex-shrink-0 flex flex-col" style={{ background: 'var(--bg-surface)', borderRight: '1px solid var(--border)' }}>
         {view === 'server' ? (
-          <ChannelSidebar server={activeServer} categories={categories} channels={channels}
+          <DraggableChannelSidebar server={activeServer} categories={categories} channels={channels}
             activeId={activeChannel?.id} onSelect={setActiveChannel}
             onAdd={(catId) => { setModalData(catId); setModal('create-channel'); }}
             onSettings={() => setModal('server-settings')} onInvite={() => setModal('invite')}
-            onModPanel={() => setModal('mod-panel')} isOwner={isOwner} />
+            onModPanel={() => setModal('mod-panel')} onAnalytics={() => setModal('analytics')}
+            onChannelSettings={(ch) => { setChannelToEdit(ch); setModal('channel-settings'); }}
+            isOwner={isOwner} />
         ) : (
           <DMSidebar conversations={conversations} activeId={activeConv?.id}
             onSelect={(c) => { setActiveConv(c); setView('home'); }}
@@ -314,6 +339,11 @@ export default function AppShell({ currentUser }) {
         {modal === 'status' && <StatusPickerModal onClose={() => setModal(null)} currentStatus={profile?.status} customStatus={profile?.custom_status} onSave={handleStatusUpdate} />}
         {modal === 'elite' && <KairoEliteModal onClose={() => setModal(null)} profile={profile} hasElite={hasElite} />}
         {modal === 'mod-panel' && activeServer && <ModPanelModal onClose={() => setModal(null)} server={activeServer} />}
+        {modal === 'analytics' && activeServer && <AnalyticsDashboardModal onClose={() => setModal(null)} server={activeServer} />}
+        {modal === 'channel-settings' && channelToEdit && (
+          <ChannelSettingsModal onClose={() => { setModal(null); setChannelToEdit(null); }} channel={channelToEdit}
+            onDelete={() => { if (activeChannel?.id === channelToEdit.id) setActiveChannel(null); }} />
+        )}
       </AnimatePresence>
     </div>
   );
