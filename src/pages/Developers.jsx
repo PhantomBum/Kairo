@@ -3,7 +3,7 @@ import { Bot, Plus, Settings, Trash2, Eye, Shield, Copy, RefreshCw, Code, Zap, M
 import { base44 } from '@/api/base44Client';
 import { createPageUrl } from '@/utils';
 import PageShell from '@/components/app/shared/PageShell';
-import BotEditor from '@/components/app/developers/BotEditor';
+import BotEditor from '@/components/app/developers/BotEditor.jsx';
 
 export default function Developers() {
   const [user, setUser] = useState(null);
