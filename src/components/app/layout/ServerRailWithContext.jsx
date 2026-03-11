@@ -68,7 +68,7 @@ export default function ServerRailWithContext({ servers, activeServerId, onServe
 
   return (
     <div className="w-[72px] flex-shrink-0 flex flex-col items-center py-3 gap-2 overflow-y-auto scrollbar-none"
-      style={{ background: colors.bg.base }} role="navigation" aria-label="Server list">
+      style={{ background: `linear-gradient(180deg, ${colors.bg.base}, rgba(15,15,19,0.95))` }} role="navigation" aria-label="Server list">
       <ContextMenu>
         <ContextMenuTrigger>
           <div><RailIcon active={isHome} onClick={onHomeClick} tooltip="Direct Messages" badge={badge}>
@@ -113,7 +113,7 @@ export default function ServerRailWithContext({ servers, activeServerId, onServe
 
       <ServerDivider />
 
-      <RailIcon onClick={onCreateServer} tooltip="Add a Server"><Plus className="w-5 h-5" style={{ color: colors.success }} /></RailIcon>
+      <RailIcon onClick={onCreateServer} tooltip="Add a Server"><Plus className="w-5 h-5" style={{ color: colors.accent.primary }} /></RailIcon>
       <RailIcon onClick={onDiscover} tooltip="Explore Servers"><Compass className="w-5 h-5" style={{ color: colors.success }} /></RailIcon>
       <RailIcon onClick={onSpaces} tooltip="Kairo Spaces"><Globe className="w-5 h-5" style={{ color: colors.info }} /></RailIcon>
       <RailIcon onClick={onSearch} tooltip="Search"><Search className="w-5 h-5" style={{ color: colors.text.muted }} /></RailIcon>
