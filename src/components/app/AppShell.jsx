@@ -289,7 +289,16 @@ export default function AppShell({ currentUser }) {
     const existing = friends.find(f => f.friend_id === targetId);
     if (existing) await base44.entities.Friendship.delete(existing.id);
     await base44.entities.BlockedUser.create({ user_id: currentUser.id, blocked_user_id: targetId, blocked_email: targetEmail, blocked_name: targetName });
+    // Immediately invalidate all relevant queries so block takes effect instantly
     qc.invalidateQueries({ queryKey: ['friends'] });
+    qc.invalidateQueries({ queryKey: ['blocked'] });
+    qc.invalidateQueries({ queryKey: ['conversations'] });
+    qc.invalidateQueries({ queryKey: ['incomingRequests'] });
+    // If currently in a DM with the blocked user, navigate away
+    if (activeConv?.participants?.some(p => p.user_id === targetId)) {
+      setActiveConv(null);
+      setView('home');
+    }
   };
 
   // Swipe gestures for mobile
