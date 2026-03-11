@@ -5,6 +5,7 @@ import { User, Link, Shield, LogOut, Palette, Bell, Volume2, Keyboard, Accessibi
 import ModalWrapper from './ModalWrapper';
 import { colors } from '@/components/app/design/tokens';
 import SecuritySettings from '@/components/app/features/SecuritySettings';
+import { SettingsField, SettingsToggle, SettingsSlider } from './SettingsFormParts';
 
 const TABS = [
   { id: 'profile', label: 'My Account', icon: User },
@@ -37,6 +38,7 @@ export default function SettingsModal({ onClose, profile, onUpdate, onLogout, cu
   });
   const [saving, setSaving] = useState(false);
   const set = (k, v) => setForm(p => ({ ...p, [k]: v }));
+  const get = (k) => form[k];
 
   const save = async () => {
     setSaving(true);
@@ -53,39 +55,6 @@ export default function SettingsModal({ onClose, profile, onUpdate, onLogout, cu
     input.onchange = async () => { const f = input.files?.[0]; if (!f) return; const { file_url } = await base44.integrations.Core.UploadFile({ file: f }); await onUpdate({ [type]: file_url }); };
     input.click();
   };
-
-  const Field = ({ label, k, ph, area }) => (
-    <div>
-      <label className="text-[11px] font-semibold uppercase tracking-[0.06em] block mb-1.5" style={{ color: colors.text.muted }}>{label}</label>
-      {area ? <textarea value={form[k]} onChange={e => set(k, e.target.value)} rows={3} placeholder={ph}
-        className="w-full px-3 py-2.5 rounded-lg text-[14px] outline-none resize-none" style={{ background: colors.bg.base, color: colors.text.primary, border: `1px solid ${colors.border.default}` }} />
-      : <input value={form[k]} onChange={e => set(k, e.target.value)} placeholder={ph}
-        className="w-full px-3 py-2.5 rounded-lg text-[14px] outline-none" style={{ background: colors.bg.base, color: colors.text.primary, border: `1px solid ${colors.border.default}` }} />}
-    </div>
-  );
-
-  const Toggle = ({ label, k, desc }) => (
-    <div className="flex items-center justify-between py-3" style={{ borderBottom: `1px solid ${colors.border.default}` }}>
-      <div className="flex-1 min-w-0">
-        <span className="text-[14px]" style={{ color: colors.text.primary }}>{label}</span>
-        {desc && <p className="text-[12px] mt-0.5" style={{ color: colors.text.muted }}>{desc}</p>}
-      </div>
-      <button onClick={() => set(k, !form[k])} className="w-11 h-6 rounded-full transition-colors relative flex-shrink-0 ml-3" style={{ background: form[k] ? colors.success : colors.bg.overlay }}>
-        <div className="absolute top-1 w-4 h-4 rounded-full bg-white transition-transform" style={{ left: form[k] ? 24 : 4 }} />
-      </button>
-    </div>
-  );
-
-  const Slider = ({ label, k, min, max, unit }) => (
-    <div className="py-3" style={{ borderBottom: `1px solid ${colors.border.default}` }}>
-      <div className="flex justify-between mb-2">
-        <span className="text-[14px]" style={{ color: colors.text.primary }}>{label}</span>
-        <span className="text-[12px] font-medium" style={{ color: colors.text.muted }}>{form[k]}{unit}</span>
-      </div>
-      <input type="range" value={form[k]} onChange={e => set(k, Number(e.target.value))} min={min} max={max}
-        className="w-full h-1.5 rounded-full appearance-none cursor-pointer" style={{ background: colors.bg.overlay, accentColor: colors.accent.primary }} />
-    </div>
-  );
 
   return (
     <ModalWrapper title="Settings" onClose={onClose} width={680}>
