@@ -1,6 +1,6 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 
 // ── Server data ──
 export function useServers(userId, userEmail) {
@@ -19,6 +19,7 @@ export function useServers(userId, userEmail) {
       return servers.filter(s => myIds.has(s.id) || s.owner_id === userId || s.created_by === userEmail);
     },
     enabled: !!userId,
+    staleTime: 30000,
   });
 }
 
@@ -27,6 +28,7 @@ export function useCategories(serverId) {
     queryKey: ['categories', serverId],
     queryFn: () => base44.entities.Category.filter({ server_id: serverId }),
     enabled: !!serverId,
+    staleTime: 60000,
   });
 }
 
@@ -35,6 +37,7 @@ export function useChannels(serverId) {
     queryKey: ['channels', serverId],
     queryFn: () => base44.entities.Channel.filter({ server_id: serverId }),
     enabled: !!serverId,
+    staleTime: 30000,
   });
 }
 
@@ -43,6 +46,7 @@ export function useMembers(serverId) {
     queryKey: ['members', serverId],
     queryFn: () => base44.entities.ServerMember.filter({ server_id: serverId }),
     enabled: !!serverId,
+    staleTime: 30000,
   });
 }
 
@@ -51,11 +55,22 @@ export function useRoles(serverId) {
     queryKey: ['roles', serverId],
     queryFn: () => base44.entities.Role.filter({ server_id: serverId }),
     enabled: !!serverId,
+    staleTime: 60000,
   });
 }
 
-// ── Messages ──
+// ── Messages with real-time subscriptions ──
 export function useMessages(channelId) {
+  const qc = useQueryClient();
+
+  useEffect(() => {
+    if (!channelId) return;
+    const unsub = base44.entities.Message.subscribe((event) => {
+      qc.invalidateQueries({ queryKey: ['messages', channelId] });
+    });
+    return unsub;
+  }, [channelId, qc]);
+
   return useQuery({
     queryKey: ['messages', channelId],
     queryFn: async () => {
@@ -63,11 +78,21 @@ export function useMessages(channelId) {
       return msgs.filter(m => !m.is_deleted).reverse();
     },
     enabled: !!channelId,
-    refetchInterval: 4000,
+    staleTime: 5000,
   });
 }
 
 export function useDMMessages(conversationId) {
+  const qc = useQueryClient();
+
+  useEffect(() => {
+    if (!conversationId) return;
+    const unsub = base44.entities.DirectMessage.subscribe((event) => {
+      qc.invalidateQueries({ queryKey: ['dmMessages', conversationId] });
+    });
+    return unsub;
+  }, [conversationId, qc]);
+
   return useQuery({
     queryKey: ['dmMessages', conversationId],
     queryFn: async () => {
@@ -75,12 +100,22 @@ export function useDMMessages(conversationId) {
       return msgs.filter(m => !m.is_deleted).reverse();
     },
     enabled: !!conversationId,
-    refetchInterval: 4000,
+    staleTime: 5000,
   });
 }
 
 // ── Conversations ──
 export function useConversations(userEmail, userId) {
+  const qc = useQueryClient();
+
+  useEffect(() => {
+    if (!userEmail) return;
+    const unsub = base44.entities.Conversation.subscribe(() => {
+      qc.invalidateQueries({ queryKey: ['conversations', userEmail] });
+    });
+    return unsub;
+  }, [userEmail, qc]);
+
   return useQuery({
     queryKey: ['conversations', userEmail],
     queryFn: async () => {
@@ -88,6 +123,7 @@ export function useConversations(userEmail, userId) {
       return all.filter(c => c.participants?.some(p => p.user_email === userEmail || p.user_id === userId));
     },
     enabled: !!userEmail,
+    staleTime: 10000,
   });
 }
 
@@ -97,6 +133,7 @@ export function useFriends(userId) {
     queryKey: ['friends', userId],
     queryFn: () => base44.entities.Friendship.filter({ user_id: userId, status: 'accepted' }),
     enabled: !!userId,
+    staleTime: 30000,
   });
 }
 
@@ -108,11 +145,13 @@ export function useFriendRequests(userId, userEmail) {
       return all.filter(f => f.friend_id === userId || f.friend_email === userEmail);
     },
     enabled: !!userId,
+    staleTime: 15000,
   });
   const outgoing = useQuery({
     queryKey: ['outgoingRequests', userId],
     queryFn: () => base44.entities.Friendship.filter({ user_id: userId, status: 'pending' }),
     enabled: !!userId,
+    staleTime: 15000,
   });
   return { incoming: incoming.data || [], outgoing: outgoing.data || [] };
 }
@@ -123,6 +162,7 @@ export function useBlocked(userId) {
     queryKey: ['blocked', userId],
     queryFn: () => base44.entities.BlockedUser.filter({ user_id: userId }),
     enabled: !!userId,
+    staleTime: 60000,
   });
 }
 
@@ -135,5 +175,6 @@ export function useMyProfile(email) {
       return p[0] || null;
     },
     enabled: !!email,
+    staleTime: 30000,
   });
 }
