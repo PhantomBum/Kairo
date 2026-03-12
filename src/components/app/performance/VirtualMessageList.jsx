@@ -110,10 +110,10 @@ export default function VirtualMessageList({
     <div className="flex-1 relative min-h-0">
       <div ref={containerRef} onScroll={onScroll} className="absolute inset-0 overflow-y-auto pb-2 scrollbar-none" role="log" aria-label={`Messages in ${channelName}`}>
         {/* Channel welcome */}
-        <div className="px-4 md:px-8 pt-16 pb-8">
-          <div className="w-[68px] h-[68px] rounded-full flex items-center justify-center mb-4"
+        <div className="px-4 md:px-8 pt-20 pb-10">
+          <div className="w-[76px] h-[76px] rounded-full flex items-center justify-center mb-5 mx-auto md:mx-0"
             style={{ background: colors.bg.overlay }}>
-            {isDM ? <MessageSquare className="w-8 h-8" style={{ color: colors.text.primary }} /> : <Hash className="w-8 h-8" style={{ color: colors.text.primary }} />}
+            {isDM ? <MessageSquare className="w-9 h-9" style={{ color: colors.text.primary }} /> : <Hash className="w-9 h-9" style={{ color: colors.text.primary }} />}
           </div>
           <h2 className="text-[32px] font-bold mb-2" style={{ color: colors.text.primary }}>
             {isDM ? channelName : `Welcome to #${channelName}`}
