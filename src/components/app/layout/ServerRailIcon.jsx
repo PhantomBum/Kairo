@@ -47,10 +47,11 @@ export default function ServerRailIcon({ server, active, unread, onClick, childr
         className="relative overflow-hidden flex items-center justify-center"
         whileTap={{ scale: 0.92 }}
         style={{
-          width: 48, height: 48,
-          borderRadius: active || hovered ? 16 : 24,
+          width: 44, height: 44,
+          borderRadius: active || hovered ? 15 : 22,
           background: active ? (server?.banner_color || colors.accent.primary) : hovered ? (server?.banner_color || colors.accent.primary) : colors.bg.surface,
           transition: 'border-radius 150ms ease, background 150ms ease',
+          boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.03)',
         }}
       >
         {children}
