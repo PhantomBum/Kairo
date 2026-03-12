@@ -1,5 +1,5 @@
 import React from 'react';
-import { Plus, Compass, Bot, Crown, HelpCircle, Zap, Hash } from 'lucide-react';
+import { Plus, Compass, Crown, HelpCircle, Zap, Hash } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { createPageUrl } from '@/utils';
 import { colors } from '@/components/app/design/tokens';
@@ -7,9 +7,9 @@ import { colors } from '@/components/app/design/tokens';
 function getGreeting() {
   const h = new Date().getHours();
   if (h < 5) return { text: 'Late night?', sub: 'The quiet hours hit different.' };
-  if (h < 12) return { text: 'Morning', sub: 'Coffee first, then chaos.' };
-  if (h < 17) return { text: 'Hey', sub: 'Back at it.' };
-  if (h < 21) return { text: 'Evening', sub: 'Good time to catch up.' };
+  if (h < 12) return { text: 'Good morning', sub: 'Start the day right.' };
+  if (h < 17) return { text: 'Good afternoon', sub: 'Hope it\'s going well.' };
+  if (h < 21) return { text: 'Good evening', sub: 'Time to catch up.' };
   return { text: 'Night owl', sub: 'One more scroll won\'t hurt.' };
 }
 
@@ -44,48 +44,48 @@ export default function EmptyView({ onCreateServer, onJoinServer, emptyServer, s
         initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4 }}
         className="relative z-10 w-full max-w-md"
       >
-        {/* Minimal header */}
-        <div className="mb-12">
+        {/* Warm greeting */}
+        <div className="mb-14">
           <p className="text-[13px] font-medium mb-3" style={{ color: colors.text.disabled }}>
             {greeting.text} — {greeting.sub}
           </p>
-          <h1 className="text-[28px] font-bold tracking-tight leading-[1.15]" style={{ color: colors.text.primary }}>
+          <h1 className="text-[32px] font-bold tracking-tight leading-[1.1]" style={{ color: colors.text.primary }}>
             Kairo
           </h1>
-          <div className="w-8 h-[3px] rounded-full mt-3" style={{ background: colors.accent.primary }} />
+          <div className="w-8 h-[3px] rounded-full mt-4" style={{ background: colors.accent.primary }} />
         </div>
 
-        {/* Actions — stacked, not side-by-side */}
-        <div className="space-y-2 mb-10">
+        {/* Actions */}
+        <div className="space-y-2.5 mb-12">
           <button onClick={onCreateServer}
-            className="w-full flex items-center gap-3 px-4 py-3.5 rounded-lg text-left group"
-            style={{ background: 'rgba(255,255,255,0.03)', border: `1px solid ${colors.border.default}` }}>
-            <div className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0"
+            className="w-full flex items-center gap-4 px-5 py-4 rounded-xl text-left transition-colors hover:bg-[rgba(255,255,255,0.02)]"
+            style={{ background: 'rgba(255,255,255,0.02)', border: `1px solid ${colors.border.default}` }}>
+            <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
               style={{ background: colors.accent.primary }}>
-              <Plus className="w-4 h-4 text-white" />
+              <Plus className="w-5 h-5 text-white" />
             </div>
             <div className="min-w-0">
-              <p className="text-[14px] font-medium" style={{ color: colors.text.primary }}>Create a server</p>
-              <p className="text-[12px]" style={{ color: colors.text.disabled }}>Start something new</p>
+              <p className="text-[14px] font-semibold" style={{ color: colors.text.primary }}>Create a server</p>
+              <p className="text-[12px] mt-0.5" style={{ color: colors.text.disabled }}>Start something new</p>
             </div>
           </button>
 
           <button onClick={onJoinServer}
-            className="w-full flex items-center gap-3 px-4 py-3.5 rounded-lg text-left group"
-            style={{ background: 'rgba(255,255,255,0.03)', border: `1px solid ${colors.border.default}` }}>
-            <div className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0"
-              style={{ background: colors.bg.elevated, border: `1px solid ${colors.border.light}` }}>
-              <Compass className="w-4 h-4" style={{ color: colors.text.muted }} />
+            className="w-full flex items-center gap-4 px-5 py-4 rounded-xl text-left transition-colors hover:bg-[rgba(255,255,255,0.02)]"
+            style={{ background: 'rgba(255,255,255,0.02)', border: `1px solid ${colors.border.default}` }}>
+            <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
+              style={{ background: colors.bg.overlay, border: `1px solid ${colors.border.light}` }}>
+              <Compass className="w-5 h-5" style={{ color: colors.text.muted }} />
             </div>
             <div className="min-w-0">
-              <p className="text-[14px] font-medium" style={{ color: colors.text.primary }}>Join with an invite</p>
-              <p className="text-[12px]" style={{ color: colors.text.disabled }}>Got a code? Paste it here</p>
+              <p className="text-[14px] font-semibold" style={{ color: colors.text.primary }}>Join with an invite</p>
+              <p className="text-[12px] mt-0.5" style={{ color: colors.text.disabled }}>Got a code? Paste it here</p>
             </div>
           </button>
         </div>
 
-        {/* Links — just text, no icons, casual */}
-        <div className="flex gap-4 flex-wrap">
+        {/* Links */}
+        <div className="flex gap-5 flex-wrap">
           {[
             { href: createPageUrl('BotMarketplace'), label: 'Bots' },
             { href: createPageUrl('Elite'), label: 'Elite', accent: true },
