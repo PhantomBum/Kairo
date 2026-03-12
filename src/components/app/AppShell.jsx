@@ -165,7 +165,8 @@ export default function AppShell({ currentUser }) {
       const existing = await base44.entities.ServerMember.filter({ server_id: server.id, user_id: currentUser.id });
       if (existing.length === 0) {
         await base44.entities.ServerMember.create({ server_id: server.id, user_id: currentUser.id, user_email: currentUser.email, joined_at: new Date().toISOString(), role_ids: [] });
-        await base44.entities.Server.update(server.id, { member_count: (server.member_count || 1) + 1 });
+        const allMems = await base44.entities.ServerMember.filter({ server_id: server.id });
+        await base44.entities.Server.update(server.id, { member_count: allMems.filter(m => !m.is_banned).length });
       }
       return server;
     },
@@ -554,7 +555,7 @@ export default function AppShell({ currentUser }) {
         {modal === 'add-friend' && <AddFriendModal onClose={() => setModal(null)} currentUserId={currentUser.id} />}
         {modal === 'settings' && <SettingsModal onClose={() => setModal(null)} profile={profile} onUpdate={(d) => updateProfile.mutate(d)} onLogout={() => base44.auth.logout()} currentUser={currentUser} />}
         {modal === 'invite' && activeServer && <InviteModal onClose={() => setModal(null)} server={activeServer} />}
-        {modal === 'server-settings' && activeServer && <ServerSettingsModal onClose={(r) => { setModal(null); if (r === 'deleted') goHome(); }} server={activeServer} currentUserId={currentUser.id} />}
+        {modal === 'server-settings' && activeServer && <ServerSettingsModal onClose={(r) => { setModal(null); if (r === 'deleted' || r === 'transferred') { qc.invalidateQueries({ queryKey: ['servers'] }); goHome(); } }} server={activeServer} currentUserId={currentUser.id} />}
         {modal === 'profile' && profileModal && (
           <UserProfileModal onClose={() => { setModal(null); setProfileUserId(null); }} profile={profileModal} memberData={profileMember} roles={roles}
             isCurrentUser={profileUserId === currentUser.id} friends={friends} mutualServers={servers.slice(0, 5)}
