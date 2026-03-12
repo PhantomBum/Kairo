@@ -5,19 +5,10 @@ import { colors } from '@/components/app/design/tokens';
 
 function MemberSkeleton() {
   return (
-    <div className="flex items-center gap-3 px-3 py-2">
+    <div className="flex items-center gap-3 px-2 py-1.5">
       <div className="w-8 h-8 rounded-full k-shimmer" />
       <div className="flex-1 h-3 rounded k-shimmer" style={{ width: '60%' }} />
     </div>
-  );
-}
-
-function RoleBadge({ name, color }) {
-  return (
-    <span className="text-[10px] font-semibold px-1.5 py-[1px] rounded flex-shrink-0 leading-tight"
-      style={{ background: `${color}18`, color: color, letterSpacing: '0.01em' }}>
-      {name}
-    </span>
   );
 }
 
@@ -30,24 +21,21 @@ function MemberRow({ member, profile, isOwner, roleColor, highestRole, onClick }
 
   return (
     <button onClick={() => onClick?.(member.user_id)}
-      className="w-full flex items-center gap-3 px-3 py-[7px] rounded-lg transition-colors hover:bg-[rgba(255,255,255,0.04)] group"
-      style={{ opacity: isOnline ? 1 : 0.4 }}>
+      className="w-full flex items-center gap-2 px-2 py-1.5 rounded transition-colors hover:bg-[rgba(255,255,255,0.06)] group"
+      style={{ opacity: isOnline ? 1 : 0.35 }}>
       <div className="relative flex-shrink-0">
-        <div className="w-8 h-8 rounded-full flex items-center justify-center text-[12px] font-semibold overflow-hidden"
-          style={{ background: colors.bg.overlay, color: colors.text.muted }}>
+        <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold overflow-hidden"
+          style={{ background: roleColor || colors.bg.overlay, color: '#fff' }}>
           {avatar ? <img src={avatar} className="w-full h-full object-cover" alt="" /> : name.charAt(0).toUpperCase()}
         </div>
-        <div className="absolute -bottom-px -right-px w-[11px] h-[11px] rounded-full border-[2px]"
+        <div className="absolute -bottom-px -right-px w-[10px] h-[10px] rounded-full border-2"
           style={{ background: statusColor, borderColor: colors.bg.surface }} />
       </div>
-      <span className="text-[13px] truncate flex-1 text-left" style={{ color: roleColor || colors.text.secondary, fontWeight: 500 }} title={name}>
+      <span className="text-[13px] truncate flex-1 text-left" style={{ color: roleColor || colors.text.secondary, fontWeight: 500 }}>
         {name}
       </span>
-      {highestRole && (
-        <RoleBadge name={highestRole.name} color={highestRole.color} />
-      )}
-      {isOwner && !highestRole && (
-        <span className="text-[9px] px-1.5 py-0.5 rounded font-semibold" style={{ background: 'rgba(240,178,50,0.12)', color: colors.warning }}>OWNER</span>
+      {isOwner && (
+        <Crown className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#f0b232' }} />
       )}
     </button>
   );
@@ -64,7 +52,6 @@ export default function MemberPanel({ members, roles, ownerId, onProfileClick })
   const sortedRoles = useMemo(() => (roles || []).filter(r => !r.is_default).sort((a,b) => (b.position||0) - (a.position||0)), [roles]);
   const hoistedRoles = useMemo(() => sortedRoles.filter(r => r.hoist), [sortedRoles]);
 
-  // For each member, find their highest display role
   const getHighestRole = useMemo(() => {
     return (member) => {
       if (!member.role_ids?.length) return null;
@@ -90,31 +77,22 @@ export default function MemberPanel({ members, roles, ownerId, onProfileClick })
     return groups;
   }, [enriched, hoistedRoles]);
 
-  const totalOnline = enriched.filter(m => m.profile?.is_online).length;
-
   if (!members || members.length === 0) {
     return (
-      <div className="w-[240px] flex-shrink-0 overflow-y-auto scrollbar-none p-3 hidden md:block" style={{ borderLeft: `1px solid ${colors.border.default}`, background: colors.bg.surface }}>
+      <div className="w-[240px] flex-shrink-0 overflow-y-auto scrollbar-none p-2 hidden md:block" style={{ background: colors.bg.surface }}>
         {Array.from({ length: 8 }).map((_, i) => <MemberSkeleton key={i} />)}
       </div>
     );
   }
 
   return (
-    <div className="w-[240px] flex-shrink-0 overflow-y-auto scrollbar-none px-2 pt-4 hidden md:block" style={{ borderLeft: `1px solid ${colors.border.default}`, background: colors.bg.surface }} role="complementary" aria-label="Member list">
-      {/* Member count header */}
-      <div className="px-3 pb-3 text-[11px]" style={{ color: colors.text.disabled }}>
-        {totalOnline} online · {enriched.length} members
-      </div>
-
+    <div className="w-[240px] flex-shrink-0 overflow-y-auto scrollbar-none px-2 pt-4 hidden md:block" style={{ background: colors.bg.surface }} role="complementary" aria-label="Member list">
       {grouped.map((group, gi) => (
-        <div key={gi} className="mb-3">
-          <div className="flex items-center gap-2 px-3 pt-3 pb-1.5"
-            style={{ borderLeft: group.color ? `2px solid ${group.color}` : 'none', marginLeft: group.color ? 0 : 2 }}>
-            <span className="text-[10px] font-bold uppercase tracking-[0.06em]" style={{ color: group.color || colors.text.disabled }}>
-              {group.label}
+        <div key={gi} className="mb-2">
+          <div className="px-2 pt-4 pb-1">
+            <span className="text-[11px] font-bold uppercase tracking-[0.05em]" style={{ color: colors.text.muted }}>
+              {group.label} — {group.count}
             </span>
-            <span className="text-[10px]" style={{ color: colors.text.disabled }}>{group.count}</span>
           </div>
           {group.members.map(m => (
             <MemberRow key={m.id} member={m} profile={m.profile} isOwner={m.user_id === ownerId}
