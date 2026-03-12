@@ -1,5 +1,5 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
-import { Plus, Send, X, Smile, Image, FileText, Film, Type, Sticker, ImageIcon } from 'lucide-react';
+import { Plus, Send, X, Smile, Image, FileText, Film, Type, Stamp, ImageIcon } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { colors } from '@/components/app/design/tokens';
 import FormattingToolbar from '@/components/app/features/FormattingToolbar';
@@ -199,7 +199,7 @@ export default function ChatInput({ channelName, channelId, replyTo, onCancelRep
           title="GIF"><span className="text-[12px] font-bold" style={{ color: showGif ? colors.text.primary : colors.text.muted }}>GIF</span></button>
         <button onClick={() => { closePickers(); setShowSticker(!showSticker); }}
           className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-[rgba(255,255,255,0.06)] flex-shrink-0 mb-0.5"
-          title="Sticker"><Sticker className="w-5 h-5" style={{ color: showSticker ? colors.text.primary : colors.text.muted }} /></button>
+          title="Sticker"><Stamp className="w-5 h-5" style={{ color: showSticker ? colors.text.primary : colors.text.muted }} /></button>
         <button onClick={() => { closePickers(); setShowFormatting(!showFormatting); }}
           className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-[rgba(255,255,255,0.06)] flex-shrink-0 mb-0.5"
           title="Formatting"><Type className="w-5 h-5" style={{ color: showFormatting ? colors.text.primary : colors.text.muted }} /></button>
