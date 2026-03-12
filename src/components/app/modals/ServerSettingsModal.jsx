@@ -102,7 +102,9 @@ export default function ServerSettingsModal({ onClose, server, currentUserId }) 
           <div className="h-24 rounded-xl" style={{ background: bannerColor }} />
           <button onClick={() => uploadImg('icon_url')} className="w-full py-3 rounded-xl text-[13px]" style={{ background: colors.bg.elevated, color: colors.text.secondary, border: `1px solid ${colors.border.default}` }}>Change Server Icon</button>
           <button onClick={() => uploadImg('banner_url')} className="w-full py-3 rounded-xl text-[13px]" style={{ background: colors.bg.elevated, color: colors.text.secondary, border: `1px solid ${colors.border.default}` }}>Change Server Banner</button>
-          <button onClick={() => { setBannerColor(bannerColor); saveOverview(); }} className="px-6 py-2.5 rounded-xl text-[13px] font-semibold" style={{ background: colors.accent.primary, color: '#fff' }}>Save Appearance</button>
+          <button onClick={() => { setBannerColor(bannerColor); saveOverview(); }} disabled={saving} className="px-6 py-2.5 rounded-xl text-[13px] font-semibold disabled:opacity-30" style={{ background: colors.accent.primary, color: '#fff' }}>
+            {saving ? 'Saving...' : 'Save Appearance'}
+          </button>
         </div>
       );
       case 'invites': return (
