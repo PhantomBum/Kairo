@@ -238,6 +238,19 @@ export default function ChatInput({ channelName, channelId, replyTo, onCancelRep
             if (e.key === 'Enter' && !e.shiftKey && !showSlash && !showMention) { e.preventDefault(); handleSend(); }
             if (e.key === 'ArrowUp' && !content.trim() && onEditLast) { e.preventDefault(); onEditLast(); }
             if (e.key === 'Escape') { closePickers(); if (replyTo) onCancelReply(); }
+            // Formatting shortcuts
+            const wrap = (prefix, suffix) => {
+              e.preventDefault();
+              const el = inputRef.current;
+              const s = el.selectionStart, end = el.selectionEnd;
+              const sel = content.substring(s, end) || 'text';
+              setContent(content.substring(0, s) + prefix + sel + suffix + content.substring(end));
+              setTimeout(() => { el.focus(); el.setSelectionRange(s + prefix.length, s + prefix.length + sel.length); }, 0);
+            };
+            if ((e.ctrlKey || e.metaKey) && e.key === 'b') wrap('**', '**');
+            if ((e.ctrlKey || e.metaKey) && e.key === 'i') wrap('*', '*');
+            if ((e.ctrlKey || e.metaKey) && e.key === 'u') wrap('__', '__');
+            if ((e.ctrlKey || e.metaKey) && e.key === 'e') wrap('`', '`');
           }}
           placeholder={placeholder}
           className="flex-1 bg-transparent text-[14px] outline-none resize-none max-h-[160px] placeholder:text-[13px]"
