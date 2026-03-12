@@ -104,12 +104,15 @@ export default function Layout({ children }) {
         }
         select option { background: #0a0a0a; color: #fff; padding: 8px 12px; }
 
-        @media (prefers-reduced-motion: reduce) {
+        @media (prefers-reduced-motion: reduce), .reduced-motion {
           *, *::before, *::after {
             animation-duration: 0.01ms !important; transition-duration: 0.01ms !important;
           }
           button:active:not(:disabled) { transform: none !important; }
           .k-shimmer { animation: none !important; background: var(--k-bg-elevated) !important; }
+        }
+        html.reduced-motion *, html.reduced-motion *::before, html.reduced-motion *::after {
+          animation-duration: 0.01ms !important; transition-duration: 0.01ms !important;
         }
 
         @supports (padding-bottom: env(safe-area-inset-bottom)) { .safe-bottom { padding-bottom: env(safe-area-inset-bottom); } }
