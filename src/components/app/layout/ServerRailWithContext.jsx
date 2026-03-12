@@ -119,7 +119,7 @@ export default function ServerRailWithContext({ servers, activeServerId, onServe
                 <img src={s.icon_url} className="w-full h-full object-cover absolute inset-0" alt={s.name} />
                 <div className="absolute inset-0 rounded-[inherit]" style={{ boxShadow: 'inset 0 0 0 1px rgba(0,0,0,0.15)' }} />
               </>
-                : <span className="text-[15px] font-semibold select-none" style={{ color: activeServerId === s.id ? colors.bg.base : colors.text.secondary }}>{s.name?.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()}</span>}
+                : <span className="text-[13px] font-semibold select-none" style={{ color: activeServerId === s.id ? colors.bg.base : colors.text.secondary }}>{s.name?.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()}</span>}
             </ServerRailIcon></div>
           </ContextMenuTrigger>
           <ContextMenuContent className="w-52 p-1.5 rounded-lg" style={{ background: colors.bg.float, border: `1px solid ${colors.border.strong}`, boxShadow: '0 8px 32px rgba(0,0,0,0.6)' }}>
