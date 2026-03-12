@@ -1,25 +1,25 @@
-// KAIRO V2 DESIGN SYSTEM — Lighter, breathable dark palette
-// Inspired by Kloak: charcoal tones, not pure black
+// KAIRO V2 DESIGN SYSTEM — Kloak-Inspired
+// Warm dark tones, generous spacing, confident typography
 
 export const colors = {
-  // Backgrounds — lighter charcoal scale
+  // Backgrounds — warm charcoal scale (not cold blue-black)
   bg: {
-    base: '#1a1b1e',        // darkest: server rail
-    surface: '#1e1f23',     // sidebar panels
-    elevated: '#25262b',    // chat area, main content
-    overlay: '#2c2d33',     // cards, dropdowns
-    modal: '#2c2d33',       // modals
-    hover: 'rgba(255,255,255,0.05)',
-    active: 'rgba(255,255,255,0.08)',
+    base: '#18181c',        // darkest: server rail
+    surface: '#1c1c21',     // sidebar panels
+    elevated: '#222228',    // chat area, main content
+    overlay: '#2a2a31',     // cards, dropdowns
+    modal: '#2a2a31',       // modals
+    hover: 'rgba(255,255,255,0.04)',
+    active: 'rgba(255,255,255,0.07)',
   },
-  // Accent — muted purple-blue
+  // Accent — confident indigo-blue
   accent: {
-    primary: '#6c7adb',
-    hover: '#8b96e9',
-    active: '#5b69c9',
-    subtle: 'rgba(108,122,219,0.1)',
-    muted: 'rgba(108,122,219,0.2)',
-    glow: 'rgba(108,122,219,0.12)',
+    primary: '#6875e8',
+    hover: '#7b87f0',
+    active: '#5a66d6',
+    subtle: 'rgba(104,117,232,0.10)',
+    muted: 'rgba(104,117,232,0.18)',
+    glow: 'rgba(104,117,232,0.10)',
   },
   // Status
   status: {
@@ -34,19 +34,19 @@ export const colors = {
   warning: '#faa81a',
   success: '#3ba55d',
   info: '#5865f2',
-  // Text — slightly warm off-whites
+  // Text — warm off-whites
   text: {
-    primary: '#f0f1f3',
-    secondary: '#a8aab2',
-    muted: '#8b8d95',
-    disabled: '#6b6d75',
-    link: '#6c7adb',
+    primary: '#ededf0',
+    secondary: '#a0a0ad',
+    muted: '#7d7d8a',
+    disabled: '#5c5c66',
+    link: '#6875e8',
   },
-  // Borders — visible but soft
+  // Borders — warm, subtle
   border: {
-    default: '#3a3b42',
-    light: '#44454d',
-    strong: '#52535c',
+    default: '#35353e',
+    light: '#3e3e48',
+    strong: '#4a4a55',
   },
 };
 
@@ -60,11 +60,11 @@ export const radius = {
 };
 
 export const shadows = {
-  subtle: '0 1px 3px rgba(0,0,0,0.2)',
-  medium: '0 4px 12px rgba(0,0,0,0.25)',
-  strong: '0 8px 24px rgba(0,0,0,0.35)',
-  glow: '0 0 20px rgba(108,122,219,0.1)',
-  accentGlow: '0 0 16px rgba(108,122,219,0.2)',
+  subtle: '0 1px 3px rgba(0,0,0,0.24)',
+  medium: '0 4px 14px rgba(0,0,0,0.3)',
+  strong: '0 8px 28px rgba(0,0,0,0.4)',
+  glow: '0 0 20px rgba(104,117,232,0.08)',
+  accentGlow: '0 0 16px rgba(104,117,232,0.18)',
 };
 
 export const glass = {
@@ -72,9 +72,9 @@ export const glass = {
   surface: { background: colors.bg.surface, border: `1px solid ${colors.border.default}` },
   card: { background: colors.bg.overlay, border: `1px solid ${colors.border.default}` },
   hover: { background: colors.bg.hover },
-  active: { background: 'rgba(108,122,219,0.12)', border: `1px solid rgba(108,122,219,0.25)` },
+  active: { background: 'rgba(104,117,232,0.10)', border: `1px solid rgba(104,117,232,0.22)` },
   bubble: { background: colors.bg.overlay, border: `1px solid ${colors.border.default}` },
-  bubbleOwn: { background: 'rgba(108,122,219,0.12)', border: '1px solid rgba(108,122,219,0.2)' },
+  bubbleOwn: { background: 'rgba(104,117,232,0.10)', border: '1px solid rgba(104,117,232,0.18)' },
 };
 
 export const typography = {
@@ -150,10 +150,10 @@ export const cssVariables = `
   --bg-surface: ${colors.bg.surface};
   --bg-elevated: ${colors.bg.elevated};
   --bg-overlay: ${colors.bg.overlay};
-  --bg-glass: rgba(255,255,255,0.04);
-  --bg-glass-hover: rgba(255,255,255,0.06);
-  --bg-glass-active: rgba(255,255,255,0.09);
-  --bg-glass-strong: rgba(255,255,255,0.1);
+  --bg-glass: rgba(255,255,255,0.03);
+  --bg-glass-hover: rgba(255,255,255,0.05);
+  --bg-glass-active: rgba(255,255,255,0.08);
+  --bg-glass-strong: rgba(255,255,255,0.08);
   --text-cream: ${colors.text.primary};
   --text-primary: ${colors.text.primary};
   --text-secondary: ${colors.text.secondary};
