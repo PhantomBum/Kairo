@@ -32,7 +32,7 @@ export default function ChatHeader({ channel, conversation, currentUserId, showM
       role="banner">
       <div className="flex items-center gap-2 min-w-0">
         <Icon className="w-5 h-5 flex-shrink-0" style={{ color: colors.text.muted }} />
-        <h1 className="text-[15px] font-semibold truncate" style={{ color: '#fff' }}>{label}</h1>
+        <h1 className="text-[15px] font-semibold truncate" style={{ color: colors.text.primary }}>{label}</h1>
         {channel?.is_nsfw && (
           <span className="text-[10px] font-bold px-1.5 py-0.5 rounded flex-shrink-0" style={{ background: 'rgba(242,63,67,0.15)', color: colors.danger }}>NSFW</span>
         )}

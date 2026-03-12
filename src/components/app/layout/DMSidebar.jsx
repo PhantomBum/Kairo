@@ -95,7 +95,7 @@ export default function DMSidebar({ conversations, activeId, onSelect, onFriends
                     {group && <span className="absolute -bottom-1 -right-1 text-[8px] font-bold px-1 rounded-full" style={{ background: colors.bg.surface, color: colors.text.muted }}>{c.participants?.length}</span>}
                   </div>
                   <div className="flex-1 min-w-0 text-left">
-                    <div className="text-[15px] truncate" style={{ color: active ? '#fff' : colors.text.secondary, fontWeight: active ? 500 : 400 }}>{label}</div>
+                    <div className="text-[15px] truncate" style={{ color: active ? colors.text.primary : colors.text.secondary, fontWeight: active ? 500 : 400 }}>{label}</div>
                     {c.last_message_preview && (
                       <div className="text-[12px] truncate" style={{ color: colors.text.muted }}>{c.last_message_preview}</div>
                     )}

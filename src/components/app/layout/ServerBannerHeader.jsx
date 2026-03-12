@@ -36,14 +36,14 @@ export default function ServerBannerHeader({ server, isOwner, onInvite, onSettin
         onClick={() => setOpen(!open)}
         className="w-full h-12 px-4 flex items-center justify-between transition-colors hover:bg-[rgba(255,255,255,0.04)]"
         style={{ boxShadow: '0 1px 0 rgba(0,0,0,0.2), 0 1.5px 0 rgba(0,0,0,0.06)' }}>
-        <span className="text-[15px] font-semibold truncate" style={{ color: '#fff' }}>{server?.name}</span>
+        <span className="text-[15px] font-semibold truncate" style={{ color: colors.text.primary }}>{server?.name}</span>
         {open ? <X className="w-[18px] h-[18px] flex-shrink-0" style={{ color: colors.text.muted }} />
           : <ChevronDown className="w-[18px] h-[18px] flex-shrink-0" style={{ color: colors.text.muted }} />}
       </button>
 
       {open && (
         <div className="absolute left-2 right-2 z-50 p-1.5 rounded k-fade-in"
-          style={{ top: 48, background: colors.bg.float, boxShadow: '0 8px 16px rgba(0,0,0,0.24)' }}>
+          style={{ top: 48, background: colors.bg.float, border: `1px solid ${colors.border.strong}`, boxShadow: '0 8px 32px rgba(0,0,0,0.6)' }}>
           <DropdownItem icon={UserPlus} label="Invite People" color={colors.accent.primary} onClick={() => { onInvite(); setOpen(false); }} />
           {isOwner && (
             <>

@@ -13,7 +13,7 @@ export default function UserBar({ profile, isMuted, isDeafened, onToggleMute, on
 
   return (
     <div className="px-2 py-[6px] flex items-center gap-0.5 flex-shrink-0"
-      style={{ background: '#232428' }} role="status" aria-label="User panel">
+      style={{ background: colors.bg.base }} role="status" aria-label="User panel">
       <button onClick={onStatusClick} className="flex items-center gap-2 flex-1 min-w-0 px-1 py-1 rounded hover:bg-[rgba(255,255,255,0.06)] transition-colors" aria-label="Change status">
         <div className="relative flex-shrink-0">
           <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold overflow-hidden"
@@ -21,10 +21,10 @@ export default function UserBar({ profile, isMuted, isDeafened, onToggleMute, on
             {avatar ? <img src={avatar} className="w-full h-full object-cover" alt="" /> : name.charAt(0).toUpperCase()}
           </div>
           <div className="absolute -bottom-0.5 -right-0.5 w-[14px] h-[14px] rounded-full border-[3px]"
-            style={{ background: isGhost ? colors.status.invisible : statusColor, borderColor: '#232428' }} />
+            style={{ background: isGhost ? colors.status.invisible : statusColor, borderColor: colors.bg.base }} />
         </div>
         <div className="flex-1 min-w-0 text-left">
-          <div className="text-[13px] font-semibold truncate leading-tight flex items-center gap-1" style={{ color: '#fff' }}>
+          <div className="text-[13px] font-semibold truncate leading-tight flex items-center gap-1" style={{ color: colors.text.primary }}>
             {name}
             {isGhost && <Ghost className="w-3 h-3 flex-shrink-0" style={{ color: colors.accent.primary, opacity: 0.7 }} />}
           </div>

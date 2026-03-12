@@ -20,7 +20,7 @@ function ChannelItem({ channel, active, onClick, onSettings, isOwner, index }) {
                 className="w-full flex items-center gap-1.5 px-2 py-[6px] rounded text-[15px] group"
                 style={{
                   background: snapshot.isDragging ? 'rgba(255,255,255,0.06)' : active ? 'rgba(255,255,255,0.08)' : 'transparent',
-                  color: active ? '#fff' : colors.text.muted,
+                  color: active ? colors.text.primary : colors.text.muted,
                   fontWeight: active ? 500 : 400,
                   transition: 'background 100ms ease, color 100ms ease',
                 }}>

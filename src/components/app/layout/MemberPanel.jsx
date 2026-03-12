@@ -16,7 +16,7 @@ function MemberRow({ member, profile, isOwner, roleColor, onClick }) {
       style={{ opacity: isOnline ? 1 : 0.3 }}>
       <div className="relative flex-shrink-0">
         <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold overflow-hidden"
-          style={{ background: colors.bg.overlay, color: '#fff' }}>
+          style={{ background: colors.bg.overlay, color: colors.text.primary }}>
           {avatar ? <img src={avatar} className="w-full h-full object-cover" alt="" /> : name.charAt(0).toUpperCase()}
         </div>
         <div className="absolute -bottom-px -right-px w-[10px] h-[10px] rounded-full border-2"
