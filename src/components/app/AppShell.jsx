@@ -394,7 +394,7 @@ export default function AppShell({ currentUser }) {
           isHome={view === 'home' || view === 'friends'} badge={incomingReqs.length}
           currentUserId={currentUser.id} />
 
-        <div className="w-[240px] flex-shrink-0 flex flex-col" style={{ background: 'rgba(14,14,20,0.75)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', borderRight: '1px solid rgba(255,255,255,0.04)' }}>
+        <div className="w-[240px] flex-shrink-0 flex flex-col" style={{ background: colors.bg.surface, borderRight: `1px solid ${colors.border.default}` }}>
           {view === 'server' ? (
             <DraggableChannelSidebar server={activeServer} categories={categories} channels={channels}
               activeId={activeChannel?.id} onSelect={(ch) => { setActiveChannel(ch); setShowMobileSidebar(false); }}
@@ -421,7 +421,7 @@ export default function AppShell({ currentUser }) {
         <div className="flex-1 md:hidden" onClick={() => setShowMobileSidebar(false)} />
       </div>
 
-      <div className="flex-1 flex flex-col min-w-0 relative k-channel-fade" style={{ background: `linear-gradient(180deg, ${colors.bg.base} 0%, rgba(14,14,22,1) 100%)` }} role="main" key={activeChannel?.id || activeConv?.id || view}>
+      <div className="flex-1 flex flex-col min-w-0 relative k-channel-fade" style={{ background: colors.bg.elevated }} role="main" key={activeChannel?.id || activeConv?.id || view}>
         {view === 'spaces' ? (
           <SpacesView currentUser={currentUser} profile={profile} />
         ) : view === 'friends' ? (
