@@ -1,7 +1,7 @@
 import {
   Crown, ShieldCheck, Sparkles, Award, Heart, Code2, Eye, Gem,
   FlaskConical, Handshake, Youtube, Mic, MessageSquare, Pin,
-  Globe, Drama, Compass, Moon, Users, Clock, Volume2
+  Globe, Smile, Compass, Moon, Users, Clock, Volume2
 } from 'lucide-react';
 
 // Rarity tiers
