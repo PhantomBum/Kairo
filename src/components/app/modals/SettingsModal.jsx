@@ -5,6 +5,7 @@ import { User, Link, Shield, LogOut, Palette, Bell, Volume2, Keyboard, Accessibi
 import ModalWrapper from './ModalWrapper';
 import { colors } from '@/components/app/design/tokens';
 import SecuritySettings from '@/components/app/features/SecuritySettings';
+import { previewSound } from '@/components/app/features/NotificationSounds';
 import { SettingsField, SettingsToggle, SettingsSlider } from './SettingsFormParts';
 import BadgeOrderSettings from '@/components/app/badges/BadgeOrderSettings';
 import EffectsSettings from '@/components/app/effects/EffectsSettings';
@@ -234,7 +235,7 @@ export default function SettingsModal({ onClose, profile, onUpdate, onLogout, cu
             <SettingsToggle label="Sound Effects" checked={form.sound_notifs} onChange={v => set('sound_notifs', v)} desc="Play notification sounds" />
             <div>
               <label className="text-[11px] font-semibold uppercase tracking-[0.06em] block mb-1.5" style={{ color: colors.text.muted }}>Notification Sound</label>
-              <select value={form.notification_sound} onChange={e => set('notification_sound', e.target.value)} className="w-full px-3 py-2.5 rounded-lg text-[14px] outline-none" style={{ background: colors.bg.base, color: colors.text.primary, border: `1px solid ${colors.border.default}` }}>
+              <select value={form.notification_sound} onChange={e => { set('notification_sound', e.target.value); previewSound(e.target.value); }} className="w-full px-3 py-2.5 rounded-lg text-[14px] outline-none" style={{ background: colors.bg.base, color: colors.text.primary, border: `1px solid ${colors.border.default}` }}>
                 <option value="default">Default</option>
                 <option value="chime">Chime</option>
                 <option value="ping">Ping</option>
