@@ -11,6 +11,8 @@ import EffectsSettings from '@/components/app/effects/EffectsSettings';
 
 const TABS = [
   { id: 'profile', label: 'My Account', icon: User },
+  { id: 'badges', label: 'Badges', icon: Award },
+  { id: 'effects', label: 'Effects', icon: Sparkles },
   { id: 'social', label: 'Connections', icon: Link },
   { id: 'privacy', label: 'Privacy & Safety', icon: Shield },
   { id: 'security', label: 'Security', icon: Lock },
