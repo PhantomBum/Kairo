@@ -46,7 +46,13 @@ export default function KairoEliteModal({ onClose, profile, hasElite }) {
       return;
     }
     setSubscribing(true);
-    const res = await base44.functions.invoke('stripeCheckout', { type: 'elite_subscription' });
+    const res = await base44.functions.invoke('stripeCheckout', {
+      type: 'elite_subscription',
+      product_type: 'elite_subscription',
+      user_id: profile?.user_id,
+      success_url: window.location.href,
+      cancel_url: window.location.href,
+    });
     if (res.data?.url) window.location.href = res.data.url;
     setSubscribing(false);
   };
