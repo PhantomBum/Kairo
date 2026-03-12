@@ -252,9 +252,9 @@ export default function SettingsModal({ onClose, profile, onUpdate, onLogout, cu
             <SettingsSlider label="Color Saturation" value={form.saturation} onChange={v => set('saturation', v)} min={0} max={200} unit="%" />
           </>}
 
-          <div className="pt-2">
-            <button onClick={save} disabled={saving} className="px-5 py-2.5 rounded-lg text-[14px] font-semibold disabled:opacity-30 transition-all"
-              style={{ background: colors.accent.primary, color: '#fff' }}>{saving ? 'Saving...' : 'Save Changes'}</button>
+          <div className="pt-3 mt-2" style={{ borderTop: `1px solid ${colors.border.default}` }}>
+            <button onClick={save} disabled={saving} className="px-4 py-2 rounded-lg text-[13px] font-semibold disabled:opacity-30"
+              style={{ background: colors.accent.primary, color: '#fff' }}>{saving ? 'Saving...' : 'Save'}</button>
           </div>
         </div>
       </div>
