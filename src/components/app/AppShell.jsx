@@ -449,9 +449,16 @@ export default function AppShell({ currentUser }) {
               currentUserId={currentUser.id} incomingRequestCount={incomingReqs.length}
               blockedUserIds={(blockedUsers || []).map(b => b.blocked_user_id)} />
           )}
-          <UserBar profile={profile} isMuted={isMuted} isDeafened={isDeafened}
-            onToggleMute={() => setIsMuted(!isMuted)} onToggleDeafen={() => setIsDeafened(!isDeafened)}
-            onSettings={() => setModal('settings')} onStatusClick={() => setModal('status')} />
+          <div className="relative">
+            <UserBar profile={profile} isMuted={isMuted} isDeafened={isDeafened}
+              onToggleMute={() => setIsMuted(!isMuted)} onToggleDeafen={() => setIsDeafened(!isDeafened)}
+              onSettings={() => setModal('settings')} onStatusClick={() => setShowQuickStatus(!showQuickStatus)} />
+            {showQuickStatus && (
+              <QuickStatusPopup currentStatus={profile?.status} customStatus={profile?.custom_status}
+                onSave={(data) => { handleStatusUpdate(data); setShowQuickStatus(false); }}
+                onClose={() => setShowQuickStatus(false)} />
+            )}
+          </div>
         </div>
 
         {/* Mobile overlay backdrop */}
