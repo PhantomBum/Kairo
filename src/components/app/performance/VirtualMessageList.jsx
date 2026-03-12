@@ -18,7 +18,7 @@ function dateFmt(d) {
 
 export default function VirtualMessageList({
   messages, currentUserId, channelName, isLoading, isDM,
-  onReply, onEdit, onDelete, onReact, onPin, onProfileClick,
+  onReply, onEdit, onDelete, onReact, onPin, onStar, onProfileClick,
   editingMessage, onEditSave, onEditCancel, optimisticIds
 }) {
   const containerRef = useRef(null);
@@ -113,7 +113,7 @@ export default function VirtualMessageList({
             <div key={item.key} className="k-msg-in" style={{ opacity: isOptimistic ? 0.5 : 1 }}>
               <MessageBubble
                 message={msg} compact={item.compact} isOwn={msg.author_id === currentUserId}
-                onReply={onReply} onEdit={onEdit} onDelete={onDelete} onReact={onReact} onPin={onPin}
+                onReply={onReply} onEdit={onEdit} onDelete={onDelete} onReact={onReact} onPin={onPin} onStar={onStar}
                 currentUserId={currentUserId} onProfileClick={onProfileClick}
                 isEditing={editingMessage?.id === msg.id} onEditSave={onEditSave} onEditCancel={onEditCancel}
                 onImageClick={(src, name) => setLightbox({ src, name })}
