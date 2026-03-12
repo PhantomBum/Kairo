@@ -32,8 +32,8 @@ export default function ModalWrapper({ title, subtitle, onClose, width = 460, ch
           maxWidth: `min(${width}px, calc(100vw - 32px))`,
           maxHeight: 'min(85vh, calc(100vh - 32px))',
           background: colors.bg.surface,
-          border: `1px solid ${colors.border.default}`,
-          boxShadow: '0 24px 80px rgba(0,0,0,0.5)',
+          border: `1px solid ${colors.border.light}`,
+          boxShadow: shadows.strong,
         }}
         onClick={e => e.stopPropagation()}>
 
