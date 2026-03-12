@@ -46,7 +46,8 @@ export default function KairoEliteModal({ onClose, profile, hasElite }) {
       return;
     }
     setSubscribing(true);
-    const res = await base44.functions.invoke('stripeCheckout', { type: 'elite_subscription' });
+    const user = await base44.auth.me();
+    const res = await base44.functions.invoke('stripeCheckout', { type: 'elite_subscription', user_id: user.id });
     if (res.data?.url) window.location.href = res.data.url;
     setSubscribing(false);
   };
