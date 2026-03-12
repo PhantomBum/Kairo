@@ -31,8 +31,8 @@ export default function Layout({ children }) {
 
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 6px; }
-        ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.14); }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.06); border-radius: 6px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.1); }
         .scrollbar-none::-webkit-scrollbar { display: none; }
         .scrollbar-none { -ms-overflow-style: none; scrollbar-width: none; }
 
@@ -67,20 +67,20 @@ export default function Layout({ children }) {
         [data-radix-popper-content-wrapper] [role="menu"],
         [data-radix-popper-content-wrapper] [data-radix-menu-content] {
           background: var(--k-bg-float) !important;
-          border: none !important;
-          border-radius: 4px !important;
+          border: 1px solid rgba(255,255,255,0.08) !important;
+          border-radius: 8px !important;
           padding: 6px !important;
-          box-shadow: 0 8px 16px rgba(0,0,0,0.24) !important;
+          box-shadow: 0 8px 32px rgba(0,0,0,0.6) !important;
         }
         [data-radix-popper-content-wrapper] [role="menuitem"] {
-          border-radius: 2px !important;
-          padding: 6px 8px !important;
-          font-size: 14px !important;
+          border-radius: 6px !important;
+          padding: 7px 10px !important;
+          font-size: 13px !important;
         }
         [data-radix-popper-content-wrapper] [role="menuitem"]:hover,
         [data-radix-popper-content-wrapper] [role="menuitem"][data-highlighted] {
-          background: rgba(88, 101, 242, 0.2) !important;
-          color: #fff !important;
+          background: rgba(212,201,168,0.08) !important;
+          color: var(--k-text-primary) !important;
         }
         [data-radix-popper-content-wrapper] [role="menuitem"]:active { transform: scale(0.98) !important; }
         [data-radix-popper-content-wrapper] [role="separator"] {
@@ -94,7 +94,7 @@ export default function Layout({ children }) {
           background-repeat: no-repeat; background-position: right 10px center;
           padding-right: 30px !important; cursor: pointer;
         }
-        select option { background: #1e1f22; color: #f2f3f5; padding: 8px 12px; }
+        select option { background: #0c0c0c; color: #e8e2d4; padding: 8px 12px; }
 
         @media (prefers-reduced-motion: reduce) {
           *, *::before, *::after {

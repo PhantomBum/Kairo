@@ -72,9 +72,9 @@ function KairoInner() {
         <div className="text-center k-fade-in">
           <div className="mx-auto mb-6 flex items-center justify-center"
             style={{ width: 72, height: 72, borderRadius: 16, background: colors.accent.primary }}>
-            <span className="text-4xl font-bold text-white">K</span>
+            <span className="text-4xl font-bold" style={{ color: colors.bg.base }}>K</span>
           </div>
-          <div className="w-5 h-5 border-2 rounded-full animate-spin mx-auto" style={{ borderColor: 'rgba(255,255,255,0.06)', borderTopColor: colors.accent.primary }} />
+          <div className="w-5 h-5 border-2 rounded-full animate-spin mx-auto" style={{ borderColor: 'rgba(255,255,255,0.04)', borderTopColor: colors.accent.primary }} />
         </div>
       </div>
     );
