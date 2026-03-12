@@ -627,6 +627,11 @@ export default function AppShell({ currentUser }) {
         }} />
       )}
 
+      {/* Badge earned notifications */}
+      {newBadges.length > 0 && (
+        <BadgeNotification badge={newBadges[0]} onDismiss={() => dismissBadge(newBadges[0])} />
+      )}
+
       {/* Mobile bottom nav */}
       <MobileNav active={mobileTab} badge={incomingReqs.length}
         onChange={(tab) => {
