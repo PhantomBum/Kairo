@@ -46,6 +46,17 @@ function renderText(text, onLinkClick) {
 
 const MAX_LINES = 20;
 
+function CopyMenuItem({ text, label, icon: IconComp }) {
+  const [copied, setCopied] = useState(false);
+  const handleClick = () => { navigator.clipboard.writeText(text); setCopied(true); setTimeout(() => setCopied(false), 1500); };
+  const DisplayIcon = copied ? Pin : (IconComp || Copy);
+  return (
+    <ContextMenuItem onClick={handleClick} className="text-[13px] gap-2 rounded px-2 py-1.5" style={{ color: copied ? colors.success : colors.text.secondary }}>
+      {copied ? <span className="w-4 h-4 flex items-center justify-center text-[11px]">✓</span> : <DisplayIcon className="w-4 h-4 opacity-50" />} {copied ? 'Copied!' : label}
+    </ContextMenuItem>
+  );
+}
+
 const SYSTEM_ICONS = { boost: Zap, join: UserPlus, leave: LogOut };
 
 const SystemMessage = memo(function SystemMessage({ message }) {
