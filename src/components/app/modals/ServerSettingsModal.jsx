@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { X, Hash } from 'lucide-react';
+import { X, Hash, Copy, Check } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { colors, shadows } from '@/components/app/design/tokens';
@@ -12,6 +12,11 @@ import BotsTab from '@/components/app/server-settings/BotsTab';
 import AuditLogTab from '@/components/app/server-settings/AuditLogTab';
 import EmojiTab from '@/components/app/server-settings/EmojiTab';
 import DangerTab from '@/components/app/server-settings/DangerTab';
+import AutoModTab from '@/components/app/server-settings/AutoModTab';
+import SoundsTab from '@/components/app/server-settings/SoundsTab';
+import InsightsTab from '@/components/app/server-settings/InsightsTab';
+import GrowthTab from '@/components/app/server-settings/GrowthTab';
+import IntegrationsTab from '@/components/app/server-settings/IntegrationsTab';
 
 export default function ServerSettingsModal({ onClose, server, currentUserId }) {
   const qc = useQueryClient();
@@ -109,21 +114,12 @@ export default function ServerSettingsModal({ onClose, server, currentUserId }) 
           </button>
         </div>
       );
-      case 'invites': return (
-        <div className="space-y-3">
-          <div className="p-4 rounded-xl" style={{ background: colors.bg.elevated, border: `1px solid ${colors.border.default}` }}>
-            <p className="text-[11px] font-semibold uppercase tracking-wider mb-2" style={{ color: colors.text.disabled }}>Current Invite</p>
-            <div className="flex items-center gap-2">
-              <div className="flex-1 text-[13px] font-mono px-3 py-2.5 rounded-lg truncate" style={{ background: colors.bg.base, color: colors.text.primary, border: `1px solid ${colors.border.default}` }}>
-                {window.location.origin}/invite/{server?.invite_code}
-              </div>
-              <button onClick={() => navigator.clipboard.writeText(`${window.location.origin}/invite/${server?.invite_code}`)}
-                className="px-4 py-2.5 rounded-lg text-[12px] font-medium" style={{ background: colors.accent.primary, color: '#fff' }}>Copy</button>
-            </div>
-            <p className="text-[11px] mt-2" style={{ color: colors.text.disabled }}>Code: <span className="font-mono font-bold" style={{ color: colors.text.primary }}>{server?.invite_code}</span> · Never expires</p>
-          </div>
-        </div>
-      );
+      case 'invites': return <InvitesSection server={server} />;
+      case 'automod': return <AutoModTab serverId={server?.id} />;
+      case 'sounds': return <SoundsTab serverId={server?.id} />;
+      case 'insights': return <InsightsTab serverId={server?.id} members={members} channels={channels} />;
+      case 'growth': return <GrowthTab members={members} />;
+      case 'integrations': return <IntegrationsTab serverId={server?.id} />;
       case 'roles': return <RolesTab roles={roles} members={members} onAddRole={addRole} onUpdateRole={updateRole} onDeleteRole={deleteRole} />;
       case 'members': return <MembersTab members={members} roles={roles} serverId={server?.id} ownerId={server?.owner_id} onKick={kickMember} />;
       case 'bots': return <BotsTab serverId={server?.id} />;
