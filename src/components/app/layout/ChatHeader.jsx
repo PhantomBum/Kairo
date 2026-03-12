@@ -45,28 +45,21 @@ export default function ChatHeader({ channel, conversation, currentUserId, showM
           </>
         )}
       </div>
-      <div className="flex items-center gap-0.5 relative">
+      <div className="flex items-center gap-1 relative">
         {isDM && (
           <>
             <HeaderBtn icon={Phone} onClick={onVoiceCall} title="Start Voice Call" />
             <HeaderBtn icon={Video} onClick={onVideoCall} title="Start Video Call" />
           </>
         )}
-        {onStarred && <HeaderBtn icon={Star} onClick={onStarred} title="Starred Messages" />}
         {onPinned && <HeaderBtn icon={Pin} onClick={onPinned} badge={pinnedCount} title="Pinned Messages" />}
-        {onMediaGallery && <HeaderBtn icon={Image} onClick={onMediaGallery} title="Media Gallery" />}
         {onSearch && <HeaderBtn icon={Search} onClick={onSearch} title="Search" />}
         {!isDM && <HeaderBtn icon={Users} onClick={onToggleMembers} active={showMembers} title="Member List" />}
         <button onClick={() => setShowSupport(!showSupport)} className="w-8 h-8 flex items-center justify-center rounded hover:bg-[rgba(255,255,255,0.1)] transition-colors group relative"
-          style={{ color: colors.text.muted }}>
-          <Heart className="w-5 h-5" />
-          <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 px-2 py-1 rounded text-[11px] font-medium whitespace-nowrap pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity"
-            style={{ background: colors.bg.float, color: colors.text.secondary, border: `1px solid ${colors.border.default}` }}>
-            Support Kairo
-          </div>
+          style={{ color: '#3ba55c' }}>
+          <Heart className="w-[18px] h-[18px]" />
         </button>
         {showSupport && <SupportDropdown onClose={() => setShowSupport(false)} />}
-        <HeaderBtn icon={HelpCircle} href={createPageUrl('FAQ')} title="Help & FAQ" />
       </div>
     </div>
   );
