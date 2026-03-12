@@ -21,7 +21,7 @@ export default function AutoModTab({ serverId }) {
         if (data.length === 0) {
           setRules(DEFAULT_RULES.map((r, i) => ({ ...r, id: `default_${i}`, server_id: serverId })));
         } else {
-          setRules(data);
+          setRules(data.map(d => ({ ...d, enabled: d.is_enabled })));
         }
         setLoading(false);
       });
@@ -31,12 +31,14 @@ export default function AutoModTab({ serverId }) {
   const toggleRule = async (rule, idx) => {
     const newEnabled = !rule.enabled;
     if (rule.id?.startsWith('default_')) {
+      // Map our simple type to the entity schema type
+      const typeMap = { block_links: 'link_filter', mass_mentions: 'mention_spam', profanity: 'banned_words', caps: 'caps_filter', anti_raid: 'raid_protection' };
       const created = await base44.entities.AutoModRule.create({ 
-        server_id: serverId, name: rule.name, type: rule.type, enabled: newEnabled, config: rule.config 
+        server_id: serverId, name: rule.name, type: typeMap[rule.type] || 'banned_words', is_enabled: newEnabled 
       });
-      setRules(r => r.map((x, i) => i === idx ? { ...created } : x));
+      setRules(r => r.map((x, i) => i === idx ? { ...created, enabled: created.is_enabled } : x));
     } else {
-      await base44.entities.AutoModRule.update(rule.id, { enabled: newEnabled });
+      await base44.entities.AutoModRule.update(rule.id, { is_enabled: newEnabled });
       setRules(r => r.map((x, i) => i === idx ? { ...x, enabled: newEnabled } : x));
     }
   };
