@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useRef } from 'react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
-import { Hash, Volume2, Megaphone, Radio, MessageSquare, Lock, ChevronDown, Plus, Settings, GripVertical, LayoutGrid, ShieldAlert } from 'lucide-react';
+import { Hash, Volume2, Megaphone, Radio, MessageSquare, Lock, ChevronDown, Plus, Settings, GripVertical, LayoutGrid, ShieldAlert, CalendarDays } from 'lucide-react';
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuSeparator, ContextMenuTrigger } from '@/components/ui/context-menu';
 import { base44 } from '@/api/base44Client';
 import { colors } from '@/components/app/design/tokens';
@@ -8,7 +8,7 @@ import ServerBannerHeader from './ServerBannerHeader';
 
 const typeIcons = { text: Hash, voice: Volume2, announcement: Megaphone, stage: Radio, forum: MessageSquare, board: LayoutGrid };
 
-function ChannelItem({ channel, active, onClick, onSettings, isOwner, index }) {
+function ChannelItem({ channel, active, onClick, onSettings, onJumpToDate, isOwner, index }) {
   const Icon = typeIcons[channel.type] || Hash;
   return (
     <Draggable draggableId={channel.id} index={index} isDragDisabled={!isOwner}>
@@ -41,6 +41,11 @@ function ChannelItem({ channel, active, onClick, onSettings, isOwner, index }) {
               <ContextMenuItem onClick={() => navigator.clipboard.writeText(channel.id)} className="text-[13px] gap-2 rounded-sm px-2 py-1.5" style={{ color: colors.text.secondary }}>
                 <Hash className="w-4 h-4 opacity-50" /> Copy Channel ID
               </ContextMenuItem>
+              {channel.type === 'text' && (
+                <ContextMenuItem onClick={() => { onClick(channel); onJumpToDate?.(); }} className="text-[13px] gap-2 rounded-sm px-2 py-1.5" style={{ color: colors.text.secondary }}>
+                  <CalendarDays className="w-4 h-4 opacity-50" /> Jump to Date
+                </ContextMenuItem>
+              )}
               {isOwner && <>
                 <ContextMenuSeparator style={{ background: 'rgba(255,255,255,0.06)', margin: '4px 0' }} />
                 <ContextMenuItem onClick={() => onSettings?.(channel)} className="text-[13px] gap-2 rounded-sm px-2 py-1.5" style={{ color: colors.text.secondary }}>
@@ -91,7 +96,7 @@ function CategoryGroup({ category, channels, activeId, onSelect, onAdd, onSettin
   );
 }
 
-export default function DraggableChannelSidebar({ server, categories, channels, activeId, onSelect, onAdd, onAddCategory, onSettings, onInvite, onModPanel, onAnalytics, onBackups, onChannelSettings, isOwner }) {
+export default function DraggableChannelSidebar({ server, categories, channels, activeId, onSelect, onAdd, onAddCategory, onSettings, onInvite, onModPanel, onAnalytics, onBackups, onChannelSettings, onJumpToDate, isOwner }) {
   const sorted = [...(categories || [])].sort((a, b) => (a.position || 0) - (b.position || 0));
   const catIds = new Set(sorted.map(c => c.id));
   const uncategorized = (channels || []).filter(ch => !ch.category_id || !catIds.has(ch.category_id));
@@ -145,7 +150,7 @@ export default function DraggableChannelSidebar({ server, categories, channels, 
                   {(dropP) => (
                     <div ref={dropP.innerRef} {...dropP.droppableProps} className="space-y-px pt-2">
                       {uncategorized.sort((a, b) => (a.position || 0) - (b.position || 0)).map((ch, i) => (
-                        <ChannelItem key={ch.id} channel={ch} active={activeId === ch.id} onClick={onSelect} onSettings={onChannelSettings} isOwner={isOwner} index={i} />
+                        <ChannelItem key={ch.id} channel={ch} active={activeId === ch.id} onClick={onSelect} onSettings={onChannelSettings} onJumpToDate={onJumpToDate} isOwner={isOwner} index={i} />
                       ))}
                       {dropP.placeholder}
                     </div>
