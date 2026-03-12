@@ -532,7 +532,8 @@ export default function AppShell({ currentUser }) {
             onBlock={handleBlock} />
         )}
         {modal === 'create-group-dm' && <CreateGroupDMModal onClose={() => setModal(null)} friends={friends} onCreate={handleCreateGroupDM} />}
-        {modal === 'pinned' && <PinnedMessagesModal onClose={() => setModal(null)} messages={currentMsgs.filter(m => m.is_pinned)} onUnpin={pinMsg} />}
+        {modal === 'pinned' && <PinnedMessagesModal onClose={() => setModal(null)} messages={currentMsgs} onUnpin={pinMsg}
+          onJumpToMessage={(msg) => { setModal(null); setTimeout(() => { const el = document.querySelector(`[data-msg-id="${msg.id}"]`); if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); el.style.background = 'rgba(240,178,50,0.12)'; el.style.transition = 'background 0.3s'; setTimeout(() => { el.style.background = ''; }, 3000); } }, 100); }} />}
         {modal === 'status' && <StatusPickerModal onClose={() => setModal(null)} currentStatus={profile?.status} customStatus={profile?.custom_status} onSave={handleStatusUpdate} />}
         {modal === 'elite' && <KairoEliteModal onClose={() => setModal(null)} profile={profile} hasElite={hasElite || isAppOwner} />}
         {modal === 'mod-panel' && activeServer && <ModPanelModal onClose={() => setModal(null)} server={activeServer} />}
@@ -542,7 +543,16 @@ export default function AppShell({ currentUser }) {
             onDelete={() => { if (activeChannel?.id === channelToEdit.id) setActiveChannel(null); }} />
         )}
         {modal === 'server-backups' && activeServer && <ServerBackupsModal onClose={() => setModal(null)} server={activeServer} currentUser={currentUser} />}
-        {modal === 'search' && <AdvancedSearch onClose={() => setModal(null)} servers={servers} currentUserId={currentUser.id} />}
+        {modal === 'search' && <AdvancedSearch onClose={() => setModal(null)} servers={servers} currentUserId={currentUser.id}
+          onJumpToMessage={(msg) => {
+            setModal(null);
+            // Navigate to the right server/channel if needed
+            if (msg.server_id) {
+              const s = servers.find(sv => sv.id === msg.server_id);
+              if (s && s.id !== activeServer?.id) selectServer(s);
+            }
+            setTimeout(() => { const el = document.querySelector(`[data-msg-id="${msg.id}"]`); if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); el.style.background = 'rgba(88,101,242,0.15)'; el.style.transition = 'background 0.3s'; setTimeout(() => { el.style.background = ''; }, 3000); } }, 200);
+          }} />}
         {modal === 'invite-preview' && inviteCode && (
           <InvitePreviewModal
             code={inviteCode}
