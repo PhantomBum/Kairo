@@ -1,277 +1,246 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { X, MessageSquare, Globe, Github, Crown, Shield, Star, Zap, Heart, Calendar, Clock, Twitter, Instagram, Music, Gamepad2, UserPlus, Ban, Eye, Sparkles, Award, Moon, Bug, Volume2, Users } from 'lucide-react';
-import { base44 } from '@/api/base44Client';
+import { X, MessageSquare, Globe, Github, Crown, Shield, Star, Zap, Heart, Calendar, Clock, Twitter, Instagram, Music, Gamepad2, UserPlus, Ban, Moon, Bug, Volume2, Users } from 'lucide-react';
 import { useProfiles } from '@/components/app/providers/ProfileProvider';
 import ReactMarkdown from 'react-markdown';
+import { colors } from '@/components/app/design/tokens';
 
-const statusColors = { online: '#7bc9a4', idle: '#c9b47b', dnd: '#c97b7b', invisible: '#555248', offline: '#555248' };
+const statusColors = { online: '#3ba55c', idle: '#faa61a', dnd: '#ed4245', invisible: '#4f4f4f', offline: '#4f4f4f' };
 const statusLabels = { online: 'Online', idle: 'Idle', dnd: 'Do Not Disturb', invisible: 'Invisible', offline: 'Offline' };
 
 const badgeConfig = {
-  owner: { icon: Crown, color: '#c9b47b', label: 'Server Owner', desc: 'Owns a Kairo server' },
-  admin: { icon: Shield, color: '#7ba4c9', label: 'Admin', desc: 'Server administrator' },
-  premium: { icon: Crown, color: '#c9b47b', label: 'Kairo Elite', desc: 'Premium subscriber' },
-  verified: { icon: Star, color: '#7bc9a4', label: 'Verified', desc: 'Verified account' },
-  early_supporter: { icon: Heart, color: '#c97b7b', label: 'Early Adopter', desc: 'Joined Kairo early' },
-  bug_hunter: { icon: Bug, color: '#c9b47b', label: 'Bug Hunter', desc: 'Found and reported bugs' },
-  developer: { icon: Gamepad2, color: '#a47bc9', label: 'Developer', desc: 'Kairo app developer' },
-  moderator: { icon: Shield, color: '#7bc9a4', label: 'Moderator', desc: 'Community moderator' },
-  partner: { icon: Star, color: '#7ba4c9', label: 'Partner', desc: 'Official Kairo partner' },
-  youtube: { icon: Globe, color: '#c97b7b', label: 'Content Creator', desc: 'YouTube creator' },
-  conversation_starter: { icon: MessageSquare, color: '#7bc9a4', label: 'Conversation Starter', desc: 'Started 100+ conversations' },
-  voice_veteran: { icon: Volume2, color: '#a47bc9', label: 'Voice Veteran', desc: '100+ hours in voice' },
-  night_owl: { icon: Moon, color: '#7ba4c9', label: 'Night Owl', desc: 'Active between 12am-5am' },
-  anniversary: { icon: Award, color: '#c9b47b', label: '1 Year Anniversary', desc: '1 year on Kairo' },
-};
-
-const PROFILE_THEMES = {
-  dark: { bg: 'var(--bg-elevated)', border: 'var(--border-light)' },
-  midnight: { bg: '#0a0a1a', border: 'rgba(100,100,200,0.15)' },
-  warm: { bg: '#1a1510', border: 'rgba(200,150,100,0.15)' },
-  ocean: { bg: '#0a1520', border: 'rgba(100,150,200,0.15)' },
-  forest: { bg: '#0a1a10', border: 'rgba(100,200,120,0.15)' },
-  sunset: { bg: '#1a100a', border: 'rgba(200,120,80,0.15)' },
+  owner: { icon: Crown, color: '#faa61a', label: 'Server Owner', desc: 'Owns a Kairo server' },
+  admin: { icon: Shield, color: '#5865F2', label: 'Admin', desc: 'Server administrator' },
+  premium: { icon: Crown, color: '#faa61a', label: 'Kairo Elite', desc: 'Premium subscriber' },
+  verified: { icon: Star, color: '#3ba55c', label: 'Verified', desc: 'Verified account' },
+  early_supporter: { icon: Heart, color: '#ed4245', label: 'Early Adopter', desc: 'Joined Kairo early' },
+  bug_hunter: { icon: Bug, color: '#faa61a', label: 'Bug Hunter', desc: 'Helps hunt platform bugs' },
+  developer: { icon: Gamepad2, color: '#a78bfa', label: 'Developer', desc: 'Kairo app developer' },
+  moderator: { icon: Shield, color: '#3ba55c', label: 'Moderator', desc: 'Community moderator' },
+  partner: { icon: Star, color: '#5865F2', label: 'Partner', desc: 'Official Kairo partner' },
+  youtube: { icon: Globe, color: '#ed4245', label: 'Content Creator', desc: 'YouTube creator' },
+  tester: { icon: Bug, color: '#3ba55c', label: 'Tester', desc: 'Platform tester' },
 };
 
 const socialIcons = { github: Github, twitter: Twitter, website: Globe, instagram: Instagram, spotify: Music, tiktok: Globe, twitch: Globe, linkedin: Globe };
 
+function BadgeIcon({ badge, onHover, isHovered }) {
+  const cfg = badgeConfig[badge];
+  if (!cfg) return null;
+  const Icon = cfg.icon;
+  return (
+    <div className="relative" onMouseEnter={() => onHover(badge)} onMouseLeave={() => onHover(null)}>
+      <div className="w-7 h-7 rounded-lg flex items-center justify-center cursor-pointer transition-all hover:scale-110"
+        style={{ background: `${cfg.color}18`, border: `1px solid ${cfg.color}25` }}>
+        <Icon className="w-3.5 h-3.5" style={{ color: cfg.color }} />
+      </div>
+      {isHovered && (
+        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 rounded-xl whitespace-nowrap z-50 k-fade-in"
+          style={{ background: colors.bg.float, border: `1px solid ${colors.border.strong}`, boxShadow: '0 8px 32px rgba(0,0,0,0.7)' }}>
+          <p className="text-[11px] font-bold" style={{ color: cfg.color }}>{cfg.label}</p>
+          <p className="text-[10px]" style={{ color: colors.text.muted }}>{cfg.desc}</p>
+          <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-px w-2 h-2 rotate-45"
+            style={{ background: colors.bg.float, borderRight: `1px solid ${colors.border.strong}`, borderBottom: `1px solid ${colors.border.strong}` }} />
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function UserProfileModal({ onClose, profile, memberData, roles, isCurrentUser, onMessage, onAddFriend, onBlock, friends = [], mutualServers = [] }) {
-  const [activeTab, setActiveTab] = useState('about');
   const [badgeHover, setBadgeHover] = useState(null);
   const { profiles } = useProfiles();
 
   if (!profile) return null;
 
   const memberRoles = (roles || []).filter(r => memberData?.role_ids?.includes(r.id) && !r.is_default);
+  const defaultRole = (roles || []).find(r => r.is_default);
+  const allDisplayRoles = [...memberRoles, ...(defaultRole ? [defaultRole] : [])];
   const hasBadges = profile.badges?.length > 0;
   const hasSocial = profile.social_links && Object.values(profile.social_links).some(Boolean);
-  const hasPresence = profile.rich_presence?.name;
-  const joinDate = profile.created_date ? new Date(profile.created_date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : null;
-  const hasElite = profile.badges?.includes('premium');
-  const theme = PROFILE_THEMES[profile.settings?.theme] || PROFILE_THEMES.dark;
-
-  // Mutual friends — only count friends that are mutual (shared between viewer and target),
-  // excluding the target user themselves and any blocked users
-  const mutualFriends = useMemo(() => {
-    if (isCurrentUser || !friends?.length) return [];
-    // The friends list passed in is the current user's friends.
-    // We show them as "mutual" context — filter out the profile being viewed.
-    return friends.filter(f => f.friend_id !== profile.user_id).slice(0, 6);
-  }, [friends, profile.user_id, isCurrentUser]);
-
+  const joinDate = memberData?.joined_at || profile.created_date;
+  const formattedJoin = joinDate ? new Date(joinDate).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : null;
   const isFriend = friends?.some(f => f.friend_id === profile.user_id);
+  const statusText = profile.custom_status?.text || '';
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-      transition={{ duration: 0.15, ease: [0.4, 0, 0.2, 1] }}
-      className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(4px)' }} onClick={onClose}
-      role="dialog" aria-modal="true" aria-label="User profile">
-      <motion.div initial={{ scale: 0.96, opacity: 0, y: 8 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.96, opacity: 0, y: 4 }}
-        transition={{ type: 'spring', damping: 25, stiffness: 350, duration: 0.25 }}
-        className="w-full max-w-[400px] rounded-2xl overflow-hidden" style={{ background: theme.bg, border: `1px solid ${theme.border}`, boxShadow: 'var(--shadow-lg)' }}
+      transition={{ duration: 0.12 }}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      style={{ background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(6px)' }} onClick={onClose}>
+      <motion.div initial={{ scale: 0.95, opacity: 0, y: 10 }} animate={{ scale: 1, opacity: 1, y: 0 }}
+        transition={{ type: 'spring', damping: 28, stiffness: 380 }}
+        className="w-full max-w-[380px] rounded-2xl overflow-hidden"
+        style={{ background: colors.bg.surface, border: `1px solid ${colors.border.default}`, boxShadow: '0 24px 64px rgba(0,0,0,0.6)' }}
         onClick={e => e.stopPropagation()}>
+
         {/* Banner */}
-        <div className="h-28 relative" style={{ background: profile.banner_url ? `url(${profile.banner_url}) center/cover` : `linear-gradient(135deg, ${profile.accent_color || '#1a1a1a'}80, var(--bg-surface))` }}>
-          <button onClick={onClose} className="absolute top-2 right-2 p-1 rounded-lg" style={{ background: 'rgba(0,0,0,0.5)' }}>
+        <div className="h-[100px] relative"
+          style={{ background: profile.banner_url ? `url(${profile.banner_url}) center/cover` : `linear-gradient(135deg, ${profile.accent_color || '#0d2137'}, ${profile.accent_color ? profile.accent_color + '40' : '#0a1929'})` }}>
+
+          {/* Badge tooltip floating on banner */}
+          {hasBadges && (
+            <div className="absolute top-3 left-3">
+              {badgeHover && badgeConfig[badgeHover] && (
+                <div className="px-3 py-2 rounded-xl k-fade-in"
+                  style={{ background: colors.bg.float, border: `1px solid ${colors.border.strong}`, boxShadow: '0 8px 24px rgba(0,0,0,0.6)' }}>
+                  <p className="text-[12px] font-bold" style={{ color: badgeConfig[badgeHover].color }}>{badgeConfig[badgeHover].label}</p>
+                  <p className="text-[10px]" style={{ color: colors.text.muted }}>{badgeConfig[badgeHover].desc}</p>
+                </div>
+              )}
+            </div>
+          )}
+
+          <button onClick={onClose} className="absolute top-3 right-3 w-7 h-7 rounded-full flex items-center justify-center transition-colors hover:bg-[rgba(0,0,0,0.5)]"
+            style={{ background: 'rgba(0,0,0,0.35)' }}>
             <X className="w-3.5 h-3.5 text-white" />
           </button>
-          {hasElite && (
-            <div className="absolute bottom-2 left-3 px-2 py-0.5 rounded-full text-[8px] font-bold flex items-center gap-1" style={{ background: 'rgba(201,180,123,0.25)', color: '#c9b47b', backdropFilter: 'blur(8px)' }}>
-              <Crown className="w-2.5 h-2.5" /> ELITE
-            </div>
-          )}
         </div>
 
-        {/* Avatar + Badges */}
-        <div className="px-4 -mt-12 relative z-10 flex items-end justify-between">
-          <div className="relative">
-            <div className={`w-[88px] h-[88px] rounded-full flex items-center justify-center text-3xl font-medium overflow-hidden ${hasElite ? 'ring-2 ring-offset-2' : ''}`}
-              style={{ background: 'var(--bg-surface)', color: 'var(--text-muted)', border: `5px solid ${theme.bg}`, ringColor: '#c9b47b', ringOffsetColor: theme.bg }}>
-              {profile.avatar_url ? <img src={profile.avatar_url} className="w-full h-full object-cover" alt={`${profile.display_name || 'User'}'s avatar`} /> : (profile.display_name || 'U').charAt(0).toUpperCase()}
+        {/* Avatar */}
+        <div className="px-5 -mt-[52px] relative z-10">
+          <div className="relative w-fit">
+            <div className="w-[104px] h-[104px] rounded-full flex items-center justify-center text-3xl font-semibold overflow-hidden"
+              style={{ background: colors.bg.elevated, color: colors.text.muted, border: `6px solid ${colors.bg.surface}` }}>
+              {profile.avatar_url
+                ? <img src={profile.avatar_url} className="w-full h-full object-cover" alt="" />
+                : (profile.display_name || 'U').charAt(0).toUpperCase()}
             </div>
-            <div className="absolute bottom-1 right-1 w-5 h-5 rounded-full" style={{ background: statusColors[profile.status || 'offline'], border: `3px solid ${theme.bg}` }} />
+            <div className="absolute bottom-1.5 right-1.5 w-6 h-6 rounded-full"
+              style={{ background: statusColors[profile.status || 'offline'], border: `4px solid ${colors.bg.surface}` }} />
           </div>
-          {hasBadges && (
-            <div className="flex gap-1 mb-2 flex-wrap justify-end relative">
-              {profile.badges.map(b => {
-                const cfg = badgeConfig[b];
-                if (!cfg) return null;
-                return (
-                  <div key={b} className="relative" onMouseEnter={() => setBadgeHover(b)} onMouseLeave={() => setBadgeHover(null)}>
-                    <div className="w-7 h-7 rounded-lg flex items-center justify-center cursor-pointer transition-transform hover:scale-110"
-                      style={{ background: `${cfg.color}15`, border: `1px solid ${cfg.color}30` }}>
-                      <cfg.icon className="w-3.5 h-3.5" style={{ color: cfg.color }} />
-                    </div>
-                    {badgeHover === b && (
-                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 px-2 py-1 rounded-lg whitespace-nowrap z-50"
-                        style={{ background: 'var(--bg-deep)', border: '1px solid var(--border-light)', boxShadow: 'var(--shadow-md)' }}>
-                        <p className="text-[10px] font-medium" style={{ color: cfg.color }}>{cfg.label}</p>
-                        <p className="text-[8px]" style={{ color: 'var(--text-muted)' }}>{cfg.desc}</p>
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          )}
         </div>
 
-        {/* Info */}
-        <div className="px-4 pt-2 pb-1">
-          <h3 className="text-xl font-bold" style={{ color: 'var(--text-cream)' }}>{profile.display_name || profile.username}</h3>
+        {/* Name + Badges inline */}
+        <div className="px-5 pt-3">
           <div className="flex items-center gap-2 flex-wrap">
-            {profile.username && <p className="text-[12px] font-mono" style={{ color: 'var(--text-secondary)' }}>@{profile.username}</p>}
-            {profile.pronouns && <span className="text-[10px] px-1.5 py-0.5 rounded-full flex-shrink-0" style={{ background: 'var(--bg-glass)', color: 'var(--text-muted)' }}>{profile.pronouns}</span>}
-          </div>
-          <p className="text-[11px] mt-1 flex items-center gap-1" style={{ color: statusColors[profile.status || 'offline'] }}>
-            {profile.custom_status?.emoji ? profile.custom_status.emoji + ' ' : ''}{profile.custom_status?.text || statusLabels[profile.status || 'offline']}
-          </p>
-        </div>
-
-        {/* Tabs */}
-        <div className="px-4 mt-2 flex gap-1" style={{ borderBottom: '1px solid var(--border)' }}>
-          {['about', 'activity', 'mutual'].map(t => (
-            <button key={t} onClick={() => setActiveTab(t)} className="px-3 py-2 text-[11px] capitalize transition-colors"
-              style={{ color: activeTab === t ? 'var(--text-cream)' : 'var(--text-muted)', borderBottom: activeTab === t ? '2px solid var(--text-cream)' : '2px solid transparent' }}>
-              {t === 'mutual' ? `Mutual${mutualFriends.length > 0 ? ` (${mutualFriends.length})` : ''}` : t}
-            </button>
-          ))}
-        </div>
-
-        {/* Content */}
-        <div className="px-4 py-3 space-y-3 max-h-[280px] overflow-y-auto scrollbar-none">
-          {activeTab === 'about' && <>
-            {profile.bio && (
-              <div className="p-3 rounded-xl" style={{ background: 'var(--bg-glass)' }}>
-                <p className="text-[10px] font-semibold uppercase tracking-[0.08em] mb-1" style={{ color: 'var(--text-muted)', fontFamily: 'monospace' }}>About Me</p>
-                <div className="text-[12px] leading-relaxed prose prose-sm prose-invert max-w-none" style={{ color: 'var(--text-primary)' }}>
-                  <ReactMarkdown>{profile.bio}</ReactMarkdown>
-                </div>
-              </div>
-            )}
-            {memberRoles.length > 0 && (
-              <div>
-                <p className="text-[10px] font-semibold uppercase tracking-[0.08em] mb-1.5" style={{ color: 'var(--text-muted)', fontFamily: 'monospace' }}>Roles</p>
-                <div className="flex flex-wrap gap-1">
-                  {memberRoles.map(r => <span key={r.id} className="text-[10px] px-2 py-0.5 rounded-full font-mono" style={{ border: `1px solid ${r.color}30`, color: r.color, background: `${r.color}10` }}>{r.name}</span>)}
-                </div>
-              </div>
-            )}
-            {joinDate && <div className="flex items-center gap-2 text-[11px]" style={{ color: 'var(--text-muted)' }}><Calendar className="w-3 h-3" /> Member since {joinDate}</div>}
-            {profile.last_seen && !profile.is_online && <div className="flex items-center gap-2 text-[11px]" style={{ color: 'var(--text-faint)' }}><Clock className="w-3 h-3" /> Last seen {new Date(profile.last_seen).toLocaleDateString()}</div>}
-            {profile.social_links?.website && (
-              <div className="flex items-center gap-2 text-[11px]">
-                <Globe className="w-3 h-3" style={{ color: 'var(--accent-blue)' }} />
-                <a href={profile.social_links.website} target="_blank" rel="noopener noreferrer" className="underline" style={{ color: 'var(--accent-blue)' }}>{profile.social_links.website.replace(/^https?:\/\//, '')}</a>
-              </div>
-            )}
-            {hasSocial && (
-              <div>
-                <p className="text-[10px] font-semibold uppercase tracking-[0.08em] mb-1.5" style={{ color: 'var(--text-muted)', fontFamily: 'monospace' }}>Connections</p>
-                <div className="grid grid-cols-2 gap-1.5">
-                  {Object.entries(profile.social_links).filter(([k, v]) => v && k !== 'website').map(([key, url]) => {
-                    const Icon = socialIcons[key] || Globe;
-                    return (
-                      <a key={key} href={url} target="_blank" rel="noopener noreferrer"
-                        className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[10px] transition-colors hover:bg-[var(--bg-glass-hover)]"
-                        style={{ background: 'var(--bg-glass)', color: 'var(--text-secondary)', border: '1px solid var(--border)' }}>
-                        <Icon className="w-3 h-3" /> <span className="capitalize truncate">{key}</span>
-                      </a>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-          </>}
-          {activeTab === 'activity' && (
-            <div>
-              {hasPresence ? (
-                <div className="p-3 rounded-xl" style={{ background: 'var(--bg-glass)' }}>
-                  <p className="text-[10px] uppercase mb-1.5" style={{ color: 'var(--text-muted)' }}>{profile.rich_presence.type || 'Playing'}</p>
-                  <div className="flex items-center gap-3">
-                    {profile.rich_presence.large_image && <img src={profile.rich_presence.large_image} className="w-14 h-14 rounded-xl" alt={profile.rich_presence.name || 'Activity'} />}
-                    <div>
-                      <p className="text-[13px] font-medium" style={{ color: 'var(--text-cream)' }}>{profile.rich_presence.name}</p>
-                      {profile.rich_presence.details && <p className="text-[11px]" style={{ color: 'var(--text-secondary)' }}>{profile.rich_presence.details}</p>}
-                      {profile.rich_presence.state && <p className="text-[11px]" style={{ color: 'var(--text-muted)' }}>{profile.rich_presence.state}</p>}
-                      {profile.rich_presence.start_timestamp && (
-                        <p className="text-[9px] mt-0.5" style={{ color: 'var(--text-faint)' }}>
-                          {Math.floor((Date.now() - profile.rich_presence.start_timestamp) / 60000)} min elapsed
-                        </p>
-                      )}
+            <h3 className="text-[20px] font-bold leading-tight" style={{ color: colors.text.primary }}>
+              {profile.display_name || profile.username}
+            </h3>
+            {hasBadges && (
+              <div className="flex items-center gap-1">
+                {profile.badges.map(b => {
+                  const cfg = badgeConfig[b];
+                  if (!cfg) return null;
+                  const Icon = cfg.icon;
+                  return (
+                    <div key={b} className="cursor-pointer transition-transform hover:scale-125"
+                      onMouseEnter={() => setBadgeHover(b)} onMouseLeave={() => setBadgeHover(null)}
+                      title={cfg.label}>
+                      <Icon className="w-4 h-4" style={{ color: cfg.color }} />
                     </div>
-                  </div>
-                </div>
-              ) : (
-                <div className="text-center py-8 k-fade-in">
-                  <Gamepad2 className="w-8 h-8 mx-auto mb-2 opacity-20" style={{ color: 'var(--text-muted)' }} />
-                  <p className="text-[13px] font-medium mb-0.5" style={{ color: 'var(--text-secondary)' }}>No current activity</p>
-                  <p className="text-[11px]" style={{ color: 'var(--text-muted)' }}>When they're playing or listening to something, it'll show here</p>
-                </div>
-              )}
+                  );
+                })}
+              </div>
+            )}
+          </div>
+          {profile.username && (
+            <p className="text-[13px] mt-0.5" style={{ color: colors.text.muted }}>@{profile.username}</p>
+          )}
+        </div>
+
+        {/* Custom status / bio */}
+        {(statusText || profile.bio) && (
+          <div className="px-5 pt-2">
+            <p className="text-[13px]" style={{ color: colors.text.secondary }}>
+              {profile.custom_status?.emoji && <span className="mr-1">{profile.custom_status.emoji}</span>}
+              {statusText || ''}
+            </p>
+            {profile.bio && !statusText && (
+              <div className="text-[13px] leading-relaxed prose prose-sm prose-invert max-w-none" style={{ color: colors.text.secondary }}>
+                <ReactMarkdown>{profile.bio}</ReactMarkdown>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Info card */}
+        <div className="mx-5 mt-3 p-4 rounded-xl space-y-4"
+          style={{ background: colors.bg.elevated, border: `1px solid ${colors.border.default}` }}>
+
+          {/* Member since */}
+          {formattedJoin && (
+            <div>
+              <div className="flex items-center gap-2 mb-0.5">
+                <Calendar className="w-3.5 h-3.5" style={{ color: colors.text.muted }} />
+                <p className="text-[11px] font-bold uppercase tracking-wider" style={{ color: colors.text.muted }}>Member Since</p>
+              </div>
+              <p className="text-[13px] font-semibold ml-[22px]" style={{ color: colors.text.primary }}>{formattedJoin}</p>
             </div>
           )}
-          {activeTab === 'mutual' && (
-            <div className="space-y-3">
-              {mutualServers.length > 0 && (
-                <div>
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.08em] mb-1.5" style={{ color: 'var(--text-muted)', fontFamily: 'monospace' }}>Mutual Servers — {mutualServers.length}</p>
-                  <div className="flex flex-wrap gap-2">
-                    {mutualServers.map(s => (
-                      <div key={s.id} className="flex items-center gap-2 px-2 py-1.5 rounded-lg" style={{ background: 'var(--bg-glass)', border: '1px solid var(--border)' }}>
-                        {s.icon_url ? <img src={s.icon_url} className="w-5 h-5 rounded-md" /> : <div className="w-5 h-5 rounded-md flex items-center justify-center text-[8px] font-mono" style={{ background: 'var(--bg-glass-strong)', color: 'var(--text-muted)' }}>{s.name?.slice(0,2)}</div>}
-                        <span className="text-[10px]" style={{ color: 'var(--text-secondary)' }}>{s.name}</span>
-                      </div>
-                    ))}
+
+          {/* Roles */}
+          {allDisplayRoles.length > 0 && (
+            <div>
+              <p className="text-[11px] font-bold uppercase tracking-wider mb-2" style={{ color: colors.text.muted }}>Roles</p>
+              <div className="flex flex-wrap gap-1.5">
+                {allDisplayRoles.map(r => (
+                  <span key={r.id} className="text-[12px] font-semibold px-2.5 py-1 rounded-md"
+                    style={{ background: `${r.color || colors.text.muted}20`, color: r.color || colors.text.muted, border: `1px solid ${r.color || colors.text.muted}30` }}>
+                    {r.name}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Mutual / Shared Servers */}
+          {mutualServers.length > 0 && (
+            <div>
+              <p className="text-[11px] font-bold uppercase tracking-wider mb-2" style={{ color: colors.text.muted }}>Shared Servers</p>
+              <div className="flex flex-wrap gap-2">
+                {mutualServers.map(s => (
+                  <div key={s.id} className="w-9 h-9 rounded-xl overflow-hidden flex items-center justify-center cursor-pointer transition-transform hover:scale-110"
+                    style={{ background: s.banner_color || colors.bg.overlay }}
+                    title={s.name}>
+                    {s.icon_url
+                      ? <img src={s.icon_url} className="w-full h-full object-cover" alt={s.name} />
+                      : <span className="text-[11px] font-bold" style={{ color: colors.text.muted }}>{(s.name || '').slice(0, 2).toUpperCase()}</span>}
                   </div>
-                </div>
-              )}
-              {mutualFriends.length > 0 && (
-                <div>
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.08em] mb-1.5" style={{ color: 'var(--text-muted)', fontFamily: 'monospace' }}>Mutual Friends — {mutualFriends.length}</p>
-                  <div className="space-y-1">
-                    {mutualFriends.map(f => (
-                      <div key={f.id} className="flex items-center gap-2 px-2 py-1.5 rounded-lg" style={{ background: 'var(--bg-glass)' }}>
-                        <div className="w-6 h-6 rounded-full flex items-center justify-center text-[9px] overflow-hidden" style={{ background: 'var(--bg-glass-strong)', color: 'var(--text-muted)' }}>
-                          {f.friend_avatar ? <img src={f.friend_avatar} className="w-full h-full object-cover" /> : (f.friend_name||'?').charAt(0).toUpperCase()}
-                        </div>
-                        <span className="text-[11px]" style={{ color: 'var(--text-primary)' }}>{f.friend_name}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-              {mutualServers.length === 0 && mutualFriends.length === 0 && (
-                <div className="text-center py-8 k-fade-in">
-                  <Users className="w-8 h-8 mx-auto mb-2 opacity-20" style={{ color: 'var(--text-muted)' }} />
-                  <p className="text-[13px] font-medium mb-0.5" style={{ color: 'var(--text-secondary)' }}>No mutual connections</p>
-                  <p className="text-[11px]" style={{ color: 'var(--text-muted)' }}>You don't share any servers or friends yet</p>
-                </div>
-              )}
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Social links */}
+          {hasSocial && (
+            <div>
+              <p className="text-[11px] font-bold uppercase tracking-wider mb-2" style={{ color: colors.text.muted }}>Connections</p>
+              <div className="flex flex-wrap gap-1.5">
+                {Object.entries(profile.social_links).filter(([, v]) => v).map(([key, url]) => {
+                  const Icon = socialIcons[key] || Globe;
+                  return (
+                    <a key={key} href={url} target="_blank" rel="noopener noreferrer"
+                      className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] transition-colors hover:brightness-125"
+                      style={{ background: colors.bg.overlay, color: colors.text.secondary, border: `1px solid ${colors.border.default}` }}>
+                      <Icon className="w-3 h-3" /> <span className="capitalize">{key}</span>
+                    </a>
+                  );
+                })}
+              </div>
             </div>
           )}
         </div>
 
-        {/* Actions */}
+        {/* Action buttons */}
         {!isCurrentUser && (
-          <div className="px-4 pb-4 flex gap-2">
+          <div className="px-5 py-4 flex gap-2">
             {onMessage && isFriend && (
-              <button onClick={onMessage} className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium transition-all"
-                style={{ background: 'var(--text-cream)', color: 'var(--bg-deep)' }}>
+              <button onClick={onMessage} className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-[13px] font-semibold transition-all hover:brightness-110"
+                style={{ background: colors.bg.overlay, color: colors.text.primary, border: `1px solid ${colors.border.default}` }}>
                 <MessageSquare className="w-4 h-4" /> Message
               </button>
             )}
             {!isFriend && onAddFriend && (
-              <button onClick={() => onAddFriend(profile)} className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium transition-all"
-                style={{ background: 'var(--accent-green)', color: '#000' }}>
+              <button onClick={() => onAddFriend(profile)} className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-[13px] font-semibold transition-all hover:brightness-110"
+                style={{ background: colors.bg.overlay, color: colors.text.primary, border: `1px solid ${colors.border.default}` }}>
                 <UserPlus className="w-4 h-4" /> Add Friend
               </button>
             )}
-            {isFriend && onMessage && (
-              <button onClick={() => onBlock?.(profile)} className="p-2.5 rounded-xl transition-colors hover:bg-[rgba(201,123,123,0.1)]"
-                style={{ border: '1px solid var(--border)' }}>
-                <Ban className="w-4 h-4" style={{ color: 'var(--accent-red)' }} />
+            {onBlock && (
+              <button onClick={() => onBlock(profile)} className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-[13px] font-semibold transition-all hover:brightness-110"
+                style={{ background: colors.bg.overlay, color: colors.text.primary, border: `1px solid ${colors.border.default}` }}>
+                <Ban className="w-4 h-4" /> Block
               </button>
             )}
           </div>
