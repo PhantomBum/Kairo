@@ -43,8 +43,11 @@ export default function EmptyView({ onCreateServer, onJoinServer, emptyServer, s
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }} className="w-full max-w-md">
         <div className="mb-12">
           <p className="text-[13px] font-medium mb-2" style={{ color: colors.text.disabled }}>{greeting.text} — {greeting.sub}</p>
-          <h1 className="text-[32px] font-bold tracking-tight" style={{ color: colors.text.primary }}>Kairo</h1>
-          <div className="w-8 h-[3px] rounded-full mt-3" style={{ background: colors.accent.primary }} />
+          <div className="flex items-center gap-3">
+            <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/697a93eea52ff0ef8406c21a/7d580f3da_generated_image.png" alt="Kairo" className="w-9 h-9 object-contain" style={{ filter: 'brightness(10)' }} />
+            <h1 className="text-[32px] font-bold tracking-tight" style={{ color: colors.text.primary }}>Kairo</h1>
+          </div>
+          <div className="w-8 h-[3px] rounded-full mt-3" style={{ background: '#fff' }} />
         </div>
 
         <div className="space-y-2 mb-10">

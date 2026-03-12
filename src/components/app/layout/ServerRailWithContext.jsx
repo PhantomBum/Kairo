@@ -88,9 +88,7 @@ export default function ServerRailWithContext({ servers, activeServerId, onServe
       <ContextMenu>
         <ContextMenuTrigger>
           <div><RailIcon active={isHome} onClick={onHomeClick} tooltip="Direct Messages" badge={badge}>
-            <svg width="28" height="20" viewBox="0 0 28 20" fill="none">
-              <path d="M23.0212 1.67671C21.3107 0.879656 19.5079 0.318797 17.6584 0C17.4062 0.461742 17.1749 0.934541 16.9708 1.4184C15.003 1.12145 12.9974 1.12145 11.0292 1.4184C10.8251 0.934541 10.5765 0.461742 10.3416 0C8.49019 0.321971 6.68536 0.884561 4.97292 1.68363C1.09514 7.30826 0.0965 12.7908 0.585974 18.1944C2.57539 19.6554 4.83016 20.6863 7.21875 21.2233C7.73762 20.5143 8.19605 19.7611 8.59561 18.9698C7.83699 18.6858 7.1094 18.3291 6.42102 17.9029C6.60487 17.7695 6.78458 17.6305 6.95814 17.4916C11.5536 19.604 16.5009 19.604 21.0419 17.4916C21.2178 17.6361 21.3975 17.775 21.579 17.9029C20.8887 18.3309 20.1589 18.6894 19.398 18.9754C19.7976 19.7667 20.2627 20.5199 20.7752 21.2289C23.1673 20.6932 25.4243 19.6611 27.414 18.1944C27.9905 11.9547 26.4431 6.52452 23.0212 1.67671Z" fill={isHome ? '#fff' : colors.text.muted}/>
-            </svg>
+            <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/697a93eea52ff0ef8406c21a/7d580f3da_generated_image.png" alt="Kairo" className="w-7 h-7 object-contain" style={{ filter: isHome ? 'brightness(10)' : 'brightness(0.6)' }} />
           </RailIcon></div>
         </ContextMenuTrigger>
         <ContextMenuContent className="w-52 p-1.5 rounded-lg" style={{ background: colors.bg.float, border: `1px solid ${colors.border.strong}`, boxShadow: '0 8px 32px rgba(0,0,0,0.6)' }}>
