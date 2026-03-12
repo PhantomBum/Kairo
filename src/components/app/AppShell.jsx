@@ -43,6 +43,8 @@ import ChannelSettingsModal from '@/components/app/modals/ChannelSettingsModal';
 import ServerBackupsModal from '@/components/app/modals/ServerBackupsModal';
 import InvitePreviewModal from '@/components/app/modals/InvitePreviewModal';
 import CreateCategoryModal from '@/components/app/modals/CreateCategoryModal';
+import DiscoverModal from '@/components/app/modals/DiscoverModal';
+import AdminPanelModal from '@/components/app/modals/AdminPanelModal';
 import AdvancedSearch from '@/components/app/features/AdvancedSearch';
 import MediaGallery from '@/components/app/features/MediaGallery';
 import PrivacyDashboard from '@/components/app/features/PrivacyDashboard';
@@ -378,6 +380,7 @@ export default function AppShell({ currentUser }) {
   const profileModal = profileUserId ? getProfile(profileUserId) : null;
   const profileMember = profileUserId ? members.find(m => m.user_id === profileUserId) : null;
   const hasElite = profile?.badges?.includes('premium') || false;
+  const isAppOwner = currentUser.role === 'admin';
   const isFriendProfile = profileUserId ? friends.some(f => f.friend_id === profileUserId) : false;
 
   return (
