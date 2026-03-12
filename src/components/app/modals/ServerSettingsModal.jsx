@@ -22,6 +22,7 @@ export default function ServerSettingsModal({ onClose, server, currentUserId }) 
   const [members, setMembers] = useState([]);
   const [saving, setSaving] = useState(false);
   const [channels, setChannels] = useState([]);
+  const [serverCategories, setServerCategories] = useState([]);
   const [features, setFeatures] = useState(server?.features || []);
   const [serverSettings, setServerSettings] = useState(server?.settings || {});
   const [bannerColor, setBannerColor] = useState(server?.banner_color || '#5865F2');
@@ -32,6 +33,7 @@ export default function ServerSettingsModal({ onClose, server, currentUserId }) 
     base44.entities.Role.filter({ server_id: server.id }).then(setRoles);
     base44.entities.ServerMember.filter({ server_id: server.id }).then(setMembers);
     base44.entities.Channel.filter({ server_id: server.id }).then(setChannels);
+    base44.entities.Category.filter({ server_id: server.id }).then(setServerCategories);
   }, [server?.id]);
 
   const saveOverview = async () => {
@@ -139,6 +141,31 @@ export default function ServerSettingsModal({ onClose, server, currentUserId }) 
               <span className="text-[11px] px-2 py-0.5 rounded" style={{ background: colors.bg.overlay, color: colors.text.disabled }}>{ch.type}</span>
             </div>
           ))}
+        </div>
+      );
+      case 'categories': return (
+        <div className="space-y-3">
+          <p className="text-[13px] mb-3" style={{ color: colors.text.muted }}>Categories organize your channels into groups. Drag categories in the sidebar to reorder.</p>
+          {(serverCategories || []).sort((a, b) => (a.position || 0) - (b.position || 0)).map(cat => {
+            const catChannels = (channels || []).filter(ch => ch.category_id === cat.id);
+            return (
+              <div key={cat.id} className="px-3 py-3 rounded-lg" style={{ background: colors.bg.elevated, border: `1px solid ${colors.border.default}` }}>
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-[13px] font-semibold uppercase tracking-wider" style={{ color: colors.text.primary }}>{cat.name}</span>
+                  <span className="text-[11px]" style={{ color: colors.text.disabled }}>{catChannels.length} channels</span>
+                </div>
+                {catChannels.length > 0 && (
+                  <div className="mt-2 space-y-1">
+                    {catChannels.map(ch => (
+                      <div key={ch.id} className="flex items-center gap-2 text-[12px] pl-2" style={{ color: colors.text.muted }}>
+                        <Hash className="w-3 h-3" /> {ch.name}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       );
       default: return (
