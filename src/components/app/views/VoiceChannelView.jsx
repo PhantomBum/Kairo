@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { base44 } from '@/api/base44Client';
-import { Mic, MicOff, Headphones, HeadphoneOff, PhoneOff, Monitor, MonitorOff, Volume2, Users, AlertCircle } from 'lucide-react';
+import { Mic, MicOff, Headphones, HeadphoneOff, PhoneOff, Monitor, MonitorOff, Volume2, Users, AlertCircle, Settings, ChevronUp } from 'lucide-react';
 import { useProfiles } from '@/components/app/providers/ProfileProvider';
 import { motion, AnimatePresence } from 'framer-motion';
 import { colors } from '@/components/app/design/tokens';
@@ -70,13 +70,47 @@ export default function VoiceChannelView({ channel, currentUser, isMuted, isDeaf
 
   const agora = useAgora();
 
-  // Fetch voice states
+  const [showDevices, setShowDevices] = useState(false);
+  const [audioInputs, setAudioInputs] = useState([]);
+  const [audioOutputs, setAudioOutputs] = useState([]);
+  const [selectedInput, setSelectedInput] = useState('');
+  const [selectedOutput, setSelectedOutput] = useState('');
+
+  // Enumerate audio devices
+  useEffect(() => {
+    const getDevices = async () => {
+      try {
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        setAudioInputs(devices.filter(d => d.kind === 'audioinput'));
+        setAudioOutputs(devices.filter(d => d.kind === 'audiooutput'));
+      } catch {}
+    };
+    getDevices();
+  }, [agora.joined]);
+
+  // Fetch voice states — deduplicate by user_id
   useEffect(() => {
     if (!channel?.id) return;
-    base44.entities.VoiceState.filter({ channel_id: channel.id }).then(setVoiceStates);
-    const unsub = base44.entities.VoiceState.subscribe((event) => {
-      base44.entities.VoiceState.filter({ channel_id: channel.id }).then(setVoiceStates);
-    });
+    const fetchAndDedup = async () => {
+      const states = await base44.entities.VoiceState.filter({ channel_id: channel.id });
+      // Deduplicate: keep only the latest state per user_id
+      const seen = new Map();
+      const toDelete = [];
+      for (const s of states) {
+        if (seen.has(s.user_id)) {
+          toDelete.push(s.id);
+        } else {
+          seen.set(s.user_id, s);
+        }
+      }
+      // Clean up duplicates in background
+      if (toDelete.length > 0) {
+        toDelete.forEach(id => base44.entities.VoiceState.delete(id));
+      }
+      setVoiceStates(Array.from(seen.values()));
+    };
+    fetchAndDedup();
+    const unsub = base44.entities.VoiceState.subscribe(() => fetchAndDedup());
     return unsub;
   }, [channel?.id]);
 
@@ -87,9 +121,12 @@ export default function VoiceChannelView({ channel, currentUser, isMuted, isDeaf
     }
   }, [isMuted, agora.joined]);
 
-  // Connect: join Agora + create VoiceState record
+  // Connect: clean up any stale states first, then join
   const handleConnect = async () => {
     setConnecting(true);
+    // Remove any stale voice states for this user in this channel
+    const stale = await base44.entities.VoiceState.filter({ channel_id: channel.id, user_id: currentUser.id });
+    for (const s of stale) await base44.entities.VoiceState.delete(s.id);
     const channelName = `server_${channel.server_id}_channel_${channel.id}`;
     await agora.join(channelName);
     await base44.entities.VoiceState.create({
@@ -198,11 +235,49 @@ export default function VoiceChannelView({ channel, currentUser, isMuted, isDeaf
 
         {/* Controls */}
         {agora.joined ? (
-          <div className="flex items-start justify-center gap-4">
-            <ControlButton icon={isMuted ? MicOff : Mic} active={isMuted} onClick={onToggleMute} label={isMuted ? 'Unmute' : 'Mute'} />
-            <ControlButton icon={isDeafened ? HeadphoneOff : Headphones} active={isDeafened} onClick={onToggleDeafen} label={isDeafened ? 'Undeafen' : 'Deafen'} />
-            <ControlButton icon={agora.screenSharing ? MonitorOff : Monitor} active={agora.screenSharing} onClick={toggleScreenShare} label={agora.screenSharing ? 'Stop Share' : 'Share Screen'} />
-            <ControlButton icon={PhoneOff} danger onClick={handleDisconnect} label="Leave" />
+          <div className="relative">
+            {/* Device selector dropup */}
+            <AnimatePresence>
+              {showDevices && (
+                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 10 }}
+                  className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 w-80 p-4 rounded-xl z-10"
+                  style={{ background: colors.bg.surface, border: `1px solid ${colors.border.light}`, boxShadow: '0 -8px 32px rgba(0,0,0,0.4)' }}>
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-[13px] font-semibold" style={{ color: colors.text.primary }}>Audio Devices</span>
+                    <button onClick={() => setShowDevices(false)} className="p-1 rounded hover:bg-[rgba(255,255,255,0.06)]">
+                      <ChevronUp className="w-4 h-4" style={{ color: colors.text.muted }} />
+                    </button>
+                  </div>
+                  <div className="space-y-3">
+                    <div>
+                      <label className="text-[10px] font-semibold uppercase tracking-wider block mb-1" style={{ color: colors.text.disabled }}>Input Device</label>
+                      <select value={selectedInput} onChange={e => setSelectedInput(e.target.value)}
+                        className="w-full px-3 py-2 rounded-lg text-[12px] outline-none"
+                        style={{ background: colors.bg.elevated, color: colors.text.primary, border: `1px solid ${colors.border.default}` }}>
+                        <option value="">Default</option>
+                        {audioInputs.map(d => <option key={d.deviceId} value={d.deviceId}>{d.label || `Mic ${d.deviceId.slice(0,6)}`}</option>)}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="text-[10px] font-semibold uppercase tracking-wider block mb-1" style={{ color: colors.text.disabled }}>Output Device</label>
+                      <select value={selectedOutput} onChange={e => setSelectedOutput(e.target.value)}
+                        className="w-full px-3 py-2 rounded-lg text-[12px] outline-none"
+                        style={{ background: colors.bg.elevated, color: colors.text.primary, border: `1px solid ${colors.border.default}` }}>
+                        <option value="">Default</option>
+                        {audioOutputs.map(d => <option key={d.deviceId} value={d.deviceId}>{d.label || `Speaker ${d.deviceId.slice(0,6)}`}</option>)}
+                      </select>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+            <div className="flex items-start justify-center gap-4">
+              <ControlButton icon={isMuted ? MicOff : Mic} active={isMuted} onClick={onToggleMute} label={isMuted ? 'Unmute' : 'Mute'} />
+              <ControlButton icon={isDeafened ? HeadphoneOff : Headphones} active={isDeafened} onClick={onToggleDeafen} label={isDeafened ? 'Undeafen' : 'Deafen'} />
+              <ControlButton icon={Settings} active={showDevices} onClick={() => setShowDevices(!showDevices)} label="Devices" />
+              <ControlButton icon={agora.screenSharing ? MonitorOff : Monitor} active={agora.screenSharing} onClick={toggleScreenShare} label={agora.screenSharing ? 'Stop Share' : 'Share Screen'} />
+              <ControlButton icon={PhoneOff} danger onClick={handleDisconnect} label="Leave" />
+            </div>
           </div>
         ) : (
           <button onClick={handleConnect} disabled={connecting}
