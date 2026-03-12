@@ -51,7 +51,10 @@ export default function SettingsModal({ onClose, profile, onUpdate, onLogout, cu
     if (tab === 'profile') Object.assign(data, { display_name: form.display_name, username: form.username, bio: form.bio, pronouns: form.pronouns });
     else if (tab === 'social') data.social_links = { twitter: form.twitter, github: form.github, website: form.website, instagram: form.instagram, spotify: form.spotify, tiktok: form.tiktok, linkedin: form.linkedin, twitch: form.twitch };
     else if (tab === 'privacy') data.settings = { ...profile?.settings, dm_privacy: form.dm_privacy, friend_requests: form.friend_requests, read_receipts: form.read_receipts, typing_indicators: form.typing_indicators, ghost_mode: form.ghost_mode, focus_mode: form.focus_mode };
-    else if (tab === 'appearance') { data.settings = { ...profile?.settings, theme: form.theme, message_display: form.message_display, compact_servers: form.compact_servers }; data.accent_color = form.accent_color; }
+    else if (tab === 'appearance') { data.settings = { ...profile?.settings, theme: form.theme, message_display: form.message_display, compact_servers: form.compact_servers, font_scaling: form.font_scaling, saturation: form.saturation }; data.accent_color = form.accent_color; }
+    else if (tab === 'notifications') { data.settings = { ...profile?.settings, desktop_notifs: form.desktop_notifs, dm_notifs: form.dm_notifs, mention_notifs: form.mention_notifs, sound_notifs: form.sound_notifs, notification_sound: form.notification_sound }; }
+    else if (tab === 'accessibility') { data.settings = { ...profile?.settings, reduced_motion: form.reduced_motion, high_contrast: form.high_contrast, font_scaling: form.font_scaling, saturation: form.saturation }; }
+    else if (tab === 'voice') { data.settings = { ...profile?.settings, noise_suppression: form.noise_suppression, echo_cancellation: form.echo_cancellation, auto_gain: form.auto_gain }; }
     await onUpdate(data); setSaving(false);
   };
 
