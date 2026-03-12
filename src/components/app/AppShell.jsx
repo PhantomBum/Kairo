@@ -611,6 +611,8 @@ export default function AppShell({ currentUser }) {
               onMediaGallery={isDM ? () => setShowMediaGallery(!showMediaGallery) : () => setModal('media-gallery')}
               onSearch={() => setModal('search')}
               onStarred={() => setShowStarred(true)}
+              onVoiceCall={isDM ? () => startCall(false) : undefined}
+              onVideoCall={isDM ? () => startCall(true) : undefined}
               serverName={activeServer?.name} />
             <div className="flex-1 flex min-h-0">
               <div className="flex-1 flex flex-col min-w-0">
