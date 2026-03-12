@@ -64,7 +64,7 @@ function RailIcon({ active, unread, onClick, tooltip, badge, children }) {
 }
 
 function ServerDivider() {
-  return <div className="w-6 h-[1px] rounded-full my-1.5" style={{ background: 'linear-gradient(90deg, transparent, rgba(139,92,246,0.2), transparent)' }} />;
+  return <div className="w-6 h-[1px] rounded-full my-1.5" style={{ background: `linear-gradient(90deg, transparent, ${colors.border.light}, transparent)` }} />;
 }
 
 export default function ServerRailWithContext({ servers, activeServerId, onServerSelect, onHomeClick, onCreateServer, onDiscover, onElite, onLeaveServer, isHome, badge, currentUserId }) {
