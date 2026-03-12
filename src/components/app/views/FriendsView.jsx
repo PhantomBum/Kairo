@@ -89,7 +89,7 @@ export default function FriendsView({ friends, incomingRequests, outgoingRequest
   return (
     <div className="flex-1 flex flex-col">
       {/* Header */}
-      <div className="h-12 px-4 flex items-center gap-3 flex-shrink-0" style={{ borderBottom: `1px solid ${colors.border.default}`, background: colors.bg.surface, boxShadow: '0 1px 0 rgba(0,0,0,0.15)' }}>
+      <div className="h-12 px-4 flex items-center gap-3 flex-shrink-0" style={{ borderBottom: `1px solid ${colors.border.default}`, background: colors.bg.surface }}>
         <Users className="w-5 h-5" style={{ color: colors.text.disabled }} />
         <span className="text-[15px] font-semibold" style={{ color: colors.text.primary }}>Friends</span>
         <div className="flex gap-0.5 ml-3">
