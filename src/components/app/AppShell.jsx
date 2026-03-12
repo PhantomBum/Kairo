@@ -60,6 +60,14 @@ import JumpToDate from '@/components/app/features/JumpToDate';
 import { useBadgeCheck } from '@/components/app/badges/useBadgeCheck';
 import BadgeNotification from '@/components/app/badges/BadgeNotification';
 import DMCallView, { IncomingCallOverlay, OutgoingCallOverlay } from '@/components/app/views/DMCallView';
+import ThemeEnforcer from '@/components/app/providers/ThemeEnforcer';
+import TypingIndicator from '@/components/app/features/TypingIndicator';
+import { useTypingEmitter } from '@/components/app/features/useTypingEmitter';
+import { useDesktopNotifications } from '@/components/app/features/DesktopNotifications';
+import { playNotificationSound } from '@/components/app/features/NotificationSounds';
+
+const ForwardMessageModal = lazy(() => import('@/components/app/modals/ForwardMessageModal'));
+const ScheduleMessageModal = lazy(() => import('@/components/app/features/ScheduleMessageModal'));
 
 function ModalSuspense({ children }) {
   return <Suspense fallback={<div className="fixed inset-0 z-50 flex items-center justify-center" style={{ background: 'rgba(0,0,0,0.5)' }}><div className="w-6 h-6 border-2 rounded-full animate-spin" style={{ borderColor: 'rgba(255,255,255,0.1)', borderTopColor: '#5865F2' }} /></div>}>{children}</Suspense>;
@@ -96,9 +104,18 @@ export default function AppShell({ currentUser }) {
   const [activeCall, setActiveCall] = useState(null);
   const [incomingCall, setIncomingCall] = useState(null);
   const [outgoingCall, setOutgoingCall] = useState(null);
+  const [forwardMsg, setForwardMsg] = useState(null);
 
   const { data: profile } = useMyProfile(currentUser.email);
   const { newBadges, dismissBadge } = useBadgeCheck(currentUser.id, profile?.id);
+  const emitTyping = useTypingEmitter(currentUser, profile);
+  const { notify } = useDesktopNotifications({
+    enabled: profile?.settings?.desktop_notifs !== false,
+    soundEnabled: profile?.settings?.sound_notifs !== false,
+    soundName: profile?.settings?.notification_sound || 'default',
+    currentUserId: currentUser.id,
+    ghostMode: profile?.settings?.ghost_mode,
+  });
   const { data: servers = [] } = useServers(currentUser.id, currentUser.email);
   const { data: categories = [] } = useCategories(activeServer?.id);
   const { data: channels = [] } = useChannels(activeServer?.id);
