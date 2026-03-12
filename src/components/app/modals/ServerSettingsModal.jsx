@@ -21,6 +21,7 @@ export default function ServerSettingsModal({ onClose, server, currentUserId }) 
   const [roles, setRoles] = useState([]);
   const [members, setMembers] = useState([]);
   const [saving, setSaving] = useState(false);
+  const [channels, setChannels] = useState([]);
   const [features, setFeatures] = useState(server?.features || []);
   const [serverSettings, setServerSettings] = useState(server?.settings || {});
   const [bannerColor, setBannerColor] = useState(server?.banner_color || '#5865F2');
@@ -30,6 +31,7 @@ export default function ServerSettingsModal({ onClose, server, currentUserId }) 
     if (!server?.id) return;
     base44.entities.Role.filter({ server_id: server.id }).then(setRoles);
     base44.entities.ServerMember.filter({ server_id: server.id }).then(setMembers);
+    base44.entities.Channel.filter({ server_id: server.id }).then(setChannels);
   }, [server?.id]);
 
   const saveOverview = async () => {
