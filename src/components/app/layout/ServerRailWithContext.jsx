@@ -27,14 +27,14 @@ function RailIcon({ active, unread, onClick, tooltip, badge, size = 40, children
   const [hovered, setHovered] = useState(false);
   return (
     <div className="relative flex items-center justify-center" onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
-      <motion.div className="absolute left-0 rounded-r-full" initial={false}
+      <motion.div className="absolute rounded-r-full" initial={false}
         animate={{
           width: 4,
           height: active ? 40 : hovered ? 20 : unread ? 8 : 0,
           opacity: active || hovered || unread ? 1 : 0,
         }}
         transition={{ duration: 0.15, ease: 'easeOut' }}
-        style={{ background: colors.text.primary, position: 'absolute', left: 0, top: '50%', transform: 'translateY(-50%)', borderRadius: '0 4px 4px 0' }} />
+        style={{ background: colors.text.primary, left: -12, top: '50%', transform: 'translateY(-50%)' }} />
       <motion.button onClick={onClick}
         className="relative overflow-hidden flex items-center justify-center"
         whileTap={{ scale: 0.92 }}
