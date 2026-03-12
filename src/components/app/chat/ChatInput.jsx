@@ -129,7 +129,9 @@ export default function ChatInput({ channelName, channelId, replyTo, onCancelRep
   const charCount = content.length;
   const nearLimit = charCount > 1500;
 
-  const placeholder = replyTo ? `Reply to ${replyTo.author_name}...` : `Message ${channelName ? '#' + channelName : ''}`;
+  const placeholders = [`What's on your mind?`, `Say something nice...`, `Share your thoughts...`, `Type a message...`];
+  const placeholderIdx = Math.abs((channelName || '').length) % placeholders.length;
+  const placeholder = replyTo ? `Reply to ${replyTo.author_name}...` : (channelName ? `Message #${channelName}` : placeholders[placeholderIdx]);
 
   return (
     <div className="px-4 pb-5 pt-1 relative"

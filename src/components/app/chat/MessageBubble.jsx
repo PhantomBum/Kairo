@@ -6,7 +6,7 @@ import ReactionTooltip from '@/components/app/shared/ReactionTooltip';
 import VideoPlayer from '@/components/app/chat/VideoPlayer';
 import { colors } from '@/components/app/design/tokens';
 
-function ts(d) { return new Date(d).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }); }
+function ts(d) { return new Date(d).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }); }
 function fullTs(d) { return new Date(d).toLocaleString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit' }); }
 
 function isMediaUrl(url) {
@@ -145,7 +145,7 @@ const MessageBubble = memo(function MessageBubble({ message, compact, isOwn, onR
                   className="text-[15px] font-medium hover:underline truncate max-w-[200px]" style={{ color: roleColor }}>{authorName}</button>
                 {!isDeleted && <RoleBadge badges={message.author_badges} />}
                 <button onClick={() => setShowFullTs(!showFullTs)} className="text-[11px] tabular-nums select-none flex-shrink-0 hover:underline"
-                  style={{ color: colors.text.disabled }} title={fullTs(message.created_date)}>
+                  style={{ color: colors.text.muted, opacity: 0.7 }} title={fullTs(message.created_date)}>
                   {showFullTs ? fullTs(message.created_date) : ts(message.created_date)}
                 </button>
                 {message.is_edited && <span className="text-[11px] flex-shrink-0" style={{ color: colors.text.disabled }}>(edited)</span>}
