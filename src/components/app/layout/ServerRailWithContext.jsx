@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Home, Plus, Compass, Crown, LogOut, Copy, Settings, FolderPlus } from 'lucide-react';
+import { Home, Plus, Compass, Crown, LogOut, Copy, Settings, FolderPlus, ShieldCheck } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuSeparator, ContextMenuTrigger } from '@/components/ui/context-menu';
 import { base44 } from '@/api/base44Client';
@@ -65,7 +65,7 @@ function ServerDivider() {
   return <div className="w-6 h-[1px] rounded-full my-2" style={{ background: colors.border.default }} />;
 }
 
-export default function ServerRailWithContext({ servers, activeServerId, onServerSelect, onHomeClick, onCreateServer, onDiscover, onElite, onLeaveServer, isHome, badge, currentUserId }) {
+export default function ServerRailWithContext({ servers, activeServerId, onServerSelect, onHomeClick, onCreateServer, onDiscover, onElite, onLeaveServer, isHome, badge, currentUserId, isAppOwner, onAdminPanel }) {
   const [folders, setFolders] = useState([]);
   const [showCreateFolder, setShowCreateFolder] = useState(false);
 
@@ -138,6 +138,11 @@ export default function ServerRailWithContext({ servers, activeServerId, onServe
       <RailIcon onClick={onDiscover} tooltip="Explore Servers"><Compass className="w-5 h-5" style={{ color: colors.text.muted }} /></RailIcon>
 
       <div className="flex-1" />
+      {isAppOwner && (
+        <RailIcon onClick={onAdminPanel} tooltip="Admin Panel">
+          <ShieldCheck className="w-5 h-5" style={{ color: '#faa81a' }} />
+        </RailIcon>
+      )}
       <RailIcon onClick={onElite} tooltip="Kairo Elite"><Crown className="w-5 h-5" style={{ color: colors.text.muted }} /></RailIcon>
 
       <AnimatePresence>{showCreateFolder && <FolderCreateModal onClose={() => setShowCreateFolder(false)} onCreate={createFolder} />}</AnimatePresence>
