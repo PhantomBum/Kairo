@@ -53,6 +53,10 @@ const ActivityStatus = lazy(() => import('@/components/app/features/ActivityStat
 
 import SpacesView from '@/components/app/features/KairoSpaces';
 import KairoBoards from '@/components/app/features/KairoBoards';
+import StarredMessagesPanel from '@/components/app/features/StarredMessages';
+import QuickStatusPopup from '@/components/app/features/QuickStatusPopup';
+import ServerNotes from '@/components/app/features/ServerNotes';
+import JumpToDate from '@/components/app/features/JumpToDate';
 
 function ModalSuspense({ children }) {
   return <Suspense fallback={<div className="fixed inset-0 z-50 flex items-center justify-center" style={{ background: 'rgba(0,0,0,0.5)' }}><div className="w-6 h-6 border-2 rounded-full animate-spin" style={{ borderColor: 'rgba(255,255,255,0.1)', borderTopColor: '#5865F2' }} /></div>}>{children}</Suspense>;
@@ -82,6 +86,10 @@ export default function AppShell({ currentUser }) {
   const [mobileTab, setMobileTab] = useState('servers');
   const [nsfwAccepted, setNsfwAccepted] = useState(new Set());
   const [inviteCode, setInviteCode] = useState(null);
+  const [showStarred, setShowStarred] = useState(false);
+  const [showQuickStatus, setShowQuickStatus] = useState(false);
+  const [showServerNotes, setShowServerNotes] = useState(false);
+  const [showJumpToDate, setShowJumpToDate] = useState(false);
 
   const { data: profile } = useMyProfile(currentUser.email);
   const { data: servers = [] } = useServers(currentUser.id, currentUser.email);
