@@ -541,6 +541,14 @@ export default function AppShell({ currentUser }) {
     try { localStorage.setItem(key, JSON.stringify(updated)); } catch {}
   }, [currentUser.id, channelLabel]);
 
+  const highlightMsg = useCallback(async (msg) => {
+    await base44.entities.Highlight.create({
+      user_id: currentUser.id, message_id: msg.id, content: msg.content,
+      author_name: msg.author_name, channel_name: channelLabel,
+      server_id: activeServer?.id, channel_id: activeChannel?.id,
+    });
+  }, [currentUser.id, channelLabel, activeServer?.id, activeChannel?.id]);
+
   const pinnedCount = isDM ? dmMessages.filter(m => m.is_pinned).length : messages.filter(m => m.is_pinned).length;
   const isOwner = activeServer?.owner_id === currentUser.id || activeServer?.created_by === currentUser.email;
   const profileModal = profileUserId ? getProfile(profileUserId) : null;
