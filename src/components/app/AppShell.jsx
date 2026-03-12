@@ -397,7 +397,7 @@ export default function AppShell({ currentUser }) {
           isHome={view === 'home' || view === 'friends'} badge={incomingReqs.length}
           currentUserId={currentUser.id} isAppOwner={isAppOwner} onAdminPanel={() => setModal('admin-panel')} />
 
-        <div className="w-[240px] flex-shrink-0 flex flex-col" style={{ background: colors.bg.surface, borderRight: `1px solid ${colors.border.default}` }}>
+        <div className="w-[240px] flex-shrink-0 flex flex-col" style={{ background: colors.bg.surface }}>
           {view === 'server' ? (
             <DraggableChannelSidebar server={activeServer} categories={categories} channels={channels}
               activeId={activeChannel?.id} onSelect={(ch) => { setActiveChannel(ch); setShowMobileSidebar(false); }}
