@@ -14,26 +14,28 @@ function VoiceMember({ state, profile, isCurrentUser, isSpeaking }) {
   const isStreaming = state.is_streaming;
 
   return (
-    <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="flex flex-col items-center gap-2">
-      <div className="relative group">
-        <div className={`w-20 h-20 rounded-full flex items-center justify-center text-2xl font-semibold overflow-hidden transition-shadow ${isSpeaking ? 'k-speaking-ring' : ''}`}
+    <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }}
+      className="flex flex-col items-center gap-3 p-4 rounded-xl"
+      style={{ background: colors.bg.surface, border: `1px solid ${isSpeaking ? colors.status.online : colors.border.default}`, minWidth: 100 }}>
+      <div className="relative">
+        <div className={`w-16 h-16 rounded-full flex items-center justify-center text-xl font-semibold overflow-hidden transition-shadow ${isSpeaking ? 'k-speaking-ring' : ''}`}
           style={{
             background: colors.bg.elevated,
-            border: `2px solid ${isSpeaking ? colors.status.online : colors.border.light}`,
+            border: `2px solid ${isSpeaking ? colors.status.online : 'transparent'}`,
             color: colors.text.muted,
           }}>
           {avatar ? <img src={avatar} className="w-full h-full object-cover" alt={name} /> : name.charAt(0).toUpperCase()}
         </div>
         {isMuted && (
-          <div className="absolute -bottom-0.5 -right-0.5 w-6 h-6 rounded-full flex items-center justify-center"
-            style={{ background: colors.bg.base, border: `2px solid ${colors.bg.elevated}` }}>
-            <MicOff className="w-3 h-3" style={{ color: '#f23f43' }} />
+          <div className="absolute -bottom-0.5 -right-0.5 w-5 h-5 rounded-full flex items-center justify-center"
+            style={{ background: colors.bg.base, border: `2px solid ${colors.bg.surface}` }}>
+            <MicOff className="w-2.5 h-2.5" style={{ color: colors.danger }} />
           </div>
         )}
         {isDeafened && (
-          <div className="absolute -bottom-0.5 -left-0.5 w-6 h-6 rounded-full flex items-center justify-center"
-            style={{ background: colors.bg.base, border: `2px solid ${colors.bg.elevated}` }}>
-            <HeadphoneOff className="w-3 h-3" style={{ color: '#f23f43' }} />
+          <div className="absolute -bottom-0.5 -left-0.5 w-5 h-5 rounded-full flex items-center justify-center"
+            style={{ background: colors.bg.base, border: `2px solid ${colors.bg.surface}` }}>
+            <HeadphoneOff className="w-2.5 h-2.5" style={{ color: colors.danger }} />
           </div>
         )}
       </div>
@@ -41,7 +43,7 @@ function VoiceMember({ state, profile, isCurrentUser, isSpeaking }) {
         style={{ color: isCurrentUser ? colors.text.primary : colors.text.secondary }}>{name}</span>
       {isStreaming && (
         <span className="text-[10px] px-2 py-0.5 rounded-full font-medium"
-          style={{ background: 'rgba(242,63,67,0.12)', color: '#f23f43' }}>LIVE</span>
+          style={{ background: 'rgba(242,63,67,0.12)', color: colors.danger }}>LIVE</span>
       )}
     </motion.div>
   );
@@ -50,12 +52,12 @@ function VoiceMember({ state, profile, isCurrentUser, isSpeaking }) {
 function ControlButton({ active, danger, onClick, icon: Icon, label, disabled }) {
   return (
     <button onClick={onClick} disabled={disabled} className="flex flex-col items-center gap-1.5 group disabled:opacity-30" title={label}>
-      <div className="w-12 h-12 rounded-full flex items-center justify-center transition-all"
+      <div className="w-11 h-11 rounded-full flex items-center justify-center transition-all"
         style={{
-          background: danger ? 'rgba(242,63,67,0.12)' : active ? 'rgba(255,255,255,0.08)' : colors.bg.elevated,
-          border: `1px solid ${danger ? 'rgba(242,63,67,0.25)' : active ? colors.border.strong : colors.border.default}`,
+          background: danger ? 'rgba(237,66,69,0.12)' : active ? 'rgba(237,66,69,0.08)' : colors.bg.surface,
+          border: `1px solid ${danger ? 'rgba(237,66,69,0.25)' : active ? colors.border.strong : colors.border.default}`,
         }}>
-        <Icon className="w-5 h-5" style={{ color: danger ? '#f23f43' : active ? '#f23f43' : colors.text.secondary }} />
+        <Icon className="w-[18px] h-[18px]" style={{ color: danger ? colors.danger : active ? colors.danger : colors.text.secondary }} />
       </div>
       <span className="text-[10px]" style={{ color: colors.text.disabled }}>{label}</span>
     </button>
@@ -193,7 +195,7 @@ export default function VoiceChannelView({ channel, currentUser, isMuted, isDeaf
   const hasRemoteScreen = agora.remoteUsers.some(u => u.uid > 100000 && u.videoTrack);
 
   return (
-    <div className="flex-1 flex flex-col items-center justify-center p-8" style={{ background: colors.bg.base }}>
+    <div className="flex-1 flex flex-col items-center justify-center p-8" style={{ background: colors.bg.elevated }}>
       <div className="text-center max-w-xl w-full">
         {/* Channel info */}
         <div className="flex items-center justify-center gap-2 mb-2">
@@ -221,8 +223,8 @@ export default function VoiceChannelView({ channel, currentUser, isMuted, isDeaf
           </div>
         )}
 
-        {/* Participants grid */}
-        <div className="flex flex-wrap gap-6 justify-center mb-12 min-h-[100px] items-center">
+        {/* Participants grid — Kloak spatial feel */}
+        <div className="flex flex-wrap gap-4 justify-center mb-12 min-h-[100px] items-center">
           <AnimatePresence>
             {voiceStates.map(s => (
               <VoiceMember key={s.id} state={s} profile={getProfile(s.user_id)} isCurrentUser={s.user_id === currentUser.id} />
