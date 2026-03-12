@@ -168,6 +168,35 @@ export default function ServerSettingsModal({ onClose, server, currentUserId }) 
           })}
         </div>
       );
+      case 'bans': {
+        const banned = members.filter(m => m.is_banned);
+        return (
+          <div className="space-y-3">
+            <p className="text-[13px] mb-2" style={{ color: colors.text.muted }}>{banned.length} banned member{banned.length !== 1 ? 's' : ''}</p>
+            {banned.length === 0 ? (
+              <div className="text-center py-8">
+                <p className="text-[28px] mb-2">✅</p>
+                <p className="text-[14px]" style={{ color: colors.text.muted }}>No banned members</p>
+              </div>
+            ) : banned.map(m => (
+              <div key={m.id} className="flex items-center gap-3 px-3 py-2.5 rounded-lg" style={{ background: colors.bg.elevated, border: `1px solid ${colors.border.default}` }}>
+                <div className="w-8 h-8 rounded-full flex items-center justify-center text-[12px] font-semibold" style={{ background: colors.bg.overlay, color: colors.text.muted }}>
+                  {(m.user_email || '?').charAt(0).toUpperCase()}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <span className="text-[13px] truncate block" style={{ color: colors.text.primary }}>{m.user_email}</span>
+                  {m.ban_reason && <span className="text-[11px]" style={{ color: colors.text.disabled }}>Reason: {m.ban_reason}</span>}
+                </div>
+                <button onClick={async () => {
+                  await base44.entities.ServerMember.update(m.id, { is_banned: false, ban_reason: '' });
+                  setMembers(ms => ms.map(x => x.id === m.id ? { ...x, is_banned: false } : x));
+                  qc.invalidateQueries({ queryKey: ['members'] });
+                }} className="text-[12px] px-3 py-1.5 rounded-lg" style={{ background: colors.bg.overlay, color: colors.text.secondary }}>Unban</button>
+              </div>
+            ))}
+          </div>
+        );
+      }
       default: return (
         <div className="text-center py-16">
           <p className="text-[32px] mb-3">🚧</p>
