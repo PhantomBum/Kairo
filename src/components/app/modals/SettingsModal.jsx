@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { createPageUrl } from '@/utils';
-import { User, Link, Shield, LogOut, Palette, Bell, Volume2, Keyboard, Accessibility, HelpCircle, Crown, ExternalLink, Lock, Mail, Award, Sparkles } from 'lucide-react';
+import { User, Link, Shield, LogOut, Palette, Bell, Volume2, Keyboard, Accessibility, HelpCircle, Crown, ExternalLink, Lock, Mail, Award, Sparkles, Play } from 'lucide-react';
 import ModalWrapper from './ModalWrapper';
 import { colors } from '@/components/app/design/tokens';
 import SecuritySettings from '@/components/app/features/SecuritySettings';
@@ -44,7 +44,19 @@ export default function SettingsModal({ onClose, profile, onUpdate, onLogout, cu
     notification_sound: profile?.settings?.notification_sound || 'default',
   });
   const [saving, setSaving] = useState(false);
+  const [audioDevices, setAudioDevices] = useState({ inputs: [], outputs: [] });
   const set = (k, v) => setForm(p => ({ ...p, [k]: v }));
+
+  // Enumerate audio devices when voice tab is selected
+  React.useEffect(() => {
+    if (tab !== 'voice') return;
+    navigator.mediaDevices?.enumerateDevices().then(devices => {
+      setAudioDevices({
+        inputs: devices.filter(d => d.kind === 'audioinput'),
+        outputs: devices.filter(d => d.kind === 'audiooutput'),
+      });
+    }).catch(() => {});
+  }, [tab]);
 
   const save = async () => {
     setSaving(true);
@@ -254,6 +266,7 @@ export default function SettingsModal({ onClose, profile, onUpdate, onLogout, cu
               <label className="text-[11px] font-semibold uppercase tracking-[0.06em] block mb-1.5" style={{ color: colors.text.muted }}>Input Device</label>
               <select value={form.input_device} onChange={e => set('input_device', e.target.value)} className="w-full px-3 py-2.5 rounded-lg text-[14px] outline-none" style={{ background: colors.bg.base, color: colors.text.primary, border: `1px solid ${colors.border.default}` }}>
                 <option value="default">Default</option>
+                {audioDevices.inputs.map(d => <option key={d.deviceId} value={d.deviceId}>{d.label || `Mic ${d.deviceId.slice(0,8)}`}</option>)}
               </select>
             </div>
             <SettingsSlider label="Input Volume" value={form.input_volume} onChange={v => set('input_volume', v)} min={0} max={200} unit="%" />
@@ -261,6 +274,7 @@ export default function SettingsModal({ onClose, profile, onUpdate, onLogout, cu
               <label className="text-[11px] font-semibold uppercase tracking-[0.06em] block mb-1.5" style={{ color: colors.text.muted }}>Output Device</label>
               <select value={form.output_device} onChange={e => set('output_device', e.target.value)} className="w-full px-3 py-2.5 rounded-lg text-[14px] outline-none" style={{ background: colors.bg.base, color: colors.text.primary, border: `1px solid ${colors.border.default}` }}>
                 <option value="default">Default</option>
+                {audioDevices.outputs.map(d => <option key={d.deviceId} value={d.deviceId}>{d.label || `Speaker ${d.deviceId.slice(0,8)}`}</option>)}
               </select>
             </div>
             <SettingsSlider label="Output Volume" value={form.output_volume} onChange={v => set('output_volume', v)} min={0} max={200} unit="%" />
