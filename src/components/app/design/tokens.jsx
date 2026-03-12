@@ -1,62 +1,61 @@
-// KAIRO DESIGN SYSTEM — True Discord Dark Theme
-// Pixel-perfect dark palette, crisp typography, minimal decoration
+// KAIRO DESIGN SYSTEM — Kloak-inspired: true black + warm cream
+// Deep blacks, warm off-white text, minimal gray, rich contrast
 
 export const colors = {
   bg: {
-    base: '#1e1f22',        // server rail bg
-    surface: '#2b2d31',     // sidebar bg  
-    elevated: '#313338',    // main chat area
-    overlay: '#383a40',     // inputs, cards, dropdowns
-    modal: '#313338',       // modals
-    hover: 'rgba(255,255,255,0.06)',
-    active: 'rgba(255,255,255,0.1)',
-    float: '#111214',       // tooltips, popouts, context menus
+    base: '#0c0c0c',        // server rail — true black
+    surface: '#121212',     // sidebar panels — near-black  
+    elevated: '#181818',    // main chat area
+    overlay: '#1e1e1e',     // inputs, cards, dropdowns
+    modal: '#141414',       // modals
+    hover: 'rgba(255,255,255,0.05)',
+    active: 'rgba(255,255,255,0.08)',
+    float: '#0a0a0a',       // tooltips, popouts, context menus
   },
   accent: {
-    primary: '#5865f2',
-    hover: '#4752c4',
-    active: '#3c45a5',
-    subtle: 'rgba(88,101,242,0.15)',
-    muted: 'rgba(88,101,242,0.2)',
-    glow: 'rgba(88,101,242,0.08)',
+    primary: '#d4c9a8',     // warm cream accent (Kloak-style)
+    hover: '#c4b898',
+    active: '#b4a888',
+    subtle: 'rgba(212,201,168,0.08)',
+    muted: 'rgba(212,201,168,0.15)',
+    glow: 'rgba(212,201,168,0.05)',
   },
   status: {
-    online: '#23a559',
-    idle: '#f0b232',
-    dnd: '#f23f43',
-    offline: '#80848e',
-    invisible: '#80848e',
+    online: '#4ade80',
+    idle: '#fbbf24',
+    dnd: '#f87171',
+    offline: '#525252',
+    invisible: '#525252',
   },
-  danger: '#f23f43',
-  warning: '#f0b232',
-  success: '#23a559',
-  info: '#5865f2',
+  danger: '#ef4444',
+  warning: '#f59e0b',
+  success: '#4ade80',
+  info: '#60a5fa',
   text: {
-    primary: '#f2f3f5',
-    secondary: '#b5bac1',
-    muted: '#949ba4',
-    disabled: '#6d6f78',
-    link: '#00a8fc',
+    primary: '#e8e2d4',      // warm cream — main text
+    secondary: '#b8b0a0',    // muted warm
+    muted: '#807868',         // soft warm gray
+    disabled: '#585048',      // dim warm
+    link: '#87ceeb',          // soft sky blue links
   },
   border: {
-    default: 'rgba(255,255,255,0.06)',
-    light: 'rgba(255,255,255,0.08)',
-    strong: 'rgba(255,255,255,0.12)',
+    default: 'rgba(255,255,255,0.05)',
+    light: 'rgba(255,255,255,0.07)',
+    strong: 'rgba(255,255,255,0.1)',
   },
 };
 
 export const shadows = {
-  subtle: '0 1px 2px rgba(0,0,0,0.2)',
-  medium: '0 4px 12px rgba(0,0,0,0.32)',
-  strong: '0 8px 24px rgba(0,0,0,0.4)',
-  glow: '0 0 20px rgba(88,101,242,0.06)',
+  subtle: '0 1px 3px rgba(0,0,0,0.5)',
+  medium: '0 4px 16px rgba(0,0,0,0.6)',
+  strong: '0 8px 32px rgba(0,0,0,0.7)',
+  glow: '0 0 24px rgba(212,201,168,0.03)',
   elevation: {
-    low: '0 1px 0 rgba(0,0,0,0.2), 0 1.5px 0 rgba(0,0,0,0.06)',
-    high: '0 8px 16px rgba(0,0,0,0.24)',
+    low: '0 1px 0 rgba(0,0,0,0.4)',
+    high: '0 8px 24px rgba(0,0,0,0.6)',
   },
 };
 
-// Legacy compat
 export const glass = {
   rail: { background: colors.bg.base },
   surface: { background: colors.bg.surface },
@@ -124,10 +123,10 @@ export const cssVariables = `
   --bg-surface: ${colors.bg.surface};
   --bg-elevated: ${colors.bg.elevated};
   --bg-overlay: ${colors.bg.overlay};
-  --bg-glass: rgba(255,255,255,0.03);
-  --bg-glass-hover: rgba(255,255,255,0.06);
-  --bg-glass-active: rgba(255,255,255,0.1);
-  --bg-glass-strong: rgba(255,255,255,0.08);
+  --bg-glass: rgba(255,255,255,0.02);
+  --bg-glass-hover: rgba(255,255,255,0.05);
+  --bg-glass-active: rgba(255,255,255,0.08);
+  --bg-glass-strong: rgba(255,255,255,0.04);
   --text-cream: ${colors.text.primary};
   --text-primary: ${colors.text.primary};
   --text-secondary: ${colors.text.secondary};
@@ -138,7 +137,7 @@ export const cssVariables = `
   --accent-blue: ${colors.info};
   --accent-green: ${colors.success};
   --accent-red: ${colors.danger};
-  --accent-purple: ${colors.accent.primary};
+  --accent-purple: #a78bfa;
   --accent-amber: ${colors.warning};
   --accent-glow: ${colors.accent.subtle};
   --border: ${colors.border.default};
