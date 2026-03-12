@@ -634,8 +634,13 @@ export default function AppShell({ currentUser }) {
 
       <div className="flex-1 flex flex-col min-w-0 relative k-channel-fade" style={{ background: colors.bg.elevated }} role="main" key={activeChannel?.id || activeConv?.id || view}>
         {view === 'spaces' ? (
-          <SpacesView currentUser={currentUser} profile={profile} />
+          <>
+            <GlobalTopBar onSearch={() => setModal('search')} />
+            <SpacesView currentUser={currentUser} profile={profile} />
+          </>
         ) : view === 'friends' ? (
+          <>
+          <GlobalTopBar onSearch={() => setModal('search')} />
           <FriendsView friends={friends} incomingRequests={incomingReqs} outgoingRequests={outgoingReqs}
             blocked={blockedUsers}
             onAddFriend={() => setModal('add-friend')} onMessage={handleStartDM} onBlock={handleBlock}
