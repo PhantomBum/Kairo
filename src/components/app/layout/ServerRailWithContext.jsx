@@ -88,7 +88,7 @@ export default function ServerRailWithContext({ servers, activeServerId, onServe
       <ContextMenu>
         <ContextMenuTrigger>
           <div><RailIcon active={isHome} onClick={onHomeClick} tooltip="Direct Messages" badge={badge}>
-            <span className="text-xl font-bold" style={{ color: isHome ? '#fff' : colors.text.muted }}>K</span>
+            <span className="text-lg font-bold" style={{ color: isHome ? '#fff' : colors.text.muted }}>K</span>
           </RailIcon></div>
         </ContextMenuTrigger>
         <ContextMenuContent className="w-52 p-1.5 rounded-lg" style={{ background: colors.bg.float, border: `1px solid ${colors.border.strong}`, boxShadow: '0 8px 32px rgba(0,0,0,0.6)' }}>

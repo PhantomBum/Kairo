@@ -70,8 +70,8 @@ function KairoInner() {
     return (
       <div className="h-screen w-screen flex items-center justify-center" style={{ background: colors.bg.base }} role="status" aria-label="Loading Kairo">
         <div className="text-center k-fade-in">
-          <div className="mx-auto mb-6 flex items-center justify-center" style={{ width: 72, height: 72, borderRadius: 16, background: colors.accent.primary }}>
-            <span className="text-4xl font-bold text-white">K</span>
+          <div className="mx-auto mb-6 flex items-center justify-center" style={{ width: 56, height: 56, borderRadius: 14, background: colors.accent.primary }}>
+            <span className="text-2xl font-bold text-white">K</span>
           </div>
           <div className="w-5 h-5 border-2 rounded-full animate-spin mx-auto" style={{ borderColor: 'rgba(255,255,255,0.06)', borderTopColor: colors.accent.primary }} />
         </div>
