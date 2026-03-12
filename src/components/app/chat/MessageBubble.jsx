@@ -1,10 +1,11 @@
 import React, { useState, memo } from 'react';
-import { Reply, Pencil, Trash2, Copy, Pin, PinOff, Link, ChevronDown, ChevronUp, Bookmark, ArrowRight, Zap, UserPlus, LogOut, Star, Crown, Shield, Gamepad2, Bug } from 'lucide-react';
+import { Reply, Pencil, Trash2, Copy, Pin, PinOff, Link, ChevronDown, ChevronUp, Bookmark, ArrowRight, Zap, UserPlus, LogOut, Star } from 'lucide-react';
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuSeparator, ContextMenuTrigger } from '@/components/ui/context-menu';
 import ImageWithFallback from '@/components/app/shared/ImageWithFallback';
 import ReactionTooltip from '@/components/app/shared/ReactionTooltip';
 import VideoPlayer from '@/components/app/chat/VideoPlayer';
 import { colors } from '@/components/app/design/tokens';
+import { BADGE_CONFIG } from '@/components/app/badges/badgeConfig';
 
 function ts(d) { return new Date(d).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }); }
 function fullTs(d) { return new Date(d).toLocaleString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit' }); }
