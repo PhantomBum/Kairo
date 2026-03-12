@@ -68,26 +68,15 @@ function isEmojiOnly(text) {
   return stripped.length <= 12 && EMOJI_ONLY_REGEX.test(stripped);
 }
 
-/* Badge icons inline after username — small colored icons like Discord/inspo */
-const BADGE_ICONS = {
-  owner: { icon: Crown, color: '#faa61a' },
-  admin: { icon: Shield, color: '#5865F2' },
-  developer: { icon: Gamepad2, color: '#a78bfa' },
-  bug_hunter: { icon: Bug, color: '#faa61a' },
-  tester: { icon: Bug, color: '#3ba55c' },
-  moderator: { icon: Shield, color: '#3ba55c' },
-  premium: { icon: Crown, color: '#faa61a' },
-  verified: { icon: Star, color: '#3ba55c' },
-  partner: { icon: Star, color: '#5865F2' },
-  early_supporter: { icon: Star, color: '#ed4245' },
-};
-
+/* Badge icons inline after username — uses centralized badge config */
 function InlineBadges({ badges }) {
   if (!badges?.length) return null;
+  // Show max 3 inline in chat
+  const shown = badges.slice(0, 3);
   return (
     <span className="inline-flex items-center gap-0.5 ml-1">
-      {badges.map(b => {
-        const cfg = BADGE_ICONS[b];
+      {shown.map(b => {
+        const cfg = BADGE_CONFIG[b];
         if (!cfg) return null;
         const Icon = cfg.icon;
         return <Icon key={b} className="w-4 h-4 flex-shrink-0" style={{ color: cfg.color }} />;
