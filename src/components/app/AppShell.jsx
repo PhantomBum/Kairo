@@ -24,6 +24,7 @@ import EmptyView from '@/components/app/views/EmptyView';
 import VoiceChannelView from '@/components/app/views/VoiceChannelView';
 import DMMediaGallery from '@/components/app/views/DMMediaGallery';
 import NSFWGate from '@/components/app/shared/NSFWGate';
+import GlobalTopBar from '@/components/app/layout/GlobalTopBar';
 
 // Lazy-loaded modals — only downloaded when opened
 const CreateServerModal = lazy(() => import('@/components/app/modals/CreateServerModal'));
