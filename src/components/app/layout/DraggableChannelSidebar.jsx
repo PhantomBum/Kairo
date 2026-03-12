@@ -1,6 +1,7 @@
 import React, { useState, useCallback, useRef } from 'react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { Hash, Volume2, Megaphone, Radio, MessageSquare, Lock, ChevronDown, Plus, Settings, GripVertical, LayoutGrid, ShieldAlert, CalendarDays } from 'lucide-react';
+import VoiceChannelUsers from './VoiceChannelUsers';
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuSeparator, ContextMenuTrigger } from '@/components/ui/context-menu';
 import { base44 } from '@/api/base44Client';
 import { colors } from '@/components/app/design/tokens';
@@ -8,7 +9,7 @@ import ServerBannerHeader from './ServerBannerHeader';
 
 const typeIcons = { text: Hash, voice: Volume2, announcement: Megaphone, stage: Radio, forum: MessageSquare, board: LayoutGrid };
 
-function ChannelItem({ channel, active, onClick, onSettings, onJumpToDate, isOwner, index }) {
+function ChannelItem({ channel, active, onClick, onSettings, onJumpToDate, isOwner, index, voiceStates }) {
   const Icon = typeIcons[channel.type] || Hash;
   return (
     <Draggable draggableId={channel.id} index={index} isDragDisabled={!isOwner}>
@@ -54,13 +55,16 @@ function ChannelItem({ channel, active, onClick, onSettings, onJumpToDate, isOwn
               </>}
             </ContextMenuContent>
           </ContextMenu>
+          {(channel.type === 'voice' || channel.type === 'stage') && voiceStates && voiceStates.length > 0 && (
+            <VoiceChannelUsers voiceStates={voiceStates} />
+          )}
         </div>
       )}
     </Draggable>
   );
 }
 
-function CategoryGroup({ category, channels, activeId, onSelect, onAdd, onSettings, onJumpToDate, isOwner, index }) {
+function CategoryGroup({ category, channels, activeId, onSelect, onAdd, onSettings, onJumpToDate, isOwner, index, voiceStates }) {
   const [open, setOpen] = useState(true);
   return (
     <Draggable draggableId={`cat-${category.id}`} index={index} isDragDisabled={!isOwner}>
@@ -83,7 +87,8 @@ function CategoryGroup({ category, channels, activeId, onSelect, onAdd, onSettin
               {(dropProvided) => (
                 <div ref={dropProvided.innerRef} {...dropProvided.droppableProps} className="space-y-px min-h-[2px]">
                   {channels.sort((a, b) => (a.position || 0) - (b.position || 0)).map((ch, i) => (
-                    <ChannelItem key={ch.id} channel={ch} active={activeId === ch.id} onClick={onSelect} onSettings={onSettings} onJumpToDate={onJumpToDate} isOwner={isOwner} index={i} />
+                    <ChannelItem key={ch.id} channel={ch} active={activeId === ch.id} onClick={onSelect} onSettings={onSettings} onJumpToDate={onJumpToDate} isOwner={isOwner} index={i}
+                      voiceStates={(voiceStates || []).filter(s => s.channel_id === ch.id)} />
                   ))}
                   {dropProvided.placeholder}
                 </div>
@@ -96,7 +101,7 @@ function CategoryGroup({ category, channels, activeId, onSelect, onAdd, onSettin
   );
 }
 
-export default function DraggableChannelSidebar({ server, categories, channels, activeId, onSelect, onAdd, onAddCategory, onSettings, onInvite, onModPanel, onAnalytics, onBackups, onChannelSettings, onJumpToDate, isOwner }) {
+export default function DraggableChannelSidebar({ server, categories, channels, activeId, onSelect, onAdd, onAddCategory, onSettings, onInvite, onModPanel, onAnalytics, onBackups, onChannelSettings, onJumpToDate, voiceStates, isOwner }) {
   const sorted = [...(categories || [])].sort((a, b) => (a.position || 0) - (b.position || 0));
   const catIds = new Set(sorted.map(c => c.id));
   const uncategorized = (channels || []).filter(ch => !ch.category_id || !catIds.has(ch.category_id));
@@ -150,7 +155,8 @@ export default function DraggableChannelSidebar({ server, categories, channels, 
                   {(dropP) => (
                     <div ref={dropP.innerRef} {...dropP.droppableProps} className="space-y-px pt-2">
                       {uncategorized.sort((a, b) => (a.position || 0) - (b.position || 0)).map((ch, i) => (
-                        <ChannelItem key={ch.id} channel={ch} active={activeId === ch.id} onClick={onSelect} onSettings={onChannelSettings} onJumpToDate={onJumpToDate} isOwner={isOwner} index={i} />
+                        <ChannelItem key={ch.id} channel={ch} active={activeId === ch.id} onClick={onSelect} onSettings={onChannelSettings} onJumpToDate={onJumpToDate} isOwner={isOwner} index={i}
+                          voiceStates={(voiceStates || []).filter(s => s.channel_id === ch.id)} />
                       ))}
                       {dropP.placeholder}
                     </div>
@@ -160,7 +166,8 @@ export default function DraggableChannelSidebar({ server, categories, channels, 
               {sorted.map((cat, i) => (
                 <CategoryGroup key={cat.id} category={cat} index={i}
                   channels={(channels || []).filter(ch => ch.category_id === cat.id)}
-                  activeId={activeId} onSelect={onSelect} onAdd={onAdd} onSettings={onChannelSettings} onJumpToDate={onJumpToDate} isOwner={isOwner} />
+                  activeId={activeId} onSelect={onSelect} onAdd={onAdd} onSettings={onChannelSettings} onJumpToDate={onJumpToDate} isOwner={isOwner}
+                  voiceStates={voiceStates} />
               ))}
               {isOwner && (
                 <button onClick={onAddCategory}

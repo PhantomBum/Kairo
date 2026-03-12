@@ -3,7 +3,7 @@ import { useQueryClient, useMutation } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { AnimatePresence } from 'framer-motion';
 import { useProfiles } from '@/components/app/providers/ProfileProvider';
-import { useServers, useCategories, useChannels, useMembers, useRoles, useMessages, useDMMessages, useConversations, useFriends, useFriendRequests, useBlocked, useMyProfile } from '@/components/app/hooks/useData';
+import { useServers, useCategories, useChannels, useMembers, useRoles, useMessages, useDMMessages, useConversations, useFriends, useFriendRequests, useBlocked, useMyProfile, useVoiceStates } from '@/components/app/hooks/useData';
 import { useOptimisticMessages } from '@/components/app/performance/useOptimistic';
 import { useChannelCache } from '@/components/app/performance/useChannelCache';
 import { useSwipeGesture } from '@/components/app/mobile/useSwipeGesture';
@@ -110,6 +110,7 @@ export default function AppShell({ currentUser }) {
   const { data: friends = [] } = useFriends(currentUser.id);
   const { data: blockedUsers = [] } = useBlocked(currentUser.id);
   const { incoming: incomingReqs, outgoing: outgoingReqs } = useFriendRequests(currentUser.id, currentUser.email);
+  const { data: voiceStates = [] } = useVoiceStates(activeServer?.id);
 
   useEffect(() => { if (activeServer && channels.length > 0 && !activeChannel) { const first = channels.sort((a, b) => (a.position || 0) - (b.position || 0)).find(c => c.type === 'text'); if (first) setActiveChannel(first); } }, [activeServer, channels]);
   // Persist mute/deafen state for session
@@ -548,6 +549,7 @@ export default function AppShell({ currentUser }) {
               onModPanel={() => setModal('mod-panel')} onAnalytics={() => setModal('analytics')} onBackups={() => setModal('server-backups')}
               onChannelSettings={(ch) => { setChannelToEdit(ch); setModal('channel-settings'); }}
               onJumpToDate={() => setShowJumpToDate(true)}
+              voiceStates={voiceStates}
               isOwner={isOwner} />
           ) : (
             <DMSidebar conversations={conversations} activeId={activeConv?.id}
