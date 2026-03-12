@@ -11,43 +11,41 @@ function RailTooltip({ text, visible }) {
   return (
     <AnimatePresence>
       {visible && text && (
-        <motion.div initial={{ opacity: 0, x: -6, scale: 0.95 }} animate={{ opacity: 1, x: 0, scale: 1 }} exit={{ opacity: 0, x: -6, scale: 0.95 }}
-          transition={{ duration: 0.1 }}
-          className="absolute left-[68px] z-50 px-3 py-1.5 rounded text-sm font-semibold whitespace-nowrap pointer-events-none"
-          style={{ background: colors.bg.float, color: colors.text.primary, border: `1px solid ${colors.border.strong}`, boxShadow: '0 8px 32px rgba(0,0,0,0.6)' }}>
+        <motion.div initial={{ opacity: 0, x: -4 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -4 }}
+          transition={{ duration: 0.08 }}
+          className="absolute left-[58px] z-50 px-2.5 py-1 rounded-md text-[13px] font-medium whitespace-nowrap pointer-events-none"
+          style={{ background: colors.bg.float, color: colors.text.primary, border: `1px solid ${colors.border.strong}`, boxShadow: '0 4px 16px rgba(0,0,0,0.5)' }}>
           {text}
-          <div className="absolute left-[-4px] top-1/2 -translate-y-1/2 w-2 h-2 rotate-45" style={{ background: colors.bg.float, borderLeft: `1px solid ${colors.border.strong}`, borderBottom: `1px solid ${colors.border.strong}` }} />
         </motion.div>
       )}
     </AnimatePresence>
   );
 }
 
-function RailIcon({ active, unread, onClick, tooltip, badge, size = 44, children }) {
+function RailIcon({ active, unread, onClick, tooltip, badge, size = 40, children }) {
   const [hovered, setHovered] = useState(false);
   return (
     <div className="relative flex items-center justify-center" onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
       <motion.div className="absolute rounded-r-full" initial={false}
         animate={{
-          width: 4,
-          height: active ? 40 : hovered ? 20 : unread ? 8 : 0,
+          width: 3,
+          height: active ? 32 : hovered ? 16 : unread ? 6 : 0,
           opacity: active || hovered || unread ? 1 : 0,
         }}
-        transition={{ duration: 0.15, ease: 'easeOut' }}
-        style={{ background: colors.text.primary, left: -12, top: '50%', transform: 'translateY(-50%)' }} />
+        transition={{ duration: 0.12, ease: 'easeOut' }}
+        style={{ background: colors.text.primary, left: -8, top: '50%', transform: 'translateY(-50%)' }} />
       <motion.button onClick={onClick}
         className="relative overflow-hidden flex items-center justify-center"
-        whileTap={{ scale: 0.92 }}
+        whileTap={{ scale: 0.94 }}
         style={{
           width: size, height: size,
-          borderRadius: active || hovered ? Math.round(size * 0.33) : Math.round(size * 0.5),
-          background: active ? colors.accent.primary : hovered ? colors.accent.primary : colors.bg.overlay,
-          transition: 'border-radius 150ms ease, background 150ms ease',
-          boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.03)',
+          borderRadius: active || hovered ? 12 : 20,
+          background: active ? colors.accent.primary : hovered ? 'rgba(88,101,242,0.15)' : colors.bg.overlay,
+          transition: 'border-radius 120ms ease, background 120ms ease',
         }}>
         {children}
         {badge > 0 && (
-          <div className="absolute -bottom-1 -right-1 min-w-[16px] h-[16px] px-1 rounded-full text-[10px] font-bold flex items-center justify-center"
+          <div className="absolute -bottom-0.5 -right-0.5 min-w-[14px] h-[14px] px-0.5 rounded-full text-[9px] font-bold flex items-center justify-center"
             style={{ background: colors.danger, color: '#fff', border: `2px solid ${colors.bg.base}` }}>{badge > 99 ? '99+' : badge}</div>
         )}
       </motion.button>
@@ -57,7 +55,7 @@ function RailIcon({ active, unread, onClick, tooltip, badge, size = 44, children
 }
 
 function RailDivider() {
-  return <div className="w-8 h-[2px] rounded-full mx-auto my-0.5" style={{ background: 'rgba(255,255,255,0.06)' }} />;
+  return <div className="w-6 h-px rounded-full mx-auto my-1" style={{ background: 'rgba(255,255,255,0.06)' }} />;
 }
 
 export default function ServerRailWithContext({ servers, activeServerId, onServerSelect, onHomeClick, onCreateServer, onDiscover, onElite, onLeaveServer, isHome, badge, currentUserId, isAppOwner, onAdminPanel, onServerNotes, compact }) {
@@ -83,7 +81,7 @@ export default function ServerRailWithContext({ servers, activeServerId, onServe
   };
 
   return (
-    <div className={`${compact ? 'w-[52px] gap-0.5' : 'w-[68px] gap-1'} flex-shrink-0 flex flex-col items-center py-3 overflow-y-auto scrollbar-none`}
+    <div className={`${compact ? 'w-[48px] gap-0.5' : 'w-[56px] gap-0.5'} flex-shrink-0 flex flex-col items-center py-2 overflow-y-auto scrollbar-none`}
       style={{ background: colors.bg.base }} role="navigation" aria-label="Server list">
       {/* Home / DMs button */}
       <ContextMenu>
@@ -136,10 +134,10 @@ export default function ServerRailWithContext({ servers, activeServerId, onServe
 
       {/* Add / Discover */}
       <RailIcon onClick={onCreateServer} tooltip="Add a Server">
-        <Plus className="w-4 h-4" style={{ color: colors.success }} />
+        <Plus className="w-[15px] h-[15px]" style={{ color: colors.success }} />
       </RailIcon>
       <RailIcon onClick={onDiscover} tooltip="Explore Servers">
-        <Compass className="w-4 h-4" style={{ color: colors.success }} />
+        <Compass className="w-[15px] h-[15px]" style={{ color: colors.success }} />
       </RailIcon>
 
       <div className="flex-1" />
@@ -147,11 +145,11 @@ export default function ServerRailWithContext({ servers, activeServerId, onServe
       {/* Admin + Elite */}
       {isAppOwner && (
         <RailIcon onClick={onAdminPanel} tooltip="Admin Panel">
-          <ShieldCheck className="w-4 h-4" style={{ color: '#f0b232' }} />
+          <ShieldCheck className="w-[15px] h-[15px]" style={{ color: '#f0b232' }} />
         </RailIcon>
       )}
       <RailIcon onClick={onElite} tooltip="Kairo Elite">
-        <Crown className="w-4 h-4 k-crown-shimmer" style={{ color: '#f0b232' }} />
+        <Crown className="w-[15px] h-[15px] k-crown-shimmer" style={{ color: '#f0b232' }} />
       </RailIcon>
 
       <AnimatePresence>{showCreateFolder && <FolderCreateModal onClose={() => setShowCreateFolder(false)} onCreate={createFolder} />}</AnimatePresence>
