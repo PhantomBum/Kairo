@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, Trash2, GripVertical, ChevronRight, Users } from 'lucide-react';
+import { Plus, Trash2, ChevronRight, Users } from 'lucide-react';
 import { colors } from '@/components/app/design/tokens';
 
 const ROLE_TEMPLATES = [
