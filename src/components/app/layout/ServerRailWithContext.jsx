@@ -23,7 +23,7 @@ function RailTooltip({ text, visible }) {
   );
 }
 
-function RailIcon({ active, unread, onClick, tooltip, badge, size = 48, children }) {
+function RailIcon({ active, unread, onClick, tooltip, badge, size = 40, children }) {
   const [hovered, setHovered] = useState(false);
   return (
     <div className="relative flex items-center justify-center" onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
@@ -88,7 +88,7 @@ export default function ServerRailWithContext({ servers, activeServerId, onServe
       {/* Home / DMs button */}
       <ContextMenu>
         <ContextMenuTrigger>
-          <div><RailIcon active={isHome} onClick={onHomeClick} tooltip="Direct Messages" badge={badge} size={44}>
+          <div><RailIcon active={isHome} onClick={onHomeClick} tooltip="Direct Messages" badge={badge}>
             <span className="text-base font-bold" style={{ color: isHome ? '#fff' : colors.text.muted }}>K</span>
           </RailIcon></div>
         </ContextMenuTrigger>
@@ -135,23 +135,23 @@ export default function ServerRailWithContext({ servers, activeServerId, onServe
       <RailDivider />
 
       {/* Add / Discover */}
-      <RailIcon onClick={onCreateServer} tooltip="Add a Server" size={44}>
-        <Plus className="w-[18px] h-[18px]" style={{ color: colors.success }} />
+      <RailIcon onClick={onCreateServer} tooltip="Add a Server">
+        <Plus className="w-4 h-4" style={{ color: colors.success }} />
       </RailIcon>
-      <RailIcon onClick={onDiscover} tooltip="Explore Servers" size={44}>
-        <Compass className="w-[18px] h-[18px]" style={{ color: colors.success }} />
+      <RailIcon onClick={onDiscover} tooltip="Explore Servers">
+        <Compass className="w-4 h-4" style={{ color: colors.success }} />
       </RailIcon>
 
       <div className="flex-1" />
 
       {/* Admin + Elite */}
       {isAppOwner && (
-        <RailIcon onClick={onAdminPanel} tooltip="Admin Panel" size={44}>
-          <ShieldCheck className="w-[18px] h-[18px]" style={{ color: '#f0b232' }} />
+        <RailIcon onClick={onAdminPanel} tooltip="Admin Panel">
+          <ShieldCheck className="w-4 h-4" style={{ color: '#f0b232' }} />
         </RailIcon>
       )}
-      <RailIcon onClick={onElite} tooltip="Kairo Elite" size={44}>
-        <Crown className="w-[18px] h-[18px] k-crown-shimmer" style={{ color: '#f0b232' }} />
+      <RailIcon onClick={onElite} tooltip="Kairo Elite">
+        <Crown className="w-4 h-4 k-crown-shimmer" style={{ color: '#f0b232' }} />
       </RailIcon>
 
       <AnimatePresence>{showCreateFolder && <FolderCreateModal onClose={() => setShowCreateFolder(false)} onCreate={createFolder} />}</AnimatePresence>
