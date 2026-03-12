@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Search, Users, Server, Globe, Shield, Crown, RefreshCw, Ban, CheckCircle, AlertTriangle, Mail, Calendar, UserPlus, LogIn, Eye, Trash2, Settings, MessageSquare, Database, Activity } from 'lucide-react';
+import { Search, Users, Server, Globe, Shield, Crown, RefreshCw, Ban, CheckCircle, AlertTriangle, Mail, Calendar, UserPlus, LogIn, Eye, Trash2, Settings, MessageSquare, Database, Activity, Code, FlaskConical } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import ModalWrapper from './ModalWrapper';
 import { colors } from '@/components/app/design/tokens';
@@ -207,6 +207,16 @@ export default function AdminPanelModal({ onClose }) {
     showFeedback(`Revoked Elite from ${u.displayName}`); refresh();
   };
 
+  const handleToggleBadge = async (u, badge) => {
+    const profile = profileMap[u.email?.toLowerCase()] || profileMap[u.id];
+    if (!profile) return;
+    const current = profile.badges || [];
+    const has = current.includes(badge);
+    const badges = has ? current.filter(b => b !== badge) : [...new Set([...current, badge])];
+    await base44.entities.UserProfile.update(profile.id, { badges });
+    showFeedback(`${has ? 'Removed' : 'Granted'} ${badge} badge ${has ? 'from' : 'to'} ${u.displayName}`); refresh();
+  };
+
   const handleDeleteServer = async (s) => {
     setProcessing(true);
     const serverMembers = allMembers.filter(m => m.server_id === s.id);
@@ -325,6 +335,8 @@ export default function AdminPanelModal({ onClose }) {
                     <span className="text-[13px] font-semibold truncate" style={{ color: colors.text.primary }}>{u.displayName}</span>
                     {u.badges?.includes('owner') && <Crown className="w-3 h-3 flex-shrink-0" style={{ color: '#faa81a' }} />}
                     {u.badges?.includes('admin') && <Shield className="w-3 h-3 flex-shrink-0" style={{ color: colors.accent.primary }} />}
+                    {u.badges?.includes('developer') && <Code className="w-3 h-3 flex-shrink-0" style={{ color: '#a78bfa' }} />}
+                    {u.badges?.includes('tester') && <FlaskConical className="w-3 h-3 flex-shrink-0" style={{ color: '#3ba55c' }} />}
                     {u.isBanned && <Ban className="w-3 h-3 flex-shrink-0" style={{ color: colors.danger }} />}
                   </div>
                   <div className="flex items-center gap-2">
@@ -359,6 +371,16 @@ export default function AdminPanelModal({ onClose }) {
                       </button>
                     )
                   )}
+                  {/* Toggle Developer badge */}
+                  <button onClick={() => handleToggleBadge(u, 'developer')} className="p-1.5 rounded-md transition-colors hover:bg-[rgba(255,255,255,0.04)]"
+                    title={u.badges?.includes('developer') ? 'Remove Developer' : 'Grant Developer'}>
+                    <Code className="w-3.5 h-3.5" style={{ color: u.badges?.includes('developer') ? '#a78bfa' : colors.text.disabled }} />
+                  </button>
+                  {/* Toggle Tester badge */}
+                  <button onClick={() => handleToggleBadge(u, 'tester')} className="p-1.5 rounded-md transition-colors hover:bg-[rgba(255,255,255,0.04)]"
+                    title={u.badges?.includes('tester') ? 'Remove Tester' : 'Grant Tester'}>
+                    <FlaskConical className="w-3.5 h-3.5" style={{ color: u.badges?.includes('tester') ? '#3ba55c' : colors.text.disabled }} />
+                  </button>
                   {/* Add to server */}
                   {allServers.length > 0 && (
                     <div className="relative group/add">

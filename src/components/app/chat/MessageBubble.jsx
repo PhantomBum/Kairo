@@ -63,15 +63,18 @@ const MAX_LINES = 20;
 
 function RoleBadge({ badges }) {
   if (!badges?.length) return null;
-  const isOwner = badges.includes('owner');
-  const isAdmin = badges.includes('admin');
-  if (!isOwner && !isAdmin) return null;
-  const label = isOwner ? 'Owner' : 'Admin';
-  const color = isOwner ? colors.warning : colors.info;
-  return (
-    <span className="text-[10px] font-semibold px-1.5 py-px rounded flex-shrink-0"
-      style={{ background: `${color}15`, color }}>{label}</span>
-  );
+  const BADGE_CONFIG = [
+    { key: 'owner', label: 'Owner', color: colors.warning },
+    { key: 'admin', label: 'Admin', color: colors.info },
+    { key: 'developer', label: 'Dev', color: '#a78bfa' },
+    { key: 'tester', label: 'Tester', color: '#3ba55c' },
+  ];
+  const matched = BADGE_CONFIG.filter(b => badges.includes(b.key));
+  if (!matched.length) return null;
+  return matched.map(b => (
+    <span key={b.key} className="text-[10px] font-semibold px-1.5 py-px rounded flex-shrink-0"
+      style={{ background: `${b.color}15`, color: b.color }}>{b.label}</span>
+  ));
 }
 
 const SystemMessage = memo(function SystemMessage({ message }) {

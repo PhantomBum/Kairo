@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { createPageUrl } from '@/utils';
-import { User, Link, Shield, LogOut, Palette, Bell, Volume2, Keyboard, Accessibility, HelpCircle, Crown, ExternalLink, Lock } from 'lucide-react';
+import { User, Link, Shield, LogOut, Palette, Bell, Volume2, Keyboard, Accessibility, HelpCircle, Crown, ExternalLink, Lock, Mail } from 'lucide-react';
 import ModalWrapper from './ModalWrapper';
 import { colors } from '@/components/app/design/tokens';
 import SecuritySettings from '@/components/app/features/SecuritySettings';
@@ -75,6 +75,9 @@ export default function SettingsModal({ onClose, profile, onUpdate, onLogout, cu
           </a>
           <a href={createPageUrl('Support')} className="w-full flex items-center gap-2.5 px-2.5 py-[7px] rounded-lg text-[13px] font-medium hover:bg-[rgba(255,255,255,0.03)]" style={{ color: colors.text.disabled }}>
             <ExternalLink className="w-3.5 h-3.5" /> Support
+          </a>
+          <a href="mailto:ilikebagels1612@gmail.com" className="w-full flex items-center gap-2.5 px-2.5 py-[7px] rounded-lg text-[13px] font-medium hover:bg-[rgba(255,255,255,0.03)]" style={{ color: colors.text.disabled }}>
+            <Mail className="w-3.5 h-3.5" /> Contact Us
           </a>
           <div className="my-2.5 h-px" style={{ background: colors.border.default }} />
           <button onClick={onLogout} className="w-full flex items-center gap-2.5 px-2.5 py-[7px] rounded-lg text-[13px] font-medium hover:bg-[rgba(242,63,67,0.06)]" style={{ color: colors.danger }}>
