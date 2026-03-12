@@ -1,5 +1,5 @@
 import React, { useState, memo } from 'react';
-import { Reply, Pencil, Trash2, Copy, Pin, PinOff, Link, Smile, ChevronDown, ChevronUp, Bookmark } from 'lucide-react';
+import { Reply, Pencil, Trash2, Copy, Pin, PinOff, Link, Smile, ChevronDown, ChevronUp, Bookmark, ArrowRight, Zap, UserPlus, LogOut } from 'lucide-react';
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuSeparator, ContextMenuTrigger } from '@/components/ui/context-menu';
 import ImageWithFallback from '@/components/app/shared/ImageWithFallback';
 import ReactionTooltip from '@/components/app/shared/ReactionTooltip';
@@ -46,7 +46,35 @@ function renderText(text, onLinkClick) {
 
 const MAX_LINES = 20;
 
+const SYSTEM_ICONS = { boost: Zap, join: UserPlus, leave: LogOut };
+
+const SystemMessage = memo(function SystemMessage({ message }) {
+  const content = message.content || '';
+  const isBoost = content.toLowerCase().includes('boost');
+  const isJoin = content.toLowerCase().includes('joined') || content.toLowerCase().includes('welcome');
+  const isLeave = content.toLowerCase().includes('left') || content.toLowerCase().includes('leave');
+  const Icon = isBoost ? Zap : isJoin ? UserPlus : isLeave ? LogOut : ArrowRight;
+  const accentColor = isBoost ? '#a855f7' : isJoin ? colors.success : isLeave ? colors.text.muted : colors.text.disabled;
+  
+  return (
+    <div className="flex items-center gap-3 py-1.5 px-4 k-msg-in" style={{ marginTop: '4px' }}>
+      <div className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: `${accentColor}15` }}>
+        <Icon className="w-3.5 h-3.5" style={{ color: accentColor }} />
+      </div>
+      <span className="text-[13px]" style={{ color: colors.text.muted }}>
+        {content}
+      </span>
+      <span className="text-[10px] tabular-nums ml-auto" style={{ color: colors.text.disabled }}>
+        {ts(message.created_date)}
+      </span>
+    </div>
+  );
+});
+
 const MessageBubble = memo(function MessageBubble({ message, compact, isOwn, onReply, onEdit, onDelete, onReact, onPin, currentUserId, onProfileClick, isEditing, onEditSave, onEditCancel, onImageClick, onLinkClick, onHighlight }) {
+  // Handle system messages separately
+  if (message.type === 'system') return <SystemMessage message={message} />;
+
   const [hovered, setHovered] = useState(false);
   const [editText, setEditText] = useState(message.content || '');
   const [expanded, setExpanded] = useState(false);
