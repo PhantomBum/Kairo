@@ -15,50 +15,52 @@ export default function ModalWrapper({ title, subtitle, onClose, width = 460, ch
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      transition={{ duration: 0.25, ease: [0, 0, 0.2, 1] }}
+      transition={{ duration: 0.15 }}
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(4px)' }}
+      style={{ background: 'rgba(0,0,0,0.65)' }}
       onClick={onClose}
       role="dialog"
       aria-modal="true"
       aria-label={title || 'Dialog'}>
       <motion.div
-        initial={{ scale: 0.93, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        exit={{ scale: 0.95, opacity: 0 }}
-        transition={{ type: 'spring', damping: 25, stiffness: 350 }}
-        className="rounded-xl overflow-hidden w-full relative"
+        initial={{ scale: 0.97, opacity: 0, y: 8 }}
+        animate={{ scale: 1, opacity: 1, y: 0 }}
+        exit={{ scale: 0.98, opacity: 0, y: 4 }}
+        transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+        className="rounded-2xl overflow-hidden w-full relative"
         style={{
           maxWidth: `min(${width}px, calc(100vw - 32px))`,
           maxHeight: 'min(85vh, calc(100vh - 32px))',
-          background: colors.bg.modal,
-          border: `1px solid ${colors.border.light}`,
-          boxShadow: shadows.strong,
+          background: colors.bg.surface,
+          border: `1px solid ${colors.border.default}`,
+          boxShadow: '0 24px 80px rgba(0,0,0,0.5)',
         }}
         onClick={e => e.stopPropagation()}>
-        {/* Header */}
+
         {!hideTitle && (
-          <div className="flex items-center justify-between px-5 py-4" style={{ borderBottom: `1px solid ${colors.border.default}` }}>
+          <div className="flex items-start justify-between px-6 pt-5 pb-0">
             <div className="min-w-0 flex-1">
-              {title && <h2 className="text-[16px] font-semibold truncate" style={{ color: danger ? colors.danger : colors.text.primary }}>{title}</h2>}
-              {subtitle && <p className="text-[13px] mt-0.5 truncate" style={{ color: colors.text.muted }}>{subtitle}</p>}
+              {title && <h2 className="text-[17px] font-semibold" style={{ color: danger ? colors.danger : colors.text.primary }}>{title}</h2>}
+              {subtitle && <p className="text-[13px] mt-0.5" style={{ color: colors.text.disabled }}>{subtitle}</p>}
             </div>
             <button onClick={onClose}
-              className="w-8 h-8 flex items-center justify-center rounded-md flex-shrink-0 ml-3 hover:bg-[rgba(255,255,255,0.06)]"
+              className="w-7 h-7 flex items-center justify-center rounded-lg flex-shrink-0 ml-3 hover:bg-[rgba(255,255,255,0.06)] -mt-0.5"
               aria-label="Close dialog">
-              <X className="w-[18px] h-[18px]" style={{ color: colors.text.muted }} />
+              <X className="w-4 h-4" style={{ color: colors.text.disabled }} />
             </button>
           </div>
         )}
+
         {hideTitle && (
           <button onClick={onClose}
-            className="absolute top-3 right-3 z-10 w-8 h-8 flex items-center justify-center rounded-full hover:bg-[rgba(255,255,255,0.1)]"
+            className="absolute top-3 right-3 z-10 w-7 h-7 flex items-center justify-center rounded-lg hover:bg-[rgba(255,255,255,0.08)]"
             aria-label="Close dialog">
-            <X className="w-[18px] h-[18px]" style={{ color: colors.text.primary }} />
+            <X className="w-4 h-4" style={{ color: colors.text.muted }} />
           </button>
         )}
-        {/* Body */}
-        <div className={`${hideTitle ? 'px-6 py-6' : 'px-5 py-5'} overflow-y-auto scrollbar-none`} style={{ maxHeight: hideTitle ? 'calc(min(85vh, calc(100vh - 32px)))' : 'calc(min(85vh, calc(100vh - 32px)) - 64px)' }}>
+
+        <div className={`${hideTitle ? 'px-6 py-6' : 'px-6 pb-6 pt-4'} overflow-y-auto scrollbar-none`}
+          style={{ maxHeight: hideTitle ? 'calc(min(85vh, calc(100vh - 32px)))' : 'calc(min(85vh, calc(100vh - 32px)) - 52px)' }}>
           {children}
         </div>
       </motion.div>
