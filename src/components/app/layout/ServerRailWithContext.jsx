@@ -59,7 +59,7 @@ function RailDivider() {
   return <div className="w-8 h-[2px] rounded-full mx-auto my-0.5" style={{ background: 'rgba(255,255,255,0.06)' }} />;
 }
 
-export default function ServerRailWithContext({ servers, activeServerId, onServerSelect, onHomeClick, onCreateServer, onDiscover, onElite, onLeaveServer, isHome, badge, currentUserId, isAppOwner, onAdminPanel, onServerNotes }) {
+export default function ServerRailWithContext({ servers, activeServerId, onServerSelect, onHomeClick, onCreateServer, onDiscover, onElite, onLeaveServer, isHome, badge, currentUserId, isAppOwner, onAdminPanel, onServerNotes, compact }) {
   const [folders, setFolders] = useState([]);
   const [showCreateFolder, setShowCreateFolder] = useState(false);
 
@@ -82,7 +82,7 @@ export default function ServerRailWithContext({ servers, activeServerId, onServe
   };
 
   return (
-    <div className="w-[72px] flex-shrink-0 flex flex-col items-center py-3 gap-2 overflow-y-auto scrollbar-none"
+    <div className={`${compact ? 'w-[52px] gap-1' : 'w-[72px] gap-2'} flex-shrink-0 flex flex-col items-center py-3 overflow-y-auto scrollbar-none`}
       style={{ background: colors.bg.base }} role="navigation" aria-label="Server list">
       {/* Home / DMs button */}
       <ContextMenu>
