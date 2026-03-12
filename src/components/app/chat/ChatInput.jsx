@@ -1,5 +1,5 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
-import { Plus, Send, X, Smile, Image, FileText, Film, Type, Stamp } from 'lucide-react';
+import { Plus, Send, X, Smile, Image, FileText, Film, Type, Stamp, Clock } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { colors } from '@/components/app/design/tokens';
 import FormattingToolbar from '@/components/app/features/FormattingToolbar';
@@ -9,7 +9,7 @@ import SlashCommandPicker from '@/components/app/chat/SlashCommandPicker';
 import MentionPicker from '@/components/app/chat/MentionPicker';
 import EmojiPicker from '@/components/app/chat/EmojiPicker';
 
-export default function ChatInput({ channelName, channelId, replyTo, onCancelReply, onSend, onTyping, onEditLast, serverId, members, getProfile }) {
+export default function ChatInput({ channelName, channelId, replyTo, onCancelReply, onSend, onTyping, onEditLast, onSchedule, serverId, members, getProfile }) {
   const storageKey = `kairo-draft-${channelId || channelName || 'default'}`;
   const [content, setContent] = useState(() => {
     try { return localStorage.getItem(storageKey) || ''; } catch { return ''; }
@@ -270,6 +270,9 @@ export default function ChatInput({ channelName, channelId, replyTo, onCancelRep
         <button onClick={() => { closePickers(); setShowEmoji(!showEmoji); }}
           className="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-[rgba(255,255,255,0.06)] flex-shrink-0 mb-0.5"
           title="Emoji"><Smile className="w-5 h-5" style={{ color: showEmoji ? colors.text.primary : colors.text.muted }} /></button>
+        {onSchedule && <button onClick={onSchedule}
+          className="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-[rgba(255,255,255,0.06)] flex-shrink-0 mb-0.5"
+          title="Schedule Message"><Clock className="w-5 h-5" style={{ color: colors.text.muted }} /></button>}
         <button onClick={handleSend} disabled={(!content.trim() && files.length === 0) || sending}
           className="w-8 h-8 flex items-center justify-center rounded-lg flex-shrink-0 mb-0.5 disabled:opacity-20"
           style={{ background: content.trim() || files.length > 0 ? colors.accent.primary : 'transparent', color: content.trim() || files.length > 0 ? '#fff' : colors.text.muted }}
