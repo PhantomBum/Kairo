@@ -39,7 +39,7 @@ function renderText(text, onLinkClick) {
       const key = `${si}-${i}`;
       if (p.match(/^https?:\/\//)) {
         const mediaType = isMediaUrl(p);
-        if (mediaType === 'gif' || mediaType === 'image') return <img key={key} src={p} alt="embedded" className="max-w-[400px] max-h-[280px] rounded mt-1 block" style={{ border: `1px solid ${colors.border.default}` }} loading="lazy" />;
+        if (mediaType === 'gif' || mediaType === 'image') return <img key={key} src={p} alt="embedded" className="max-w-[400px] max-h-[280px] rounded mt-1 block" style={{ border: `1px solid ${colors.border.default}` }} loading="lazy" decoding="async" />;
         return <a key={key} href={p} onClick={e => { if (onLinkClick) { e.preventDefault(); onLinkClick(p); } }} target="_blank" rel="noopener noreferrer" className="hover:underline" style={{ color: colors.text.link, wordBreak: 'break-all' }}>{p}</a>;
       }
       if (p === '@everyone' || p === '@here') return <span key={key} className="px-0.5 rounded" style={{ background: `${colors.accent.primary}20`, color: colors.accent.primary }}>{p}</span>;
@@ -191,7 +191,7 @@ const MessageBubble = memo(function MessageBubble({ message, compact, isOwn, onR
               <div className="flex flex-wrap gap-2 mt-1">
                 {message.attachments.map((a, i) => {
                   const isGif = a.content_type === 'image/gif' || a.filename?.toLowerCase().endsWith('.gif') || a.url?.toLowerCase().includes('.gif');
-                  if (a.content_type?.startsWith('image/') || isGif) return <ImageWithFallback key={i} src={a.url} alt={a.filename || 'image'} className="max-w-[400px] max-h-[300px] rounded cursor-pointer hover:brightness-110" style={{ border: `1px solid ${colors.border.default}` }} onClick={() => onImageClick?.(a.url, a.filename)} />;
+                  if (a.content_type?.startsWith('image/') || isGif) return <ImageWithFallback key={i} src={a.url} alt={a.filename || 'image'} className="max-w-[400px] max-h-[300px] rounded cursor-pointer hover:brightness-110" style={{ border: `1px solid ${colors.border.default}` }} onClick={() => onImageClick?.(a.url, a.filename)} loading="lazy" decoding="async" />;
                   if (a.content_type?.startsWith('video/') || a.url?.match(/\.(mp4|webm|mov|avi|mkv)(\?|$)/i)) return <VideoPlayer key={i} src={a.url} filename={a.filename} />;
                   if (a.content_type?.startsWith('audio/') || a.url?.match(/\.(mp3|wav|ogg|flac|aac)(\?|$)/i)) return <audio key={i} src={a.url} controls className="max-w-[300px]" />;
                   return <a key={i} href={a.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-[13px] px-3 py-2 rounded" style={{ color: colors.text.secondary, background: colors.bg.overlay }}>📎 {a.filename || 'File'}</a>;
