@@ -35,7 +35,7 @@ export default function SupportDropdown({ onClose }) {
             className="flex items-center justify-between px-3 py-2.5 rounded-lg transition-colors hover:bg-[rgba(255,255,255,0.08)]"
             style={{ background: 'rgba(255,255,255,0.04)', border: `1px solid ${colors.border.default}` }}>
             <span className="flex items-center gap-2 text-[13px]" style={{ color: colors.text.primary }}>
-              <span className="text-base">☕</span> Buy Me a Coffee
+              <span className="text-base">☕</span> Buy Me a Coffee Not added yet :(
             </span>
             <ExternalLink className="w-3.5 h-3.5 flex-shrink-0" style={{ color: colors.text.muted }} />
           </a>
