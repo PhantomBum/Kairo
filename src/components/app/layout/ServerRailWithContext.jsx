@@ -43,6 +43,7 @@ function RailIcon({ active, unread, onClick, tooltip, badge, children }) {
           borderRadius: active || hovered ? 16 : 24,
           background: active ? colors.accent.primary : hovered ? colors.accent.primary : colors.bg.overlay,
           transition: 'border-radius 150ms ease, background 150ms ease',
+          boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.03)',
         }}>
         {children}
         {badge > 0 && (
