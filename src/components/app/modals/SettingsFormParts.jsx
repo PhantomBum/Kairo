@@ -4,14 +4,14 @@ import { colors } from '@/components/app/design/tokens';
 export function SettingsField({ label, value, onChange, placeholder, area }) {
   return (
     <div>
-      <label className="text-[11px] font-semibold uppercase tracking-[0.06em] block mb-1.5" style={{ color: colors.text.muted }}>{label}</label>
+      <label className="text-[11px] font-semibold uppercase tracking-[0.06em] block mb-2" style={{ color: colors.text.muted }}>{label}</label>
       {area ? (
         <textarea value={value} onChange={e => onChange(e.target.value)} rows={3} placeholder={placeholder}
-          className="w-full px-3 py-2.5 rounded-lg text-[14px] outline-none resize-none"
+          className="w-full px-3 py-2.5 rounded-lg text-[14px] outline-none resize-none transition-colors focus:border-[#6875e8]"
           style={{ background: colors.bg.base, color: colors.text.primary, border: `1px solid ${colors.border.default}` }} />
       ) : (
         <input value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder}
-          className="w-full px-3 py-2.5 rounded-lg text-[14px] outline-none"
+          className="w-full px-3 py-2.5 rounded-lg text-[14px] outline-none transition-colors focus:border-[#6875e8]"
           style={{ background: colors.bg.base, color: colors.text.primary, border: `1px solid ${colors.border.default}` }} />
       )}
     </div>
