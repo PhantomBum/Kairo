@@ -187,7 +187,24 @@ export default function PrivacyDashboard({ onClose, profile, currentUser, onUpda
                   <p className="text-[12px]" style={{ color: colors.text.muted }}>Permanently delete your account and all associated data. This cannot be undone.</p>
                 </div>
                 <button className="px-4 py-2 rounded-lg text-[13px] font-semibold" style={{ background: colors.danger, color: '#fff' }}
-                  onClick={() => { if (confirm('Are you absolutely sure? This will permanently delete your account and ALL your data. This action CANNOT be undone.')) alert('Account deletion would proceed here.'); }}>
+                  onClick={async () => {
+                    if (!confirm('Are you absolutely sure? This will permanently delete your account and ALL your data. This action CANNOT be undone.')) return;
+                    if (!confirm('FINAL WARNING: Type "yes" after clicking OK to confirm deletion.')) return;
+                    // Delete profile, messages, DMs, friendships
+                    const [msgs, dms, friends, profs] = await Promise.all([
+                      base44.entities.Message.filter({ author_id: currentUser.id }),
+                      base44.entities.DirectMessage.filter({ author_id: currentUser.id }),
+                      base44.entities.Friendship.filter({ user_id: currentUser.id }),
+                      base44.entities.UserProfile.filter({ user_id: currentUser.id }),
+                    ]);
+                    await Promise.all([
+                      ...msgs.map(m => base44.entities.Message.update(m.id, { is_deleted: true, content: '[Deleted Account]' })),
+                      ...dms.map(m => base44.entities.DirectMessage.update(m.id, { is_deleted: true, content: '[Deleted Account]' })),
+                      ...friends.map(f => base44.entities.Friendship.delete(f.id)),
+                      ...profs.map(p => base44.entities.UserProfile.update(p.id, { display_name: 'Deleted User', bio: '', avatar_url: '', banner_url: '', is_banned: true })),
+                    ]);
+                    base44.auth.logout();
+                  }}>
                   Delete
                 </button>
               </div>
