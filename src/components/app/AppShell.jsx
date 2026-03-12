@@ -149,6 +149,26 @@ export default function AppShell({ currentUser }) {
     return () => window.removeEventListener('keydown', handler);
   }, [modal]);
 
+  // Notify on new DM messages
+  const prevDmCountRef = React.useRef(dmMessages.length);
+  useEffect(() => {
+    if (dmMessages.length > prevDmCountRef.current) {
+      const newest = dmMessages[dmMessages.length - 1];
+      if (newest && newest.author_id !== currentUser.id) {
+        notify(`${newest.author_name}`, newest.content?.slice(0, 80), newest.author_avatar);
+      }
+    }
+    prevDmCountRef.current = dmMessages.length;
+  }, [dmMessages.length]);
+
+  // Ghost mode: set status to offline
+  useEffect(() => {
+    if (!profile?.id) return;
+    if (profile?.settings?.ghost_mode && profile?.status !== 'invisible') {
+      base44.entities.UserProfile.update(profile.id, { status: 'invisible', is_online: false });
+    }
+  }, [profile?.settings?.ghost_mode, profile?.id]);
+
   // Intercept invite links pasted/navigated within the app
   useEffect(() => {
     const checkUrl = () => {
@@ -542,6 +562,12 @@ export default function AppShell({ currentUser }) {
 
   return (
     <div className="h-screen w-screen flex flex-col md:flex-row overflow-hidden" style={{ background: colors.bg.base }} {...swipeHandlers}>
+      <ThemeEnforcer
+        theme={profile?.settings?.theme || 'dark'}
+        fontScaling={profile?.settings?.font_scaling}
+        saturation={profile?.settings?.saturation}
+        accentColor={profile?.accent_color}
+      />
       <ConnectionBanner />
 
       {/* Desktop: always show. Mobile: show when sidebar toggled */}
