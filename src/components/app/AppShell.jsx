@@ -490,7 +490,7 @@ export default function AppShell({ currentUser }) {
           <EmptyView emptyServer serverName={activeServer.name}
             onCreateChannel={isOwner ? () => { setModalData(categories[0]?.id); setModal('create-channel'); } : undefined} />
         ) : (
-          <EmptyView onCreateServer={() => setModal('create-server')} onJoinServer={() => setModal('join-server')} />
+          <EmptyView onCreateServer={() => setModal('create-server')} onJoinServer={() => setModal('discover')} />
         )}
       </div>
 
@@ -516,7 +516,7 @@ export default function AppShell({ currentUser }) {
         {modal === 'create-group-dm' && <CreateGroupDMModal onClose={() => setModal(null)} friends={friends} onCreate={handleCreateGroupDM} />}
         {modal === 'pinned' && <PinnedMessagesModal onClose={() => setModal(null)} messages={currentMsgs.filter(m => m.is_pinned)} onUnpin={pinMsg} />}
         {modal === 'status' && <StatusPickerModal onClose={() => setModal(null)} currentStatus={profile?.status} customStatus={profile?.custom_status} onSave={handleStatusUpdate} />}
-        {modal === 'elite' && <KairoEliteModal onClose={() => setModal(null)} profile={profile} hasElite={hasElite} />}
+        {modal === 'elite' && <KairoEliteModal onClose={() => setModal(null)} profile={profile} hasElite={hasElite || isAppOwner} />}
         {modal === 'mod-panel' && activeServer && <ModPanelModal onClose={() => setModal(null)} server={activeServer} />}
         {modal === 'analytics' && activeServer && <AnalyticsDashboardModal onClose={() => setModal(null)} server={activeServer} />}
         {modal === 'channel-settings' && channelToEdit && (
@@ -544,7 +544,7 @@ export default function AppShell({ currentUser }) {
           setMobileTab(tab);
           if (tab === 'servers') setShowMobileSidebar(true);
           else if (tab === 'dms') { goHome(); setShowMobileSidebar(true); }
-          else if (tab === 'explore') setModal('join-server');
+          else if (tab === 'explore') setModal('discover');
           else if (tab === 'profile') setModal('settings');
         }} />
     </div>
