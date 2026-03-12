@@ -27,7 +27,7 @@ export default function Layout({ children }) {
         }
 
         * { border-color: var(--k-border); }
-        ::selection { background: var(--k-accent-subtle); color: var(--k-text-primary); }
+        ::selection { background: rgba(88,101,242,0.3); color: #fff; }
 
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
@@ -79,8 +79,8 @@ export default function Layout({ children }) {
         }
         [data-radix-popper-content-wrapper] [role="menuitem"]:hover,
         [data-radix-popper-content-wrapper] [role="menuitem"][data-highlighted] {
-          background: rgba(212,201,168,0.08) !important;
-          color: var(--k-text-primary) !important;
+          background: rgba(88,101,242,0.15) !important;
+          color: #fff !important;
         }
         [data-radix-popper-content-wrapper] [role="menuitem"]:active { transform: scale(0.98) !important; }
         [data-radix-popper-content-wrapper] [role="separator"] {
@@ -94,7 +94,7 @@ export default function Layout({ children }) {
           background-repeat: no-repeat; background-position: right 10px center;
           padding-right: 30px !important; cursor: pointer;
         }
-        select option { background: #0c0c0c; color: #e8e2d4; padding: 8px 12px; }
+        select option { background: #0a0a0a; color: #fff; padding: 8px 12px; }
 
         @media (prefers-reduced-motion: reduce) {
           *, *::before, *::after {

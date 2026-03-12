@@ -29,7 +29,7 @@ export default function EmptyView({ onCreateServer, onJoinServer, emptyServer, s
           </p>
           {onCreateChannel && (
             <button onClick={onCreateChannel} className="inline-flex items-center gap-2 px-5 py-2.5 rounded text-[14px] font-medium"
-              style={{ background: colors.accent.primary, color: '#fff' }}>
+              style={{ background: colors.accent.primary, color: '#fff', borderRadius: 8 }}>
               <Plus className="w-4 h-4" /> New Channel
             </button>
           )}
@@ -43,19 +43,16 @@ export default function EmptyView({ onCreateServer, onJoinServer, emptyServer, s
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }} className="w-full max-w-md">
         <div className="mb-12">
           <p className="text-[13px] font-medium mb-2" style={{ color: colors.text.disabled }}>{greeting.text} — {greeting.sub}</p>
-          <div className="flex items-center gap-3">
-            <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/697a93eea52ff0ef8406c21a/7d580f3da_generated_image.png" alt="Kairo" className="w-9 h-9 object-contain" style={{ filter: 'brightness(10)' }} />
-            <h1 className="text-[32px] font-bold tracking-tight" style={{ color: colors.text.primary }}>Kairo</h1>
-          </div>
-          <div className="w-8 h-[3px] rounded-full mt-3" style={{ background: '#fff' }} />
+          <h1 className="text-[32px] font-bold tracking-tight" style={{ color: colors.text.primary }}>Kairo</h1>
+          <div className="w-8 h-[3px] rounded-full mt-3" style={{ background: colors.accent.primary }} />
         </div>
 
         <div className="space-y-2 mb-10">
           <button onClick={onCreateServer}
             className="w-full flex items-center gap-4 px-5 py-4 rounded-lg text-left transition-colors hover:bg-[rgba(255,255,255,0.03)]"
             style={{ background: 'rgba(255,255,255,0.02)', border: `1px solid ${colors.border.default}` }}>
-            <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: colors.accent.primary }}>
-              <Plus className="w-5 h-5 text-white" />
+            <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: colors.bg.overlay, border: `1px solid ${colors.border.strong}` }}>
+              <Plus className="w-5 h-5" style={{ color: colors.text.secondary }} />
             </div>
             <div>
               <p className="text-[14px] font-semibold" style={{ color: colors.text.primary }}>Create a server</p>
