@@ -29,7 +29,7 @@ export const BADGE_CONFIG = {
   thread_enthusiast:    { icon: MessageSquare,color:'#06b6d4', rarity: 'rare',      label: 'Thread Enthusiast',      desc: 'Created 100+ threads' },
   curator:              { icon: Pin,         color: '#f59e0b', rarity: 'rare',      label: 'Curator',                desc: 'Pinned 50+ messages' },
   globetrotter:         { icon: Globe,       color: '#10b981', rarity: 'uncommon',  label: 'Globetrotter',           desc: 'Joined servers from 5+ categories' },
-  expresser:            { icon: Drama,       color: '#f97316', rarity: 'uncommon',  label: 'Expresser',              desc: 'Used 200+ unique emoji' },
+  expresser:            { icon: Smile,       color: '#f97316', rarity: 'uncommon',  label: 'Expresser',              desc: 'Used 200+ unique emoji' },
   conversationalist:    { icon: Mic,         color: '#6366f1', rarity: 'uncommon',  label: 'Conversationalist',      desc: 'Sent 1000+ messages' },
   voice_regular:        { icon: Clock,       color: '#8b5cf6', rarity: 'common',    label: 'Voice Regular',          desc: '10+ hours in voice channels' },
   explorer:             { icon: Compass,     color: '#14b8a6', rarity: 'common',    label: 'Explorer',               desc: 'Joined 5+ servers' },
