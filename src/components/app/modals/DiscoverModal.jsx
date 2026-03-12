@@ -14,6 +14,8 @@ export default function DiscoverModal({ onClose, currentUserId, currentUserEmail
   const [joinCode, setJoinCode] = useState('');
   const [joinError, setJoinError] = useState('');
 
+  const [realCounts, setRealCounts] = useState({});
+
   useEffect(() => {
     const load = async () => {
       const [allServers, memberships] = await Promise.all([
@@ -22,6 +24,14 @@ export default function DiscoverModal({ onClose, currentUserId, currentUserEmail
       ]);
       setServers(allServers);
       setMyMemberships(memberships);
+      // Fetch real member counts for public servers
+      const publicOnes = allServers.filter(s => s.is_public);
+      const counts = {};
+      await Promise.all(publicOnes.map(async (s) => {
+        const mems = await base44.entities.ServerMember.filter({ server_id: s.id });
+        counts[s.id] = mems.filter(m => !m.is_banned).length;
+      }));
+      setRealCounts(counts);
       setLoading(false);
     };
     load();
@@ -39,7 +49,9 @@ export default function DiscoverModal({ onClose, currentUserId, currentUserEmail
     const existing = await base44.entities.ServerMember.filter({ server_id: server.id, user_id: currentUserId });
     if (existing.length === 0) {
       await base44.entities.ServerMember.create({ server_id: server.id, user_id: currentUserId, user_email: currentUserEmail, joined_at: new Date().toISOString(), role_ids: [] });
-      await base44.entities.Server.update(server.id, { member_count: (server.member_count || 1) + 1 });
+      // Update with real count
+      const allMems = await base44.entities.ServerMember.filter({ server_id: server.id });
+      await base44.entities.Server.update(server.id, { member_count: allMems.filter(m => !m.is_banned).length });
     }
     setJoining(null);
     onJoinSuccess(server);
@@ -111,7 +123,7 @@ export default function DiscoverModal({ onClose, currentUserId, currentUserEmail
                     {s.description && <p className="text-[12px] truncate mt-0.5" style={{ color: colors.text.muted }}>{s.description}</p>}
                     <div className="flex items-center gap-3 mt-1">
                       <span className="flex items-center gap-1 text-[11px]" style={{ color: colors.text.disabled }}>
-                        <Users className="w-3 h-3" /> {s.member_count || 1} members
+                        <Users className="w-3 h-3" /> {realCounts[s.id] ?? s.member_count ?? 1} members
                       </span>
                     </div>
                   </div>
