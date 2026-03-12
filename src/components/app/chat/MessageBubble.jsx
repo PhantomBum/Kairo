@@ -121,6 +121,7 @@ const MessageBubble = memo(function MessageBubble({ message, compact, isOwn, onR
     <ContextMenu>
       <ContextMenuTrigger>
         <div className="relative group flex items-start gap-4 py-0.5 px-4 hover:bg-[rgba(255,255,255,0.02)]"
+          data-msg-id={message.id}
           onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}
           style={{ marginTop: compact ? 0 : '1.0625rem' }}>
           {compact ? (
