@@ -54,6 +54,8 @@ export default function Layout({ children }) {
         .k-scale-in { animation: k-scale-in 100ms ease-out; }
         .k-channel-fade { animation: k-fade-in 80ms ease-out; }
         .break-words { word-break: break-word; overflow-wrap: anywhere; }
+        pre code { white-space: pre; word-break: normal; overflow-wrap: normal; }
+        pre { max-width: 100%; overflow-x: auto; }
 
         button, a, [role="button"], [role="tab"], [role="menuitem"] {
           transition: background 100ms ease, color 100ms ease, opacity 100ms ease;
@@ -106,6 +108,13 @@ export default function Layout({ children }) {
 
         @supports (padding-bottom: env(safe-area-inset-bottom)) { .safe-bottom { padding-bottom: env(safe-area-inset-bottom); } }
         @media (pointer: coarse) { button, a, [role="button"] { min-height: 44px; min-width: 44px; } }
+
+        /* Toast positioning — higher to avoid input overlap */
+        [data-sonner-toaster] { bottom: 80px !important; }
+        [data-sonner-toast] { font-size: 13px !important; padding: 10px 14px !important; }
+
+        /* Mobile viewport fix for Android keyboard */
+        @supports (height: 100dvh) { .h-screen-safe { height: 100dvh; } }
       `}</style>
       {children}
     </div>
