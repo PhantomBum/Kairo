@@ -37,7 +37,7 @@ export default function SettingsModal({ onClose, profile, onUpdate, onLogout, cu
     desktop_notifs: true, dm_notifs: true, mention_notifs: true, sound_notifs: true,
     input_device: 'default', output_device: 'default', input_volume: 80, output_volume: 100,
     noise_suppression: true, echo_cancellation: true, auto_gain: true,
-    reduced_motion: false, high_contrast: false, font_scaling: 100, saturation: 100,
+    reduced_motion: profile?.settings?.reduced_motion || false, high_contrast: false, font_scaling: profile?.settings?.font_scaling || 100, saturation: profile?.settings?.saturation || 100,
     theme: profile?.settings?.theme || 'dark', message_display: profile?.settings?.message_display || 'cozy',
     accent_color: profile?.accent_color || colors.accent.primary,
     compact_servers: profile?.settings?.compact_servers || false,
