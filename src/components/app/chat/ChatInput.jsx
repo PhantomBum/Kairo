@@ -238,7 +238,13 @@ export default function ChatInput({ channelName, channelId, replyTo, onCancelRep
         <button onClick={handleSend} disabled={(!content.trim() && files.length === 0) || sending}
           className="w-8 h-8 flex items-center justify-center rounded-lg flex-shrink-0 mb-0.5 disabled:opacity-20"
           style={{ background: content.trim() || files.length > 0 ? colors.accent.primary : 'transparent', color: content.trim() || files.length > 0 ? '#fff' : colors.text.muted }}
-          title="Send"><Send className="w-[18px] h-[18px]" /></button>
+          title="Send">
+          {sending ? (
+            <div className="w-4 h-4 border-2 rounded-full animate-spin" style={{ borderColor: 'rgba(255,255,255,0.3)', borderTopColor: '#fff' }} />
+          ) : (
+            <Send className="w-[18px] h-[18px]" />
+          )}
+        </button>
       </div>
     </div>
   );
