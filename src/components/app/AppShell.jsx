@@ -442,6 +442,7 @@ export default function AppShell({ currentUser }) {
               onSettings={() => setModal('server-settings')} onInvite={() => setModal('invite')}
               onModPanel={() => setModal('mod-panel')} onAnalytics={() => setModal('analytics')} onBackups={() => setModal('server-backups')}
               onChannelSettings={(ch) => { setChannelToEdit(ch); setModal('channel-settings'); }}
+              onJumpToDate={() => setShowJumpToDate(true)}
               isOwner={isOwner} />
           ) : (
             <DMSidebar conversations={conversations} activeId={activeConv?.id}
