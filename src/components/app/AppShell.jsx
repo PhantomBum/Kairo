@@ -94,6 +94,7 @@ export default function AppShell({ currentUser }) {
   const [showJumpToDate, setShowJumpToDate] = useState(false);
 
   const { data: profile } = useMyProfile(currentUser.email);
+  const { newBadges, dismissBadge } = useBadgeCheck(currentUser.id, profile?.id);
   const { data: servers = [] } = useServers(currentUser.id, currentUser.email);
   const { data: categories = [] } = useCategories(activeServer?.id);
   const { data: channels = [] } = useChannels(activeServer?.id);
