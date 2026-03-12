@@ -43,7 +43,20 @@ export default function SettingsModal({ onClose, profile, onUpdate, onLogout, cu
     notification_sound: profile?.settings?.notification_sound || 'default',
   });
   const [saving, setSaving] = useState(false);
+  const [audioDevices, setAudioDevices] = useState({ inputs: [], outputs: [] });
   const set = (k, v) => setForm(p => ({ ...p, [k]: v }));
+
+  // Enumerate audio devices for voice tab
+  React.useEffect(() => {
+    if (tab === 'voice') {
+      navigator.mediaDevices?.enumerateDevices().then(devices => {
+        setAudioDevices({
+          inputs: devices.filter(d => d.kind === 'audioinput'),
+          outputs: devices.filter(d => d.kind === 'audiooutput'),
+        });
+      }).catch(() => {});
+    }
+  }, [tab]);
 
   const save = async () => {
     setSaving(true);
@@ -231,7 +244,12 @@ export default function SettingsModal({ onClose, profile, onUpdate, onLogout, cu
           </>}
 
           {tab === 'notifications' && <>
-            <SettingsToggle label="Desktop Notifications" checked={form.desktop_notifs} onChange={v => set('desktop_notifs', v)} desc="Show system notifications" />
+            <SettingsToggle label="Desktop Notifications" checked={form.desktop_notifs} onChange={v => {
+              set('desktop_notifs', v);
+              if (v && 'Notification' in window && Notification.permission === 'default') {
+                Notification.requestPermission();
+              }
+            }} desc="Show system notifications" />
             <SettingsToggle label="DM Notifications" checked={form.dm_notifs} onChange={v => set('dm_notifs', v)} desc="Notify for new direct messages" />
             <SettingsToggle label="Mention Notifications" checked={form.mention_notifs} onChange={v => set('mention_notifs', v)} desc="Notify when you're mentioned" />
             <SettingsToggle label="Sound Effects" checked={form.sound_notifs} onChange={v => set('sound_notifs', v)} desc="Play notification sounds" />
@@ -254,6 +272,7 @@ export default function SettingsModal({ onClose, profile, onUpdate, onLogout, cu
               <label className="text-[11px] font-semibold uppercase tracking-[0.06em] block mb-1.5" style={{ color: colors.text.muted }}>Input Device</label>
               <select value={form.input_device} onChange={e => set('input_device', e.target.value)} className="w-full px-3 py-2.5 rounded-lg text-[14px] outline-none" style={{ background: colors.bg.base, color: colors.text.primary, border: `1px solid ${colors.border.default}` }}>
                 <option value="default">Default</option>
+                {audioDevices.inputs.map(d => <option key={d.deviceId} value={d.deviceId}>{d.label || `Mic ${d.deviceId.slice(0,6)}`}</option>)}
               </select>
             </div>
             <SettingsSlider label="Input Volume" value={form.input_volume} onChange={v => set('input_volume', v)} min={0} max={200} unit="%" />
@@ -261,6 +280,7 @@ export default function SettingsModal({ onClose, profile, onUpdate, onLogout, cu
               <label className="text-[11px] font-semibold uppercase tracking-[0.06em] block mb-1.5" style={{ color: colors.text.muted }}>Output Device</label>
               <select value={form.output_device} onChange={e => set('output_device', e.target.value)} className="w-full px-3 py-2.5 rounded-lg text-[14px] outline-none" style={{ background: colors.bg.base, color: colors.text.primary, border: `1px solid ${colors.border.default}` }}>
                 <option value="default">Default</option>
+                {audioDevices.outputs.map(d => <option key={d.deviceId} value={d.deviceId}>{d.label || `Speaker ${d.deviceId.slice(0,6)}`}</option>)}
               </select>
             </div>
             <SettingsSlider label="Output Volume" value={form.output_volume} onChange={v => set('output_volume', v)} min={0} max={200} unit="%" />
