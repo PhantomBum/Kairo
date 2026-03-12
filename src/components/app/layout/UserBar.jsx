@@ -13,7 +13,7 @@ export default function UserBar({ profile, isMuted, isDeafened, onToggleMute, on
 
   return (
     <div className="px-2 py-[6px] flex items-center gap-0.5 flex-shrink-0"
-      style={{ background: colors.bg.base }} role="status" aria-label="User panel">
+      style={{ background: colors.bg.base, borderTop: `1px solid rgba(255,255,255,0.04)` }} role="status" aria-label="User panel">
       <button onClick={onStatusClick} className="flex items-center gap-2 flex-1 min-w-0 px-1 py-1 rounded hover:bg-[rgba(255,255,255,0.06)] transition-colors" aria-label="Change status">
         <div className="relative flex-shrink-0">
           <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold overflow-hidden"

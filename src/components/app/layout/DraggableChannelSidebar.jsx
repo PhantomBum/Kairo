@@ -19,7 +19,7 @@ function ChannelItem({ channel, active, onClick, onSettings, isOwner, index }) {
               <button onClick={() => onClick(channel)}
                 className="w-full flex items-center gap-1.5 px-2 py-[6px] rounded text-[15px] group"
                 style={{
-                  background: snapshot.isDragging ? 'rgba(255,255,255,0.06)' : active ? 'rgba(255,255,255,0.08)' : 'transparent',
+                  background: snapshot.isDragging ? 'rgba(255,255,255,0.06)' : active ? 'rgba(88,101,242,0.12)' : 'transparent',
                   color: active ? colors.text.primary : colors.text.muted,
                   fontWeight: active ? 500 : 400,
                   transition: 'background 100ms ease, color 100ms ease',
@@ -62,8 +62,8 @@ function CategoryGroup({ category, channels, activeId, onSelect, onAdd, onSettin
       {(provided) => (
         <div ref={provided.innerRef} {...provided.draggableProps} className="mb-0.5">
           <div {...provided.dragHandleProps}>
-            <button onClick={() => setOpen(!open)} className="w-full flex items-center gap-0.5 px-0.5 pt-[18px] pb-1 group">
-              <ChevronDown className="w-3 h-3" style={{ color: colors.text.muted, transform: open ? 'rotate(0deg)' : 'rotate(-90deg)', transition: 'transform 200ms ease' }} />
+            <button onClick={() => setOpen(!open)} className="w-full flex items-center gap-1 px-0.5 pt-[18px] pb-1 group min-h-[36px]">
+              <ChevronDown className="w-4 h-4" style={{ color: colors.text.muted, transform: open ? 'rotate(0deg)' : 'rotate(-90deg)', transition: 'transform 200ms ease' }} />
               <span className="text-[12px] font-bold uppercase tracking-[0.02em] flex-1 text-left truncate" style={{ color: colors.text.muted }}>{category.name}</span>
               {isOwner && <Plus onClick={e => { e.stopPropagation(); onAdd(category.id); }} className="w-[16px] h-[16px] opacity-0 group-hover:opacity-50 hover:opacity-100 cursor-pointer flex-shrink-0" style={{ color: colors.text.muted }} />}
             </button>
