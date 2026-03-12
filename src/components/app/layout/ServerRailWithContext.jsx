@@ -23,7 +23,7 @@ function RailTooltip({ text, visible }) {
   );
 }
 
-function RailIcon({ active, unread, onClick, tooltip, badge, children }) {
+function RailIcon({ active, unread, onClick, tooltip, badge, size = 48, children }) {
   const [hovered, setHovered] = useState(false);
   return (
     <div className="relative flex items-center justify-center" onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
@@ -39,16 +39,16 @@ function RailIcon({ active, unread, onClick, tooltip, badge, children }) {
         className="relative overflow-hidden flex items-center justify-center"
         whileTap={{ scale: 0.92 }}
         style={{
-          width: 48, height: 48,
-          borderRadius: active || hovered ? 16 : 24,
+          width: size, height: size,
+          borderRadius: active || hovered ? Math.round(size * 0.33) : Math.round(size * 0.5),
           background: active ? colors.accent.primary : hovered ? colors.accent.primary : colors.bg.overlay,
           transition: 'border-radius 150ms ease, background 150ms ease',
           boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.03)',
         }}>
         {children}
         {badge > 0 && (
-          <div className="absolute -bottom-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full text-[11px] font-bold flex items-center justify-center"
-            style={{ background: colors.danger, color: '#fff', border: `3px solid ${colors.bg.base}` }}>{badge > 99 ? '99+' : badge}</div>
+          <div className="absolute -bottom-1 -right-1 min-w-[16px] h-[16px] px-1 rounded-full text-[10px] font-bold flex items-center justify-center"
+            style={{ background: colors.danger, color: '#fff', border: `2px solid ${colors.bg.base}` }}>{badge > 99 ? '99+' : badge}</div>
         )}
       </motion.button>
       <RailTooltip text={tooltip} visible={hovered && !active} />
