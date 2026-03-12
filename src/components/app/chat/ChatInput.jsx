@@ -28,11 +28,11 @@ export default function ChatInput({ channelName, channelId, replyTo, onCancelRep
   const inputRef = useRef(null);
   const typingRef = useRef(0);
 
-  React.useEffect(() => {
+  useEffect(() => {
     try { if (content) localStorage.setItem(storageKey, content); else localStorage.removeItem(storageKey); } catch {}
   }, [content, storageKey]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     try { setContent(localStorage.getItem(storageKey) || ''); } catch { setContent(''); }
     setShowEmoji(false); setShowFormatting(false); setShowGif(false); setShowSticker(false); setShowSlash(false); setFiles([]);
   }, [storageKey]);
