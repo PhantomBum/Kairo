@@ -1,6 +1,10 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { X, MessageSquare, Globe, Github, Crown, Shield, Star, Zap, Heart, Calendar, Clock, Twitter, Instagram, Music, Gamepad2, UserPlus, Ban, Moon, Bug, Volume2, Users } from 'lucide-react';
+import {
+  X, MessageSquare, Globe, Github, Crown, ShieldCheck, Sparkles, Award, Heart,
+  Calendar, Twitter, Instagram, Music, Code2, UserPlus, Ban, Eye, Gem,
+  FlaskConical, Mic, Handshake, Youtube
+} from 'lucide-react';
 import { useProfiles } from '@/components/app/providers/ProfileProvider';
 import ReactMarkdown from 'react-markdown';
 import { colors } from '@/components/app/design/tokens';
@@ -9,38 +13,39 @@ const statusColors = { online: '#3ba55c', idle: '#faa61a', dnd: '#ed4245', invis
 const statusLabels = { online: 'Online', idle: 'Idle', dnd: 'Do Not Disturb', invisible: 'Invisible', offline: 'Offline' };
 
 const badgeConfig = {
-  owner: { icon: Crown, color: '#faa61a', label: 'Server Owner', desc: 'Owns a Kairo server' },
-  admin: { icon: Shield, color: '#5865F2', label: 'Admin', desc: 'Server administrator' },
-  premium: { icon: Crown, color: '#faa61a', label: 'Kairo Elite', desc: 'Premium subscriber' },
-  verified: { icon: Star, color: '#3ba55c', label: 'Verified', desc: 'Verified account' },
-  early_supporter: { icon: Heart, color: '#ed4245', label: 'Early Adopter', desc: 'Joined Kairo early' },
-  bug_hunter: { icon: Bug, color: '#faa61a', label: 'Bug Hunter', desc: 'Helps hunt platform bugs' },
-  developer: { icon: Gamepad2, color: '#a78bfa', label: 'Developer', desc: 'Kairo app developer' },
-  moderator: { icon: Shield, color: '#3ba55c', label: 'Moderator', desc: 'Community moderator' },
-  partner: { icon: Star, color: '#5865F2', label: 'Partner', desc: 'Official Kairo partner' },
-  youtube: { icon: Globe, color: '#ed4245', label: 'Content Creator', desc: 'YouTube creator' },
-  tester: { icon: Bug, color: '#3ba55c', label: 'Tester', desc: 'Platform tester' },
+  owner:          { icon: Crown,       color: '#f0b232', bg: '#f0b23220', label: 'Server Owner' },
+  admin:          { icon: ShieldCheck, color: '#5865F2', bg: '#5865F220', label: 'Admin' },
+  premium:        { icon: Gem,         color: '#f0b232', bg: '#f0b23220', label: 'Kairo Elite' },
+  verified:       { icon: Award,       color: '#3ba55c', bg: '#3ba55c20', label: 'Verified' },
+  early_supporter:{ icon: Heart,       color: '#ed4245', bg: '#ed424520', label: 'Early Supporter' },
+  bug_hunter:     { icon: FlaskConical,color: '#faa61a', bg: '#faa61a20', label: 'Bug Hunter' },
+  developer:      { icon: Code2,       color: '#a78bfa', bg: '#a78bfa20', label: 'Developer' },
+  moderator:      { icon: Eye,         color: '#2ecc71', bg: '#2ecc7120', label: 'Moderator' },
+  partner:        { icon: Handshake,   color: '#5865F2', bg: '#5865F220', label: 'Partner' },
+  youtube:        { icon: Youtube,     color: '#ff0000', bg: '#ff000020', label: 'Creator' },
+  tester:         { icon: Sparkles,    color: '#00d4aa', bg: '#00d4aa20', label: 'Tester' },
 };
 
-const socialIcons = { github: Github, twitter: Twitter, website: Globe, instagram: Instagram, spotify: Music, tiktok: Globe, twitch: Globe, linkedin: Globe };
+const socialIcons = { github: Github, twitter: Twitter, website: Globe, instagram: Instagram, spotify: Music, tiktok: Mic, twitch: Globe, linkedin: Globe };
 
-function BadgeIcon({ badge, onHover, isHovered }) {
+function ProfileBadge({ badge }) {
+  const [hovered, setHovered] = useState(false);
   const cfg = badgeConfig[badge];
   if (!cfg) return null;
   const Icon = cfg.icon;
+
   return (
-    <div className="relative" onMouseEnter={() => onHover(badge)} onMouseLeave={() => onHover(null)}>
-      <div className="w-7 h-7 rounded-lg flex items-center justify-center cursor-pointer transition-all hover:scale-110"
-        style={{ background: `${cfg.color}18`, border: `1px solid ${cfg.color}25` }}>
-        <Icon className="w-3.5 h-3.5" style={{ color: cfg.color }} />
+    <div className="relative" onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
+      <div className="w-8 h-8 rounded-full flex items-center justify-center cursor-default transition-transform hover:scale-110"
+        style={{ background: cfg.bg, border: `1px solid ${cfg.color}30` }}>
+        <Icon className="w-4 h-4" style={{ color: cfg.color }} />
       </div>
-      {isHovered && (
-        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 rounded-xl whitespace-nowrap z-50 k-fade-in"
-          style={{ background: colors.bg.float, border: `1px solid ${colors.border.strong}`, boxShadow: '0 8px 32px rgba(0,0,0,0.7)' }}>
-          <p className="text-[11px] font-bold" style={{ color: cfg.color }}>{cfg.label}</p>
-          <p className="text-[10px]" style={{ color: colors.text.muted }}>{cfg.desc}</p>
-          <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-px w-2 h-2 rotate-45"
-            style={{ background: colors.bg.float, borderRight: `1px solid ${colors.border.strong}`, borderBottom: `1px solid ${colors.border.strong}` }} />
+      {hovered && (
+        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2.5 py-1.5 rounded-lg whitespace-nowrap z-50 k-fade-in pointer-events-none"
+          style={{ background: '#111', border: `1px solid ${colors.border.strong}`, boxShadow: '0 4px 16px rgba(0,0,0,0.6)' }}>
+          <p className="text-[11px] font-semibold text-center" style={{ color: cfg.color }}>{cfg.label}</p>
+          <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-[1px] w-0 h-0"
+            style={{ borderLeft: '5px solid transparent', borderRight: '5px solid transparent', borderTop: '5px solid #111' }} />
         </div>
       )}
     </div>
@@ -48,7 +53,6 @@ function BadgeIcon({ badge, onHover, isHovered }) {
 }
 
 export default function UserProfileModal({ onClose, profile, memberData, roles, isCurrentUser, onMessage, onAddFriend, onBlock, friends = [], mutualServers = [] }) {
-  const [badgeHover, setBadgeHover] = useState(null);
   const { profiles } = useProfiles();
 
   if (!profile) return null;
@@ -59,124 +63,119 @@ export default function UserProfileModal({ onClose, profile, memberData, roles, 
   const hasBadges = profile.badges?.length > 0;
   const hasSocial = profile.social_links && Object.values(profile.social_links).some(Boolean);
   const joinDate = memberData?.joined_at || profile.created_date;
-  const formattedJoin = joinDate ? new Date(joinDate).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : null;
+  const formattedJoin = joinDate ? new Date(joinDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : null;
   const isFriend = friends?.some(f => f.friend_id === profile.user_id);
   const statusText = profile.custom_status?.text || '';
+  const accentColor = profile.accent_color || '#5865F2';
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-      transition={{ duration: 0.12 }}
+      transition={{ duration: 0.1 }}
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      style={{ background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(6px)' }} onClick={onClose}>
-      <motion.div initial={{ scale: 0.95, opacity: 0, y: 10 }} animate={{ scale: 1, opacity: 1, y: 0 }}
-        transition={{ type: 'spring', damping: 28, stiffness: 380 }}
-        className="w-full max-w-[380px] rounded-2xl overflow-hidden"
-        style={{ background: colors.bg.surface, border: `1px solid ${colors.border.default}`, boxShadow: '0 24px 64px rgba(0,0,0,0.6)' }}
+      style={{ background: 'rgba(0,0,0,0.7)' }} onClick={onClose}>
+      <motion.div initial={{ scale: 0.96, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
+        transition={{ type: 'spring', damping: 30, stiffness: 400 }}
+        className="w-full max-w-[360px] rounded-2xl overflow-hidden"
+        style={{ background: colors.bg.modal, boxShadow: '0 20px 60px rgba(0,0,0,0.5)' }}
         onClick={e => e.stopPropagation()}>
 
-        {/* Banner */}
-        <div className="h-[100px] relative"
-          style={{ background: profile.banner_url ? `url(${profile.banner_url}) center/cover` : `linear-gradient(135deg, ${profile.accent_color || '#0d2137'}, ${profile.accent_color ? profile.accent_color + '40' : '#0a1929'})` }}>
-
-          {/* Badge tooltip floating on banner */}
-          {hasBadges && (
-            <div className="absolute top-3 left-3">
-              {badgeHover && badgeConfig[badgeHover] && (
-                <div className="px-3 py-2 rounded-xl k-fade-in"
-                  style={{ background: colors.bg.float, border: `1px solid ${colors.border.strong}`, boxShadow: '0 8px 24px rgba(0,0,0,0.6)' }}>
-                  <p className="text-[12px] font-bold" style={{ color: badgeConfig[badgeHover].color }}>{badgeConfig[badgeHover].label}</p>
-                  <p className="text-[10px]" style={{ color: colors.text.muted }}>{badgeConfig[badgeHover].desc}</p>
-                </div>
-              )}
-            </div>
+        {/* Accent strip + close */}
+        <div className="h-20 relative overflow-hidden">
+          {profile.banner_url ? (
+            <img src={profile.banner_url} className="w-full h-full object-cover" alt="" />
+          ) : (
+            <div className="w-full h-full" style={{ background: `linear-gradient(135deg, ${accentColor}, ${accentColor}60 60%, ${colors.bg.modal})` }} />
           )}
-
-          <button onClick={onClose} className="absolute top-3 right-3 w-7 h-7 rounded-full flex items-center justify-center transition-colors hover:bg-[rgba(0,0,0,0.5)]"
-            style={{ background: 'rgba(0,0,0,0.35)' }}>
-            <X className="w-3.5 h-3.5 text-white" />
+          <button onClick={onClose}
+            className="absolute top-2.5 right-2.5 w-7 h-7 rounded-full flex items-center justify-center transition-colors hover:bg-[rgba(255,255,255,0.15)]"
+            style={{ background: 'rgba(0,0,0,0.4)' }}>
+            <X className="w-3.5 h-3.5 text-white/80" />
           </button>
         </div>
 
-        {/* Avatar */}
-        <div className="px-5 -mt-[52px] relative z-10">
-          <div className="relative w-fit">
-            <div className="w-[104px] h-[104px] rounded-full flex items-center justify-center text-3xl font-semibold overflow-hidden"
-              style={{ background: colors.bg.elevated, color: colors.text.muted, border: `6px solid ${colors.bg.surface}` }}>
+        {/* Avatar row */}
+        <div className="px-4 -mt-10 flex items-end justify-between">
+          <div className="relative">
+            <div className="w-20 h-20 rounded-2xl overflow-hidden flex items-center justify-center text-2xl font-bold"
+              style={{ background: colors.bg.elevated, color: colors.text.muted, border: `3px solid ${colors.bg.modal}`, boxShadow: '0 4px 12px rgba(0,0,0,0.3)' }}>
               {profile.avatar_url
                 ? <img src={profile.avatar_url} className="w-full h-full object-cover" alt="" />
                 : (profile.display_name || 'U').charAt(0).toUpperCase()}
             </div>
-            <div className="absolute bottom-1.5 right-1.5 w-6 h-6 rounded-full"
-              style={{ background: statusColors[profile.status || 'offline'], border: `4px solid ${colors.bg.surface}` }} />
+            <div className="absolute -bottom-0.5 -right-0.5 w-5 h-5 rounded-full"
+              style={{ background: statusColors[profile.status || 'offline'], border: `3px solid ${colors.bg.modal}` }} />
+          </div>
+
+          {/* Status pill */}
+          <div className="mb-1 flex items-center gap-1.5 px-2.5 py-1 rounded-full"
+            style={{ background: colors.bg.overlay }}>
+            <div className="w-2 h-2 rounded-full" style={{ background: statusColors[profile.status || 'offline'] }} />
+            <span className="text-[11px] font-medium" style={{ color: colors.text.secondary }}>
+              {statusLabels[profile.status || 'offline']}
+            </span>
           </div>
         </div>
 
-        {/* Name + Badges inline */}
-        <div className="px-5 pt-3">
-          <div className="flex items-center gap-2 flex-wrap">
-            <h3 className="text-[20px] font-bold leading-tight" style={{ color: colors.text.primary }}>
-              {profile.display_name || profile.username}
-            </h3>
-            {hasBadges && (
-              <div className="flex items-center gap-1">
-                {profile.badges.map(b => {
-                  const cfg = badgeConfig[b];
-                  if (!cfg) return null;
-                  const Icon = cfg.icon;
-                  return (
-                    <div key={b} className="cursor-pointer transition-transform hover:scale-125"
-                      onMouseEnter={() => setBadgeHover(b)} onMouseLeave={() => setBadgeHover(null)}
-                      title={cfg.label}>
-                      <Icon className="w-4 h-4" style={{ color: cfg.color }} />
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
+        {/* Identity */}
+        <div className="px-4 pt-3 pb-1">
+          <h3 className="text-lg font-bold leading-snug" style={{ color: colors.text.primary }}>
+            {profile.display_name || profile.username}
+          </h3>
           {profile.username && (
-            <p className="text-[13px] mt-0.5" style={{ color: colors.text.muted }}>@{profile.username}</p>
+            <p className="text-[12px] -mt-0.5" style={{ color: colors.text.muted }}>@{profile.username}</p>
+          )}
+
+          {/* Custom status */}
+          {statusText && (
+            <p className="text-[12px] mt-1.5 flex items-center gap-1" style={{ color: colors.text.secondary }}>
+              {profile.custom_status?.emoji && <span>{profile.custom_status.emoji}</span>}
+              {statusText}
+            </p>
           )}
         </div>
 
-        {/* Custom status / bio */}
-        {(statusText || profile.bio) && (
-          <div className="px-5 pt-2">
-            <p className="text-[13px]" style={{ color: colors.text.secondary }}>
-              {profile.custom_status?.emoji && <span className="mr-1">{profile.custom_status.emoji}</span>}
-              {statusText || ''}
-            </p>
-            {profile.bio && !statusText && (
-              <div className="text-[13px] leading-relaxed prose prose-sm prose-invert max-w-none" style={{ color: colors.text.secondary }}>
-                <ReactMarkdown>{profile.bio}</ReactMarkdown>
-              </div>
-            )}
+        {/* Badges row */}
+        {hasBadges && (
+          <div className="px-4 pt-1 pb-2">
+            <div className="flex items-center gap-1.5 flex-wrap">
+              {profile.badges.map(b => <ProfileBadge key={b} badge={b} />)}
+            </div>
           </div>
         )}
 
-        {/* Info card */}
-        <div className="mx-5 mt-3 p-4 rounded-xl space-y-4"
-          style={{ background: colors.bg.elevated, border: `1px solid ${colors.border.default}` }}>
+        {/* Divider */}
+        <div className="mx-4 h-px" style={{ background: colors.border.default }} />
+
+        {/* Content sections */}
+        <div className="px-4 py-3 space-y-3 max-h-[280px] overflow-y-auto scrollbar-thin">
+
+          {/* Bio */}
+          {profile.bio && (
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-wider mb-1" style={{ color: colors.text.muted }}>About</p>
+              <div className="text-[13px] leading-relaxed prose prose-sm prose-invert max-w-none" style={{ color: colors.text.secondary }}>
+                <ReactMarkdown>{profile.bio}</ReactMarkdown>
+              </div>
+            </div>
+          )}
 
           {/* Member since */}
           {formattedJoin && (
-            <div>
-              <div className="flex items-center gap-2 mb-0.5">
-                <Calendar className="w-3.5 h-3.5" style={{ color: colors.text.muted }} />
-                <p className="text-[11px] font-bold uppercase tracking-wider" style={{ color: colors.text.muted }}>Member Since</p>
-              </div>
-              <p className="text-[13px] font-semibold ml-[22px]" style={{ color: colors.text.primary }}>{formattedJoin}</p>
+            <div className="flex items-center gap-2">
+              <Calendar className="w-3.5 h-3.5 flex-shrink-0" style={{ color: colors.text.muted }} />
+              <span className="text-[12px]" style={{ color: colors.text.muted }}>Joined <span style={{ color: colors.text.secondary }}>{formattedJoin}</span></span>
             </div>
           )}
 
           {/* Roles */}
           {allDisplayRoles.length > 0 && (
             <div>
-              <p className="text-[11px] font-bold uppercase tracking-wider mb-2" style={{ color: colors.text.muted }}>Roles</p>
-              <div className="flex flex-wrap gap-1.5">
+              <p className="text-[10px] font-bold uppercase tracking-wider mb-1.5" style={{ color: colors.text.muted }}>Roles</p>
+              <div className="flex flex-wrap gap-1">
                 {allDisplayRoles.map(r => (
-                  <span key={r.id} className="text-[12px] font-semibold px-2.5 py-1 rounded-md"
-                    style={{ background: `${r.color || colors.text.muted}20`, color: r.color || colors.text.muted, border: `1px solid ${r.color || colors.text.muted}30` }}>
+                  <span key={r.id} className="inline-flex items-center gap-1.5 text-[11px] font-medium px-2 py-0.5 rounded-full"
+                    style={{ background: `${r.color || colors.text.muted}15`, color: r.color || colors.text.muted }}>
+                    <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: r.color || colors.text.muted }} />
                     {r.name}
                   </span>
                 ))}
@@ -184,35 +183,37 @@ export default function UserProfileModal({ onClose, profile, memberData, roles, 
             </div>
           )}
 
-          {/* Mutual / Shared Servers */}
+          {/* Mutual servers */}
           {mutualServers.length > 0 && (
             <div>
-              <p className="text-[11px] font-bold uppercase tracking-wider mb-2" style={{ color: colors.text.muted }}>Shared Servers</p>
-              <div className="flex flex-wrap gap-2">
+              <p className="text-[10px] font-bold uppercase tracking-wider mb-1.5" style={{ color: colors.text.muted }}>
+                {mutualServers.length} Mutual Server{mutualServers.length !== 1 ? 's' : ''}
+              </p>
+              <div className="flex flex-wrap gap-1.5">
                 {mutualServers.map(s => (
-                  <div key={s.id} className="w-9 h-9 rounded-xl overflow-hidden flex items-center justify-center cursor-pointer transition-transform hover:scale-110"
+                  <div key={s.id} className="w-8 h-8 rounded-lg overflow-hidden flex items-center justify-center transition-transform hover:scale-110 cursor-pointer"
                     style={{ background: s.banner_color || colors.bg.overlay }}
                     title={s.name}>
                     {s.icon_url
                       ? <img src={s.icon_url} className="w-full h-full object-cover" alt={s.name} />
-                      : <span className="text-[11px] font-bold" style={{ color: colors.text.muted }}>{(s.name || '').slice(0, 2).toUpperCase()}</span>}
+                      : <span className="text-[10px] font-bold" style={{ color: colors.text.muted }}>{(s.name || '').slice(0, 2).toUpperCase()}</span>}
                   </div>
                 ))}
               </div>
             </div>
           )}
 
-          {/* Social links */}
+          {/* Social */}
           {hasSocial && (
             <div>
-              <p className="text-[11px] font-bold uppercase tracking-wider mb-2" style={{ color: colors.text.muted }}>Connections</p>
+              <p className="text-[10px] font-bold uppercase tracking-wider mb-1.5" style={{ color: colors.text.muted }}>Connections</p>
               <div className="flex flex-wrap gap-1.5">
                 {Object.entries(profile.social_links).filter(([, v]) => v).map(([key, url]) => {
                   const Icon = socialIcons[key] || Globe;
                   return (
                     <a key={key} href={url} target="_blank" rel="noopener noreferrer"
-                      className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] transition-colors hover:brightness-125"
-                      style={{ background: colors.bg.overlay, color: colors.text.secondary, border: `1px solid ${colors.border.default}` }}>
+                      className="flex items-center gap-1.5 px-2 py-1 rounded-lg text-[11px] transition-colors hover:bg-[rgba(255,255,255,0.06)]"
+                      style={{ background: colors.bg.overlay, color: colors.text.secondary }}>
                       <Icon className="w-3 h-3" /> <span className="capitalize">{key}</span>
                     </a>
                   );
@@ -222,25 +223,28 @@ export default function UserProfileModal({ onClose, profile, memberData, roles, 
           )}
         </div>
 
-        {/* Action buttons */}
+        {/* Actions */}
         {!isCurrentUser && (
-          <div className="px-5 py-4 flex gap-2">
+          <div className="px-4 pb-4 pt-1 flex gap-2">
             {onMessage && isFriend && (
-              <button onClick={onMessage} className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-[13px] font-semibold transition-all hover:brightness-110"
-                style={{ background: colors.bg.overlay, color: colors.text.primary, border: `1px solid ${colors.border.default}` }}>
-                <MessageSquare className="w-4 h-4" /> Message
+              <button onClick={onMessage}
+                className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-[12px] font-semibold transition-all hover:brightness-125"
+                style={{ background: colors.accent.primary, color: '#fff' }}>
+                <MessageSquare className="w-3.5 h-3.5" /> Message
               </button>
             )}
             {!isFriend && onAddFriend && (
-              <button onClick={() => onAddFriend(profile)} className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-[13px] font-semibold transition-all hover:brightness-110"
-                style={{ background: colors.bg.overlay, color: colors.text.primary, border: `1px solid ${colors.border.default}` }}>
-                <UserPlus className="w-4 h-4" /> Add Friend
+              <button onClick={() => onAddFriend(profile)}
+                className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-[12px] font-semibold transition-all hover:brightness-125"
+                style={{ background: colors.accent.primary, color: '#fff' }}>
+                <UserPlus className="w-3.5 h-3.5" /> Add Friend
               </button>
             )}
             {onBlock && (
-              <button onClick={() => onBlock(profile)} className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-[13px] font-semibold transition-all hover:brightness-110"
-                style={{ background: colors.bg.overlay, color: colors.text.primary, border: `1px solid ${colors.border.default}` }}>
-                <Ban className="w-4 h-4" /> Block
+              <button onClick={() => onBlock(profile)}
+                className="flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-[12px] font-semibold transition-all hover:bg-[rgba(255,255,255,0.06)]"
+                style={{ background: colors.bg.overlay, color: colors.text.muted }}>
+                <Ban className="w-3.5 h-3.5" /> Block
               </button>
             )}
           </div>
