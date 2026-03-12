@@ -125,7 +125,25 @@ export default function ServerSettingsModal({ onClose, server, currentUserId }) 
       case 'emoji': return <EmojiTab serverId={server?.id} type="emoji" />;
       case 'stickers': return <EmojiTab serverId={server?.id} type="sticker" />;
       case 'danger': return <DangerTab server={server} onDelete={deleteServer} />;
-      default: return <div className="text-center py-12"><p className="text-[14px]" style={{ color: colors.text.muted }}>Coming soon</p></div>;
+      case 'channels': return (
+        <div className="space-y-3">
+          <p className="text-[13px] mb-3" style={{ color: colors.text.muted }}>Manage channels from the sidebar. Right-click any channel to edit or delete it.</p>
+          {(channels || []).sort((a, b) => (a.position || 0) - (b.position || 0)).map(ch => (
+            <div key={ch.id} className="flex items-center gap-3 px-3 py-2.5 rounded-lg" style={{ background: colors.bg.elevated, border: `1px solid ${colors.border.default}` }}>
+              <Hash className="w-4 h-4" style={{ color: colors.text.disabled }} />
+              <span className="text-[13px] flex-1" style={{ color: colors.text.primary }}>{ch.name}</span>
+              <span className="text-[11px] px-2 py-0.5 rounded" style={{ background: colors.bg.overlay, color: colors.text.disabled }}>{ch.type}</span>
+            </div>
+          ))}
+        </div>
+      );
+      default: return (
+        <div className="text-center py-16">
+          <p className="text-[32px] mb-3">🚧</p>
+          <p className="text-[15px] font-semibold mb-1" style={{ color: colors.text.primary }}>Under Construction</p>
+          <p className="text-[13px]" style={{ color: colors.text.muted }}>This section is being built and will be available soon.</p>
+        </div>
+      );
     }
   };
 
