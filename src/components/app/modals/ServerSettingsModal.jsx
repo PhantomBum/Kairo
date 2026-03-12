@@ -81,6 +81,8 @@ export default function ServerSettingsModal({ onClose, server, currentUserId }) 
   const [serverSettings, setServerSettings] = useState(server?.settings || {});
   const [bannerColor, setBannerColor] = useState(server?.banner_color || '#5865F2');
   const [isPublic, setIsPublic] = useState(server?.is_public || false);
+  const [localIconUrl, setLocalIconUrl] = useState(server?.icon_url || '');
+  const [localBannerUrl, setLocalBannerUrl] = useState(server?.banner_url || '');
 
   useEffect(() => {
     if (!server?.id) return;
@@ -99,7 +101,14 @@ export default function ServerSettingsModal({ onClose, server, currentUserId }) 
 
   const uploadImg = async (field) => {
     const input = document.createElement('input'); input.type = 'file'; input.accept = 'image/*';
-    input.onchange = async () => { const f = input.files?.[0]; if (!f) return; const { file_url } = await base44.integrations.Core.UploadFile({ file: f }); await base44.entities.Server.update(server.id, { [field]: file_url }); qc.invalidateQueries({ queryKey: ['servers'] }); };
+    input.onchange = async () => {
+      const f = input.files?.[0]; if (!f) return;
+      const { file_url } = await base44.integrations.Core.UploadFile({ file: f });
+      await base44.entities.Server.update(server.id, { [field]: file_url });
+      if (field === 'icon_url') setLocalIconUrl(file_url);
+      if (field === 'banner_url') setLocalBannerUrl(file_url);
+      qc.invalidateQueries({ queryKey: ['servers'] });
+    };
     input.click();
   };
 
