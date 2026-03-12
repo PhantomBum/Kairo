@@ -140,6 +140,24 @@ export default function SettingsModal({ onClose, profile, onUpdate, onLogout, cu
             <SettingsField label="Pronouns" value={form.pronouns} onChange={v => set('pronouns', v)} placeholder="they/them" />
           </>}
 
+          {tab === 'badges' && (
+            <BadgeOrderSettings
+              badges={profile?.badges || []}
+              badgeOrder={profile?.badge_order || []}
+              onSave={(order) => onUpdate({ badge_order: order })}
+            />
+          )}
+
+          {tab === 'effects' && (
+            <EffectsSettings
+              currentEffect={profile?.profile_effect || 'none'}
+              hasElite={profile?.badges?.includes('premium') || profile?.badges?.includes('kairo_elite')}
+              bannerUrl={profile?.banner_url}
+              accentColor={profile?.accent_color}
+              onSave={(effect) => onUpdate({ profile_effect: effect })}
+            />
+          )}
+
           {tab === 'social' && <>
             <p className="text-[14px] mb-2" style={{ color: colors.text.muted }}>Add your social profiles and website links.</p>
             <SettingsField label="Twitter / X" value={form.twitter} onChange={v => set('twitter', v)} placeholder="https://twitter.com/you" />
