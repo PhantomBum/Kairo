@@ -88,8 +88,8 @@ export default function VirtualMessageList({
   return (
     <div className="flex-1 relative min-h-0">
       <div ref={containerRef} onScroll={onScroll} className="absolute inset-0 overflow-y-auto pb-2 scrollbar-none k-channel-fade" role="log" aria-label={`Messages in ${channelName}`}>
-        {/* Channel welcome */}
-        <div className="px-6 pt-16 pb-8">
+        {/* Channel welcome — generous Kloak-style spacing */}
+        <div className="px-8 pt-20 pb-10">
           <div className="w-[64px] h-[64px] rounded-2xl flex items-center justify-center mb-5"
             style={{ background: `linear-gradient(135deg, ${colors.accent.subtle}, ${colors.accent.muted})` }}>
             {isDM ? <MessageSquare className="w-7 h-7" style={{ color: colors.accent.primary }} /> : <Hash className="w-7 h-7" style={{ color: colors.accent.primary }} />}
@@ -105,9 +105,9 @@ export default function VirtualMessageList({
         {items.map(item => {
           if (item.type === 'divider') {
             return (
-              <div key={item.key} className="flex items-center gap-4 my-4 mx-4" role="separator">
+              <div key={item.key} className="flex items-center gap-4 my-6 mx-5" role="separator">
                 <div className="flex-1 h-px" style={{ background: colors.border.default }} />
-                <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full select-none"
+                <span className="text-[11px] font-medium px-3 py-0.5 rounded-full select-none"
                   style={{ color: colors.text.muted, background: colors.bg.surface }}>{dateFmt(item.date)}</span>
                 <div className="flex-1 h-px" style={{ background: colors.border.default }} />
               </div>

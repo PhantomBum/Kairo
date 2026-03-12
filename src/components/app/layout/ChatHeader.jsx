@@ -28,8 +28,8 @@ export default function ChatHeader({ channel, conversation, currentUserId, showM
   const Icon = isDM ? AtSign : (typeIcons[channel?.type] || Hash);
 
   return (
-    <div className="h-12 px-4 flex items-center justify-between flex-shrink-0"
-      style={{ borderBottom: `1px solid ${colors.border.default}`, background: colors.bg.surface }}
+    <div className="h-12 px-5 flex items-center justify-between flex-shrink-0"
+      style={{ borderBottom: `1px solid ${colors.border.default}`, background: colors.bg.elevated }}
       role="banner" aria-label={isDM ? `Conversation with ${label}` : `Channel ${label}`}>
       <div className="flex items-center gap-2.5 min-w-0">
         {!isDM && serverName && (
