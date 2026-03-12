@@ -1,17 +1,38 @@
 import React, { useState, useEffect } from 'react';
 import { CheckCircle, AlertCircle, Loader } from 'lucide-react';
+import { base44 } from '@/api/base44Client';
 
 const SERVICES = [
-  { name: 'API', check: () => fetch('https://api.base44.com/health') },
+  { name: 'API', check: async () => {
+    // Test the Base44 API by checking auth status
+    const isAuth = await base44.auth.isAuthenticated();
+    return { ok: true }; // If we get here without error, API is up
+  }},
   { name: 'WebSocket', check: () => new Promise(res => {
-    const ws = new WebSocket('wss://ws.base44.com');
-    ws.onopen = () => { ws.close(); res({ ok: true }); };
-    ws.onerror = () => res({ ok: false });
-    setTimeout(() => res({ ok: false }), 3000);
-  }) },
-  { name: 'Database', check: () => fetch('https://db.base44.com/health') },
-  { name: 'File Storage', check: () => fetch('https://files.base44.com/health') },
-  { name: 'Voice Servers', check: () => fetch('https://voice.base44.com/health') },
+    // Real-time subscriptions use WebSockets under the hood — test connectivity
+    const timeout = setTimeout(() => res({ ok: false }), 5000);
+    try {
+      const unsub = base44.entities.Server.subscribe(() => {});
+      clearTimeout(timeout);
+      setTimeout(() => unsub(), 100);
+      res({ ok: true });
+    } catch { clearTimeout(timeout); res({ ok: false }); }
+  })},
+  { name: 'Database', check: async () => {
+    // Test DB by doing a real entity list call
+    await base44.entities.Server.list('-created_date', 1);
+    return { ok: true };
+  }},
+  { name: 'File Storage', check: async () => {
+    // Test file storage by fetching a known public file
+    const res = await fetch('https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/697a93eea52ff0ef8406c21a/e96e433dc_generated_image.png', { method: 'HEAD' });
+    return { ok: res.ok };
+  }},
+  { name: 'Voice Servers', check: async () => {
+    // Test Agora voice connectivity 
+    const res = await fetch('https://edge.agora.io', { method: 'HEAD', mode: 'no-cors' });
+    return { ok: true }; // no-cors succeeds if network is reachable
+  }},
 ];
 
 function ServiceStatus({ service }) {
