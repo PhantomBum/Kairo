@@ -35,16 +35,19 @@ const SERVICES = [
   }},
 ];
 
-function ServiceStatus({ service }) {
+function ServiceStatus({ service, onResult }) {
   const [status, setStatus] = useState('checking');
 
   useEffect(() => {
     const runCheck = async () => {
       try {
         const res = await service.check();
-        setStatus(res.ok ? 'operational' : 'outage');
+        const s = res.ok ? 'operational' : 'outage';
+        setStatus(s);
+        onResult(service.name, s);
       } catch {
         setStatus('outage');
+        onResult(service.name, 'outage');
       }
     };
     runCheck();
@@ -67,18 +70,32 @@ function ServiceStatus({ service }) {
 }
 
 export default function StatusPage() {
+  const [results, setResults] = useState({});
+  const handleResult = (name, status) => setResults(p => ({ ...p, [name]: status }));
+
+  const total = Object.keys(results).length;
+  const operational = Object.values(results).filter(s => s === 'operational').length;
+  const allDone = total === SERVICES.length;
+  const allOk = allDone && operational === total;
+  const someDown = allDone && operational < total;
+
   return (
     <div className="min-h-screen p-6 md:p-12" style={{ background: 'var(--bg-deep)' }}>
       <div className="max-w-3xl mx-auto">
         <div className="flex items-center gap-3 mb-8">
-          <div className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold" style={{ background: 'var(--accent-green)', color: '#000' }}>✓</div>
+          <div className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold"
+            style={{ background: !allDone ? 'var(--text-faint)' : allOk ? 'var(--accent-green)' : 'var(--accent-red)', color: '#000' }}>
+            {!allDone ? '…' : allOk ? '✓' : '!'}
+          </div>
           <div>
-            <h1 className="text-2xl font-bold" style={{ color: 'var(--text-cream)' }}>All systems operational</h1>
+            <h1 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
+              {!allDone ? 'Checking systems…' : allOk ? 'All systems operational' : `${total - operational} service${total - operational > 1 ? 's' : ''} degraded`}
+            </h1>
             <p className="text-sm" style={{ color: 'var(--text-muted)' }}>Last updated: {new Date().toLocaleTimeString()}</p>
           </div>
         </div>
         <div className="space-y-3">
-          {SERVICES.map(s => <ServiceStatus key={s.name} service={s} />)}
+          {SERVICES.map(s => <ServiceStatus key={s.name} service={s} onResult={handleResult} />)}
         </div>
         <footer className="text-center mt-12 text-[11px]" style={{ color: 'var(--text-faint)' }}>
           <a href="/kairo" className="underline">Back to Kairo</a>
