@@ -1,6 +1,6 @@
 import React, { useState, useRef, useCallback } from 'react';
-import { motion } from 'framer-motion';
-import { colors, radius, shadows, glass } from '@/components/app/design/tokens';
+import { motion, AnimatePresence } from 'framer-motion';
+import { colors } from '@/components/app/design/tokens';
 import ServerHoverCard from './ServerHoverCard';
 
 export default function ServerRailIcon({ server, active, unread, onClick, children }) {
@@ -14,9 +14,7 @@ export default function ServerRailIcon({ server, active, unread, onClick, childr
     setHovered(true);
     if (server) {
       timerRef.current = setTimeout(() => {
-        if (iconRef.current) {
-          setAnchorRect(iconRef.current.getBoundingClientRect());
-        }
+        if (iconRef.current) setAnchorRect(iconRef.current.getBoundingClientRect());
         setShowCard(true);
       }, 600);
     }
@@ -28,56 +26,38 @@ export default function ServerRailIcon({ server, active, unread, onClick, childr
     setShowCard(false);
   }, []);
 
-  const accentColor = server?.banner_color || colors.accent.primary;
-
   return (
     <div className="relative flex items-center justify-center"
-      onMouseEnter={handleEnter}
-      onMouseLeave={handleLeave}
-      ref={iconRef}
-    >
-      {/* Kloak: clean solid pill — no glow */}
+      onMouseEnter={handleEnter} onMouseLeave={handleLeave} ref={iconRef}>
+      {/* Pill indicator */}
       <motion.div
-        className="absolute -left-0.5 top-1/2 rounded-full"
+        className="absolute rounded-r-full"
         initial={false}
         animate={{
-          width: active ? 4 : 3,
-          height: active ? 28 : hovered ? 16 : unread ? 7 : 0,
-          y: '-50%',
+          width: 4,
+          height: active ? 40 : hovered ? 20 : unread ? 8 : 0,
           opacity: active || hovered || unread ? 1 : 0,
         }}
-        transition={{ duration: 0.2, ease: [0, 0, 0.2, 1] }}
-        style={{ background: active ? accentColor : colors.text.primary }}
+        transition={{ duration: 0.15 }}
+        style={{ background: '#fff', left: -12, top: '50%', transform: 'translateY(-50%)' }}
       />
 
       <motion.button
         onClick={onClick}
         className="relative overflow-hidden flex items-center justify-center"
-        animate={{
-          scale: hovered && !active ? 1.06 : 1,
-          borderRadius: active ? 14 : hovered ? 16 : 22,
-        }}
-        transition={{ duration: 0.2, ease: [0, 0, 0.2, 1] }}
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
         style={{
-          width: 48,
-          height: 48,
-          background: active
-            ? accentColor
-            : hovered ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.03)',
-          border: `1px solid ${active ? accentColor : colors.border.default}`,
-          transition: 'background 0.2s',
+          width: 48, height: 48,
+          borderRadius: active || hovered ? 16 : 24,
+          background: active ? (server?.banner_color || colors.accent.primary) : hovered ? (server?.banner_color || colors.accent.primary) : '#313338',
+          transition: 'border-radius 0.2s ease, background 0.15s ease',
         }}
       >
         {children}
       </motion.button>
 
-      {server && (
-        <ServerHoverCard
-          server={server}
-          visible={showCard}
-          anchorRect={anchorRect}
-        />
-      )}
+      {server && <ServerHoverCard server={server} visible={showCard} anchorRect={anchorRect} />}
     </div>
   );
 }
