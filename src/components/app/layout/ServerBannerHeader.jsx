@@ -90,9 +90,7 @@ export default function ServerBannerHeader({ server, isOwner, onInvite, onSettin
         <div className="absolute left-0 right-0 z-50 p-1.5 k-fade-in"
           style={{
             top: bannerHeight,
-            background: 'rgba(30,30,42,0.92)',
-            backdropFilter: 'blur(16px)',
-            WebkitBackdropFilter: 'blur(16px)',
+            background: colors.bg.modal,
             border: `1px solid ${colors.border.light}`,
             borderTop: 'none',
             borderRadius: '0 0 12px 12px',
