@@ -1,46 +1,48 @@
-// KAIRO DESIGN SYSTEM — Kloak-inspired: true black + warm cream
-// Deep blacks, warm off-white text, minimal gray, rich contrast
+// KAIRO DESIGN SYSTEM — Kloak-inspired: deep black + clean white
+// No warm cream — pure white text, cold grays, high contrast
+
+export const KAIRO_LOGO_URL = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/697a93eea52ff0ef8406c21a/e96e433dc_generated_image.png';
 
 export const colors = {
   bg: {
-    base: '#0c0c0c',        // server rail — true black
-    surface: '#121212',     // sidebar panels — near-black  
-    elevated: '#181818',    // main chat area
-    overlay: '#1e1e1e',     // inputs, cards, dropdowns
-    modal: '#141414',       // modals
-    hover: 'rgba(255,255,255,0.05)',
-    active: 'rgba(255,255,255,0.08)',
-    float: '#0a0a0a',       // tooltips, popouts, context menus
+    base: '#0a0a0a',        // server rail — true black
+    surface: '#111111',     // sidebar panels
+    elevated: '#161616',    // main chat area
+    overlay: '#1a1a1a',     // inputs, cards, dropdowns
+    modal: '#131313',       // modals
+    hover: 'rgba(255,255,255,0.04)',
+    active: 'rgba(255,255,255,0.07)',
+    float: '#0e0e0e',       // tooltips, popouts, context menus
   },
   accent: {
-    primary: '#d4c9a8',     // warm cream accent (Kloak-style)
-    hover: '#c4b898',
-    active: '#b4a888',
-    subtle: 'rgba(212,201,168,0.08)',
-    muted: 'rgba(212,201,168,0.15)',
-    glow: 'rgba(212,201,168,0.05)',
+    primary: '#5865F2',     // Kloak-style blue-violet accent
+    hover: '#4752C4',
+    active: '#3C45A5',
+    subtle: 'rgba(88,101,242,0.1)',
+    muted: 'rgba(88,101,242,0.18)',
+    glow: 'rgba(88,101,242,0.06)',
   },
   status: {
-    online: '#4ade80',
-    idle: '#fbbf24',
-    dnd: '#f87171',
-    offline: '#525252',
-    invisible: '#525252',
+    online: '#3ba55c',
+    idle: '#faa61a',
+    dnd: '#ed4245',
+    offline: '#4f4f4f',
+    invisible: '#4f4f4f',
   },
-  danger: '#ef4444',
-  warning: '#f59e0b',
-  success: '#4ade80',
-  info: '#60a5fa',
+  danger: '#ed4245',
+  warning: '#faa61a',
+  success: '#3ba55c',
+  info: '#5865F2',
   text: {
-    primary: '#e8e2d4',      // warm cream — main text
-    secondary: '#b8b0a0',    // muted warm
-    muted: '#807868',         // soft warm gray
-    disabled: '#585048',      // dim warm
-    link: '#87ceeb',          // soft sky blue links
+    primary: '#ffffff',        // pure white — main text
+    secondary: '#b5bac1',     // cool gray
+    muted: '#6d6f78',          // mid gray
+    disabled: '#4e4f56',       // dim gray
+    link: '#00AFF4',           // Kloak-style link blue
   },
   border: {
-    default: 'rgba(255,255,255,0.05)',
-    light: 'rgba(255,255,255,0.07)',
+    default: 'rgba(255,255,255,0.06)',
+    light: 'rgba(255,255,255,0.04)',
     strong: 'rgba(255,255,255,0.1)',
   },
 };
@@ -49,7 +51,7 @@ export const shadows = {
   subtle: '0 1px 3px rgba(0,0,0,0.5)',
   medium: '0 4px 16px rgba(0,0,0,0.6)',
   strong: '0 8px 32px rgba(0,0,0,0.7)',
-  glow: '0 0 24px rgba(212,201,168,0.03)',
+  glow: '0 0 24px rgba(88,101,242,0.04)',
   elevation: {
     low: '0 1px 0 rgba(0,0,0,0.4)',
     high: '0 8px 24px rgba(0,0,0,0.6)',
@@ -124,9 +126,9 @@ export const cssVariables = `
   --bg-elevated: ${colors.bg.elevated};
   --bg-overlay: ${colors.bg.overlay};
   --bg-glass: rgba(255,255,255,0.02);
-  --bg-glass-hover: rgba(255,255,255,0.05);
-  --bg-glass-active: rgba(255,255,255,0.08);
-  --bg-glass-strong: rgba(255,255,255,0.04);
+  --bg-glass-hover: rgba(255,255,255,0.04);
+  --bg-glass-active: rgba(255,255,255,0.07);
+  --bg-glass-strong: rgba(255,255,255,0.03);
   --text-cream: ${colors.text.primary};
   --text-primary: ${colors.text.primary};
   --text-secondary: ${colors.text.secondary};
