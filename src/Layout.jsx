@@ -137,6 +137,41 @@ export default function Layout({ children }) {
         .glow-border { box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08), 0 0 24px rgba(139,92,246,0.08); }
         .k-glass-card { background: rgba(255,255,255,0.035); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; }
 
+        /* Context menu styling — refined from Discord-like to Kairo glass style */
+        [data-radix-popper-content-wrapper] [role="menu"],
+        [data-radix-popper-content-wrapper] [data-radix-menu-content] {
+          background: rgba(18, 18, 26, 0.95) !important;
+          backdrop-filter: blur(20px) !important;
+          -webkit-backdrop-filter: blur(20px) !important;
+          border: 1px solid rgba(255,255,255,0.08) !important;
+          border-radius: 12px !important;
+          padding: 6px !important;
+          box-shadow: 0 8px 32px rgba(0,0,0,0.5), 0 0 1px rgba(0,0,0,0.2) !important;
+        }
+        [data-radix-popper-content-wrapper] [role="menuitem"] {
+          border-radius: 8px !important;
+          padding: 8px 10px !important;
+          font-size: 13px !important;
+          transition: background 80ms ease, transform 80ms ease !important;
+        }
+        [data-radix-popper-content-wrapper] [role="menuitem"]:hover,
+        [data-radix-popper-content-wrapper] [role="menuitem"][data-highlighted] {
+          background: rgba(139, 92, 246, 0.12) !important;
+          color: #f8fafc !important;
+        }
+        [data-radix-popper-content-wrapper] [role="menuitem"]:active {
+          transform: scale(0.98) !important;
+        }
+        [data-radix-popper-content-wrapper] [role="separator"] {
+          background: rgba(255,255,255,0.06) !important;
+          margin: 4px 6px !important;
+        }
+
+        /* Plus button rotate animation */
+        .k-rotate-hover { transition: transform 200ms cubic-bezier(0,0,0.2,1); }
+        .k-rotate-hover:hover { transform: rotate(90deg); }
+        .k-rotate-hover:active { transform: rotate(90deg) scale(0.9); }
+
         /* Reduced motion — every animation snaps to end state instantly, no exceptions */
         @media (prefers-reduced-motion: reduce) {
           *, *::before, *::after {

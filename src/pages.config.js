@@ -51,11 +51,11 @@ import BotMarketplace from './pages/BotMarketplace';
 import Developers from './pages/Developers';
 import Elite from './pages/Elite';
 import FAQ from './pages/FAQ';
+import Invite from './pages/Invite';
 import Kairo from './pages/Kairo';
 import Spaces from './pages/Spaces';
 import Status from './pages/Status';
 import Support from './pages/Support';
-import Invite from './pages/Invite';
 import __Layout from './Layout.jsx';
 
 
@@ -64,11 +64,11 @@ export const PAGES = {
     "Developers": Developers,
     "Elite": Elite,
     "FAQ": FAQ,
+    "Invite": Invite,
     "Kairo": Kairo,
     "Spaces": Spaces,
     "Status": Status,
     "Support": Support,
-    "Invite": Invite,
 }
 
 export const pagesConfig = {
