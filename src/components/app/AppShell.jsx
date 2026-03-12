@@ -260,15 +260,6 @@ export default function AppShell({ currentUser }) {
     }
   }, [activeChannel?.id, activeConv?.id]);
 
-  const starMsg = useCallback((msg) => {
-    const key = `kairo-starred-${currentUser.id}`;
-    let starred = [];
-    try { starred = JSON.parse(localStorage.getItem(key) || '[]'); } catch {}
-    if (starred.some(m => m.id === msg.id)) return; // Already starred
-    starred.unshift({ ...msg, channel_name: channelLabel });
-    try { localStorage.setItem(key, JSON.stringify(starred.slice(0, 200))); } catch {}
-  }, [currentUser.id, channelLabel]);
-
   const reactMsg = useCallback(async (msg, emoji) => {
     const reactions = msg.reactions || [];
     const existing = reactions.find(r => r.emoji === emoji);
