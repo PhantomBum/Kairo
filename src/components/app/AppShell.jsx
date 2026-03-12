@@ -747,6 +747,8 @@ export default function AppShell({ currentUser }) {
         {modal === 'media-gallery' && <MediaGallery onClose={() => setModal(null)} messages={currentMsgs} channelName={channelLabel} />}
         {modal === 'privacy-dashboard' && <PrivacyDashboard onClose={() => setModal(null)} profile={profile} currentUser={currentUser} onUpdate={(d) => updateProfile.mutate(d)} />}
         {modal === 'activity' && <ActivityStatus onClose={() => setModal(null)} profile={profile} onUpdate={(d) => updateProfile.mutate(d)} />}
+        {modal === 'forward' && forwardMsg && <ForwardMessageModal onClose={() => { setModal(null); setForwardMsg(null); }} message={forwardMsg} channels={channels} conversations={conversations} currentUser={currentUser} profile={profile} />}
+        {modal === 'schedule-message' && <ScheduleMessageModal onClose={() => setModal(null)} channelId={activeChannel?.id} serverId={activeServer?.id} currentUser={currentUser} profile={profile} />}
       </AnimatePresence>
       </ModalSuspense>
 
