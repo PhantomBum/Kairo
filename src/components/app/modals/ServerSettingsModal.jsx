@@ -154,8 +154,8 @@ export default function ServerSettingsModal({ onClose, server, currentUserId }) 
 
   const renderContent = () => {
     switch (tab) {
-      case 'overview': return <OverviewTab server={server} name={name} setName={setName} desc={desc} setDesc={setDesc} isPublic={isPublic} setIsPublic={setIsPublic} serverSettings={serverSettings} setServerSettings={setServerSettings} onSave={saveOverview} onUploadImg={uploadImg} saving={saving} />;
-      case 'appearance': return <AppearanceSection bannerColor={bannerColor} setBannerColor={setBannerColor} uploadImg={uploadImg} saveOverview={saveOverview} saving={saving} server={server} />;
+      case 'overview': return <OverviewTab server={{ ...server, icon_url: localIconUrl, banner_url: localBannerUrl }} name={name} setName={setName} desc={desc} setDesc={setDesc} isPublic={isPublic} setIsPublic={setIsPublic} serverSettings={serverSettings} setServerSettings={setServerSettings} onSave={saveOverview} onUploadImg={uploadImg} saving={saving} />;
+      case 'appearance': return <AppearanceSection bannerColor={bannerColor} setBannerColor={setBannerColor} uploadImg={uploadImg} saveOverview={saveOverview} saving={saving} server={{ ...server, icon_url: localIconUrl, banner_url: localBannerUrl }} />;
       case 'invites': return <InvitesSection server={server} />;
       case 'automod': return <AutoModTab serverId={server?.id} />;
       case 'sounds': return <SoundsTab serverId={server?.id} />;
