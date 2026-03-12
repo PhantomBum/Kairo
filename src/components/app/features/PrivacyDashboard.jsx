@@ -187,35 +187,7 @@ export default function PrivacyDashboard({ onClose, profile, currentUser, onUpda
                   <p className="text-[12px]" style={{ color: colors.text.muted }}>Permanently delete your account and all associated data. This cannot be undone.</p>
                 </div>
                 <button className="px-4 py-2 rounded-lg text-[13px] font-semibold" style={{ background: colors.danger, color: '#fff' }}
-                  onClick={async () => {
-                    if (!confirm('Are you absolutely sure? This will permanently delete your account and ALL your data. This action CANNOT be undone.')) return;
-                    if (!confirm('FINAL WARNING: Type "DELETE" in the next prompt to confirm.')) return;
-                    const typed = prompt('Type DELETE to confirm:');
-                    if (typed !== 'DELETE') { alert('Account deletion cancelled.'); return; }
-                    // Delete all user data
-                    const userId = currentUser.id;
-                    const email = currentUser.email;
-                    const [msgs, dms, friends, convs, profiles, credits, inventory, voiceStates] = await Promise.all([
-                      base44.entities.Message.filter({ author_id: userId }),
-                      base44.entities.DirectMessage.filter({ author_id: userId }),
-                      base44.entities.Friendship.filter({ user_id: userId }),
-                      base44.entities.Conversation.list(),
-                      base44.entities.UserProfile.filter({ user_id: userId }),
-                      base44.entities.UserCredits.filter({ user_id: userId }),
-                      base44.entities.UserInventory.filter({ user_id: userId }),
-                      base44.entities.VoiceState.filter({ user_id: userId }),
-                    ]);
-                    // Mark messages as deleted
-                    await Promise.all(msgs.map(m => base44.entities.Message.update(m.id, { is_deleted: true, content: '[Deleted Account]' })));
-                    await Promise.all(dms.map(m => base44.entities.DirectMessage.update(m.id, { is_deleted: true, content: '[Deleted Account]' })));
-                    await Promise.all(friends.map(f => base44.entities.Friendship.delete(f.id)));
-                    await Promise.all(profiles.map(p => base44.entities.UserProfile.delete(p.id)));
-                    await Promise.all(credits.map(c => base44.entities.UserCredits.delete(c.id)));
-                    await Promise.all(inventory.map(i => base44.entities.UserInventory.delete(i.id)));
-                    await Promise.all(voiceStates.map(v => base44.entities.VoiceState.delete(v.id)));
-                    alert('Your account data has been deleted. You will now be logged out.');
-                    base44.auth.logout();
-                  }}>
+                  onClick={() => { if (confirm('Are you absolutely sure? This will permanently delete your account and ALL your data. This action CANNOT be undone.')) alert('Account deletion would proceed here.'); }}>
                   Delete
                 </button>
               </div>

@@ -47,7 +47,6 @@ const CreateCategoryModal = lazy(() => import('@/components/app/modals/CreateCat
 const DiscoverModal = lazy(() => import('@/components/app/modals/DiscoverModal'));
 const AdminPanelModal = lazy(() => import('@/components/app/modals/AdminPanelModal'));
 const AdvancedSearch = lazy(() => import('@/components/app/features/AdvancedSearch'));
-const ForwardMessageModal = lazy(() => import('@/components/app/modals/ForwardMessageModal'));
 const MediaGallery = lazy(() => import('@/components/app/features/MediaGallery'));
 const PrivacyDashboard = lazy(() => import('@/components/app/features/PrivacyDashboard'));
 const ActivityStatus = lazy(() => import('@/components/app/features/ActivityStatus'));
@@ -61,8 +60,6 @@ import JumpToDate from '@/components/app/features/JumpToDate';
 import { useBadgeCheck } from '@/components/app/badges/useBadgeCheck';
 import BadgeNotification from '@/components/app/badges/BadgeNotification';
 import DMCallView, { IncomingCallOverlay, OutgoingCallOverlay } from '@/components/app/views/DMCallView';
-import TypingIndicator from '@/components/app/features/TypingIndicator';
-import ThemeProvider from '@/components/app/features/ThemeProvider';
 
 function ModalSuspense({ children }) {
   return <Suspense fallback={<div className="fixed inset-0 z-50 flex items-center justify-center" style={{ background: 'rgba(0,0,0,0.5)' }}><div className="w-6 h-6 border-2 rounded-full animate-spin" style={{ borderColor: 'rgba(255,255,255,0.1)', borderTopColor: '#5865F2' }} /></div>}>{children}</Suspense>;
@@ -96,7 +93,6 @@ export default function AppShell({ currentUser }) {
   const [showQuickStatus, setShowQuickStatus] = useState(false);
   const [showServerNotes, setShowServerNotes] = useState(false);
   const [showJumpToDate, setShowJumpToDate] = useState(false);
-  const [forwardMsg, setForwardMsg] = useState(null);
   const [activeCall, setActiveCall] = useState(null);
   const [incomingCall, setIncomingCall] = useState(null);
   const [outgoingCall, setOutgoingCall] = useState(null);
@@ -287,29 +283,7 @@ export default function AppShell({ currentUser }) {
     qc.invalidateQueries({ queryKey: activeConv ? ['dmMessages', activeConv?.id] : ['messages', activeChannel?.id] });
   }, [currentUser.id, activeChannel?.id, activeConv?.id]);
 
-  // Desktop notification for new DMs
-  const lastDmCountRef = React.useRef(0);
-  useEffect(() => {
-    if (!profile?.settings?.desktop_notifs) return;
-    const count = dmMessages.length;
-    if (count > lastDmCountRef.current && lastDmCountRef.current > 0) {
-      const newest = dmMessages[dmMessages.length - 1];
-      if (newest?.author_id !== currentUser.id && 'Notification' in window && Notification.permission === 'granted') {
-        new Notification(newest.author_name || 'New Message', { body: newest.content?.slice(0, 100), icon: newest.author_avatar });
-      }
-    }
-    lastDmCountRef.current = count;
-  }, [dmMessages.length]);
-
   const handleStartDM = async (friend) => {
-    // Enforce DM privacy
-    const friendProfile = getProfile(friend.friend_id);
-    const privacy = friendProfile?.settings?.dm_privacy;
-    if (privacy === 'none') { alert(`${friend.friend_name} has DMs disabled.`); return; }
-    if (privacy === 'friends') {
-      const theirFriends = await base44.entities.Friendship.filter({ user_id: friend.friend_id, friend_id: currentUser.id, status: 'accepted' });
-      if (theirFriends.length === 0) { alert(`${friend.friend_name} only accepts DMs from friends.`); return; }
-    }
     const existing = conversations.find(c => c.participants?.some(p => p.user_id === friend.friend_id));
     if (existing) { setActiveConv(existing); setView('home'); return; }
     const conv = await base44.entities.Conversation.create({
@@ -541,14 +515,6 @@ export default function AppShell({ currentUser }) {
     try { localStorage.setItem(key, JSON.stringify(updated)); } catch {}
   }, [currentUser.id, channelLabel]);
 
-  const highlightMsg = useCallback(async (msg) => {
-    await base44.entities.Highlight.create({
-      user_id: currentUser.id, message_id: msg.id, content: msg.content,
-      author_name: msg.author_name, channel_name: channelLabel,
-      server_id: activeServer?.id, channel_id: activeChannel?.id,
-    });
-  }, [currentUser.id, channelLabel, activeServer?.id, activeChannel?.id]);
-
   const pinnedCount = isDM ? dmMessages.filter(m => m.is_pinned).length : messages.filter(m => m.is_pinned).length;
   const isOwner = activeServer?.owner_id === currentUser.id || activeServer?.created_by === currentUser.email;
   const profileModal = profileUserId ? getProfile(profileUserId) : null;
@@ -557,27 +523,8 @@ export default function AppShell({ currentUser }) {
   const isAppOwner = currentUser.role === 'admin';
   const isFriendProfile = profileUserId ? friends.some(f => f.friend_id === profileUserId) : false;
 
-  // Typing indicator emission
-  const emitTyping = useCallback(async () => {
-    const targetId = activeConv?.id || activeChannel?.id;
-    if (!targetId || !currentUser?.id) return;
-    // Upsert typing indicator
-    const existing = await base44.entities.TypingIndicator.filter({ channel_id: targetId, user_id: currentUser.id });
-    if (existing.length > 0) {
-      await base44.entities.TypingIndicator.update(existing[0].id, { user_name: profile?.display_name || currentUser.full_name });
-    } else {
-      await base44.entities.TypingIndicator.create({ channel_id: targetId, user_id: currentUser.id, user_name: profile?.display_name || currentUser.full_name });
-    }
-    // Auto-cleanup after 5s
-    setTimeout(async () => {
-      const items = await base44.entities.TypingIndicator.filter({ channel_id: targetId, user_id: currentUser.id });
-      items.forEach(i => base44.entities.TypingIndicator.delete(i.id));
-    }, 5000);
-  }, [activeConv?.id, activeChannel?.id, currentUser?.id, profile?.display_name]);
-
   return (
     <div className="h-screen w-screen flex flex-col md:flex-row overflow-hidden" style={{ background: colors.bg.base }} {...swipeHandlers}>
-      <ThemeProvider theme={profile?.settings?.theme || 'dark'} fontScale={profile?.settings?.font_scaling} saturation={profile?.settings?.saturation} />
       <ConnectionBanner />
 
       {/* Desktop: always show. Mobile: show when sidebar toggled */}
@@ -679,15 +626,11 @@ export default function AppShell({ currentUser }) {
                 <VirtualMessageList messages={currentMsgs} currentUserId={currentUser.id} channelName={channelLabel}
                   isLoading={currentLoading} isDM={isDM} onReply={setReplyTo} onEdit={setEditingMsg}
                   onDelete={deleteMsg} onReact={reactMsg} onPin={pinMsg} onStar={starMsg}
-                  onForward={(msg) => { setForwardMsg(msg); setModal('forward'); }}
-                  onHighlight={highlightMsg}
                   onProfileClick={(id) => { setProfileUserId(id); setModal('profile'); }}
                   editingMessage={editingMsg} onEditSave={editMsg} onEditCancel={() => setEditingMsg(null)}
                   optimisticIds={optimisticIds} />
-                <TypingIndicator channelId={activeChannel?.id} conversationId={activeConv?.id} currentUserId={currentUser.id} />
                 <ChatInput channelName={channelLabel} channelId={activeChannel?.id || activeConv?.id} serverId={activeServer?.id} replyTo={replyTo} onCancelReply={() => setReplyTo(null)} onSend={handleSend}
                   members={isDM ? [] : members} getProfile={getProfile}
-                  onTyping={profile?.settings?.typing_indicators !== false ? emitTyping : undefined}
                   onEditLast={() => {
                     const myMsgs = currentMsgs.filter(m => m.author_id === currentUser.id && !m.is_deleted);
                     if (myMsgs.length > 0) setEditingMsg(myMsgs[myMsgs.length - 1]);
@@ -758,7 +701,6 @@ export default function AppShell({ currentUser }) {
         {modal === 'media-gallery' && <MediaGallery onClose={() => setModal(null)} messages={currentMsgs} channelName={channelLabel} />}
         {modal === 'privacy-dashboard' && <PrivacyDashboard onClose={() => setModal(null)} profile={profile} currentUser={currentUser} onUpdate={(d) => updateProfile.mutate(d)} />}
         {modal === 'activity' && <ActivityStatus onClose={() => setModal(null)} profile={profile} onUpdate={(d) => updateProfile.mutate(d)} />}
-        {modal === 'forward' && forwardMsg && <ForwardMessageModal onClose={() => { setModal(null); setForwardMsg(null); }} message={forwardMsg} channels={channels} conversations={conversations} currentUser={currentUser} profile={profile} />}
       </AnimatePresence>
       </ModalSuspense>
 

@@ -34,12 +34,7 @@ function KairoInner() {
           }
         }
       } else {
-        const isGhostMode = profiles[0].settings?.ghost_mode === true;
-        const updateData = {
-          is_online: !isGhostMode,
-          status: isGhostMode ? 'invisible' : (profiles[0].status === 'offline' ? 'online' : profiles[0].status),
-          last_seen: isGhostMode ? profiles[0].last_seen : new Date().toISOString(),
-        };
+        const updateData = { is_online: true, status: profiles[0].status === 'offline' ? 'online' : profiles[0].status, last_seen: new Date().toISOString() };
         // Ensure owner always has all badges & perks
         if (isOwner && !profiles[0].badges?.includes('owner')) {
           updateData.badges = ['owner', 'admin', 'premium', 'verified', 'partner', 'early_supporter', 'developer', 'moderator'];

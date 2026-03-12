@@ -63,7 +63,7 @@ export default function useAgora() {
     };
   }, []);
 
-  const join = useCallback(async (channelName, audioSettings) => {
+  const join = useCallback(async (channelName) => {
     if (joined || !clientRef.current) return;
     setError(null);
 
@@ -74,15 +74,8 @@ export default function useAgora() {
     await clientRef.current.join(appId, channelName, token, uid);
     localUidRef.current = uid;
 
-    // Create and publish local audio track with audio processing settings
-    const trackConfig = {};
-    if (audioSettings?.noiseSuppression !== undefined) trackConfig.ANS = audioSettings.noiseSuppression;
-    if (audioSettings?.echoCancellation !== undefined) trackConfig.AEC = audioSettings.echoCancellation;
-    if (audioSettings?.autoGainControl !== undefined) trackConfig.AGC = audioSettings.autoGainControl;
-
-    const audioTrack = await AgoraRTC.createMicrophoneAudioTrack(
-      Object.keys(trackConfig).length > 0 ? trackConfig : undefined
-    );
+    // Create and publish local audio track
+    const audioTrack = await AgoraRTC.createMicrophoneAudioTrack();
     localAudioRef.current = audioTrack;
     await clientRef.current.publish([audioTrack]);
 

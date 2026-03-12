@@ -43,20 +43,7 @@ export default function SettingsModal({ onClose, profile, onUpdate, onLogout, cu
     notification_sound: profile?.settings?.notification_sound || 'default',
   });
   const [saving, setSaving] = useState(false);
-  const [audioDevices, setAudioDevices] = useState({ inputs: [], outputs: [] });
   const set = (k, v) => setForm(p => ({ ...p, [k]: v }));
-
-  // Enumerate audio devices for voice tab
-  React.useEffect(() => {
-    if (tab === 'voice') {
-      navigator.mediaDevices?.enumerateDevices().then(devices => {
-        setAudioDevices({
-          inputs: devices.filter(d => d.kind === 'audioinput'),
-          outputs: devices.filter(d => d.kind === 'audiooutput'),
-        });
-      }).catch(() => {});
-    }
-  }, [tab]);
 
   const save = async () => {
     setSaving(true);
@@ -64,10 +51,7 @@ export default function SettingsModal({ onClose, profile, onUpdate, onLogout, cu
     if (tab === 'profile') Object.assign(data, { display_name: form.display_name, username: form.username, bio: form.bio, pronouns: form.pronouns });
     else if (tab === 'social') data.social_links = { twitter: form.twitter, github: form.github, website: form.website, instagram: form.instagram, spotify: form.spotify, tiktok: form.tiktok, linkedin: form.linkedin, twitch: form.twitch };
     else if (tab === 'privacy') data.settings = { ...profile?.settings, dm_privacy: form.dm_privacy, friend_requests: form.friend_requests, read_receipts: form.read_receipts, typing_indicators: form.typing_indicators, ghost_mode: form.ghost_mode, focus_mode: form.focus_mode };
-    else if (tab === 'appearance') { data.settings = { ...profile?.settings, theme: form.theme, message_display: form.message_display, compact_servers: form.compact_servers, font_scaling: form.font_scaling, saturation: form.saturation }; data.accent_color = form.accent_color; }
-    else if (tab === 'notifications') { data.settings = { ...profile?.settings, desktop_notifs: form.desktop_notifs, dm_notifs: form.dm_notifs, mention_notifs: form.mention_notifs, sound_notifs: form.sound_notifs, notification_sound: form.notification_sound }; }
-    else if (tab === 'accessibility') { data.settings = { ...profile?.settings, reduced_motion: form.reduced_motion, high_contrast: form.high_contrast, font_scaling: form.font_scaling, saturation: form.saturation }; }
-    else if (tab === 'voice') { data.settings = { ...profile?.settings, noise_suppression: form.noise_suppression, echo_cancellation: form.echo_cancellation, auto_gain: form.auto_gain }; }
+    else if (tab === 'appearance') { data.settings = { ...profile?.settings, theme: form.theme, message_display: form.message_display, compact_servers: form.compact_servers }; data.accent_color = form.accent_color; }
     await onUpdate(data); setSaving(false);
   };
 
@@ -244,12 +228,7 @@ export default function SettingsModal({ onClose, profile, onUpdate, onLogout, cu
           </>}
 
           {tab === 'notifications' && <>
-            <SettingsToggle label="Desktop Notifications" checked={form.desktop_notifs} onChange={v => {
-              set('desktop_notifs', v);
-              if (v && 'Notification' in window && Notification.permission === 'default') {
-                Notification.requestPermission();
-              }
-            }} desc="Show system notifications" />
+            <SettingsToggle label="Desktop Notifications" checked={form.desktop_notifs} onChange={v => set('desktop_notifs', v)} desc="Show system notifications" />
             <SettingsToggle label="DM Notifications" checked={form.dm_notifs} onChange={v => set('dm_notifs', v)} desc="Notify for new direct messages" />
             <SettingsToggle label="Mention Notifications" checked={form.mention_notifs} onChange={v => set('mention_notifs', v)} desc="Notify when you're mentioned" />
             <SettingsToggle label="Sound Effects" checked={form.sound_notifs} onChange={v => set('sound_notifs', v)} desc="Play notification sounds" />
@@ -272,7 +251,6 @@ export default function SettingsModal({ onClose, profile, onUpdate, onLogout, cu
               <label className="text-[11px] font-semibold uppercase tracking-[0.06em] block mb-1.5" style={{ color: colors.text.muted }}>Input Device</label>
               <select value={form.input_device} onChange={e => set('input_device', e.target.value)} className="w-full px-3 py-2.5 rounded-lg text-[14px] outline-none" style={{ background: colors.bg.base, color: colors.text.primary, border: `1px solid ${colors.border.default}` }}>
                 <option value="default">Default</option>
-                {audioDevices.inputs.map(d => <option key={d.deviceId} value={d.deviceId}>{d.label || `Mic ${d.deviceId.slice(0,6)}`}</option>)}
               </select>
             </div>
             <SettingsSlider label="Input Volume" value={form.input_volume} onChange={v => set('input_volume', v)} min={0} max={200} unit="%" />
@@ -280,7 +258,6 @@ export default function SettingsModal({ onClose, profile, onUpdate, onLogout, cu
               <label className="text-[11px] font-semibold uppercase tracking-[0.06em] block mb-1.5" style={{ color: colors.text.muted }}>Output Device</label>
               <select value={form.output_device} onChange={e => set('output_device', e.target.value)} className="w-full px-3 py-2.5 rounded-lg text-[14px] outline-none" style={{ background: colors.bg.base, color: colors.text.primary, border: `1px solid ${colors.border.default}` }}>
                 <option value="default">Default</option>
-                {audioDevices.outputs.map(d => <option key={d.deviceId} value={d.deviceId}>{d.label || `Speaker ${d.deviceId.slice(0,6)}`}</option>)}
               </select>
             </div>
             <SettingsSlider label="Output Volume" value={form.output_volume} onChange={v => set('output_volume', v)} min={0} max={200} unit="%" />
