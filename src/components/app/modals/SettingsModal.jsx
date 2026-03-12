@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { createPageUrl } from '@/utils';
-import { User, Link, Shield, LogOut, Palette, Bell, Volume2, Keyboard, Accessibility, HelpCircle, Crown, ExternalLink, Gamepad2, Lock, Database } from 'lucide-react';
+import { User, Link, Shield, LogOut, Palette, Bell, Volume2, Keyboard, Accessibility, HelpCircle, Crown, ExternalLink, Lock } from 'lucide-react';
 import ModalWrapper from './ModalWrapper';
 import { colors } from '@/components/app/design/tokens';
 import SecuritySettings from '@/components/app/features/SecuritySettings';
