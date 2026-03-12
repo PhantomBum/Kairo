@@ -68,7 +68,7 @@ function CategoryGroup({ category, channels, activeId, onSelect, onAdd, onSettin
             <button onClick={() => setOpen(!open)} className="w-full flex items-center gap-1.5 px-1 pt-4 pb-1.5 group">
               <ChevronDown className="w-3 h-3" style={{ color: colors.text.disabled, transform: open ? 'rotate(0deg)' : 'rotate(-90deg)', transition: 'transform 200ms cubic-bezier(0,0,0.2,1)' }} />
               <span className="text-[10px] font-bold uppercase tracking-[0.08em] flex-1 text-left truncate" style={{ color: colors.text.disabled, letterSpacing: '0.08em' }}>{category.name}</span>
-              {isOwner && <Plus onClick={e => { e.stopPropagation(); onAdd(category.id); }} className="w-[14px] h-[14px] opacity-0 group-hover:opacity-50 hover:opacity-100 cursor-pointer transition-opacity" style={{ color: colors.accent.hover }} />}
+              {isOwner && <Plus onClick={e => { e.stopPropagation(); onAdd(category.id); }} className="w-[14px] h-[14px] opacity-0 group-hover:opacity-50 hover:opacity-100 cursor-pointer k-rotate-hover" style={{ color: colors.accent.hover }} />}
             </button>
           </div>
           <div style={{
@@ -206,7 +206,7 @@ export default function DraggableChannelSidebar({ server, categories, channels, 
                 <button onClick={onAddCategory}
                   className="w-full flex items-center gap-2 px-3 py-2 mt-2 rounded-xl text-[12px] font-medium transition-colors hover:bg-[rgba(255,255,255,0.04)]"
                   style={{ color: colors.text.disabled }}>
-                  <Plus className="w-3.5 h-3.5" /> Create Category
+                  <Plus className="w-3.5 h-3.5 k-rotate-hover" /> Create Category
                 </button>
               )}
               {provided.placeholder}
