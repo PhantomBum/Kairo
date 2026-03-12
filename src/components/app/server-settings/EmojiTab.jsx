@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Search, Trash2, Pencil, Check, X } from 'lucide-react';
+// Reusable for both emoji and sticker tabs
 import { base44 } from '@/api/base44Client';
 import { colors } from '@/components/app/design/tokens';
 
