@@ -31,7 +31,7 @@ const THEME_OVERRIDES = {
   },
 };
 
-export default function ThemeEnforcer({ theme, fontScaling, saturation, accentColor }) {
+export default function ThemeEnforcer({ theme, fontScaling, saturation, accentColor, reducedMotion }) {
   useEffect(() => {
     const root = document.documentElement;
     const overrides = THEME_OVERRIDES[theme] || {};
@@ -72,6 +72,16 @@ export default function ThemeEnforcer({ theme, fontScaling, saturation, accentCo
     }
     return () => { document.documentElement.style.filter = ''; };
   }, [saturation]);
+
+  // Reduced motion
+  useEffect(() => {
+    if (reducedMotion) {
+      document.documentElement.classList.add('reduced-motion');
+    } else {
+      document.documentElement.classList.remove('reduced-motion');
+    }
+    return () => document.documentElement.classList.remove('reduced-motion');
+  }, [reducedMotion]);
 
   // Accent color
   useEffect(() => {
