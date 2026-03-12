@@ -1,6 +1,6 @@
 import React from 'react';
 import { createPageUrl } from '@/utils';
-import { Hash, Volume2, Megaphone, Radio, MessageSquare, HelpCircle, Users, Pin, AtSign, Image, Phone, Video, Search, LayoutGrid } from 'lucide-react';
+import { Hash, Volume2, Megaphone, Radio, MessageSquare, HelpCircle, Users, Pin, AtSign, Image, Phone, Video, Search, LayoutGrid, Star } from 'lucide-react';
 import { colors } from '@/components/app/design/tokens';
 
 const typeIcons = { text: Hash, voice: Volume2, announcement: Megaphone, stage: Radio, forum: MessageSquare, board: LayoutGrid };
@@ -20,7 +20,7 @@ function HeaderBtn({ icon: Icon, onClick, href, active, badge, title }) {
   );
 }
 
-export default function ChatHeader({ channel, conversation, currentUserId, showMembers, onToggleMembers, isDM, onPinned, pinnedCount, onMediaGallery, onVoiceCall, onVideoCall, serverName, onSearch }) {
+export default function ChatHeader({ channel, conversation, currentUserId, showMembers, onToggleMembers, isDM, onPinned, pinnedCount, onMediaGallery, onVoiceCall, onVideoCall, serverName, onSearch, onStarred }) {
   const label = isDM
     ? (conversation?.name || conversation?.participants?.find(p => p.user_id !== currentUserId)?.user_name || 'DM')
     : (channel?.name || '');
@@ -50,6 +50,7 @@ export default function ChatHeader({ channel, conversation, currentUserId, showM
             <HeaderBtn icon={Video} onClick={onVideoCall} title="Start Video Call" />
           </>
         )}
+        {onStarred && <HeaderBtn icon={Star} onClick={onStarred} title="Starred Messages" />}
         {onPinned && <HeaderBtn icon={Pin} onClick={onPinned} badge={pinnedCount} title="Pinned Messages" />}
         {onMediaGallery && <HeaderBtn icon={Image} onClick={onMediaGallery} title="Media Gallery" />}
         {onSearch && <HeaderBtn icon={Search} onClick={onSearch} title="Search" />}
