@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
-import { Upload, Users, Gamepad2, Code, Lock, Mic, Briefcase, Calendar } from 'lucide-react';
+import { Upload, Users, Gamepad2, Code, Lock, Mic, Calendar } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import ModalWrapper from './ModalWrapper';
 import { colors } from '@/components/app/design/tokens';
 
 const templates = [
-  { id: 'blank', label: 'Blank', icon: null, desc: 'Start fresh' },
+  { id: 'blank', label: 'Blank', icon: null },
   { id: 'community', label: 'Community', icon: Users },
   { id: 'gaming', label: 'Gaming', icon: Gamepad2 },
-  { id: 'development', label: 'Dev Team', icon: Code },
+  { id: 'development', label: 'Dev', icon: Code },
   { id: 'private', label: 'Private', icon: Lock },
   { id: 'creator', label: 'Creator', icon: Mic },
   { id: 'event', label: 'Event', icon: Calendar },
@@ -32,61 +32,55 @@ export default function CreateServerModal({ onClose, onCreate, isCreating }) {
   };
 
   return (
-    <ModalWrapper title="Create a Server" subtitle="Your server is where you and your friends hang out" onClose={onClose} width={460}>
+    <ModalWrapper title="New server" onClose={onClose} width={420}>
       <div className="space-y-5">
-        {/* Icon upload */}
-        <div className="flex items-center gap-4">
+        {/* Icon + Name on same row */}
+        <div className="flex items-center gap-3">
           <button onClick={() => document.getElementById('srv-icon').click()}
-            className="w-20 h-20 rounded-2xl flex items-center justify-center overflow-hidden hover:brightness-125"
-            style={{ background: colors.bg.elevated, border: `2px dashed ${colors.border.light}` }}
-            aria-label="Upload server icon">
-            {uploading ? <div className="w-5 h-5 border-2 rounded-full animate-spin" style={{ borderColor: colors.border.default, borderTopColor: colors.text.muted }} />
-            : iconUrl ? <img src={iconUrl} className="w-full h-full object-cover" alt="Server icon" />
-            : <Upload className="w-5 h-5" style={{ color: colors.text.muted }} />}
+            className="w-14 h-14 rounded-xl flex items-center justify-center overflow-hidden flex-shrink-0"
+            style={{ background: iconUrl ? 'transparent' : colors.bg.elevated, border: `1px dashed ${colors.border.light}` }}>
+            {uploading ? <div className="w-4 h-4 border-2 rounded-full animate-spin" style={{ borderColor: colors.border.default, borderTopColor: colors.text.muted }} />
+            : iconUrl ? <img src={iconUrl} className="w-full h-full object-cover" alt="" />
+            : <Upload className="w-4 h-4" style={{ color: colors.text.disabled }} />}
           </button>
-          <input id="srv-icon" type="file" accept="image/*" onChange={handleIcon} className="hidden" aria-hidden="true" />
-          <div>
-            <p className="text-[14px] font-medium" style={{ color: colors.text.primary }}>Server Icon</p>
-            <p className="text-[12px]" style={{ color: colors.text.muted }}>512×512 recommended</p>
-          </div>
-        </div>
-
-        {/* Server name */}
-        <div>
-          <label htmlFor="server-name" className="text-[11px] font-semibold uppercase tracking-[0.06em] block mb-2" style={{ color: colors.text.muted }}>Server Name</label>
-          <input id="server-name" value={name} onChange={e => setName(e.target.value)} placeholder="My awesome server"
+          <input id="srv-icon" type="file" accept="image/*" onChange={handleIcon} className="hidden" />
+          <input value={name} onChange={e => setName(e.target.value)} placeholder="Server name"
             onKeyDown={e => e.key === 'Enter' && handleCreate()}
-            className="w-full px-3 py-2.5 rounded-lg text-[14px] outline-none"
+            className="flex-1 px-3 py-2.5 rounded-lg text-[14px] outline-none"
             style={{ background: colors.bg.base, color: colors.text.primary, border: `1px solid ${colors.border.default}` }} autoFocus />
         </div>
 
-        {/* Template selection */}
+        {/* Templates as a compact horizontal scroll */}
         <div>
-          <label className="text-[11px] font-semibold uppercase tracking-[0.06em] block mb-2" style={{ color: colors.text.muted }}>Template</label>
-          <div className="grid grid-cols-3 gap-2">
-            {templates.map(t => (
-              <button key={t.id} onClick={() => setTemplate(t.id)}
-                className="flex flex-col items-center gap-1.5 p-3 rounded-lg"
-                style={{
-                  background: template === t.id ? colors.accent.subtle : colors.bg.elevated,
-                  border: `1px solid ${template === t.id ? colors.accent.muted : colors.border.default}`,
-                  color: template === t.id ? colors.text.primary : colors.text.muted,
-                }}
-                aria-pressed={template === t.id}>
-                {t.icon && <t.icon className="w-4 h-4" />}
-                <span className="text-[11px] font-medium">{t.label}</span>
-              </button>
-            ))}
+          <p className="text-[11px] font-medium uppercase tracking-wider mb-2" style={{ color: colors.text.disabled }}>Template</p>
+          <div className="flex gap-1.5 flex-wrap">
+            {templates.map(t => {
+              const active = template === t.id;
+              return (
+                <button key={t.id} onClick={() => setTemplate(t.id)}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-medium"
+                  style={{
+                    background: active ? colors.accent.subtle : 'transparent',
+                    color: active ? colors.accent.hover : colors.text.muted,
+                    border: `1px solid ${active ? colors.accent.muted : colors.border.default}`,
+                  }}>
+                  {t.icon && <t.icon className="w-3 h-3" />}
+                  {t.label}
+                </button>
+              );
+            })}
           </div>
         </div>
 
-        {/* Actions */}
-        <div className="flex justify-end gap-3 pt-2">
-          <button onClick={onClose} className="px-4 py-2.5 rounded-lg text-[14px] hover:bg-[rgba(255,255,255,0.04)]" style={{ color: colors.text.secondary }}>Cancel</button>
+        {/* Footer */}
+        <div className="flex items-center justify-between pt-1">
+          <button onClick={onClose} className="text-[13px] font-medium hover:underline" style={{ color: colors.text.disabled }}>
+            Cancel
+          </button>
           <button onClick={handleCreate} disabled={!name.trim() || isCreating}
-            className="px-5 py-2.5 rounded-lg text-[14px] font-semibold disabled:opacity-30"
+            className="px-5 py-2 rounded-lg text-[13px] font-semibold disabled:opacity-30"
             style={{ background: colors.accent.primary, color: '#fff' }}>
-            {isCreating ? 'Creating...' : 'Create Server'}
+            {isCreating ? 'Creating...' : 'Create'}
           </button>
         </div>
       </div>

@@ -1,28 +1,16 @@
 import React from 'react';
-import { Plus, Compass, Bot, Crown, HelpCircle, Zap, Hash, Users, MessageCircle, Shield, Sparkles } from 'lucide-react';
+import { Plus, Compass, Bot, Crown, HelpCircle, Zap, Hash } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { createPageUrl } from '@/utils';
-import { colors, shadows } from '@/components/app/design/tokens';
+import { colors } from '@/components/app/design/tokens';
 
 function getGreeting() {
   const h = new Date().getHours();
-  if (h < 5) return { text: 'Still up?', sub: "The best ideas come at night.", emoji: '🌌' };
-  if (h < 12) return { text: 'Good morning', sub: "What's on the agenda today?", emoji: '☀️' };
-  if (h < 17) return { text: 'Good afternoon', sub: 'Hope your day is going well.', emoji: '🌤️' };
-  if (h < 21) return { text: 'Good evening', sub: 'Time to wind down and connect.', emoji: '🌆' };
-  return { text: 'Good night', sub: 'One more conversation before bed?', emoji: '🌙' };
-}
-
-function FeatureCard({ icon: Icon, label, desc, color }) {
-  return (
-    <div className="p-4 rounded-xl group" style={{ background: colors.bg.elevated, border: `1px solid ${colors.border.default}` }}>
-      <div className="w-9 h-9 rounded-lg flex items-center justify-center mb-3" style={{ background: `${color}12` }}>
-        <Icon className="w-[18px] h-[18px]" style={{ color }} />
-      </div>
-      <p className="text-[14px] font-semibold mb-1" style={{ color: colors.text.primary }}>{label}</p>
-      <p className="text-[12px] leading-relaxed" style={{ color: colors.text.muted }}>{desc}</p>
-    </div>
-  );
+  if (h < 5) return { text: 'Late night?', sub: 'The quiet hours hit different.' };
+  if (h < 12) return { text: 'Morning', sub: 'Coffee first, then chaos.' };
+  if (h < 17) return { text: 'Hey', sub: 'Back at it.' };
+  if (h < 21) return { text: 'Evening', sub: 'Good time to catch up.' };
+  return { text: 'Night owl', sub: 'One more scroll won\'t hurt.' };
 }
 
 export default function EmptyView({ onCreateServer, onJoinServer, emptyServer, serverName, onCreateChannel }) {
@@ -31,19 +19,18 @@ export default function EmptyView({ onCreateServer, onJoinServer, emptyServer, s
   if (emptyServer) {
     return (
       <div className="flex-1 flex items-center justify-center p-8">
-        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, ease: [0, 0, 0.2, 1] }}
-          className="text-center max-w-sm">
-          <div className="w-16 h-16 rounded-2xl mx-auto mb-6 flex items-center justify-center" style={{ background: colors.accent.subtle }}>
-            <Hash className="w-8 h-8" style={{ color: colors.accent.primary }} />
-          </div>
-          <h2 className="text-[24px] font-bold mb-2 tracking-tight" style={{ color: colors.text.primary }}>No channels yet</h2>
-          <p className="text-[14px] leading-relaxed mb-6" style={{ color: colors.text.muted }}>
-            {serverName || 'This server'} is a blank canvas. Create your first channel to start the conversation.
+        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="text-center max-w-xs">
+          <div className="text-[40px] mb-4">📭</div>
+          <h2 className="text-[20px] font-bold mb-1.5" style={{ color: colors.text.primary }}>
+            Empty in here
+          </h2>
+          <p className="text-[14px] mb-6" style={{ color: colors.text.muted }}>
+            {serverName ? `${serverName} needs` : 'This server needs'} a channel to get started.
           </p>
           {onCreateChannel && (
-            <button onClick={onCreateChannel} className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-[14px] font-semibold hover:brightness-110"
-              style={{ background: colors.accent.primary, color: '#fff', boxShadow: shadows.accentGlow }}>
-              <Plus className="w-4 h-4" /> Create Channel
+            <button onClick={onCreateChannel} className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-[14px] font-medium"
+              style={{ background: colors.accent.primary, color: '#fff' }}>
+              <Plus className="w-4 h-4" /> New channel
             </button>
           )}
         </motion.div>
@@ -52,55 +39,63 @@ export default function EmptyView({ onCreateServer, onJoinServer, emptyServer, s
   }
 
   return (
-    <div className="flex-1 flex items-center justify-center p-8 relative overflow-hidden">
-      {/* Ambient gradient */}
-      <div className="absolute inset-0 pointer-events-none" style={{
-        background: `radial-gradient(ellipse 80% 50% at 50% 100%, ${colors.accent.primary}08, transparent), radial-gradient(ellipse 50% 40% at 20% 20%, ${colors.info}05, transparent)`,
-      }} />
-
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: [0, 0, 0.2, 1] }}
-        className="text-center max-w-lg relative z-10">
-        
-        {/* Kairo logo mark */}
-        <div className="w-20 h-20 rounded-[22px] mx-auto mb-8 flex items-center justify-center relative"
-          style={{ background: `linear-gradient(135deg, ${colors.accent.primary}, ${colors.accent.active})`, boxShadow: shadows.accentGlow }}>
-          <span className="text-4xl font-bold text-white" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.3)' }}>K</span>
+    <div className="flex-1 flex flex-col items-center justify-center p-8 relative overflow-hidden select-none">
+      <motion.div
+        initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4 }}
+        className="relative z-10 w-full max-w-md"
+      >
+        {/* Minimal header */}
+        <div className="mb-12">
+          <p className="text-[13px] font-medium mb-3" style={{ color: colors.text.disabled }}>
+            {greeting.text} — {greeting.sub}
+          </p>
+          <h1 className="text-[28px] font-bold tracking-tight leading-[1.15]" style={{ color: colors.text.primary }}>
+            Kairo
+          </h1>
+          <div className="w-8 h-[3px] rounded-full mt-3" style={{ background: colors.accent.primary }} />
         </div>
 
-        {/* Greeting */}
-        <p className="text-[15px] mb-1.5 font-medium" style={{ color: colors.text.muted }}>{greeting.emoji} {greeting.text}</p>
-        <h2 className="text-[36px] font-bold mb-2 tracking-tight leading-tight" style={{ color: colors.text.primary }}>Welcome to Kairo</h2>
-        <p className="text-[15px] leading-relaxed mb-10" style={{ color: colors.text.muted }}>{greeting.sub}</p>
-
-        {/* Primary actions */}
-        <div className="flex gap-3 justify-center flex-wrap">
-          <button onClick={onCreateServer} className="flex items-center gap-2.5 px-7 py-3.5 rounded-xl text-[15px] font-semibold hover:brightness-110"
-            style={{ background: `linear-gradient(135deg, ${colors.accent.primary}, ${colors.accent.active})`, color: '#fff', boxShadow: shadows.accentGlow }}>
-            <Plus className="w-5 h-5" /> Create Server
+        {/* Actions — stacked, not side-by-side */}
+        <div className="space-y-2 mb-10">
+          <button onClick={onCreateServer}
+            className="w-full flex items-center gap-3 px-4 py-3.5 rounded-lg text-left group"
+            style={{ background: 'rgba(255,255,255,0.03)', border: `1px solid ${colors.border.default}` }}>
+            <div className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0"
+              style={{ background: colors.accent.primary }}>
+              <Plus className="w-4 h-4 text-white" />
+            </div>
+            <div className="min-w-0">
+              <p className="text-[14px] font-medium" style={{ color: colors.text.primary }}>Create a server</p>
+              <p className="text-[12px]" style={{ color: colors.text.disabled }}>Start something new</p>
+            </div>
           </button>
-          <button onClick={onJoinServer} className="flex items-center gap-2.5 px-7 py-3.5 rounded-xl text-[15px] font-semibold hover:bg-[rgba(255,255,255,0.06)]"
-            style={{ background: colors.bg.elevated, color: colors.text.secondary, border: `1px solid ${colors.border.light}` }}>
-            <Compass className="w-5 h-5" /> Join Server
+
+          <button onClick={onJoinServer}
+            className="w-full flex items-center gap-3 px-4 py-3.5 rounded-lg text-left group"
+            style={{ background: 'rgba(255,255,255,0.03)', border: `1px solid ${colors.border.default}` }}>
+            <div className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0"
+              style={{ background: colors.bg.elevated, border: `1px solid ${colors.border.light}` }}>
+              <Compass className="w-4 h-4" style={{ color: colors.text.muted }} />
+            </div>
+            <div className="min-w-0">
+              <p className="text-[14px] font-medium" style={{ color: colors.text.primary }}>Join with an invite</p>
+              <p className="text-[12px]" style={{ color: colors.text.disabled }}>Got a code? Paste it here</p>
+            </div>
           </button>
         </div>
 
-        {/* Feature grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-12 text-left">
-          <FeatureCard icon={MessageCircle} label="Real-time Chat" desc="Instant messaging with reactions, threads, and rich media" color={colors.accent.primary} />
-          <FeatureCard icon={Shield} label="Privacy First" desc="Ghost mode, encryption, and complete data control" color={colors.success} />
-          <FeatureCard icon={Sparkles} label="Built Different" desc="Spaces, boards, bots, and features you won't find anywhere else" color={colors.warning} />
-        </div>
-
-        {/* Quick links */}
-        <div className="flex gap-1 justify-center mt-8 flex-wrap">
+        {/* Links — just text, no icons, casual */}
+        <div className="flex gap-4 flex-wrap">
           {[
-            { href: createPageUrl('BotMarketplace'), icon: Bot, label: 'Bots' },
-            { href: createPageUrl('Elite'), icon: Crown, label: 'Elite', color: colors.warning },
-            { href: createPageUrl('FAQ'), icon: HelpCircle, label: 'Help' },
-            { href: createPageUrl('Support'), icon: Zap, label: 'Support' },
+            { href: createPageUrl('BotMarketplace'), label: 'Bots' },
+            { href: createPageUrl('Elite'), label: 'Elite', accent: true },
+            { href: createPageUrl('FAQ'), label: 'Help' },
+            { href: createPageUrl('Support'), label: 'Support' },
           ].map(link => (
-            <a key={link.label} href={link.href} className="flex items-center gap-1.5 text-[12px] font-medium px-3 py-2 rounded-lg hover:bg-[rgba(255,255,255,0.04)]" style={{ color: link.color || colors.text.muted }}>
-              <link.icon className="w-3.5 h-3.5" /> {link.label}
+            <a key={link.label} href={link.href}
+              className="text-[12px] font-medium hover:underline"
+              style={{ color: link.accent ? colors.accent.hover : colors.text.disabled }}>
+              {link.label}
             </a>
           ))}
         </div>
