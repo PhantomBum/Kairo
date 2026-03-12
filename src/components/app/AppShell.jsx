@@ -722,6 +722,19 @@ export default function AppShell({ currentUser }) {
         }} />
       )}
 
+      {/* DM Calls */}
+      {activeCall && (
+        <DMCallView call={activeCall} conversation={conversations.find(c => c.id === activeCall.conversation_id) || activeConv}
+          currentUser={currentUser} profile={profile} onEndCall={endCall} />
+      )}
+      {outgoingCall && !activeCall && (
+        <OutgoingCallOverlay recipientName={outgoingCall.recipientName} recipientAvatar={outgoingCall.recipientAvatar}
+          isVideoCall={outgoingCall.is_video_call} onCancel={cancelOutgoing} />
+      )}
+      {incomingCall && !activeCall && (
+        <IncomingCallOverlay call={incomingCall} onAccept={acceptCall} onDecline={declineCall} />
+      )}
+
       {/* Badge earned notifications */}
       {newBadges.length > 0 && (
         <BadgeNotification badge={newBadges[0]} onDismiss={() => dismissBadge(newBadges[0])} />
