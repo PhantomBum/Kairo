@@ -324,11 +324,13 @@ export default function AppShell({ currentUser }) {
   };
 
   const leaveServer = async (server) => {
-    if (server.owner_id === currentUser.id) { alert("You can't leave a server you own."); return; }
+    if (server.owner_id === currentUser.id) { alert("You can't leave a server you own. Transfer ownership first in Server Settings → Ownership."); return; }
     if (!confirm(`Leave ${server.name}?`)) return;
     const mems = await base44.entities.ServerMember.filter({ server_id: server.id, user_id: currentUser.id });
     for (const m of mems) await base44.entities.ServerMember.delete(m.id);
-    await base44.entities.Server.update(server.id, { member_count: Math.max(1, (server.member_count || 1) - 1) });
+    // Update member count based on actual members
+    const remaining = await base44.entities.ServerMember.filter({ server_id: server.id });
+    await base44.entities.Server.update(server.id, { member_count: remaining.filter(m => !m.is_banned).length });
     qc.invalidateQueries({ queryKey: ['servers'] }); qc.invalidateQueries({ queryKey: ['members'] });
     if (activeServer?.id === server.id) goHome();
   };

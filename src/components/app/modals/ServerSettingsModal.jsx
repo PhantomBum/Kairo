@@ -12,6 +12,7 @@ import BotsTab from '@/components/app/server-settings/BotsTab';
 import AuditLogTab from '@/components/app/server-settings/AuditLogTab';
 import EmojiTab from '@/components/app/server-settings/EmojiTab';
 import DangerTab from '@/components/app/server-settings/DangerTab';
+import OwnershipTab from '@/components/app/server-settings/OwnershipTab';
 import AutoModTab from '@/components/app/server-settings/AutoModTab';
 import SoundsTab from '@/components/app/server-settings/SoundsTab';
 import InsightsTab from '@/components/app/server-settings/InsightsTab';
@@ -168,6 +169,11 @@ export default function ServerSettingsModal({ onClose, server, currentUserId }) 
       case 'audit-log': return <AuditLogTab serverId={server?.id} />;
       case 'emoji': return <EmojiTab serverId={server?.id} type="emoji" />;
       case 'stickers': return <EmojiTab serverId={server?.id} type="sticker" />;
+      case 'ownership': return <OwnershipTab server={server} members={members} currentUserId={currentUserId} onTransfer={async (newOwnerId) => {
+        await base44.entities.Server.update(server.id, { owner_id: newOwnerId });
+        qc.invalidateQueries({ queryKey: ['servers'] });
+        onClose('transferred');
+      }} />;
       case 'danger': return <DangerTab server={server} onDelete={deleteServer} />;
       case 'channels': return (
         <div className="space-y-3">

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Settings, Palette, Link, Hash, FolderOpen, Shield, Users, Bot, ShieldAlert, FileText, Ban, Smile, Stamp, Volume2, BarChart3, TrendingUp, Webhook, AlertTriangle, ChevronRight } from 'lucide-react';
+import { Settings, Palette, Link, Hash, FolderOpen, Shield, Users, Bot, ShieldAlert, FileText, Ban, Smile, Stamp, Volume2, BarChart3, TrendingUp, Webhook, AlertTriangle, Crown, ChevronRight } from 'lucide-react';
 import { colors } from '@/components/app/design/tokens';
 
 const NAV = [
@@ -33,6 +33,7 @@ const NAV = [
     { id: 'integrations', label: 'Integrations', icon: Webhook },
   ]},
   { section: '', items: [
+    { id: 'ownership', label: 'Ownership', icon: Crown },
     { id: 'danger', label: 'Danger Zone', icon: AlertTriangle, danger: true },
   ]},
 ];
