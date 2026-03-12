@@ -300,6 +300,17 @@ export function useBlocked(userId) {
   });
 }
 
+// ── Voice States ──
+export function useVoiceStates(serverId) {
+  return useQuery({
+    queryKey: ['voiceStates', serverId],
+    queryFn: () => base44.entities.VoiceState.filter({ server_id: serverId }),
+    enabled: !!serverId,
+    staleTime: 5000,
+    refetchInterval: 5000,
+  });
+}
+
 // ── Profile ──
 export function useMyProfile(email) {
   const qc = useQueryClient();
