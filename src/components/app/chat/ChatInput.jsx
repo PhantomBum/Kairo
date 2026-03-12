@@ -6,10 +6,11 @@ import FormattingToolbar from '@/components/app/features/FormattingToolbar';
 import GifPicker from '@/components/app/chat/GifPicker';
 import StickerPicker from '@/components/app/chat/StickerPicker';
 import SlashCommandPicker from '@/components/app/chat/SlashCommandPicker';
+import MentionPicker from '@/components/app/chat/MentionPicker';
 
 const EMOJIS = ['😀','😂','😍','🤔','👍','👎','❤️','🔥','🎉','😎','😢','😡','🙏','💯','✨','🚀','👀','🤝','💀','🎮','🎵','☕','⭐','💜'];
 
-export default function ChatInput({ channelName, channelId, replyTo, onCancelReply, onSend, onTyping, onEditLast, serverId }) {
+export default function ChatInput({ channelName, channelId, replyTo, onCancelReply, onSend, onTyping, onEditLast, serverId, members, getProfile }) {
   const storageKey = `kairo-draft-${channelId || channelName || 'default'}`;
   const [content, setContent] = useState(() => {
     try { return localStorage.getItem(storageKey) || ''; } catch { return ''; }
@@ -24,6 +25,8 @@ export default function ChatInput({ channelName, channelId, replyTo, onCancelRep
   const [showFormatting, setShowFormatting] = useState(false);
   const [showSlash, setShowSlash] = useState(false);
   const [slashFilter, setSlashFilter] = useState('');
+  const [showMention, setShowMention] = useState(false);
+  const [mentionFilter, setMentionFilter] = useState('');
   const fileRef = useRef(null);
   const inputRef = useRef(null);
   const typingRef = useRef(0);
@@ -53,7 +56,7 @@ export default function ChatInput({ channelName, channelId, replyTo, onCancelRep
     setUploading(false);
   };
 
-  const closePickers = () => { setShowEmoji(false); setShowGif(false); setShowSticker(false); setShowSlash(false); };
+  const closePickers = () => { setShowEmoji(false); setShowGif(false); setShowSticker(false); setShowSlash(false); setShowMention(false); };
 
   const handleSend = async () => {
     const trimmed = content.trim();
@@ -72,9 +75,32 @@ export default function ChatInput({ channelName, channelId, replyTo, onCancelRep
     if (val.startsWith('/')) {
       setShowSlash(true);
       setSlashFilter(val.slice(1));
+      setShowMention(false);
     } else if (showSlash) {
       setShowSlash(false);
     }
+    // @mention detection — look for @ at word boundary
+    const cursorPos = inputRef.current?.selectionStart || val.length;
+    const textBefore = val.slice(0, cursorPos);
+    const mentionMatch = textBefore.match(/@(\w*)$/);
+    if (mentionMatch && members?.length > 0) {
+      setShowMention(true);
+      setMentionFilter(mentionMatch[1]);
+      setShowSlash(false);
+    } else if (showMention) {
+      setShowMention(false);
+    }
+  };
+
+  const handleMentionSelect = (member) => {
+    if (!member) { setShowMention(false); return; }
+    const cursorPos = inputRef.current?.selectionStart || content.length;
+    const textBefore = content.slice(0, cursorPos);
+    const textAfter = content.slice(cursorPos);
+    const newBefore = textBefore.replace(/@(\w*)$/, `@${member.displayName} `);
+    setContent(newBefore + textAfter);
+    setShowMention(false);
+    inputRef.current?.focus();
   };
 
   const handleSlashSelect = (cmd) => {
@@ -120,6 +146,9 @@ export default function ChatInput({ channelName, channelId, replyTo, onCancelRep
 
       {/* Slash command picker */}
       {showSlash && <SlashCommandPicker filter={slashFilter} onSelect={handleSlashSelect} serverId={serverId} />}
+
+      {/* Mention picker */}
+      {showMention && <MentionPicker filter={mentionFilter} members={members} onSelect={handleMentionSelect} profiles={getProfile} />}
 
       {/* GIF picker */}
       {showGif && <GifPicker onSelect={handleGifSelect} onClose={() => setShowGif(false)} />}
@@ -186,7 +215,7 @@ export default function ChatInput({ channelName, channelId, replyTo, onCancelRep
         <textarea ref={inputRef} value={content}
           onChange={e => handleContentChange(e.target.value)}
           onKeyDown={e => {
-            if (e.key === 'Enter' && !e.shiftKey && !showSlash) { e.preventDefault(); handleSend(); }
+            if (e.key === 'Enter' && !e.shiftKey && !showSlash && !showMention) { e.preventDefault(); handleSend(); }
             if (e.key === 'ArrowUp' && !content.trim() && onEditLast) { e.preventDefault(); onEditLast(); }
             if (e.key === 'Escape') { closePickers(); if (replyTo) onCancelReply(); }
           }}
