@@ -449,20 +449,25 @@ export default function AppShell({ currentUser }) {
       }
       // If outgoing, check if other party accepted
       if (outgoingCall) {
-        const updated = await base44.entities.DMCall.filter({ id: outgoingCall.id });
-        if (updated[0]) {
-          if (updated[0].status === 'ongoing') {
-            setActiveCall(updated[0]);
-            setOutgoingCall(null);
-          } else if (updated[0].status === 'missed' || updated[0].status === 'ended') {
+        const updated = await base44.entities.DMCall.filter({ conversation_id: outgoingCall.conversation_id, status: 'ongoing' });
+        const match = updated.find(c => c.id === outgoingCall.id);
+        if (match) {
+          setActiveCall(match);
+          setOutgoingCall(null);
+        } else {
+          // Check if it was declined/missed
+          const missed = await base44.entities.DMCall.filter({ conversation_id: outgoingCall.conversation_id });
+          const orig = missed.find(c => c.id === outgoingCall.id);
+          if (orig && (orig.status === 'missed' || orig.status === 'ended')) {
             setOutgoingCall(null);
           }
         }
       }
       // If in active call, check if it ended
       if (activeCall) {
-        const updated = await base44.entities.DMCall.filter({ id: activeCall.id });
-        if (updated[0]?.status === 'ended') {
+        const all = await base44.entities.DMCall.filter({ conversation_id: activeCall.conversation_id });
+        const current = all.find(c => c.id === activeCall.id);
+        if (current?.status === 'ended') {
           setActiveCall(null);
         }
       }
