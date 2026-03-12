@@ -381,6 +381,95 @@ export default function AppShell({ currentUser }) {
     }
   };
 
+  // DM Call handlers
+  const startCall = async (isVideo) => {
+    if (!activeConv || activeCall || outgoingCall) return;
+    const other = activeConv.participants?.find(p => p.user_id !== currentUser.id);
+    const call = await base44.entities.DMCall.create({
+      conversation_id: activeConv.id,
+      initiator_id: currentUser.id,
+      initiator_name: profile?.display_name || currentUser.full_name,
+      status: 'ringing',
+      is_video_call: isVideo,
+      started_at: new Date().toISOString(),
+      participants: [{ user_id: currentUser.id, user_name: profile?.display_name || currentUser.full_name, joined_at: new Date().toISOString() }],
+    });
+    setOutgoingCall({ ...call, recipientName: other?.user_name, recipientAvatar: other?.avatar });
+  };
+
+  const acceptCall = async () => {
+    if (!incomingCall) return;
+    await base44.entities.DMCall.update(incomingCall.id, {
+      status: 'ongoing',
+      participants: [...(incomingCall.participants || []), { user_id: currentUser.id, user_name: profile?.display_name || currentUser.full_name, joined_at: new Date().toISOString() }],
+    });
+    const updated = { ...incomingCall, status: 'ongoing' };
+    setActiveCall(updated);
+    // Navigate to the conversation if not already there
+    if (!activeConv || activeConv.id !== incomingCall.conversation_id) {
+      const conv = conversations.find(c => c.id === incomingCall.conversation_id);
+      if (conv) { setActiveConv(conv); setView('home'); }
+    }
+    setIncomingCall(null);
+  };
+
+  const declineCall = async () => {
+    if (!incomingCall) return;
+    await base44.entities.DMCall.update(incomingCall.id, { status: 'missed', ended_at: new Date().toISOString() });
+    setIncomingCall(null);
+  };
+
+  const cancelOutgoing = async () => {
+    if (!outgoingCall) return;
+    await base44.entities.DMCall.update(outgoingCall.id, { status: 'missed', ended_at: new Date().toISOString() });
+    setOutgoingCall(null);
+  };
+
+  const endCall = async () => {
+    const callId = activeCall?.id || outgoingCall?.id;
+    if (callId) {
+      await base44.entities.DMCall.update(callId, { status: 'ended', ended_at: new Date().toISOString() });
+    }
+    setActiveCall(null);
+    setOutgoingCall(null);
+  };
+
+  // Poll for incoming calls & outgoing call status changes
+  useEffect(() => {
+    if (!currentUser?.id) return;
+    const interval = setInterval(async () => {
+      // Check for incoming ringing calls in my conversations
+      if (!activeCall && !incomingCall) {
+        const ringing = await base44.entities.DMCall.filter({ status: 'ringing' });
+        const incoming = ringing.find(c =>
+          c.initiator_id !== currentUser.id &&
+          conversations.some(conv => conv.id === c.conversation_id)
+        );
+        if (incoming) setIncomingCall(incoming);
+      }
+      // If outgoing, check if other party accepted
+      if (outgoingCall) {
+        const updated = await base44.entities.DMCall.filter({ id: outgoingCall.id });
+        if (updated[0]) {
+          if (updated[0].status === 'ongoing') {
+            setActiveCall(updated[0]);
+            setOutgoingCall(null);
+          } else if (updated[0].status === 'missed' || updated[0].status === 'ended') {
+            setOutgoingCall(null);
+          }
+        }
+      }
+      // If in active call, check if it ended
+      if (activeCall) {
+        const updated = await base44.entities.DMCall.filter({ id: activeCall.id });
+        if (updated[0]?.status === 'ended') {
+          setActiveCall(null);
+        }
+      }
+    }, 2000);
+    return () => clearInterval(interval);
+  }, [currentUser?.id, conversations, activeCall, outgoingCall, incomingCall]);
+
   // Swipe gestures for mobile
   const swipeHandlers = useSwipeGesture({
     onSwipeRight: () => setShowMobileSidebar(true),
