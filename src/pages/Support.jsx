@@ -162,6 +162,11 @@ export default function Support() {
           {tab === 'contact' && (
             <div className="space-y-4">
               <h3 className="text-sm font-semibold" style={{ color: 'var(--text-cream)', fontFamily: 'monospace' }}>Contact Support</h3>
+              <div className="p-4 rounded-xl space-y-2" style={{ background: 'rgba(88,101,242,0.06)', border: '1px solid rgba(88,101,242,0.15)' }}>
+                <p className="text-[13px] font-medium" style={{ color: 'var(--text-cream)' }}>You can also reach us directly via email:</p>
+                <a href="mailto:ilikebagels1612@gmail.com" className="text-[14px] font-semibold hover:underline" style={{ color: 'var(--accent-blue)' }}>ilikebagels1612@gmail.com</a>
+                <p className="text-[11px]" style={{ color: 'var(--text-muted)' }}>For support, questions, or to apply as a <span style={{ color: '#a78bfa' }}>Developer</span> or <span style={{ color: '#3ba55c' }}>Tester</span> for Kairo.</p>
+              </div>
               <Input label="Subject" value={contactForm.subject} onChange={v => setContactForm(p => ({ ...p, subject: v }))} placeholder="What do you need help with?" />
               <div>
                 <label className="text-[10px] font-semibold uppercase tracking-[0.08em] block mb-1.5" style={{ color: 'var(--text-muted)', fontFamily: 'monospace' }}>Category</label>
