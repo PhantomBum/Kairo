@@ -60,7 +60,7 @@ function ChannelItem({ channel, active, onClick, onSettings, onJumpToDate, isOwn
   );
 }
 
-function CategoryGroup({ category, channels, activeId, onSelect, onAdd, onSettings, isOwner, index }) {
+function CategoryGroup({ category, channels, activeId, onSelect, onAdd, onSettings, onJumpToDate, isOwner, index }) {
   const [open, setOpen] = useState(true);
   return (
     <Draggable draggableId={`cat-${category.id}`} index={index} isDragDisabled={!isOwner}>
@@ -83,7 +83,7 @@ function CategoryGroup({ category, channels, activeId, onSelect, onAdd, onSettin
               {(dropProvided) => (
                 <div ref={dropProvided.innerRef} {...dropProvided.droppableProps} className="space-y-px min-h-[2px]">
                   {channels.sort((a, b) => (a.position || 0) - (b.position || 0)).map((ch, i) => (
-                    <ChannelItem key={ch.id} channel={ch} active={activeId === ch.id} onClick={onSelect} onSettings={onSettings} isOwner={isOwner} index={i} />
+                    <ChannelItem key={ch.id} channel={ch} active={activeId === ch.id} onClick={onSelect} onSettings={onSettings} onJumpToDate={onJumpToDate} isOwner={isOwner} index={i} />
                   ))}
                   {dropProvided.placeholder}
                 </div>
@@ -160,7 +160,7 @@ export default function DraggableChannelSidebar({ server, categories, channels, 
               {sorted.map((cat, i) => (
                 <CategoryGroup key={cat.id} category={cat} index={i}
                   channels={(channels || []).filter(ch => ch.category_id === cat.id)}
-                  activeId={activeId} onSelect={onSelect} onAdd={onAdd} onSettings={onChannelSettings} isOwner={isOwner} />
+                  activeId={activeId} onSelect={onSelect} onAdd={onAdd} onSettings={onChannelSettings} onJumpToDate={onJumpToDate} isOwner={isOwner} />
               ))}
               {isOwner && (
                 <button onClick={onAddCategory}
