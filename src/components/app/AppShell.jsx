@@ -93,6 +93,9 @@ export default function AppShell({ currentUser }) {
   const [showQuickStatus, setShowQuickStatus] = useState(false);
   const [showServerNotes, setShowServerNotes] = useState(false);
   const [showJumpToDate, setShowJumpToDate] = useState(false);
+  const [activeCall, setActiveCall] = useState(null);
+  const [incomingCall, setIncomingCall] = useState(null);
+  const [outgoingCall, setOutgoingCall] = useState(null);
 
   const { data: profile } = useMyProfile(currentUser.email);
   const { newBadges, dismissBadge } = useBadgeCheck(currentUser.id, profile?.id);
