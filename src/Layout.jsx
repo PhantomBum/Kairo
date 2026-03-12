@@ -35,21 +35,20 @@ export default function Layout({ children }) {
           color: var(--k-text-primary);
         }
 
-        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.06); border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.12); }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 6px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.14); }
         .scrollbar-none::-webkit-scrollbar { display: none; }
         .scrollbar-none { -ms-overflow-style: none; scrollbar-width: none; }
 
-        /* Focus visible for keyboard nav */
         :focus-visible {
           outline: 2px solid var(--k-accent);
           outline-offset: 2px;
         }
         :focus:not(:focus-visible) { outline: none; }
 
-        /* Kairo skeleton shimmer */
+        /* Shimmer loading */
         @keyframes k-shimmer {
           0% { background-position: -200% 0; }
           100% { background-position: 200% 0; }
@@ -60,135 +59,107 @@ export default function Layout({ children }) {
           animation: k-shimmer 1.5s ease-in-out infinite;
         }
 
-        /* KAIRO V2 — Purpose-driven animation system */
-        /* Enter: cubic-bezier(0,0,0.2,1) | Exit: cubic-bezier(0.4,0,1,1) | State: cubic-bezier(0.4,0,0.2,1) */
-
-        /* Messages */
-        @keyframes k-msg-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+        /* Animations */
+        @keyframes k-msg-in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes k-msg-delete { to { opacity: 0; max-height: 0; padding: 0; margin: 0; overflow: hidden; } }
-
-        /* Reactions */
-        @keyframes k-reaction-pop { 0% { transform: scale(0); opacity: 0; } 70% { transform: scale(1.1); } 100% { transform: scale(1); opacity: 1; } }
-        @keyframes k-count-tick { 0% { transform: translateY(0); opacity: 1; } 40% { transform: translateY(-4px); opacity: 0; } 60% { transform: translateY(4px); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
-
-        /* Typing */
-        @keyframes k-typing-dot { 0%, 60%, 100% { transform: translateY(0); opacity: 0.4; } 30% { transform: translateY(-4px); opacity: 1; } }
-
-        /* UI elements */
-        @keyframes k-fade-in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes k-scale-in { from { opacity: 0; transform: scale(0.93); } to { opacity: 1; transform: scale(1); } }
-        @keyframes k-slide-in-right { from { opacity: 0; transform: translateX(16px); } to { opacity: 1; transform: translateX(0); } }
-        @keyframes k-slide-out-right { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(16px); } }
-
-        /* Unread dot */
+        @keyframes k-reaction-pop { 0% { transform: scale(0); opacity: 0; } 70% { transform: scale(1.08); } 100% { transform: scale(1); opacity: 1; } }
+        @keyframes k-count-tick { 0% { transform: translateY(0); opacity: 1; } 40% { transform: translateY(-3px); opacity: 0; } 60% { transform: translateY(3px); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
+        @keyframes k-typing-dot { 0%, 60%, 100% { transform: translateY(0); opacity: 0.4; } 30% { transform: translateY(-3px); opacity: 1; } }
+        @keyframes k-fade-in { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes k-scale-in { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        @keyframes k-slide-in-right { from { opacity: 0; transform: translateX(12px); } to { opacity: 1; transform: translateX(0); } }
+        @keyframes k-slide-out-right { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(12px); } }
         @keyframes k-dot-in { from { transform: scale(0); } to { transform: scale(1); } }
         @keyframes k-dot-out { from { transform: scale(1); } to { transform: scale(0); } }
-
-        /* Voice */
-        @keyframes k-speaking-ring { 0%, 100% { box-shadow: 0 0 0 0 rgba(35,165,90,0.4); } 50% { box-shadow: 0 0 0 3px rgba(35,165,90,0.15); } }
-        @keyframes k-speak-in { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
-
-        /* Toast */
+        @keyframes k-speaking-ring { 0%, 100% { box-shadow: 0 0 0 0 rgba(59,165,93,0.35); } 50% { box-shadow: 0 0 0 3px rgba(59,165,93,0.12); } }
+        @keyframes k-speak-in { from { opacity: 0; transform: scale(0.92); } to { opacity: 1; transform: scale(1); } }
         @keyframes k-toast-in { from { opacity: 0; transform: translateX(100%); } to { opacity: 1; transform: translateX(0); } }
         @keyframes k-toast-out { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(100%); } }
+        @keyframes k-bounce-in { 0% { transform: scale(0); } 60% { transform: scale(1.1); } 80% { transform: scale(0.97); } 100% { transform: scale(1); } }
 
-        /* Celebrate */
-        @keyframes k-bounce-in { 0% { transform: scale(0); } 60% { transform: scale(1.15); } 80% { transform: scale(0.95); } 100% { transform: scale(1); } }
-
-        /* Utility classes */
-        .k-msg-in { animation: k-msg-in 150ms cubic-bezier(0,0,0.2,1) both; }
-        .k-msg-delete { animation: k-msg-delete 200ms cubic-bezier(0.4,0,0.2,1) forwards; }
-        .k-fade-in { animation: k-fade-in 150ms cubic-bezier(0,0,0.2,1); }
-        .k-scale-in { animation: k-scale-in 150ms cubic-bezier(0,0,0.2,1); }
-        .k-slide-in-right { animation: k-slide-in-right 300ms cubic-bezier(0,0,0.2,1); }
-        .k-slide-out-right { animation: k-slide-out-right 200ms cubic-bezier(0.4,0,1,1); }
-        .k-reaction-pop { animation: k-reaction-pop 200ms cubic-bezier(0,0,0.2,1); }
-        .k-count-tick { animation: k-count-tick 100ms cubic-bezier(0.4,0,0.2,1); }
-        .k-dot-in { animation: k-dot-in 200ms cubic-bezier(0,0,0.2,1); }
-        .k-dot-out { animation: k-dot-out 150ms cubic-bezier(0.4,0,1,1); }
+        .k-msg-in { animation: k-msg-in 120ms ease-out both; }
+        .k-msg-delete { animation: k-msg-delete 180ms ease forwards; }
+        .k-fade-in { animation: k-fade-in 120ms ease-out; }
+        .k-scale-in { animation: k-scale-in 120ms ease-out; }
+        .k-slide-in-right { animation: k-slide-in-right 250ms ease-out; }
+        .k-slide-out-right { animation: k-slide-out-right 180ms ease; }
+        .k-reaction-pop { animation: k-reaction-pop 180ms ease-out; }
+        .k-count-tick { animation: k-count-tick 80ms ease; }
+        .k-dot-in { animation: k-dot-in 180ms ease-out; }
+        .k-dot-out { animation: k-dot-out 120ms ease; }
         .k-speaking-ring { animation: k-speaking-ring 1.5s ease-in-out infinite; }
-        .k-speak-in { animation: k-speak-in 100ms cubic-bezier(0,0,0.2,1); }
-        .k-toast-in { animation: k-toast-in 300ms cubic-bezier(0,0,0.2,1); }
-        .k-toast-out { animation: k-toast-out 200ms cubic-bezier(0.4,0,1,1); }
-        .k-bounce-in { animation: k-bounce-in 500ms cubic-bezier(0,0,0.2,1); }
+        .k-speak-in { animation: k-speak-in 80ms ease-out; }
+        .k-toast-in { animation: k-toast-in 250ms ease-out; }
+        .k-toast-out { animation: k-toast-out 180ms ease; }
+        .k-bounce-in { animation: k-bounce-in 400ms ease-out; }
 
-        /* Word break for long URLs */
         .break-words { word-break: break-word; overflow-wrap: anywhere; }
 
-        /* Unified interactive element transitions — 100ms for hover states */
+        /* Interactive element transitions */
         button, a, [role="button"], [role="tab"], [role="menuitem"] {
-          transition: background 100ms cubic-bezier(0.4,0,0.2,1), color 100ms cubic-bezier(0.4,0,0.2,1), opacity 100ms cubic-bezier(0.4,0,0.2,1), transform 80ms ease-out, border-color 100ms cubic-bezier(0.4,0,0.2,1), box-shadow 100ms cubic-bezier(0.4,0,0.2,1);
+          transition: background 80ms ease, color 80ms ease, opacity 80ms ease, border-color 80ms ease, box-shadow 80ms ease;
         }
         button:active:not(:disabled), [role="button"]:active:not(:disabled), [role="tab"]:active {
           transform: scale(0.98);
         }
 
-        /* Sidebar panel slide — 200ms for panel transitions */
-        .k-panel-slide { transition: transform 200ms cubic-bezier(0,0,0.2,1), opacity 200ms cubic-bezier(0,0,0.2,1); }
+        .k-panel-slide { transition: transform 180ms ease-out, opacity 180ms ease-out; }
+        .k-channel-fade { animation: k-fade-in 120ms ease-out; }
 
-        /* Channel switch — fade out 100ms, fade in 150ms */
-        .k-channel-fade { animation: k-fade-in 150ms cubic-bezier(0,0,0.2,1); }
+        /* Glass utilities */
+        .glass { background: var(--bg-glass); border: 1px solid var(--k-border); }
+        .glass-strong { background: var(--bg-glass-strong); border: 1px solid var(--k-border-light); }
+        .glass-hover:hover { background: var(--bg-glass-hover); }
+        .glass-active { background: var(--k-accent-subtle); border-color: rgba(108,122,219,0.25); }
 
-        /* Kairo glass utility classes */
-        .glass { background: rgba(255,255,255,0.03); backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur)); border: 1px solid rgba(255,255,255,0.06); }
-        .glass-strong { background: rgba(255,255,255,0.06); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border: 1px solid rgba(255,255,255,0.08); }
-        .glass-hover:hover { background: rgba(255,255,255,0.06); }
-        .glass-active { background: rgba(139,92,246,0.1); border-color: rgba(139,92,246,0.2); }
-        .glow-border { box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08), 0 0 24px rgba(139,92,246,0.08); }
-        .k-glass-card { background: rgba(255,255,255,0.035); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; }
-
-        /* Context menu styling — refined from Discord-like to Kairo glass style */
+        /* Context menus */
         [data-radix-popper-content-wrapper] [role="menu"],
         [data-radix-popper-content-wrapper] [data-radix-menu-content] {
-          background: rgba(18, 18, 26, 0.95) !important;
-          backdrop-filter: blur(20px) !important;
-          -webkit-backdrop-filter: blur(20px) !important;
-          border: 1px solid rgba(255,255,255,0.08) !important;
-          border-radius: 12px !important;
+          background: #2c2d33 !important;
+          border: 1px solid #3a3b42 !important;
+          border-radius: 14px !important;
           padding: 6px !important;
-          box-shadow: 0 8px 32px rgba(0,0,0,0.5), 0 0 1px rgba(0,0,0,0.2) !important;
+          box-shadow: 0 8px 24px rgba(0,0,0,0.35) !important;
         }
         [data-radix-popper-content-wrapper] [role="menuitem"] {
-          border-radius: 8px !important;
+          border-radius: 10px !important;
           padding: 8px 10px !important;
           font-size: 13px !important;
-          transition: background 80ms ease, transform 80ms ease !important;
         }
         [data-radix-popper-content-wrapper] [role="menuitem"]:hover,
         [data-radix-popper-content-wrapper] [role="menuitem"][data-highlighted] {
-          background: rgba(139, 92, 246, 0.12) !important;
-          color: #f8fafc !important;
+          background: rgba(108, 122, 219, 0.12) !important;
+          color: #f0f1f3 !important;
         }
         [data-radix-popper-content-wrapper] [role="menuitem"]:active {
           transform: scale(0.98) !important;
         }
         [data-radix-popper-content-wrapper] [role="separator"] {
-          background: rgba(255,255,255,0.06) !important;
+          background: #3a3b42 !important;
           margin: 4px 6px !important;
         }
 
-        /* Plus button rotate animation */
-        .k-rotate-hover { transition: transform 200ms cubic-bezier(0,0,0.2,1); }
+        .k-rotate-hover { transition: transform 180ms ease-out; }
         .k-rotate-hover:hover { transform: rotate(90deg); }
-        .k-rotate-hover:active { transform: rotate(90deg) scale(0.9); }
+        .k-rotate-hover:active { transform: rotate(90deg) scale(0.92); }
 
-        /* Better select dropdowns — remove native Discord-like look */
+        /* Select dropdowns */
         select {
           appearance: none;
           -webkit-appearance: none;
-          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b6d75' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
           background-repeat: no-repeat;
           background-position: right 10px center;
           padding-right: 30px !important;
           cursor: pointer;
         }
         select option {
-          background: #13131a;
-          color: #f8fafc;
+          background: #25262b;
+          color: #f0f1f3;
           padding: 8px 12px;
         }
 
-        /* Reduced motion — every animation snaps to end state instantly, no exceptions */
+        /* Reduced motion */
         @media (prefers-reduced-motion: reduce) {
           *, *::before, *::after {
             animation-duration: 0.01ms !important;
@@ -201,13 +172,9 @@ export default function Layout({ children }) {
             transform: none !important;
           }
           .k-shimmer { animation: none !important; background: var(--k-bg-elevated) !important; }
-          .k-msg-in, .k-fade-in, .k-scale-in, .k-slide-in-right,
-          .k-reaction-pop, .k-dot-in, .k-bounce-in, .k-toast-in,
-          .k-speak-in, .k-speaking-ring { animation: none !important; }
-          .k-msg-delete { animation: none !important; opacity: 0 !important; max-height: 0 !important; overflow: hidden !important; }
         }
 
-        /* Mobile safe area */
+        /* Mobile */
         @supports (padding-bottom: env(safe-area-inset-bottom)) {
           .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
         }
