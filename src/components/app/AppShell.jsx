@@ -567,6 +567,7 @@ export default function AppShell({ currentUser }) {
         fontScaling={profile?.settings?.font_scaling}
         saturation={profile?.settings?.saturation}
         accentColor={profile?.accent_color}
+        reducedMotion={profile?.settings?.reduced_motion}
       />
       <ConnectionBanner />
 
