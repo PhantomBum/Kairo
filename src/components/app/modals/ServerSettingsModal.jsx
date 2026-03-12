@@ -219,9 +219,7 @@ export default function ServerSettingsModal({ onClose, server, currentUserId }) 
       }
       default: return (
         <div className="text-center py-16">
-          <p className="text-[32px] mb-3">🚧</p>
-          <p className="text-[15px] font-semibold mb-1" style={{ color: colors.text.primary }}>Under Construction</p>
-          <p className="text-[13px]" style={{ color: colors.text.muted }}>This section is being built and will be available soon.</p>
+          <p className="text-[14px]" style={{ color: colors.text.muted }}>Select a section from the sidebar</p>
         </div>
       );
     }
