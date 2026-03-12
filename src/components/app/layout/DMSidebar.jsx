@@ -40,7 +40,7 @@ export default function DMSidebar({ conversations, activeId, onSelect, onFriends
   return (
     <div className="flex-1 flex flex-col min-h-0">
       {/* Search header */}
-      <div className="h-12 px-3 flex items-center flex-shrink-0" style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+      <div className="h-12 px-3 flex items-center flex-shrink-0" style={{ borderBottom: `1px solid ${colors.border.default}` }}>
         <div className="flex-1 flex items-center gap-2 px-2.5 py-1.5 rounded-xl" style={{ ...glass.card }}>
           <Search className="w-4 h-4 flex-shrink-0" style={{ color: colors.text.disabled }} />
           <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Find or start a conversation"
@@ -87,9 +87,9 @@ export default function DMSidebar({ conversations, activeId, onSelect, onFriends
                 <button onClick={() => onSelect(c)}
                   className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl transition-all group relative"
                   style={{
-                    background: active ? 'rgba(139,92,246,0.1)' : 'transparent',
-                    border: active ? '1px solid rgba(139,92,246,0.18)' : '1px solid transparent',
-                    boxShadow: active ? '0 0 10px rgba(139,92,246,0.06)' : 'none',
+                    background: active ? colors.accent.subtle : 'transparent',
+                    border: active ? `1px solid ${colors.accent.muted}` : '1px solid transparent',
+                    boxShadow: active ? shadows.glow : 'none',
                   }}>
                   <div className="relative flex-shrink-0">
                     <div className="w-8 h-8 rounded-full flex items-center justify-center text-[12px] font-semibold overflow-hidden"
@@ -111,7 +111,7 @@ export default function DMSidebar({ conversations, activeId, onSelect, onFriends
                   </div>
                 </button>
               </ContextMenuTrigger>
-              <ContextMenuContent className="w-52 p-1.5 rounded-xl" style={{ background: 'rgba(22,22,32,0.92)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.08)', boxShadow: shadows.strong }}>
+              <ContextMenuContent className="w-52 p-1.5 rounded-xl" style={{ background: colors.bg.modal, border: `1px solid ${colors.border.light}`, boxShadow: shadows.strong }}>
                 <ContextMenuItem onClick={() => onSelect(c)} className="text-[13px] gap-2.5 rounded-md px-2.5 py-2" style={{ color: colors.text.secondary }}>
                   <MessageSquare className="w-4 h-4 opacity-50" /> Open
                 </ContextMenuItem>
