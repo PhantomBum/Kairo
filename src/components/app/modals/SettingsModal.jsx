@@ -59,29 +59,26 @@ export default function SettingsModal({ onClose, profile, onUpdate, onLogout, cu
     <ModalWrapper title="Settings" onClose={onClose} width={680}>
       <div className="flex gap-5 min-h-[440px]">
         {/* Sidebar */}
-        <div className="w-[150px] flex-shrink-0 space-y-px overflow-y-auto max-h-[540px] scrollbar-none">
+        <div className="w-[150px] flex-shrink-0 space-y-0.5 overflow-y-auto max-h-[540px] scrollbar-none">
           {TABS.map(t => (
-            <button key={t.id} onClick={() => setTab(t.id)} className="w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px] font-medium transition-colors"
-              style={{ background: tab === t.id ? 'rgba(255,255,255,0.06)' : 'transparent', color: tab === t.id ? colors.text.primary : colors.text.muted }}>
-              <t.icon className="w-4 h-4" /> {t.label}
+            <button key={t.id} onClick={() => setTab(t.id)} className="w-full flex items-center gap-2.5 px-2.5 py-[7px] rounded-lg text-[13px] font-medium"
+              style={{ background: tab === t.id ? 'rgba(255,255,255,0.06)' : 'transparent', color: tab === t.id ? colors.text.primary : colors.text.disabled }}>
+              <t.icon className="w-3.5 h-3.5" /> {t.label}
             </button>
           ))}
-          <div className="my-3 h-px" style={{ background: colors.border.default }} />
-          <a href={createPageUrl('Elite')} className="w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px] font-medium transition-colors hover:bg-[rgba(255,255,255,0.04)]" style={{ color: colors.warning }}>
-            <Crown className="w-4 h-4" /> Kairo Elite
+          <div className="my-2.5 h-px" style={{ background: colors.border.default }} />
+          <a href={createPageUrl('Elite')} className="w-full flex items-center gap-2.5 px-2.5 py-[7px] rounded-lg text-[13px] font-medium hover:bg-[rgba(255,255,255,0.03)]" style={{ color: colors.warning }}>
+            <Crown className="w-3.5 h-3.5" /> Elite
           </a>
-          <a href={createPageUrl('FAQ')} className="w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px] font-medium transition-colors hover:bg-[rgba(255,255,255,0.04)]" style={{ color: colors.text.muted }}>
-            <HelpCircle className="w-4 h-4" /> FAQ
+          <a href={createPageUrl('FAQ')} className="w-full flex items-center gap-2.5 px-2.5 py-[7px] rounded-lg text-[13px] font-medium hover:bg-[rgba(255,255,255,0.03)]" style={{ color: colors.text.disabled }}>
+            <HelpCircle className="w-3.5 h-3.5" /> Help
           </a>
-          <a href={createPageUrl('Support')} className="w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px] font-medium transition-colors hover:bg-[rgba(255,255,255,0.04)]" style={{ color: colors.text.muted }}>
-            <ExternalLink className="w-4 h-4" /> Support
+          <a href={createPageUrl('Support')} className="w-full flex items-center gap-2.5 px-2.5 py-[7px] rounded-lg text-[13px] font-medium hover:bg-[rgba(255,255,255,0.03)]" style={{ color: colors.text.disabled }}>
+            <ExternalLink className="w-3.5 h-3.5" /> Support
           </a>
-          <button onClick={() => setTab('privacy')} className="w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px] font-medium transition-colors hover:bg-[rgba(255,255,255,0.04)]" style={{ color: colors.text.muted }}>
-            <Database className="w-4 h-4" /> Privacy Dashboard
-          </button>
-          <div className="my-3 h-px" style={{ background: colors.border.default }} />
-          <button onClick={onLogout} className="w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px] font-medium transition-colors hover:bg-[rgba(242,63,67,0.08)]" style={{ color: colors.danger }}>
-            <LogOut className="w-4 h-4" /> Log Out
+          <div className="my-2.5 h-px" style={{ background: colors.border.default }} />
+          <button onClick={onLogout} className="w-full flex items-center gap-2.5 px-2.5 py-[7px] rounded-lg text-[13px] font-medium hover:bg-[rgba(242,63,67,0.06)]" style={{ color: colors.danger }}>
+            <LogOut className="w-3.5 h-3.5" /> Log out
           </button>
         </div>
 
