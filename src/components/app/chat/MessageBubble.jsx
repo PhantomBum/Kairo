@@ -267,9 +267,9 @@ const MessageBubble = memo(function MessageBubble({ message, compact, isOwn, onR
           </div>
           <ContextMenuSeparator style={{ background: colors.border.default, margin: '4px 0' }} />
           <ContextMenuItem onClick={() => onReply(message)} className="text-[13px] gap-2 rounded px-2 py-1.5" style={{ color: colors.text.secondary }}><Reply className="w-4 h-4 opacity-50" /> Reply</ContextMenuItem>
-          <ContextMenuItem onClick={() => navigator.clipboard.writeText(message.content || '')} className="text-[13px] gap-2 rounded px-2 py-1.5" style={{ color: colors.text.secondary }}><Copy className="w-4 h-4 opacity-50" /> Copy Text</ContextMenuItem>
+          <CopyMenuItem text={message.content || ''} label="Copy Text" />
         </>}
-        <ContextMenuItem onClick={() => navigator.clipboard.writeText(message.id)} className="text-[13px] gap-2 rounded px-2 py-1.5" style={{ color: colors.text.secondary }}><Link className="w-4 h-4 opacity-50" /> Copy Message ID</ContextMenuItem>
+        <CopyMenuItem text={message.id} label="Copy Message ID" icon={Link} />
         {!isDeleted && onPin && <ContextMenuItem onClick={() => onPin(message)} className="text-[13px] gap-2 rounded px-2 py-1.5" style={{ color: colors.text.secondary }}><Pin className="w-4 h-4 opacity-50" /> {message.is_pinned ? 'Unpin' : 'Pin'}</ContextMenuItem>}
         {!isDeleted && <ContextMenuItem onClick={() => onHighlight?.(message)} className="text-[13px] gap-2 rounded px-2 py-1.5" style={{ color: colors.text.secondary }}><Bookmark className="w-4 h-4 opacity-50" /> Save as Highlight</ContextMenuItem>}
         {isOwn && !isDeleted && <>
