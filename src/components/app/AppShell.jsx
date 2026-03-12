@@ -709,10 +709,16 @@ export default function AppShell({ currentUser }) {
             </div>
           </>
         ) : view === 'server' && activeServer && !activeChannel ? (
-          <EmptyView emptyServer serverName={activeServer.name}
-            onCreateChannel={isOwner ? () => { setModalData(categories[0]?.id); setModal('create-channel'); } : undefined} />
+          <>
+            <GlobalTopBar onSearch={() => setModal('search')} />
+            <EmptyView emptyServer serverName={activeServer.name}
+              onCreateChannel={isOwner ? () => { setModalData(categories[0]?.id); setModal('create-channel'); } : undefined} />
+          </>
         ) : (
-          <EmptyView onCreateServer={() => setModal('create-server')} onJoinServer={() => setModal('discover')} />
+          <>
+            <GlobalTopBar onSearch={() => setModal('search')} />
+            <EmptyView onCreateServer={() => setModal('create-server')} onJoinServer={() => setModal('discover')} />
+          </>
         )}
       </div>
 
