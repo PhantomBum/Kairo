@@ -284,11 +284,15 @@ export default function VoiceChannelView({ channel, currentUser, isMuted, isDeaf
           <AnimatePresence>
             {voiceStates.map(s => (
               <VoiceMember key={s.id} state={s} profile={getProfile(s.user_id)} isCurrentUser={s.user_id === currentUser.id}
+                isSpeaking={speakingUserIds.includes(s.user_id)}
                 quality={s.user_id === currentUser.id ? 'excellent' : 'good'} />
             ))}
           </AnimatePresence>
-          {voiceStates.length === 0 && !agora.joined && (
-            <p className="text-[13px]" style={{ color: colors.text.disabled }}>No one is here yet. Be the first to join.</p>
+          {voiceStates.length === 0 && connecting && (
+            <p className="text-[13px]" style={{ color: colors.text.disabled }}>Connecting to voice...</p>
+          )}
+          {voiceStates.length === 0 && !connecting && agora.joined && (
+            <p className="text-[13px]" style={{ color: colors.text.disabled }}>You're the only one here.</p>
           )}
         </div>
 
@@ -339,11 +343,10 @@ export default function VoiceChannelView({ channel, currentUser, isMuted, isDeaf
             </div>
           </div>
         ) : (
-          <button onClick={handleConnect} disabled={connecting}
-            className="px-8 py-3 rounded-xl text-[14px] font-semibold flex items-center gap-2.5 mx-auto transition-all hover:brightness-110 disabled:opacity-50"
-            style={{ background: colors.text.primary, color: colors.bg.base }}>
-            <Mic className="w-4 h-4" /> {connecting ? 'Connecting...' : 'Join Voice'}
-          </button>
+          <div className="flex items-center justify-center gap-2">
+            <div className="w-5 h-5 border-2 rounded-full animate-spin" style={{ borderColor: 'rgba(255,255,255,0.1)', borderTopColor: colors.accent.primary }} />
+            <span className="text-[13px]" style={{ color: colors.text.muted }}>Connecting...</span>
+          </div>
         )}
       </div>
     </div>
