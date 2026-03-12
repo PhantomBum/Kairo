@@ -114,7 +114,10 @@ export default function ServerRailWithContext({ servers, activeServerId, onServe
         <ContextMenu key={s.id}>
           <ContextMenuTrigger>
             <div><ServerRailIcon server={s} active={activeServerId === s.id} onClick={() => onServerSelect(s)}>
-              {s.icon_url ? <img src={s.icon_url} className="w-full h-full object-cover absolute inset-0" alt={s.name} />
+              {s.icon_url ? <>
+                <img src={s.icon_url} className="w-full h-full object-cover absolute inset-0" alt={s.name} />
+                <div className="absolute inset-0 rounded-[inherit]" style={{ boxShadow: 'inset 0 0 0 1px rgba(0,0,0,0.15)' }} />
+              </>
                 : <span className="text-[15px] font-semibold select-none" style={{ color: activeServerId === s.id ? colors.bg.base : colors.text.secondary }}>{s.name?.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()}</span>}
             </ServerRailIcon></div>
           </ContextMenuTrigger>
@@ -146,7 +149,7 @@ export default function ServerRailWithContext({ servers, activeServerId, onServe
         </RailIcon>
       )}
       <RailIcon onClick={onElite} tooltip="Kairo Elite">
-        <Crown className="w-5 h-5" style={{ color: '#f0b232' }} />
+        <Crown className="w-5 h-5 k-crown-shimmer" style={{ color: '#f0b232' }} />
       </RailIcon>
 
       <AnimatePresence>{showCreateFolder && <FolderCreateModal onClose={() => setShowCreateFolder(false)} onCreate={createFolder} />}</AnimatePresence>
