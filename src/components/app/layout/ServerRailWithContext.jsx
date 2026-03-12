@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Compass, Crown, LogOut, Copy, Settings, FolderPlus, ShieldCheck } from 'lucide-react';
+import { Plus, Compass, Crown, LogOut, Copy, Settings, FolderPlus, ShieldCheck, StickyNote } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuSeparator, ContextMenuTrigger } from '@/components/ui/context-menu';
 import { base44 } from '@/api/base44Client';
@@ -59,7 +59,7 @@ function RailDivider() {
   return <div className="w-8 h-[2px] rounded-full mx-auto my-0.5" style={{ background: 'rgba(255,255,255,0.06)' }} />;
 }
 
-export default function ServerRailWithContext({ servers, activeServerId, onServerSelect, onHomeClick, onCreateServer, onDiscover, onElite, onLeaveServer, isHome, badge, currentUserId, isAppOwner, onAdminPanel }) {
+export default function ServerRailWithContext({ servers, activeServerId, onServerSelect, onHomeClick, onCreateServer, onDiscover, onElite, onLeaveServer, isHome, badge, currentUserId, isAppOwner, onAdminPanel, onServerNotes }) {
   const [folders, setFolders] = useState([]);
   const [showCreateFolder, setShowCreateFolder] = useState(false);
 
@@ -124,6 +124,7 @@ export default function ServerRailWithContext({ servers, activeServerId, onServe
           <ContextMenuContent className="w-52 p-1.5 rounded-lg" style={{ background: colors.bg.float, border: `1px solid ${colors.border.strong}`, boxShadow: '0 8px 32px rgba(0,0,0,0.6)' }}>
             <ContextMenuItem onClick={() => onServerSelect(s)} className="text-sm gap-2.5 rounded-md px-2 py-1.5" style={{ color: colors.text.secondary }}><Settings className="w-4 h-4 opacity-60" /> Server Settings</ContextMenuItem>
             <ContextMenuItem onClick={() => navigator.clipboard.writeText(s.invite_code || '')} className="text-sm gap-2.5 rounded-md px-2 py-1.5" style={{ color: colors.text.secondary }}><Copy className="w-4 h-4 opacity-60" /> Copy Invite Code</ContextMenuItem>
+            <ContextMenuItem onClick={() => onServerNotes?.(s.id)} className="text-sm gap-2.5 rounded-md px-2 py-1.5" style={{ color: colors.text.secondary }}><StickyNote className="w-4 h-4 opacity-60" /> Server Notes</ContextMenuItem>
             <ContextMenuSeparator style={{ background: 'rgba(255,255,255,0.06)', margin: '4px 0' }} />
             <ContextMenuItem onClick={() => onLeaveServer?.(s)} className="text-sm gap-2.5 rounded-md px-2 py-1.5" style={{ color: colors.danger }}><LogOut className="w-4 h-4 opacity-60" /> Leave Server</ContextMenuItem>
           </ContextMenuContent>
