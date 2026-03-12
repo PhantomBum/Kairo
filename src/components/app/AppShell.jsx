@@ -450,7 +450,7 @@ export default function AppShell({ currentUser }) {
               await base44.entities.Friendship.update(r.id, { status: 'accepted' });
               const sp = getProfile(r.user_id);
               await base44.entities.Friendship.create({ user_id: r.friend_id || currentUser.id, friend_id: r.user_id, friend_email: r.created_by, friend_name: sp?.display_name || 'User', friend_avatar: sp?.avatar_url, status: 'accepted', initiated_by: r.initiated_by });
-              qc.invalidateQueries({ queryKey: ['friends'] }); qc.invalidateQueries({ queryKey: ['incomingRequests'] });
+              qc.invalidateQueries({ queryKey: ['friends'] }); qc.invalidateQueries({ queryKey: ['incomingRequests'] }); qc.invalidateQueries({ queryKey: ['outgoingRequests'] });
             }}
             onDecline={async (r) => { await base44.entities.Friendship.delete(r.id); qc.invalidateQueries({ queryKey: ['incomingRequests'] }); }}
             onRemove={async (f) => { if (!confirm(`Remove ${f.friend_name}?`)) return; await base44.entities.Friendship.delete(f.id); qc.invalidateQueries({ queryKey: ['friends'] }); }} />
