@@ -23,7 +23,7 @@ function RailTooltip({ text, visible }) {
   );
 }
 
-function RailIcon({ active, unread, onClick, tooltip, badge, size = 40, children }) {
+function RailIcon({ active, unread, onClick, tooltip, badge, size = 44, children }) {
   const [hovered, setHovered] = useState(false);
   return (
     <div className="relative flex items-center justify-center" onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
@@ -83,7 +83,7 @@ export default function ServerRailWithContext({ servers, activeServerId, onServe
   };
 
   return (
-    <div className={`${compact ? 'w-[48px] gap-0.5' : 'w-[60px] gap-1'} flex-shrink-0 flex flex-col items-center py-3 overflow-y-auto scrollbar-none`}
+    <div className={`${compact ? 'w-[52px] gap-0.5' : 'w-[68px] gap-1'} flex-shrink-0 flex flex-col items-center py-3 overflow-y-auto scrollbar-none`}
       style={{ background: colors.bg.base }} role="navigation" aria-label="Server list">
       {/* Home / DMs button */}
       <ContextMenu>
