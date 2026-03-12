@@ -4,6 +4,20 @@ import { useCallback, useEffect, useRef } from 'react';
 
 // ── Server data ──
 export function useServers(userId, userEmail) {
+  const qc = useQueryClient();
+
+  // Real-time server list updates (joins, leaves, new servers)
+  useEffect(() => {
+    if (!userId) return;
+    const unsub1 = base44.entities.Server.subscribe(() => {
+      qc.invalidateQueries({ queryKey: ['servers', userId] });
+    });
+    const unsub2 = base44.entities.ServerMember.subscribe(() => {
+      qc.invalidateQueries({ queryKey: ['servers', userId] });
+    });
+    return () => { unsub1(); unsub2(); };
+  }, [userId, qc]);
+
   return useQuery({
     queryKey: ['servers', userId],
     queryFn: async () => {
@@ -19,7 +33,8 @@ export function useServers(userId, userEmail) {
       return servers.filter(s => myIds.has(s.id) || s.owner_id === userId || s.created_by === userEmail);
     },
     enabled: !!userId,
-    staleTime: 30000,
+    staleTime: 60000,
+    refetchOnWindowFocus: true,
   });
 }
 
@@ -28,25 +43,47 @@ export function useCategories(serverId) {
     queryKey: ['categories', serverId],
     queryFn: () => base44.entities.Category.filter({ server_id: serverId }),
     enabled: !!serverId,
-    staleTime: 60000,
+    staleTime: 120000,
   });
 }
 
 export function useChannels(serverId) {
+  const qc = useQueryClient();
+  useEffect(() => {
+    if (!serverId) return;
+    const unsub = base44.entities.Channel.subscribe((event) => {
+      if (event.data?.server_id === serverId || !event.data?.server_id) {
+        qc.invalidateQueries({ queryKey: ['channels', serverId] });
+      }
+    });
+    return unsub;
+  }, [serverId, qc]);
+
   return useQuery({
     queryKey: ['channels', serverId],
     queryFn: () => base44.entities.Channel.filter({ server_id: serverId }),
     enabled: !!serverId,
-    staleTime: 30000,
+    staleTime: 60000,
   });
 }
 
 export function useMembers(serverId) {
+  const qc = useQueryClient();
+  useEffect(() => {
+    if (!serverId) return;
+    const unsub = base44.entities.ServerMember.subscribe((event) => {
+      if (event.data?.server_id === serverId || !event.data?.server_id) {
+        qc.invalidateQueries({ queryKey: ['members', serverId] });
+      }
+    });
+    return unsub;
+  }, [serverId, qc]);
+
   return useQuery({
     queryKey: ['members', serverId],
     queryFn: () => base44.entities.ServerMember.filter({ server_id: serverId }),
     enabled: !!serverId,
-    staleTime: 30000,
+    staleTime: 60000,
   });
 }
 
@@ -55,7 +92,7 @@ export function useRoles(serverId) {
     queryKey: ['roles', serverId],
     queryFn: () => base44.entities.Role.filter({ server_id: serverId }),
     enabled: !!serverId,
-    staleTime: 60000,
+    staleTime: 120000,
   });
 }
 
@@ -265,6 +302,17 @@ export function useBlocked(userId) {
 
 // ── Profile ──
 export function useMyProfile(email) {
+  const qc = useQueryClient();
+  useEffect(() => {
+    if (!email) return;
+    const unsub = base44.entities.UserProfile.subscribe((event) => {
+      if (event.data?.user_email === email) {
+        qc.invalidateQueries({ queryKey: ['myProfile', email] });
+      }
+    });
+    return unsub;
+  }, [email, qc]);
+
   return useQuery({
     queryKey: ['myProfile', email],
     queryFn: async () => {
@@ -272,6 +320,6 @@ export function useMyProfile(email) {
       return p[0] || null;
     },
     enabled: !!email,
-    staleTime: 30000,
+    staleTime: 60000,
   });
 }
