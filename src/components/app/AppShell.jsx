@@ -25,32 +25,38 @@ import VoiceChannelView from '@/components/app/views/VoiceChannelView';
 import DMMediaGallery from '@/components/app/views/DMMediaGallery';
 import NSFWGate from '@/components/app/shared/NSFWGate';
 
-import CreateServerModal from '@/components/app/modals/CreateServerModal';
-import JoinServerModal from '@/components/app/modals/JoinServerModal';
-import CreateChannelModal from '@/components/app/modals/CreateChannelModal';
-import AddFriendModal from '@/components/app/modals/AddFriendModal';
-import SettingsModal from '@/components/app/modals/SettingsModal';
-import InviteModal from '@/components/app/modals/InviteModal';
-import ServerSettingsModal from '@/components/app/modals/ServerSettingsModal';
-import UserProfileModal from '@/components/app/modals/UserProfileModal';
-import CreateGroupDMModal from '@/components/app/modals/CreateGroupDMModal';
-import PinnedMessagesModal from '@/components/app/modals/PinnedMessagesModal';
-import StatusPickerModal from '@/components/app/modals/StatusPickerModal';
-import KairoEliteModal from '@/components/app/modals/KairoEliteModal';
-import ModPanelModal from '@/components/app/modals/ModPanelModal';
-import AnalyticsDashboardModal from '@/components/app/modals/AnalyticsDashboardModal';
-import ChannelSettingsModal from '@/components/app/modals/ChannelSettingsModal';
-import ServerBackupsModal from '@/components/app/modals/ServerBackupsModal';
-import InvitePreviewModal from '@/components/app/modals/InvitePreviewModal';
-import CreateCategoryModal from '@/components/app/modals/CreateCategoryModal';
-import DiscoverModal from '@/components/app/modals/DiscoverModal';
-import AdminPanelModal from '@/components/app/modals/AdminPanelModal';
-import AdvancedSearch from '@/components/app/features/AdvancedSearch';
-import MediaGallery from '@/components/app/features/MediaGallery';
-import PrivacyDashboard from '@/components/app/features/PrivacyDashboard';
-import ActivityStatus from '@/components/app/features/ActivityStatus';
+// Lazy-loaded modals — only downloaded when opened
+const CreateServerModal = lazy(() => import('@/components/app/modals/CreateServerModal'));
+const JoinServerModal = lazy(() => import('@/components/app/modals/JoinServerModal'));
+const CreateChannelModal = lazy(() => import('@/components/app/modals/CreateChannelModal'));
+const AddFriendModal = lazy(() => import('@/components/app/modals/AddFriendModal'));
+const SettingsModal = lazy(() => import('@/components/app/modals/SettingsModal'));
+const InviteModal = lazy(() => import('@/components/app/modals/InviteModal'));
+const ServerSettingsModal = lazy(() => import('@/components/app/modals/ServerSettingsModal'));
+const UserProfileModal = lazy(() => import('@/components/app/modals/UserProfileModal'));
+const CreateGroupDMModal = lazy(() => import('@/components/app/modals/CreateGroupDMModal'));
+const PinnedMessagesModal = lazy(() => import('@/components/app/modals/PinnedMessagesModal'));
+const StatusPickerModal = lazy(() => import('@/components/app/modals/StatusPickerModal'));
+const KairoEliteModal = lazy(() => import('@/components/app/modals/KairoEliteModal'));
+const ModPanelModal = lazy(() => import('@/components/app/modals/ModPanelModal'));
+const AnalyticsDashboardModal = lazy(() => import('@/components/app/modals/AnalyticsDashboardModal'));
+const ChannelSettingsModal = lazy(() => import('@/components/app/modals/ChannelSettingsModal'));
+const ServerBackupsModal = lazy(() => import('@/components/app/modals/ServerBackupsModal'));
+const InvitePreviewModal = lazy(() => import('@/components/app/modals/InvitePreviewModal'));
+const CreateCategoryModal = lazy(() => import('@/components/app/modals/CreateCategoryModal'));
+const DiscoverModal = lazy(() => import('@/components/app/modals/DiscoverModal'));
+const AdminPanelModal = lazy(() => import('@/components/app/modals/AdminPanelModal'));
+const AdvancedSearch = lazy(() => import('@/components/app/features/AdvancedSearch'));
+const MediaGallery = lazy(() => import('@/components/app/features/MediaGallery'));
+const PrivacyDashboard = lazy(() => import('@/components/app/features/PrivacyDashboard'));
+const ActivityStatus = lazy(() => import('@/components/app/features/ActivityStatus'));
+
 import SpacesView from '@/components/app/features/KairoSpaces';
 import KairoBoards from '@/components/app/features/KairoBoards';
+
+function ModalSuspense({ children }) {
+  return <Suspense fallback={<div className="fixed inset-0 z-50 flex items-center justify-center" style={{ background: 'rgba(0,0,0,0.5)' }}><div className="w-6 h-6 border-2 rounded-full animate-spin" style={{ borderColor: 'rgba(255,255,255,0.1)', borderTopColor: '#5865F2' }} /></div>}>{children}</Suspense>;
+}
 
 export default function AppShell({ currentUser }) {
   const qc = useQueryClient();
@@ -94,17 +100,7 @@ export default function AppShell({ currentUser }) {
   // Persist mute/deafen state for session
   useEffect(() => { try { sessionStorage.setItem('kairo-muted', isMuted); } catch {} }, [isMuted]);
   useEffect(() => { try { sessionStorage.setItem('kairo-deafened', isDeafened); } catch {} }, [isDeafened]);
-  // Real-time message subscription for faster edit propagation
-  useEffect(() => {
-    if (!activeChannel?.id && !activeConv?.id) return;
-    const entity = activeConv?.id ? base44.entities.DirectMessage : base44.entities.Message;
-    const unsub = entity.subscribe((event) => {
-      if (event.type === 'update' || event.type === 'create') {
-        qc.invalidateQueries({ queryKey: activeConv?.id ? ['dmMessages', activeConv.id] : ['messages', activeChannel?.id] });
-      }
-    });
-    return unsub;
-  }, [activeChannel?.id, activeConv?.id]);
+  // Real-time subscriptions are handled in useData hooks — no duplicate needed here
   useEffect(() => { setReplyTo(null); setEditingMsg(null); setShowMediaGallery(false); }, [activeChannel?.id, activeConv?.id]);
   // Track channel for cache and prefetch nearby
   useEffect(() => { trackChannel(activeChannel?.id); prefetchNearby(channels, activeChannel?.id); }, [activeChannel?.id, channels]);
@@ -508,6 +504,7 @@ export default function AppShell({ currentUser }) {
         )}
       </div>
 
+      <ModalSuspense>
       <AnimatePresence>
         {modal === 'create-server' && <CreateServerModal onClose={() => setModal(null)} onCreate={(d) => createServer.mutate(d)} isCreating={createServer.isPending} />}
         {modal === 'join-server' && <JoinServerModal onClose={() => setModal(null)} onJoin={(c) => joinServer.mutate(c)} isJoining={joinServer.isPending} />}
@@ -551,6 +548,7 @@ export default function AppShell({ currentUser }) {
         {modal === 'privacy-dashboard' && <PrivacyDashboard onClose={() => setModal(null)} profile={profile} currentUser={currentUser} onUpdate={(d) => updateProfile.mutate(d)} />}
         {modal === 'activity' && <ActivityStatus onClose={() => setModal(null)} profile={profile} onUpdate={(d) => updateProfile.mutate(d)} />}
       </AnimatePresence>
+      </ModalSuspense>
 
       {/* Mobile bottom nav */}
       <MobileNav active={mobileTab} badge={incomingReqs.length}
