@@ -28,7 +28,7 @@ export default function ChatHeader({ channel, conversation, currentUserId, showM
 
   return (
     <div className="h-12 px-4 flex items-center justify-between flex-shrink-0"
-      style={{ boxShadow: '0 1px 0 rgba(0,0,0,0.2), 0 1.5px 0 rgba(0,0,0,0.06)', background: colors.bg.elevated }}
+      style={{ boxShadow: '0 1px 0 rgba(0,0,0,0.4)', background: colors.bg.elevated }}
       role="banner">
       <div className="flex items-center gap-2 min-w-0">
         <Icon className="w-5 h-5 flex-shrink-0" style={{ color: colors.text.muted }} />

@@ -35,7 +35,7 @@ export default function ServerBannerHeader({ server, isOwner, onInvite, onSettin
       <button
         onClick={() => setOpen(!open)}
         className="w-full h-12 px-4 flex items-center justify-between transition-colors hover:bg-[rgba(255,255,255,0.04)]"
-        style={{ boxShadow: '0 1px 0 rgba(0,0,0,0.2), 0 1.5px 0 rgba(0,0,0,0.06)' }}>
+        style={{ boxShadow: '0 1px 0 rgba(0,0,0,0.4)' }}>
         <span className="text-[15px] font-semibold truncate" style={{ color: colors.text.primary }}>{server?.name}</span>
         {open ? <X className="w-[18px] h-[18px] flex-shrink-0" style={{ color: colors.text.muted }} />
           : <ChevronDown className="w-[18px] h-[18px] flex-shrink-0" style={{ color: colors.text.muted }} />}
