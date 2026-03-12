@@ -11,12 +11,14 @@ export default function useAgora() {
   const [localAudioMuted, setLocalAudioMuted] = useState(false);
   const [screenSharing, setScreenSharing] = useState(false);
   const [error, setError] = useState(null);
+  const [speakingUids, setSpeakingUids] = useState([]);
 
   const clientRef = useRef(null);
   const localAudioRef = useRef(null);
   const screenClientRef = useRef(null);
   const screenTrackRef = useRef(null);
   const channelRef = useRef(null);
+  const localUidRef = useRef(null);
 
   // Initialize client once
   useEffect(() => {
@@ -49,6 +51,13 @@ export default function useAgora() {
       setRemoteUsers(prev => prev.filter(u => u.uid !== user.uid));
     });
 
+    // Volume indicator for speaking detection
+    client.enableAudioVolumeIndicator();
+    client.on('volume-indicator', (volumes) => {
+      const speaking = volumes.filter(v => v.level > 5).map(v => v.uid);
+      setSpeakingUids(speaking);
+    });
+
     return () => {
       client.removeAllListeners();
     };
@@ -63,6 +72,7 @@ export default function useAgora() {
     const { token, appId, uid } = res.data;
 
     await clientRef.current.join(appId, channelName, token, uid);
+    localUidRef.current = uid;
 
     // Create and publish local audio track
     const audioTrack = await AgoraRTC.createMicrophoneAudioTrack();
@@ -171,6 +181,8 @@ export default function useAgora() {
     localAudioMuted,
     screenSharing,
     error,
+    speakingUids,
+    localUid: localUidRef.current,
     join,
     leave,
     toggleMute,
