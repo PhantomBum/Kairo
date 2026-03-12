@@ -7,8 +7,7 @@ import GifPicker from '@/components/app/chat/GifPicker';
 import StickerPicker from '@/components/app/chat/StickerPicker';
 import SlashCommandPicker from '@/components/app/chat/SlashCommandPicker';
 import MentionPicker from '@/components/app/chat/MentionPicker';
-
-const EMOJIS = ['😀','😂','😍','🤔','👍','👎','❤️','🔥','🎉','😎','😢','😡','🙏','💯','✨','🚀','👀','🤝','💀','🎮','🎵','☕','⭐','💜'];
+import EmojiPicker from '@/components/app/chat/EmojiPicker';
 
 export default function ChatInput({ channelName, channelId, replyTo, onCancelReply, onSend, onTyping, onEditLast, serverId, members, getProfile }) {
   const storageKey = `kairo-draft-${channelId || channelName || 'default'}`;
@@ -205,9 +204,10 @@ export default function ChatInput({ channelName, channelId, replyTo, onCancelRep
 
       {/* Emoji picker */}
       {showEmoji && (
-        <div className="mb-1 p-2 rounded-xl grid grid-cols-8 gap-0.5" style={{ background: colors.bg.elevated, border: `1px solid ${colors.border.default}` }}>
-          {EMOJIS.map(e => <button key={e} onClick={() => { setContent(p => p + e); inputRef.current?.focus(); }} className="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-[rgba(255,255,255,0.06)] text-lg transition-colors">{e}</button>)}
-        </div>
+        <EmojiPicker
+          onSelect={(e) => { setContent(p => p + e); inputRef.current?.focus(); }}
+          onClose={() => setShowEmoji(false)}
+        />
       )}
 
       {/* Formatting toolbar */}
