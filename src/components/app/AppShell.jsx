@@ -69,8 +69,8 @@ export default function AppShell({ currentUser }) {
   const [editingMsg, setEditingMsg] = useState(null);
   const [modal, setModal] = useState(null);
   const [modalData, setModalData] = useState(null);
-  const [isMuted, setIsMuted] = useState(false);
-  const [isDeafened, setIsDeafened] = useState(false);
+  const [isMuted, setIsMuted] = useState(() => { try { return sessionStorage.getItem('kairo-muted') === 'true'; } catch { return false; } });
+  const [isDeafened, setIsDeafened] = useState(() => { try { return sessionStorage.getItem('kairo-deafened') === 'true'; } catch { return false; } });
   const [profileUserId, setProfileUserId] = useState(null);
   const [channelToEdit, setChannelToEdit] = useState(null);
   const [mobileTab, setMobileTab] = useState('servers');
@@ -91,6 +91,20 @@ export default function AppShell({ currentUser }) {
   const { incoming: incomingReqs, outgoing: outgoingReqs } = useFriendRequests(currentUser.id, currentUser.email);
 
   useEffect(() => { if (activeServer && channels.length > 0 && !activeChannel) { const first = channels.sort((a, b) => (a.position || 0) - (b.position || 0)).find(c => c.type === 'text'); if (first) setActiveChannel(first); } }, [activeServer, channels]);
+  // Persist mute/deafen state for session
+  useEffect(() => { try { sessionStorage.setItem('kairo-muted', isMuted); } catch {} }, [isMuted]);
+  useEffect(() => { try { sessionStorage.setItem('kairo-deafened', isDeafened); } catch {} }, [isDeafened]);
+  // Real-time message subscription for faster edit propagation
+  useEffect(() => {
+    if (!activeChannel?.id && !activeConv?.id) return;
+    const entity = activeConv?.id ? base44.entities.DirectMessage : base44.entities.Message;
+    const unsub = entity.subscribe((event) => {
+      if (event.type === 'update' || event.type === 'create') {
+        qc.invalidateQueries({ queryKey: activeConv?.id ? ['dmMessages', activeConv.id] : ['messages', activeChannel?.id] });
+      }
+    });
+    return unsub;
+  }, [activeChannel?.id, activeConv?.id]);
   useEffect(() => { setReplyTo(null); setEditingMsg(null); setShowMediaGallery(false); }, [activeChannel?.id, activeConv?.id]);
   // Track channel for cache and prefetch nearby
   useEffect(() => { trackChannel(activeChannel?.id); prefetchNearby(channels, activeChannel?.id); }, [activeChannel?.id, channels]);
