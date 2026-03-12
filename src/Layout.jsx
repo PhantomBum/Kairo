@@ -50,6 +50,8 @@ export default function Layout({ children }) {
         @keyframes k-scale-in { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
 
         .k-msg-in { animation: k-msg-in 100ms ease-out both; }
+        @keyframes k-speaking-pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(59,165,93,0.4); } 50% { box-shadow: 0 0 0 4px rgba(59,165,93,0); } }
+        .k-speaking-ring { animation: k-speaking-pulse 1.5s ease-in-out infinite; }
         .k-fade-in { animation: k-fade-in 100ms ease-out; }
         .k-scale-in { animation: k-scale-in 100ms ease-out; }
         .k-channel-fade { animation: k-fade-in 80ms ease-out; }
