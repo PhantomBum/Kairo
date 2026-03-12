@@ -1,5 +1,5 @@
 import React, { useState, memo } from 'react';
-import { Reply, Pencil, Trash2, Copy, Pin, PinOff, Link, ChevronDown, ChevronUp, Bookmark, ArrowRight, Zap, UserPlus, LogOut, Star } from 'lucide-react';
+import { Reply, Pencil, Trash2, Copy, Pin, PinOff, Link, ChevronDown, ChevronUp, Bookmark, ArrowRight, Zap, UserPlus, LogOut, Star, Forward } from 'lucide-react';
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuSeparator, ContextMenuTrigger } from '@/components/ui/context-menu';
 import ImageWithFallback from '@/components/app/shared/ImageWithFallback';
 import ReactionTooltip from '@/components/app/shared/ReactionTooltip';
@@ -112,7 +112,7 @@ const SystemMessage = memo(function SystemMessage({ message }) {
   );
 });
 
-const MessageBubble = memo(function MessageBubble({ message, compact, isOwn, onReply, onEdit, onDelete, onReact, onPin, onStar, currentUserId, onProfileClick, isEditing, onEditSave, onEditCancel, onImageClick, onLinkClick, onHighlight }) {
+const MessageBubble = memo(function MessageBubble({ message, compact, isOwn, onReply, onEdit, onDelete, onReact, onPin, onStar, onForward, currentUserId, onProfileClick, isEditing, onEditSave, onEditCancel, onImageClick, onLinkClick, onHighlight }) {
   if (message.type === 'system') return <SystemMessage message={message} />;
 
   const [hovered, setHovered] = useState(false);
@@ -290,6 +290,7 @@ const MessageBubble = memo(function MessageBubble({ message, compact, isOwn, onR
         <ContextMenuItem onClick={() => navigator.clipboard.writeText(message.id)} className="text-[13px] gap-2 rounded-md px-2 py-1.5" style={{ color: colors.text.secondary }}><Link className="w-4 h-4 opacity-50" /> Copy Message ID</ContextMenuItem>
         {!isDeleted && onPin && <ContextMenuItem onClick={() => onPin(message)} className="text-[13px] gap-2 rounded-md px-2 py-1.5" style={{ color: colors.text.secondary }}><Pin className="w-4 h-4 opacity-50" /> {message.is_pinned ? 'Unpin' : 'Pin'}</ContextMenuItem>}
         {!isDeleted && onStar && <ContextMenuItem onClick={() => onStar(message)} className="text-[13px] gap-2 rounded-md px-2 py-1.5" style={{ color: '#faa61a' }}><Star className="w-4 h-4 opacity-50" /> Star Message</ContextMenuItem>}
+        {!isDeleted && onForward && <ContextMenuItem onClick={() => onForward(message)} className="text-[13px] gap-2 rounded-md px-2 py-1.5" style={{ color: colors.text.secondary }}><Forward className="w-4 h-4 opacity-50" /> Forward</ContextMenuItem>}
         {!isDeleted && <ContextMenuItem onClick={() => onHighlight?.(message)} className="text-[13px] gap-2 rounded-md px-2 py-1.5" style={{ color: colors.text.secondary }}><Bookmark className="w-4 h-4 opacity-50" /> Save as Highlight</ContextMenuItem>}
         {isOwn && !isDeleted && <>
           <ContextMenuSeparator style={{ background: 'rgba(255,255,255,0.06)', margin: '4px 0' }} />
