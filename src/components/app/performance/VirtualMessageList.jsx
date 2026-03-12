@@ -1,5 +1,6 @@
 import React, { useRef, useEffect, useState, useCallback, useMemo } from 'react';
 import { ArrowDown, Hash, MessageSquare } from 'lucide-react';
+import { base44 } from '@/api/base44Client';
 import MessageBubble from '@/components/app/chat/MessageBubble';
 import ImageLightbox from '@/components/app/chat/ImageLightbox';
 import ExternalLinkWarning from '@/components/app/shared/ExternalLinkWarning';
@@ -27,10 +28,35 @@ export default function VirtualMessageList({
   const [lightbox, setLightbox] = useState(null);
   const [linkWarning, setLinkWarning] = useState(null);
   const skipLinkWarning = useRef(false);
+  const [readReceipt, setReadReceipt] = useState(null);
 
   useEffect(() => {
     try { skipLinkWarning.current = localStorage.getItem('kairo-skip-link-warn') === 'true'; } catch {}
   }, []);
+
+  // DM Read receipts — show avatar of the other person under the last message they've read
+  useEffect(() => {
+    if (!isDM || !messages.length) { setReadReceipt(null); return; }
+    const otherMsgs = messages.filter(m => m.author_id !== currentUserId);
+    const myMsgs = messages.filter(m => m.author_id === currentUserId);
+    if (!myMsgs.length || !otherMsgs.length) { setReadReceipt(null); return; }
+    // The other person has "read" up to the last message before their latest message
+    const lastOtherMsg = otherMsgs[otherMsgs.length - 1];
+    const lastOtherTime = new Date(lastOtherMsg.created_date).getTime();
+    const readUpTo = myMsgs.filter(m => new Date(m.created_date).getTime() < lastOtherTime);
+    if (readUpTo.length > 0) {
+      const lastRead = readUpTo[readUpTo.length - 1];
+      setReadReceipt({ msgId: lastRead.id, avatar: lastOtherMsg.author_avatar, name: lastOtherMsg.author_name });
+    } else {
+      // If the other person's last message is after all my messages, they've read everything
+      const lastMyMsg = myMsgs[myMsgs.length - 1];
+      if (lastOtherTime > new Date(lastMyMsg.created_date).getTime()) {
+        setReadReceipt({ msgId: lastMyMsg.id, avatar: lastOtherMsg.author_avatar, name: lastOtherMsg.author_name });
+      } else {
+        setReadReceipt(null);
+      }
+    }
+  }, [messages, currentUserId, isDM]);
 
   const handleLinkClick = useCallback((url) => {
     if (skipLinkWarning.current) { window.open(url, '_blank', 'noopener,noreferrer'); return; }
@@ -123,6 +149,13 @@ export default function VirtualMessageList({
                 <div className="flex items-center gap-1.5 ml-[72px] -mt-0.5 mb-1">
                   <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: colors.text.disabled }} />
                   <span className="text-[11px]" style={{ color: colors.text.disabled }}>Sending...</span>
+                </div>
+              )}
+              {readReceipt && readReceipt.msgId === msg.id && (
+                <div className="flex justify-end pr-4 -mt-0.5 mb-1" title={`Read by ${readReceipt.name}`}>
+                  <div className="w-4 h-4 rounded-full overflow-hidden flex items-center justify-center" style={{ background: colors.bg.overlay }}>
+                    {readReceipt.avatar ? <img src={readReceipt.avatar} className="w-full h-full object-cover" alt="" /> : <span className="text-[8px]" style={{ color: colors.text.muted }}>{(readReceipt.name || 'U').charAt(0)}</span>}
+                  </div>
                 </div>
               )}
             </div>
