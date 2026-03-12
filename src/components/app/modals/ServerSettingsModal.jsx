@@ -135,7 +135,8 @@ export default function ServerSettingsModal({ onClose, server, currentUserId }) 
     if (!confirm(`Kick ${m.user_email}?`)) return;
     await base44.entities.ServerMember.delete(m.id);
     setMembers(ms => ms.filter(x => x.id !== m.id));
-    await base44.entities.Server.update(server.id, { member_count: Math.max(1, (server.member_count || 1) - 1) });
+    const remaining = await base44.entities.ServerMember.filter({ server_id: server.id });
+    await base44.entities.Server.update(server.id, { member_count: remaining.filter(x => !x.is_banned).length });
     qc.invalidateQueries({ queryKey: ['members'] });
   };
 
