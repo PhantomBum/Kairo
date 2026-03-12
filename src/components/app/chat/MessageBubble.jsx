@@ -61,6 +61,14 @@ function renderText(text, onLinkClick) {
 
 const MAX_LINES = 20;
 
+// Jumbo emoji: messages with 1-3 emoji only render at 3x size
+const EMOJI_ONLY_REGEX = /^(\p{Emoji_Presentation}|\p{Extended_Pictographic}[\uFE0F\u200D]*){1,3}$/u;
+function isEmojiOnly(text) {
+  if (!text) return false;
+  const stripped = text.trim();
+  return stripped.length <= 12 && EMOJI_ONLY_REGEX.test(stripped);
+}
+
 function RoleBadge({ badges }) {
   if (!badges?.length) return null;
   const BADGE_CONFIG = [
@@ -174,7 +182,7 @@ const MessageBubble = memo(function MessageBubble({ message, compact, isOwn, onR
               </div>
             ) : (
               <div className="relative">
-                <div className="text-[15px] leading-[1.375] whitespace-pre-wrap break-words" style={{ color: colors.text.secondary, maxHeight: isLong && !expanded ? '300px' : 'none' }}>
+                <div className={`whitespace-pre-wrap break-words ${isEmojiOnly(message.content) ? 'text-[42px] leading-[1.2]' : 'text-[15px] leading-[1.375]'}`} style={{ color: colors.text.secondary, maxHeight: isLong && !expanded ? '300px' : 'none' }}>
                   {renderText(message.content, onLinkClick)}
                 </div>
                 {isLong && !expanded && (
