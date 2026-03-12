@@ -22,6 +22,7 @@ function HeaderBtn({ icon: Icon, onClick, href, active, badge, title }) {
 }
 
 export default function ChatHeader({ channel, conversation, currentUserId, showMembers, onToggleMembers, isDM, onPinned, pinnedCount, onMediaGallery, onVoiceCall, onVideoCall, serverName, onSearch, onStarred }) {
+  const [showSupport, setShowSupport] = useState(false);
   const label = isDM
     ? (conversation?.name || conversation?.participants?.find(p => p.user_id !== currentUserId)?.user_name || 'DM')
     : (channel?.name || '');
