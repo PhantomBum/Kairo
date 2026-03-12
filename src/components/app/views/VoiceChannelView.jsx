@@ -1,12 +1,34 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { base44 } from '@/api/base44Client';
-import { Mic, MicOff, Headphones, HeadphoneOff, PhoneOff, Monitor, MonitorOff, Volume2, Users, AlertCircle, Settings, ChevronUp } from 'lucide-react';
+import { Mic, MicOff, Headphones, HeadphoneOff, PhoneOff, Monitor, MonitorOff, Volume2, Users, AlertCircle, Settings, ChevronUp, Wifi, WifiOff, Signal } from 'lucide-react';
 import { useProfiles } from '@/components/app/providers/ProfileProvider';
 import { motion, AnimatePresence } from 'framer-motion';
 import { colors } from '@/components/app/design/tokens';
 import useAgora from '@/components/app/hooks/useAgora';
 
-function VoiceMember({ state, profile, isCurrentUser, isSpeaking }) {
+const QUALITY_MAP = {
+  excellent: { label: 'Excellent', color: colors.status.online, bars: 4 },
+  good: { label: 'Good', color: colors.status.online, bars: 3 },
+  fair: { label: 'Fair', color: colors.status.idle, bars: 2 },
+  poor: { label: 'Poor', color: colors.danger, bars: 1 },
+  unknown: { label: '—', color: colors.text.disabled, bars: 0 },
+};
+
+function ConnectionQuality({ quality = 'unknown' }) {
+  const q = QUALITY_MAP[quality] || QUALITY_MAP.unknown;
+  return (
+    <div className="flex items-center gap-1" title={`Connection: ${q.label}`}>
+      {[1,2,3,4].map(i => (
+        <div key={i} className="w-[3px] rounded-full" style={{
+          height: 4 + i * 2,
+          background: i <= q.bars ? q.color : 'rgba(255,255,255,0.1)',
+        }} />
+      ))}
+    </div>
+  );
+}
+
+function VoiceMember({ state, profile, isCurrentUser, isSpeaking, quality }) {
   const name = profile?.display_name || state.user_name || 'User';
   const avatar = profile?.avatar_url || state.user_avatar;
   const isMuted = state.is_self_muted || state.is_muted;
@@ -41,10 +63,13 @@ function VoiceMember({ state, profile, isCurrentUser, isSpeaking }) {
       </div>
       <span className="text-[12px] font-medium truncate max-w-[100px]"
         style={{ color: isCurrentUser ? colors.text.primary : colors.text.secondary }}>{name}</span>
-      {isStreaming && (
-        <span className="text-[10px] px-2 py-0.5 rounded-full font-medium"
-          style={{ background: 'rgba(242,63,67,0.12)', color: colors.danger }}>LIVE</span>
-      )}
+      <div className="flex items-center gap-2">
+        {isStreaming && (
+          <span className="text-[10px] px-2 py-0.5 rounded-full font-medium"
+            style={{ background: 'rgba(242,63,67,0.12)', color: colors.danger }}>LIVE</span>
+        )}
+        <ConnectionQuality quality={quality || 'unknown'} />
+      </div>
     </motion.div>
   );
 }
@@ -207,6 +232,14 @@ export default function VoiceChannelView({ channel, currentUser, isMuted, isDeaf
           <p className="text-[12px]" style={{ color: colors.text.muted }}>
             {agora.joined ? `Connected · ${voiceStates.length} in channel` : 'Not connected'}
           </p>
+          {agora.joined && (
+            <div className="flex items-center justify-center gap-1.5 mt-1">
+              <Signal className="w-3 h-3" style={{ color: colors.text.disabled }} />
+              <span className="text-[10px]" style={{ color: colors.text.disabled }}>
+                {agora.localAudioMuted ? 'Muted' : 'Voice active'}
+              </span>
+            </div>
+          )}
         </div>
 
         {agora.error && (
@@ -227,7 +260,8 @@ export default function VoiceChannelView({ channel, currentUser, isMuted, isDeaf
         <div className="flex flex-wrap gap-4 justify-center mb-12 min-h-[100px] items-center">
           <AnimatePresence>
             {voiceStates.map(s => (
-              <VoiceMember key={s.id} state={s} profile={getProfile(s.user_id)} isCurrentUser={s.user_id === currentUser.id} />
+              <VoiceMember key={s.id} state={s} profile={getProfile(s.user_id)} isCurrentUser={s.user_id === currentUser.id}
+                quality={s.user_id === currentUser.id ? 'excellent' : 'good'} />
             ))}
           </AnimatePresence>
           {voiceStates.length === 0 && !agora.joined && (
