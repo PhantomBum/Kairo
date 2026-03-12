@@ -593,6 +593,31 @@ export default function AppShell({ currentUser }) {
       </AnimatePresence>
       </ModalSuspense>
 
+      {/* Starred Messages */}
+      {showStarred && (
+        <StarredMessagesPanel onClose={() => setShowStarred(false)} currentUserId={currentUser.id}
+          onJumpToMessage={(msg) => {
+            setShowStarred(false);
+            if (msg.server_id) { const s = servers.find(sv => sv.id === msg.server_id); if (s && s.id !== activeServer?.id) selectServer(s); }
+            setTimeout(() => { const el = document.querySelector(`[data-msg-id="${msg.id}"]`); if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); el.style.background = 'rgba(240,178,50,0.12)'; el.style.transition = 'background 0.3s'; setTimeout(() => { el.style.background = ''; }, 3000); } }, 200);
+          }} />
+      )}
+
+      {/* Server Notes */}
+      {showServerNotes && <ServerNotes serverId={showServerNotes} onClose={() => setShowServerNotes(false)} />}
+
+      {/* Jump to Date */}
+      {showJumpToDate && (
+        <JumpToDate onClose={() => setShowJumpToDate(false)} onJump={(date) => {
+          const target = date.getTime();
+          const sorted = [...currentMsgs].sort((a, b) => Math.abs(new Date(a.created_date).getTime() - target) - Math.abs(new Date(b.created_date).getTime() - target));
+          const nearest = sorted[0];
+          if (nearest) {
+            setTimeout(() => { const el = document.querySelector(`[data-msg-id="${nearest.id}"]`); if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); el.style.background = 'rgba(88,101,242,0.15)'; el.style.transition = 'background 0.3s'; setTimeout(() => { el.style.background = ''; }, 3000); } }, 100);
+          }
+        }} />
+      )}
+
       {/* Mobile bottom nav */}
       <MobileNav active={mobileTab} badge={incomingReqs.length}
         onChange={(tab) => {
