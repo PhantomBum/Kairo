@@ -41,7 +41,7 @@ function RailIcon({ active, unread, onClick, tooltip, badge, children }) {
         style={{
           width: 48, height: 48,
           borderRadius: active || hovered ? 16 : 24,
-          background: active ? colors.accent.primary : hovered ? colors.accent.primary : colors.bg.surface,
+          background: active ? colors.accent.primary : hovered ? colors.accent.primary : colors.bg.overlay,
           transition: 'border-radius 150ms ease, background 150ms ease',
         }}>
         {children}
@@ -131,10 +131,10 @@ export default function ServerRailWithContext({ servers, activeServerId, onServe
 
       {/* Add / Discover */}
       <RailIcon onClick={onCreateServer} tooltip="Add a Server">
-        <Plus className="w-5 h-5" style={{ color: colors.accent.primary }} />
+        <Plus className="w-5 h-5" style={{ color: colors.success }} />
       </RailIcon>
       <RailIcon onClick={onDiscover} tooltip="Explore Servers">
-        <Compass className="w-5 h-5" style={{ color: colors.accent.primary }} />
+        <Compass className="w-5 h-5" style={{ color: colors.success }} />
       </RailIcon>
 
       <div className="flex-1" />

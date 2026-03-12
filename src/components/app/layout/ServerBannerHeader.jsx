@@ -5,7 +5,7 @@ import { colors } from '@/components/app/design/tokens';
 function DropdownItem({ icon: Icon, label, color, onClick }) {
   return (
     <button onClick={onClick}
-      className="w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-[13px] transition-colors hover:bg-[rgba(212,201,168,0.08)]"
+      className="w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-[13px] transition-colors hover:bg-[rgba(88,101,242,0.15)]"
       style={{ color: color || colors.text.secondary }}>
       <Icon className="w-4 h-4 opacity-60" /> {label}
     </button>
