@@ -39,7 +39,7 @@ export default function ServerRailIcon({ server, active, unread, onClick, childr
           opacity: active || hovered || unread ? 1 : 0,
         }}
         transition={{ duration: 0.15, ease: 'easeOut' }}
-        style={{ background: '#fff', left: -12, top: '50%', transform: 'translateY(-50%)' }}
+        style={{ background: colors.text.primary, left: -12, top: '50%', transform: 'translateY(-50%)' }}
       />
 
       <motion.button
@@ -49,7 +49,7 @@ export default function ServerRailIcon({ server, active, unread, onClick, childr
         style={{
           width: 48, height: 48,
           borderRadius: active || hovered ? 16 : 24,
-          background: active ? (server?.banner_color || colors.accent.primary) : hovered ? (server?.banner_color || colors.accent.primary) : colors.bg.elevated,
+          background: active ? (server?.banner_color || colors.accent.primary) : hovered ? (server?.banner_color || colors.accent.primary) : colors.bg.surface,
           transition: 'border-radius 150ms ease, background 150ms ease',
         }}
       >

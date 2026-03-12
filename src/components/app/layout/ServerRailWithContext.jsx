@@ -14,9 +14,9 @@ function RailTooltip({ text, visible }) {
         <motion.div initial={{ opacity: 0, x: -6, scale: 0.95 }} animate={{ opacity: 1, x: 0, scale: 1 }} exit={{ opacity: 0, x: -6, scale: 0.95 }}
           transition={{ duration: 0.1 }}
           className="absolute left-[68px] z-50 px-3 py-1.5 rounded text-sm font-semibold whitespace-nowrap pointer-events-none"
-          style={{ background: colors.bg.float, color: '#fff', boxShadow: '0 8px 16px rgba(0,0,0,0.24)' }}>
+          style={{ background: colors.bg.float, color: colors.text.primary, border: `1px solid ${colors.border.strong}`, boxShadow: '0 8px 32px rgba(0,0,0,0.6)' }}>
           {text}
-          <div className="absolute left-[-4px] top-1/2 -translate-y-1/2 w-2 h-2 rotate-45" style={{ background: colors.bg.float }} />
+          <div className="absolute left-[-4px] top-1/2 -translate-y-1/2 w-2 h-2 rotate-45" style={{ background: colors.bg.float, borderLeft: `1px solid ${colors.border.strong}`, borderBottom: `1px solid ${colors.border.strong}` }} />
         </motion.div>
       )}
     </AnimatePresence>
@@ -34,7 +34,7 @@ function RailIcon({ active, unread, onClick, tooltip, badge, children }) {
           opacity: active || hovered || unread ? 1 : 0,
         }}
         transition={{ duration: 0.15, ease: 'easeOut' }}
-        style={{ background: '#fff', position: 'absolute', left: 0, top: '50%', transform: 'translateY(-50%)', borderRadius: '0 4px 4px 0' }} />
+        style={{ background: colors.text.primary, position: 'absolute', left: 0, top: '50%', transform: 'translateY(-50%)', borderRadius: '0 4px 4px 0' }} />
       <motion.button onClick={onClick}
         className="relative overflow-hidden flex items-center justify-center"
         whileTap={{ scale: 0.92 }}
@@ -93,10 +93,10 @@ export default function ServerRailWithContext({ servers, activeServerId, onServe
             </svg>
           </RailIcon></div>
         </ContextMenuTrigger>
-        <ContextMenuContent className="w-52 p-1.5 rounded" style={{ background: colors.bg.float, border: 'none', boxShadow: '0 8px 16px rgba(0,0,0,0.24)' }}>
-          <ContextMenuItem onClick={onCreateServer} className="text-sm gap-2.5 rounded-sm px-2 py-1.5" style={{ color: colors.text.secondary }}><Plus className="w-4 h-4 opacity-60" /> Create Server</ContextMenuItem>
-          <ContextMenuItem onClick={onDiscover} className="text-sm gap-2.5 rounded-sm px-2 py-1.5" style={{ color: colors.text.secondary }}><Compass className="w-4 h-4 opacity-60" /> Discover Servers</ContextMenuItem>
-          <ContextMenuItem onClick={() => setShowCreateFolder(true)} className="text-sm gap-2.5 rounded-sm px-2 py-1.5" style={{ color: colors.text.secondary }}><FolderPlus className="w-4 h-4 opacity-60" /> Create Folder</ContextMenuItem>
+        <ContextMenuContent className="w-52 p-1.5 rounded-lg" style={{ background: colors.bg.float, border: `1px solid ${colors.border.strong}`, boxShadow: '0 8px 32px rgba(0,0,0,0.6)' }}>
+          <ContextMenuItem onClick={onCreateServer} className="text-sm gap-2.5 rounded-md px-2 py-1.5" style={{ color: colors.text.secondary }}><Plus className="w-4 h-4 opacity-60" /> Create Server</ContextMenuItem>
+          <ContextMenuItem onClick={onDiscover} className="text-sm gap-2.5 rounded-md px-2 py-1.5" style={{ color: colors.text.secondary }}><Compass className="w-4 h-4 opacity-60" /> Discover Servers</ContextMenuItem>
+          <ContextMenuItem onClick={() => setShowCreateFolder(true)} className="text-sm gap-2.5 rounded-md px-2 py-1.5" style={{ color: colors.text.secondary }}><FolderPlus className="w-4 h-4 opacity-60" /> Create Folder</ContextMenuItem>
         </ContextMenuContent>
       </ContextMenu>
 
@@ -117,14 +117,14 @@ export default function ServerRailWithContext({ servers, activeServerId, onServe
           <ContextMenuTrigger>
             <div><ServerRailIcon server={s} active={activeServerId === s.id} onClick={() => onServerSelect(s)}>
               {s.icon_url ? <img src={s.icon_url} className="w-full h-full object-cover absolute inset-0" alt={s.name} />
-                : <span className="text-[15px] font-semibold select-none" style={{ color: activeServerId === s.id ? '#fff' : colors.text.secondary }}>{s.name?.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()}</span>}
+                : <span className="text-[15px] font-semibold select-none" style={{ color: activeServerId === s.id ? colors.bg.base : colors.text.secondary }}>{s.name?.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()}</span>}
             </ServerRailIcon></div>
           </ContextMenuTrigger>
-          <ContextMenuContent className="w-52 p-1.5 rounded" style={{ background: colors.bg.float, border: 'none', boxShadow: '0 8px 16px rgba(0,0,0,0.24)' }}>
-            <ContextMenuItem onClick={() => onServerSelect(s)} className="text-sm gap-2.5 rounded-sm px-2 py-1.5" style={{ color: colors.text.secondary }}><Settings className="w-4 h-4 opacity-60" /> Server Settings</ContextMenuItem>
-            <ContextMenuItem onClick={() => navigator.clipboard.writeText(s.invite_code || '')} className="text-sm gap-2.5 rounded-sm px-2 py-1.5" style={{ color: colors.text.secondary }}><Copy className="w-4 h-4 opacity-60" /> Copy Invite Code</ContextMenuItem>
+          <ContextMenuContent className="w-52 p-1.5 rounded-lg" style={{ background: colors.bg.float, border: `1px solid ${colors.border.strong}`, boxShadow: '0 8px 32px rgba(0,0,0,0.6)' }}>
+            <ContextMenuItem onClick={() => onServerSelect(s)} className="text-sm gap-2.5 rounded-md px-2 py-1.5" style={{ color: colors.text.secondary }}><Settings className="w-4 h-4 opacity-60" /> Server Settings</ContextMenuItem>
+            <ContextMenuItem onClick={() => navigator.clipboard.writeText(s.invite_code || '')} className="text-sm gap-2.5 rounded-md px-2 py-1.5" style={{ color: colors.text.secondary }}><Copy className="w-4 h-4 opacity-60" /> Copy Invite Code</ContextMenuItem>
             <ContextMenuSeparator style={{ background: 'rgba(255,255,255,0.06)', margin: '4px 0' }} />
-            <ContextMenuItem onClick={() => onLeaveServer?.(s)} className="text-sm gap-2.5 rounded-sm px-2 py-1.5" style={{ color: colors.danger }}><LogOut className="w-4 h-4 opacity-60" /> Leave Server</ContextMenuItem>
+            <ContextMenuItem onClick={() => onLeaveServer?.(s)} className="text-sm gap-2.5 rounded-md px-2 py-1.5" style={{ color: colors.danger }}><LogOut className="w-4 h-4 opacity-60" /> Leave Server</ContextMenuItem>
           </ContextMenuContent>
         </ContextMenu>
       ))}
