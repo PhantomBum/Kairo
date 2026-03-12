@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useRef } from 'react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { Hash, Volume2, Megaphone, Radio, MessageSquare, Lock, ChevronDown, Plus, Settings, GripVertical, LayoutGrid, ShieldAlert, CalendarDays } from 'lucide-react';
-import VoiceChannelUsers from './VoiceChannelUsers';
+import VoiceChannelUsers from '@/components/app/layout/VoiceChannelUsers';
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuSeparator, ContextMenuTrigger } from '@/components/ui/context-menu';
 import { base44 } from '@/api/base44Client';
 import { colors } from '@/components/app/design/tokens';
