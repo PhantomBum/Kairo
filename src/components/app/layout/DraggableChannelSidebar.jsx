@@ -94,7 +94,7 @@ function CategoryGroup({ category, channels, activeId, onSelect, onAdd, onSettin
   );
 }
 
-export default function DraggableChannelSidebar({ server, categories, channels, activeId, onSelect, onAdd, onSettings, onInvite, onModPanel, onAnalytics, onBackups, onChannelSettings, isOwner }) {
+export default function DraggableChannelSidebar({ server, categories, channels, activeId, onSelect, onAdd, onAddCategory, onSettings, onInvite, onModPanel, onAnalytics, onBackups, onChannelSettings, isOwner }) {
   const sorted = [...(categories || [])].sort((a, b) => (a.position || 0) - (b.position || 0));
   const catIds = new Set(sorted.map(c => c.id));
   const uncategorized = (channels || []).filter(ch => !ch.category_id || !catIds.has(ch.category_id));
@@ -202,6 +202,13 @@ export default function DraggableChannelSidebar({ server, categories, channels, 
                   channels={(channels || []).filter(ch => ch.category_id === cat.id)}
                   activeId={activeId} onSelect={onSelect} onAdd={onAdd} onSettings={onChannelSettings} isOwner={isOwner} />
               ))}
+              {isOwner && (
+                <button onClick={onAddCategory}
+                  className="w-full flex items-center gap-2 px-3 py-2 mt-2 rounded-xl text-[12px] font-medium transition-colors hover:bg-[rgba(255,255,255,0.04)]"
+                  style={{ color: colors.text.disabled }}>
+                  <Plus className="w-3.5 h-3.5" /> Create Category
+                </button>
+              )}
               {provided.placeholder}
             </div>
           )}
