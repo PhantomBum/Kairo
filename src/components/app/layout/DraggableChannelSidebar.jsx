@@ -17,16 +17,15 @@ function ChannelItem({ channel, active, onClick, onSettings, isOwner, index }) {
           <ContextMenu>
             <ContextMenuTrigger>
               <button onClick={() => onClick(channel)}
-                className="w-full flex items-center gap-2.5 px-2.5 py-[8px] rounded-lg text-[13px] group"
+                className="w-full flex items-center gap-2 px-2 py-[6px] rounded text-[14px] group"
                 style={{
-                  background: snapshot.isDragging ? colors.bg.hover : active ? colors.accent.subtle : 'transparent',
-                  border: active ? `1px solid ${colors.accent.muted}` : '1px solid transparent',
-                  color: active ? colors.text.primary : colors.text.muted,
-                  fontWeight: active ? 600 : 400,
-                  transition: 'all 120ms ease',
+                  background: snapshot.isDragging ? 'rgba(255,255,255,0.06)' : active ? 'rgba(255,255,255,0.08)' : 'transparent',
+                  color: active ? '#fff' : colors.text.muted,
+                  fontWeight: active ? 500 : 400,
+                  transition: 'background 80ms ease, color 80ms ease',
                 }}>
                 {isOwner && <GripVertical className="w-3 h-3 opacity-0 group-hover:opacity-30 flex-shrink-0" />}
-                <Icon className="w-[16px] h-[16px] flex-shrink-0" style={{ color: active ? colors.accent.primary : colors.text.disabled, transition: 'color 120ms ease' }} />
+                <Icon className="w-[18px] h-[18px] flex-shrink-0" style={{ color: active ? '#fff' : colors.text.disabled, transition: 'color 80ms ease' }} />
                 <span className="truncate flex-1 text-left">{channel.name}</span>
                 {channel.is_nsfw && <ShieldAlert className="w-3 h-3 flex-shrink-0" style={{ color: '#f23f43', opacity: 0.6 }} />}
                 {channel.is_private && <Lock className="w-3 h-3 opacity-30" />}
@@ -63,10 +62,10 @@ function CategoryGroup({ category, channels, activeId, onSelect, onAdd, onSettin
       {(provided) => (
         <div ref={provided.innerRef} {...provided.draggableProps} className="mb-1">
           <div {...provided.dragHandleProps}>
-            <button onClick={() => setOpen(!open)} className="w-full flex items-center gap-1.5 px-1 pt-5 pb-2 group">
-              <ChevronDown className="w-3 h-3" style={{ color: colors.text.disabled, transform: open ? 'rotate(0deg)' : 'rotate(-90deg)', transition: 'transform 200ms cubic-bezier(0,0,0.2,1)' }} />
-              <span className="text-[10px] font-bold uppercase tracking-[0.06em] flex-1 text-left truncate" style={{ color: colors.text.disabled }}>{category.name}</span>
-              {isOwner && <Plus onClick={e => { e.stopPropagation(); onAdd(category.id); }} className="w-[14px] h-[14px] opacity-0 group-hover:opacity-50 hover:opacity-100 cursor-pointer k-rotate-hover" style={{ color: colors.accent.hover }} />}
+            <button onClick={() => setOpen(!open)} className="w-full flex items-center gap-1 px-0.5 pt-4 pb-1 group">
+              <ChevronDown className="w-3 h-3" style={{ color: colors.text.muted, transform: open ? 'rotate(0deg)' : 'rotate(-90deg)', transition: 'transform 200ms ease' }} />
+              <span className="text-[11px] font-bold uppercase tracking-[0.05em] flex-1 text-left truncate" style={{ color: colors.text.muted }}>{category.name}</span>
+              {isOwner && <Plus onClick={e => { e.stopPropagation(); onAdd(category.id); }} className="w-[14px] h-[14px] opacity-0 group-hover:opacity-50 hover:opacity-100 cursor-pointer" style={{ color: colors.text.muted }} />}
             </button>
           </div>
           <div style={{
