@@ -20,9 +20,10 @@ export default function IntegrationsTab({ serverId }) {
 
   const create = async () => {
     if (!newName.trim()) return;
+    const webhookUrl = `https://kairo.app/webhooks/${Math.random().toString(36).slice(2, 10)}`;
     const wh = await base44.entities.ServerWebhook.create({
       server_id: serverId, name: newName.trim(), channel_id: newChannel || channels[0]?.id,
-      url: `webhook_${Math.random().toString(36).slice(2, 10)}`, token: Math.random().toString(36).slice(2, 18),
+      webhook_url: webhookUrl, is_active: true,
     });
     setWebhooks(p => [...p, wh]);
     setNewName('');
@@ -85,8 +86,8 @@ export default function IntegrationsTab({ serverId }) {
               </button>
             </div>
             <div className="flex items-center gap-2">
-              <span className="flex-1 text-[11px] font-mono truncate px-2 py-1.5 rounded-lg" style={{ background: colors.bg.base, color: colors.text.muted }}>{wh.url}</span>
-              <button onClick={() => handleCopy(wh.url, wh.id)}
+              <span className="flex-1 text-[11px] font-mono truncate px-2 py-1.5 rounded-lg" style={{ background: colors.bg.base, color: colors.text.muted }}>{wh.webhook_url}</span>
+              <button onClick={() => handleCopy(wh.webhook_url, wh.id)}
                 className="px-2.5 py-1.5 rounded-lg text-[11px] flex items-center gap-1 transition-all active:scale-95"
                 style={{ background: copied === wh.id ? colors.success : colors.bg.overlay, color: copied === wh.id ? '#fff' : colors.text.secondary }}>
                 {copied === wh.id ? <><Check className="w-3 h-3" /> Copied</> : <><Copy className="w-3 h-3" /> Copy</>}
