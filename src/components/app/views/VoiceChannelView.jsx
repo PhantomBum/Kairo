@@ -253,11 +253,11 @@ export default function VoiceChannelView({ channel, currentUser, isMuted, isDeaf
         <div className="flex items-center justify-center gap-2 mb-6">
           <Users className="w-3.5 h-3.5" style={{ color: colors.text.disabled }} />
           <p className="text-[12px]" style={{ color: colors.text.muted }}>
-            {agora.joined ? `Connected · ${voiceStates.length} in channel` : 'Not connected'}
+            {connecting ? 'Connecting...' : agora.joined ? `Connected · ${voiceStates.length} in channel` : 'Disconnected'}
           </p>
           {agora.joined && (
-            <div className="flex items-center justify-center gap-1.5 mt-1">
-              <Signal className="w-3 h-3" style={{ color: colors.text.disabled }} />
+            <div className="flex items-center gap-1.5">
+              <Signal className="w-3 h-3" style={{ color: colors.status.online }} />
               <span className="text-[10px]" style={{ color: colors.text.disabled }}>
                 {agora.localAudioMuted ? 'Muted' : 'Voice active'}
               </span>
