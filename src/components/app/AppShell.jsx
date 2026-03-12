@@ -500,12 +500,13 @@ export default function AppShell({ currentUser }) {
               isDM={isDM} onPinned={() => setModal('pinned')} pinnedCount={pinnedCount}
               onMediaGallery={isDM ? () => setShowMediaGallery(!showMediaGallery) : () => setModal('media-gallery')}
               onSearch={() => setModal('search')}
+              onStarred={() => setShowStarred(true)}
               serverName={activeServer?.name} />
             <div className="flex-1 flex min-h-0">
               <div className="flex-1 flex flex-col min-w-0">
                 <VirtualMessageList messages={currentMsgs} currentUserId={currentUser.id} channelName={channelLabel}
                   isLoading={currentLoading} isDM={isDM} onReply={setReplyTo} onEdit={setEditingMsg}
-                  onDelete={deleteMsg} onReact={reactMsg} onPin={pinMsg}
+                  onDelete={deleteMsg} onReact={reactMsg} onPin={pinMsg} onStar={starMsg}
                   onProfileClick={(id) => { setProfileUserId(id); setModal('profile'); }}
                   editingMessage={editingMsg} onEditSave={editMsg} onEditCancel={() => setEditingMsg(null)}
                   optimisticIds={optimisticIds} />
