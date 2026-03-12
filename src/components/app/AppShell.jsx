@@ -669,6 +669,7 @@ export default function AppShell({ currentUser }) {
                 <VirtualMessageList messages={currentMsgs} currentUserId={currentUser.id} channelName={channelLabel}
                   isLoading={currentLoading} isDM={isDM} onReply={setReplyTo} onEdit={setEditingMsg}
                   onDelete={deleteMsg} onReact={reactMsg} onPin={pinMsg} onStar={starMsg}
+                  onForward={(msg) => { setForwardMsg(msg); setModal('forward'); }}
                   onProfileClick={(id) => { setProfileUserId(id); setModal('profile'); }}
                   editingMessage={editingMsg} onEditSave={editMsg} onEditCancel={() => setEditingMsg(null)}
                   optimisticIds={optimisticIds} />
