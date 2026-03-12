@@ -556,12 +556,13 @@ export default function AppShell({ currentUser }) {
     await base44.entities.Highlight.create({
       user_id: currentUser.id,
       message_id: msg.id,
-      content: msg.content,
-      author_name: msg.author_name,
+      message_content: msg.content,
+      message_author: msg.author_name,
       channel_name: channelLabel,
       server_id: activeServer?.id,
+      server_name: activeServer?.name,
     });
-  }, [currentUser.id, channelLabel, activeServer?.id]);
+  }, [currentUser.id, channelLabel, activeServer?.id, activeServer?.name]);
 
   const pinnedCount = isDM ? dmMessages.filter(m => m.is_pinned).length : messages.filter(m => m.is_pinned).length;
   const isOwner = activeServer?.owner_id === currentUser.id || activeServer?.created_by === currentUser.email;
