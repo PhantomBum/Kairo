@@ -47,6 +47,7 @@ const CreateCategoryModal = lazy(() => import('@/components/app/modals/CreateCat
 const DiscoverModal = lazy(() => import('@/components/app/modals/DiscoverModal'));
 const AdminPanelModal = lazy(() => import('@/components/app/modals/AdminPanelModal'));
 const AdvancedSearch = lazy(() => import('@/components/app/features/AdvancedSearch'));
+const ForwardMessageModal = lazy(() => import('@/components/app/modals/ForwardMessageModal'));
 const MediaGallery = lazy(() => import('@/components/app/features/MediaGallery'));
 const PrivacyDashboard = lazy(() => import('@/components/app/features/PrivacyDashboard'));
 const ActivityStatus = lazy(() => import('@/components/app/features/ActivityStatus'));
@@ -95,6 +96,7 @@ export default function AppShell({ currentUser }) {
   const [showQuickStatus, setShowQuickStatus] = useState(false);
   const [showServerNotes, setShowServerNotes] = useState(false);
   const [showJumpToDate, setShowJumpToDate] = useState(false);
+  const [forwardMsg, setForwardMsg] = useState(null);
   const [activeCall, setActiveCall] = useState(null);
   const [incomingCall, setIncomingCall] = useState(null);
   const [outgoingCall, setOutgoingCall] = useState(null);
@@ -669,6 +671,7 @@ export default function AppShell({ currentUser }) {
                 <VirtualMessageList messages={currentMsgs} currentUserId={currentUser.id} channelName={channelLabel}
                   isLoading={currentLoading} isDM={isDM} onReply={setReplyTo} onEdit={setEditingMsg}
                   onDelete={deleteMsg} onReact={reactMsg} onPin={pinMsg} onStar={starMsg}
+                  onForward={(msg) => { setForwardMsg(msg); setModal('forward'); }}
                   onProfileClick={(id) => { setProfileUserId(id); setModal('profile'); }}
                   editingMessage={editingMsg} onEditSave={editMsg} onEditCancel={() => setEditingMsg(null)}
                   optimisticIds={optimisticIds} />
@@ -746,6 +749,7 @@ export default function AppShell({ currentUser }) {
         {modal === 'media-gallery' && <MediaGallery onClose={() => setModal(null)} messages={currentMsgs} channelName={channelLabel} />}
         {modal === 'privacy-dashboard' && <PrivacyDashboard onClose={() => setModal(null)} profile={profile} currentUser={currentUser} onUpdate={(d) => updateProfile.mutate(d)} />}
         {modal === 'activity' && <ActivityStatus onClose={() => setModal(null)} profile={profile} onUpdate={(d) => updateProfile.mutate(d)} />}
+        {modal === 'forward' && forwardMsg && <ForwardMessageModal onClose={() => { setModal(null); setForwardMsg(null); }} message={forwardMsg} channels={channels} conversations={conversations} currentUser={currentUser} profile={profile} />}
       </AnimatePresence>
       </ModalSuspense>
 
