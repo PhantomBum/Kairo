@@ -1,4 +1,4 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.6';
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.20';
 import Stripe from 'npm:stripe@14.0.0';
 
 const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY'));
@@ -25,7 +25,7 @@ Deno.serve(async (req) => {
     
     switch (event.type) {
       case 'checkout.session.completed': {
-        if (product_type === 'nitro') {
+        if (product_type === 'nitro' || product_type === 'elite_subscription') {
           // Grant premium status
           const profiles = await base44.asServiceRole.entities.UserProfile.filter({ user_id });
           if (profiles.length > 0) {
@@ -76,7 +76,7 @@ Deno.serve(async (req) => {
       
       case 'customer.subscription.deleted': {
         // Handle subscription cancellation
-        if (product_type === 'nitro') {
+        if (product_type === 'nitro' || product_type === 'elite_subscription') {
           const profiles = await base44.asServiceRole.entities.UserProfile.filter({ user_id });
           if (profiles.length > 0) {
             const badges = (profiles[0].badges || []).filter(b => b !== 'premium');
