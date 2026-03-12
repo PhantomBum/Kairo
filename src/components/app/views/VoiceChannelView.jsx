@@ -92,8 +92,9 @@ function ControlButton({ active, danger, onClick, icon: Icon, label, disabled })
 export default function VoiceChannelView({ channel, currentUser, isMuted, isDeafened, onToggleMute, onToggleDeafen, onDisconnect }) {
   const { getProfile } = useProfiles();
   const [voiceStates, setVoiceStates] = useState([]);
-  const [connecting, setConnecting] = useState(false);
+  const [connecting, setConnecting] = useState(true); // Start true — we auto-join
   const screenVideoRef = useRef(null);
+  const joinedOnceRef = useRef(false);
 
   const agora = useAgora();
 
@@ -120,7 +121,6 @@ export default function VoiceChannelView({ channel, currentUser, isMuted, isDeaf
     if (!channel?.id) return;
     const fetchAndDedup = async () => {
       const states = await base44.entities.VoiceState.filter({ channel_id: channel.id });
-      // Deduplicate: keep only the latest state per user_id
       const seen = new Map();
       const toDelete = [];
       for (const s of states) {
@@ -130,7 +130,6 @@ export default function VoiceChannelView({ channel, currentUser, isMuted, isDeaf
           seen.set(s.user_id, s);
         }
       }
-      // Clean up duplicates in background
       if (toDelete.length > 0) {
         toDelete.forEach(id => base44.entities.VoiceState.delete(id));
       }
@@ -148,21 +147,27 @@ export default function VoiceChannelView({ channel, currentUser, isMuted, isDeaf
     }
   }, [isMuted, agora.joined]);
 
-  // Connect: clean up any stale states first, then join
-  const handleConnect = async () => {
-    setConnecting(true);
-    // Remove any stale voice states for this user in this channel
-    const stale = await base44.entities.VoiceState.filter({ channel_id: channel.id, user_id: currentUser.id });
-    for (const s of stale) await base44.entities.VoiceState.delete(s.id);
-    const channelName = `server_${channel.server_id}_channel_${channel.id}`;
-    await agora.join(channelName);
-    await base44.entities.VoiceState.create({
-      user_id: currentUser.id, user_email: currentUser.email,
-      user_name: currentUser.full_name, channel_id: channel.id,
-      server_id: channel.server_id, is_self_muted: isMuted, is_self_deafened: isDeafened,
-    });
-    setConnecting(false);
-  };
+  // AUTO-JOIN on mount — the main reliability fix
+  useEffect(() => {
+    if (!channel?.id || !currentUser?.id || joinedOnceRef.current) return;
+    joinedOnceRef.current = true;
+    const autoJoin = async () => {
+      setConnecting(true);
+      // Clean stale states for this user across ALL channels in this server
+      const allStale = await base44.entities.VoiceState.filter({ user_id: currentUser.id, server_id: channel.server_id });
+      await Promise.all(allStale.map(s => base44.entities.VoiceState.delete(s.id)));
+      
+      const channelName = `server_${channel.server_id}_channel_${channel.id}`;
+      await agora.join(channelName);
+      await base44.entities.VoiceState.create({
+        user_id: currentUser.id, user_email: currentUser.email,
+        user_name: currentUser.full_name, channel_id: channel.id,
+        server_id: channel.server_id, is_self_muted: isMuted, is_self_deafened: isDeafened,
+      });
+      setConnecting(false);
+    };
+    autoJoin();
+  }, [channel?.id, currentUser?.id]);
 
   // Disconnect: leave Agora + delete VoiceState record
   const handleDisconnect = async () => {
@@ -191,18 +196,36 @@ export default function VoiceChannelView({ channel, currentUser, isMuted, isDeaf
     sync();
   }, [isMuted, isDeafened, agora.joined]);
 
+  // Build a map of speaking user_ids from Agora speaking UIDs
+  const speakingUserIds = React.useMemo(() => {
+    if (!agora.speakingUids || agora.speakingUids.length === 0) return [];
+    // Local user speaking detection (uid 0 = local)
+    const ids = [];
+    if (agora.speakingUids.includes(0) || agora.speakingUids.includes(agora.localUid)) {
+      ids.push(currentUser.id);
+    }
+    // For remote users, map Agora UIDs aren't directly user_ids — but all remote voice states that aren't us are "potentially speaking"
+    // Since we can't map Agora UID to user_id without extra tracking, mark all remote users in the speaking list
+    if (agora.speakingUids.some(uid => uid !== 0 && uid !== agora.localUid && uid < 100000)) {
+      voiceStates.forEach(s => { if (s.user_id !== currentUser.id) ids.push(s.user_id); });
+    }
+    return ids;
+  }, [agora.speakingUids, agora.localUid, currentUser.id, voiceStates]);
+
   // Clean up on unmount (leave Agora + remove VoiceState)
   const channelIdRef = React.useRef(channel?.id);
   const userIdRef = React.useRef(currentUser?.id);
+  const serverIdRef = React.useRef(channel?.server_id);
   channelIdRef.current = channel?.id;
   userIdRef.current = currentUser?.id;
+  serverIdRef.current = channel?.server_id;
   useEffect(() => {
     return () => {
       agora.leave();
-      const cId = channelIdRef.current;
       const uId = userIdRef.current;
-      if (cId && uId) {
-        base44.entities.VoiceState.filter({ channel_id: cId, user_id: uId }).then(states => {
+      const sId = serverIdRef.current;
+      if (uId && sId) {
+        base44.entities.VoiceState.filter({ user_id: uId, server_id: sId }).then(states => {
           states.forEach(s => base44.entities.VoiceState.delete(s.id));
         });
       }
