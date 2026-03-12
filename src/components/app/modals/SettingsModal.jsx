@@ -35,6 +35,8 @@ export default function SettingsModal({ onClose, profile, onUpdate, onLogout, cu
     reduced_motion: false, high_contrast: false, font_scaling: 100, saturation: 100,
     theme: profile?.settings?.theme || 'dark', message_display: profile?.settings?.message_display || 'cozy',
     accent_color: profile?.accent_color || colors.accent.primary,
+    compact_servers: profile?.settings?.compact_servers || false,
+    notification_sound: profile?.settings?.notification_sound || 'default',
   });
   const [saving, setSaving] = useState(false);
   const set = (k, v) => setForm(p => ({ ...p, [k]: v }));
@@ -45,7 +47,7 @@ export default function SettingsModal({ onClose, profile, onUpdate, onLogout, cu
     if (tab === 'profile') Object.assign(data, { display_name: form.display_name, username: form.username, bio: form.bio, pronouns: form.pronouns });
     else if (tab === 'social') data.social_links = { twitter: form.twitter, github: form.github, website: form.website, instagram: form.instagram, spotify: form.spotify, tiktok: form.tiktok, linkedin: form.linkedin, twitch: form.twitch };
     else if (tab === 'privacy') data.settings = { ...profile?.settings, dm_privacy: form.dm_privacy, friend_requests: form.friend_requests, read_receipts: form.read_receipts, typing_indicators: form.typing_indicators, ghost_mode: form.ghost_mode, focus_mode: form.focus_mode };
-    else if (tab === 'appearance') { data.settings = { ...profile?.settings, theme: form.theme, message_display: form.message_display }; data.accent_color = form.accent_color; }
+    else if (tab === 'appearance') { data.settings = { ...profile?.settings, theme: form.theme, message_display: form.message_display, compact_servers: form.compact_servers }; data.accent_color = form.accent_color; }
     await onUpdate(data); setSaving(false);
   };
 
@@ -199,6 +201,7 @@ export default function SettingsModal({ onClose, profile, onUpdate, onLogout, cu
                 ))}
               </div>
             </div>
+            <SettingsToggle label="Compact Server List" checked={form.compact_servers} onChange={v => set('compact_servers', v)} desc="Smaller server icons for power users" />
             <SettingsSlider label="Font Scaling" value={form.font_scaling} onChange={v => set('font_scaling', v)} min={80} max={120} unit="%" />
           </>}
 
@@ -207,6 +210,18 @@ export default function SettingsModal({ onClose, profile, onUpdate, onLogout, cu
             <SettingsToggle label="DM Notifications" checked={form.dm_notifs} onChange={v => set('dm_notifs', v)} desc="Notify for new direct messages" />
             <SettingsToggle label="Mention Notifications" checked={form.mention_notifs} onChange={v => set('mention_notifs', v)} desc="Notify when you're mentioned" />
             <SettingsToggle label="Sound Effects" checked={form.sound_notifs} onChange={v => set('sound_notifs', v)} desc="Play notification sounds" />
+            <div>
+              <label className="text-[11px] font-semibold uppercase tracking-[0.06em] block mb-1.5" style={{ color: colors.text.muted }}>Notification Sound</label>
+              <select value={form.notification_sound} onChange={e => set('notification_sound', e.target.value)} className="w-full px-3 py-2.5 rounded-lg text-[14px] outline-none" style={{ background: colors.bg.base, color: colors.text.primary, border: `1px solid ${colors.border.default}` }}>
+                <option value="default">Default</option>
+                <option value="chime">Chime</option>
+                <option value="ping">Ping</option>
+                <option value="bell">Bell</option>
+                <option value="pop">Pop</option>
+                <option value="soft">Soft</option>
+                <option value="none">None</option>
+              </select>
+            </div>
           </>}
 
           {tab === 'voice' && <>
