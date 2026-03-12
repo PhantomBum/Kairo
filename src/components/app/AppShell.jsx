@@ -430,7 +430,8 @@ export default function AppShell({ currentUser }) {
           onElite={() => setModal('elite')} onLeaveServer={leaveServer}
           isHome={view === 'home' || view === 'friends'} badge={incomingReqs.length}
           currentUserId={currentUser.id} isAppOwner={isAppOwner} onAdminPanel={() => setModal('admin-panel')}
-          onServerNotes={(id) => { setShowServerNotes(id); }} />
+          onServerNotes={(id) => { setShowServerNotes(id); }}
+          compact={profile?.settings?.compact_servers} />
 
         <div className="w-[240px] flex-shrink-0 flex flex-col" style={{ background: colors.bg.surface }}>
           {view === 'server' ? (
