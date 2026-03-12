@@ -1,52 +1,52 @@
-// KAIRO V2 DESIGN SYSTEM — Kloak-Inspired
-// Warm dark tones, generous spacing, confident typography
+// KAIRO V2 DESIGN SYSTEM — Discord-inspired dark theme
+// Deep dark tones, clean hierarchy, polished feel
 
 export const colors = {
-  // Backgrounds — warm charcoal scale (not cold blue-black)
+  // Backgrounds — true dark scale like Discord
   bg: {
-    base: '#18181c',        // darkest: server rail
-    surface: '#1c1c21',     // sidebar panels
-    elevated: '#222228',    // chat area, main content
-    overlay: '#2a2a31',     // cards, dropdowns
-    modal: '#2a2a31',       // modals
-    hover: 'rgba(255,255,255,0.04)',
-    active: 'rgba(255,255,255,0.07)',
+    base: '#1e1f22',        // server rail
+    surface: '#2b2d31',     // sidebar panels  
+    elevated: '#313338',    // chat area
+    overlay: '#383a40',     // cards, dropdowns, input bg
+    modal: '#313338',       // modals
+    hover: 'rgba(255,255,255,0.06)',
+    active: 'rgba(255,255,255,0.1)',
   },
-  // Accent — confident indigo-blue
+  // Accent — Discord blurple
   accent: {
-    primary: '#6875e8',
-    hover: '#7b87f0',
-    active: '#5a66d6',
-    subtle: 'rgba(104,117,232,0.10)',
-    muted: 'rgba(104,117,232,0.18)',
-    glow: 'rgba(104,117,232,0.10)',
+    primary: '#5865f2',
+    hover: '#4752c4',
+    active: '#3c45a5',
+    subtle: 'rgba(88,101,242,0.12)',
+    muted: 'rgba(88,101,242,0.2)',
+    glow: 'rgba(88,101,242,0.08)',
   },
   // Status
   status: {
-    online: '#3ba55d',
-    idle: '#faa81a',
-    dnd: '#ed4245',
-    offline: '#6b6d75',
-    invisible: '#6b6d75',
+    online: '#23a559',
+    idle: '#f0b232',
+    dnd: '#f23f43',
+    offline: '#80848e',
+    invisible: '#80848e',
   },
   // Semantic
-  danger: '#ed4245',
-  warning: '#faa81a',
-  success: '#3ba55d',
+  danger: '#f23f43',
+  warning: '#f0b232',
+  success: '#23a559',
   info: '#5865f2',
-  // Text — warm off-whites
+  // Text
   text: {
-    primary: '#ededf0',
-    secondary: '#a0a0ad',
-    muted: '#7d7d8a',
-    disabled: '#5c5c66',
-    link: '#6875e8',
+    primary: '#f2f3f5',
+    secondary: '#b5bac1',
+    muted: '#949ba4',
+    disabled: '#6d6f78',
+    link: '#00a8fc',
   },
-  // Borders — warm, subtle
+  // Borders
   border: {
-    default: '#35353e',
-    light: '#3e3e48',
-    strong: '#4a4a55',
+    default: 'rgba(255,255,255,0.06)',
+    light: 'rgba(255,255,255,0.08)',
+    strong: 'rgba(255,255,255,0.12)',
   },
 };
 
@@ -56,25 +56,25 @@ export const spacing = {
 };
 
 export const radius = {
-  xs: '6px', sm: '10px', md: '14px', lg: '18px', xl: '24px', pill: '9999px',
+  xs: '4px', sm: '8px', md: '12px', lg: '16px', xl: '20px', pill: '9999px',
 };
 
 export const shadows = {
-  subtle: '0 1px 3px rgba(0,0,0,0.24)',
-  medium: '0 4px 14px rgba(0,0,0,0.3)',
-  strong: '0 8px 28px rgba(0,0,0,0.4)',
-  glow: '0 0 20px rgba(104,117,232,0.08)',
-  accentGlow: '0 0 16px rgba(104,117,232,0.18)',
+  subtle: '0 1px 2px rgba(0,0,0,0.2)',
+  medium: '0 4px 12px rgba(0,0,0,0.32)',
+  strong: '0 8px 24px rgba(0,0,0,0.4)',
+  glow: '0 0 20px rgba(88,101,242,0.06)',
+  accentGlow: '0 0 16px rgba(88,101,242,0.15)',
 };
 
 export const glass = {
-  rail: { background: colors.bg.base, border: `1px solid ${colors.border.default}` },
-  surface: { background: colors.bg.surface, border: `1px solid ${colors.border.default}` },
-  card: { background: colors.bg.overlay, border: `1px solid ${colors.border.default}` },
+  rail: { background: colors.bg.base },
+  surface: { background: colors.bg.surface },
+  card: { background: colors.bg.overlay },
   hover: { background: colors.bg.hover },
-  active: { background: 'rgba(104,117,232,0.10)', border: `1px solid rgba(104,117,232,0.22)` },
-  bubble: { background: colors.bg.overlay, border: `1px solid ${colors.border.default}` },
-  bubbleOwn: { background: 'rgba(104,117,232,0.10)', border: '1px solid rgba(104,117,232,0.18)' },
+  active: { background: 'rgba(88,101,242,0.15)', border: `1px solid rgba(88,101,242,0.25)` },
+  bubble: { background: colors.bg.overlay },
+  bubbleOwn: { background: 'rgba(88,101,242,0.12)', border: '1px solid rgba(88,101,242,0.2)' },
 };
 
 export const typography = {
@@ -105,7 +105,6 @@ export const animation = {
   },
 };
 
-// CSS custom properties string to inject
 export const cssVariables = `
   --k-bg-base: ${colors.bg.base};
   --k-bg-surface: ${colors.bg.surface};
@@ -151,8 +150,8 @@ export const cssVariables = `
   --bg-elevated: ${colors.bg.elevated};
   --bg-overlay: ${colors.bg.overlay};
   --bg-glass: rgba(255,255,255,0.03);
-  --bg-glass-hover: rgba(255,255,255,0.05);
-  --bg-glass-active: rgba(255,255,255,0.08);
+  --bg-glass-hover: rgba(255,255,255,0.06);
+  --bg-glass-active: rgba(255,255,255,0.1);
   --bg-glass-strong: rgba(255,255,255,0.08);
   --text-cream: ${colors.text.primary};
   --text-primary: ${colors.text.primary};
