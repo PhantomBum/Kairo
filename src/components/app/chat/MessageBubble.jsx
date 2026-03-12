@@ -1,5 +1,5 @@
 import React, { useState, memo } from 'react';
-import { Reply, Pencil, Trash2, Copy, Pin, PinOff, Link, ChevronDown, ChevronUp, Bookmark, ArrowRight, Zap, UserPlus, LogOut } from 'lucide-react';
+import { Reply, Pencil, Trash2, Copy, Pin, PinOff, Link, ChevronDown, ChevronUp, Bookmark, ArrowRight, Zap, UserPlus, LogOut, Star } from 'lucide-react';
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuSeparator, ContextMenuTrigger } from '@/components/ui/context-menu';
 import ImageWithFallback from '@/components/app/shared/ImageWithFallback';
 import ReactionTooltip from '@/components/app/shared/ReactionTooltip';
@@ -102,7 +102,7 @@ const SystemMessage = memo(function SystemMessage({ message }) {
   );
 });
 
-const MessageBubble = memo(function MessageBubble({ message, compact, isOwn, onReply, onEdit, onDelete, onReact, onPin, currentUserId, onProfileClick, isEditing, onEditSave, onEditCancel, onImageClick, onLinkClick, onHighlight }) {
+const MessageBubble = memo(function MessageBubble({ message, compact, isOwn, onReply, onEdit, onDelete, onReact, onPin, onStar, currentUserId, onProfileClick, isEditing, onEditSave, onEditCancel, onImageClick, onLinkClick, onHighlight }) {
   if (message.type === 'system') return <SystemMessage message={message} />;
 
   const [hovered, setHovered] = useState(false);
@@ -240,6 +240,7 @@ const MessageBubble = memo(function MessageBubble({ message, compact, isOwn, onR
               {quickEmojis.map(e => <button key={e} onClick={() => onReact(message, e)} className="w-7 h-7 flex items-center justify-center rounded-sm text-sm hover:bg-[rgba(255,255,255,0.06)]">{e}</button>)}
               <div className="w-px h-5 mx-0.5" style={{ background: colors.border.default }} />
               <button onClick={() => onReply(message)} className="w-7 h-7 flex items-center justify-center rounded-sm hover:bg-[rgba(255,255,255,0.06)]" title="Reply"><Reply className="w-4 h-4" style={{ color: colors.text.muted }} /></button>
+              {onStar && <button onClick={() => onStar(message)} className="w-7 h-7 flex items-center justify-center rounded-sm hover:bg-[rgba(255,255,255,0.06)]" title="Star"><Star className="w-3.5 h-3.5" style={{ color: '#f0b232' }} /></button>}
               {onPin && <button onClick={() => onPin(message)} className="w-7 h-7 flex items-center justify-center rounded-sm hover:bg-[rgba(255,255,255,0.06)]" title={message.is_pinned ? 'Unpin' : 'Pin'}>{message.is_pinned ? <PinOff className="w-3.5 h-3.5" style={{ color: colors.warning }} /> : <Pin className="w-3.5 h-3.5" style={{ color: colors.text.muted }} />}</button>}
               {isOwn && <>
                 <button onClick={() => onEdit(message)} className="w-7 h-7 flex items-center justify-center rounded-sm hover:bg-[rgba(255,255,255,0.06)]" title="Edit"><Pencil className="w-3.5 h-3.5" style={{ color: colors.text.muted }} /></button>
@@ -263,6 +264,7 @@ const MessageBubble = memo(function MessageBubble({ message, compact, isOwn, onR
         </>}
         <ContextMenuItem onClick={() => navigator.clipboard.writeText(message.id)} className="text-[13px] gap-2 rounded-sm px-2 py-1.5" style={{ color: colors.text.secondary }}><Link className="w-4 h-4 opacity-50" /> Copy Message ID</ContextMenuItem>
         {!isDeleted && onPin && <ContextMenuItem onClick={() => onPin(message)} className="text-[13px] gap-2 rounded-sm px-2 py-1.5" style={{ color: colors.text.secondary }}><Pin className="w-4 h-4 opacity-50" /> {message.is_pinned ? 'Unpin' : 'Pin'}</ContextMenuItem>}
+        {!isDeleted && onStar && <ContextMenuItem onClick={() => onStar(message)} className="text-[13px] gap-2 rounded-sm px-2 py-1.5" style={{ color: '#f0b232' }}><Star className="w-4 h-4 opacity-50" /> Star Message</ContextMenuItem>}
         {!isDeleted && <ContextMenuItem onClick={() => onHighlight?.(message)} className="text-[13px] gap-2 rounded-sm px-2 py-1.5" style={{ color: colors.text.secondary }}><Bookmark className="w-4 h-4 opacity-50" /> Save as Highlight</ContextMenuItem>}
         {isOwn && !isDeleted && <>
           <ContextMenuSeparator style={{ background: 'rgba(255,255,255,0.06)', margin: '4px 0' }} />
