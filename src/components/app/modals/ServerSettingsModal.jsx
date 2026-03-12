@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { X } from 'lucide-react';
+import { X, Hash } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { colors, shadows } from '@/components/app/design/tokens';
