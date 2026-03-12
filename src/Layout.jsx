@@ -115,27 +115,27 @@ export default function Layout({ children }) {
         /* Context menus */
         [data-radix-popper-content-wrapper] [role="menu"],
         [data-radix-popper-content-wrapper] [data-radix-menu-content] {
-          background: #2c2d33 !important;
-          border: 1px solid #3a3b42 !important;
-          border-radius: 14px !important;
+          background: #111214 !important;
+          border: none !important;
+          border-radius: 4px !important;
           padding: 6px !important;
-          box-shadow: 0 8px 24px rgba(0,0,0,0.35) !important;
+          box-shadow: 0 8px 16px rgba(0,0,0,0.24) !important;
         }
         [data-radix-popper-content-wrapper] [role="menuitem"] {
-          border-radius: 10px !important;
-          padding: 8px 10px !important;
-          font-size: 13px !important;
+          border-radius: 2px !important;
+          padding: 6px 8px !important;
+          font-size: 14px !important;
         }
         [data-radix-popper-content-wrapper] [role="menuitem"]:hover,
         [data-radix-popper-content-wrapper] [role="menuitem"][data-highlighted] {
-          background: rgba(108, 122, 219, 0.12) !important;
-          color: #f0f1f3 !important;
+          background: rgba(88, 101, 242, 0.2) !important;
+          color: #fff !important;
         }
         [data-radix-popper-content-wrapper] [role="menuitem"]:active {
           transform: scale(0.98) !important;
         }
         [data-radix-popper-content-wrapper] [role="separator"] {
-          background: #3a3b42 !important;
+          background: rgba(255,255,255,0.06) !important;
           margin: 4px 6px !important;
         }
 
@@ -154,8 +154,8 @@ export default function Layout({ children }) {
           cursor: pointer;
         }
         select option {
-          background: #25262b;
-          color: #f0f1f3;
+          background: #1e1f22;
+          color: #f2f3f5;
           padding: 8px 12px;
         }
 
