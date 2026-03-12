@@ -650,8 +650,10 @@ export default function AppShell({ currentUser }) {
                   onProfileClick={(id) => { setProfileUserId(id); setModal('profile'); }}
                   editingMessage={editingMsg} onEditSave={editMsg} onEditCancel={() => setEditingMsg(null)}
                   optimisticIds={optimisticIds} />
+                <TypingIndicator channelId={activeChannel?.id} conversationId={activeConv?.id} currentUserId={currentUser.id} />
                 <ChatInput channelName={channelLabel} channelId={activeChannel?.id || activeConv?.id} serverId={activeServer?.id} replyTo={replyTo} onCancelReply={() => setReplyTo(null)} onSend={handleSend}
                   members={isDM ? [] : members} getProfile={getProfile}
+                  onTyping={profile?.settings?.typing_indicators !== false ? emitTyping : undefined}
                   onEditLast={() => {
                     const myMsgs = currentMsgs.filter(m => m.author_id === currentUser.id && !m.is_deleted);
                     if (myMsgs.length > 0) setEditingMsg(myMsgs[myMsgs.length - 1]);
