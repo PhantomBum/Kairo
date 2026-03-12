@@ -392,10 +392,10 @@ export default function AppShell({ currentUser }) {
         style={showMobileSidebar ? { bottom: 56 } : undefined}
         role="navigation" aria-label="Sidebar">
         <ServerRailWithContext servers={servers} activeServerId={activeServer?.id} onServerSelect={selectServer} onHomeClick={goHome}
-          onCreateServer={() => setModal('create-server')} onDiscover={() => setModal('join-server')}
+          onCreateServer={() => setModal('create-server')} onDiscover={() => setModal('discover')}
           onElite={() => setModal('elite')} onLeaveServer={leaveServer}
           isHome={view === 'home' || view === 'friends'} badge={incomingReqs.length}
-          currentUserId={currentUser.id} />
+          currentUserId={currentUser.id} isAppOwner={isAppOwner} onAdminPanel={() => setModal('admin-panel')} />
 
         <div className="w-[240px] flex-shrink-0 flex flex-col" style={{ background: colors.bg.surface, borderRight: `1px solid ${colors.border.default}` }}>
           {view === 'server' ? (
@@ -497,6 +497,9 @@ export default function AppShell({ currentUser }) {
       <AnimatePresence>
         {modal === 'create-server' && <CreateServerModal onClose={() => setModal(null)} onCreate={(d) => createServer.mutate(d)} isCreating={createServer.isPending} />}
         {modal === 'join-server' && <JoinServerModal onClose={() => setModal(null)} onJoin={(c) => joinServer.mutate(c)} isJoining={joinServer.isPending} />}
+        {modal === 'discover' && <DiscoverModal onClose={() => setModal(null)} currentUserId={currentUser.id} currentUserEmail={currentUser.email}
+          onJoinSuccess={(server) => { qc.invalidateQueries({ queryKey: ['servers'] }); selectServer(server); setModal(null); }} />}
+        {modal === 'admin-panel' && <AdminPanelModal onClose={() => setModal(null)} />}
         {modal === 'create-channel' && <CreateChannelModal onClose={() => setModal(null)} onCreate={(d) => createChannel.mutate(d)} categories={categories} defaultCategoryId={modalData} />}
         {modal === 'create-category' && <CreateCategoryModal onClose={() => setModal(null)} onCreate={(name) => createCategory.mutate(name)} />}
         {modal === 'add-friend' && <AddFriendModal onClose={() => setModal(null)} currentUserId={currentUser.id} />}
