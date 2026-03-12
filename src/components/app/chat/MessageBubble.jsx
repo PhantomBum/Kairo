@@ -207,8 +207,8 @@ const MessageBubble = memo(function MessageBubble({ message, compact, isOwn, onR
           </div>
 
           {hovered && !isEditing && !isDeleted && (
-            <div className="absolute -top-3 right-4 flex items-center p-px rounded gap-px z-10 k-fade-in"
-              style={{ background: colors.bg.elevated, border: `1px solid ${colors.border.strong}`, boxShadow: '0 2px 8px rgba(0,0,0,0.24)' }}
+            <div className="absolute -top-3 right-4 flex items-center p-px rounded-lg gap-px z-10 k-fade-in"
+              style={{ background: colors.bg.overlay, border: `1px solid ${colors.border.strong}`, boxShadow: '0 4px 16px rgba(0,0,0,0.5)' }}
               role="toolbar" aria-label="Message actions">
               {quickEmojis.map(e => <button key={e} onClick={() => onReact(message, e)} className="w-7 h-7 flex items-center justify-center rounded-sm text-sm hover:bg-[rgba(255,255,255,0.06)]">{e}</button>)}
               <div className="w-px h-5 mx-0.5" style={{ background: colors.border.default }} />
@@ -223,7 +223,7 @@ const MessageBubble = memo(function MessageBubble({ message, compact, isOwn, onR
         </div>
       </ContextMenuTrigger>
 
-      <ContextMenuContent className="w-52 p-1 rounded" style={{ background: colors.bg.float, border: 'none', boxShadow: '0 8px 16px rgba(0,0,0,0.24)' }}>
+      <ContextMenuContent className="w-52 p-1 rounded-lg" style={{ background: colors.bg.float, border: `1px solid ${colors.border.strong}`, boxShadow: '0 8px 32px rgba(0,0,0,0.6)' }}>
         {!isDeleted && <>
           <div className="flex items-center gap-0.5 px-1 py-1 mb-1">
             {['👍', '❤️', '😂', '🔥', '👀', '✨'].map(e => (

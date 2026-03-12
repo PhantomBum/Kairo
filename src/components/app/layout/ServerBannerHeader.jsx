@@ -5,7 +5,7 @@ import { colors } from '@/components/app/design/tokens';
 function DropdownItem({ icon: Icon, label, color, onClick }) {
   return (
     <button onClick={onClick}
-      className="w-full flex items-center gap-2 px-2 py-1.5 rounded-sm text-[13px] transition-colors hover:bg-[rgba(88,101,242,0.2)]"
+      className="w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-[13px] transition-colors hover:bg-[rgba(212,201,168,0.08)]"
       style={{ color: color || colors.text.secondary }}>
       <Icon className="w-4 h-4 opacity-60" /> {label}
     </button>
@@ -44,7 +44,7 @@ export default function ServerBannerHeader({ server, isOwner, onInvite, onSettin
       {open && (
         <div className="absolute left-2 right-2 z-50 p-1.5 rounded k-fade-in"
           style={{ top: 48, background: colors.bg.float, border: `1px solid ${colors.border.strong}`, boxShadow: '0 8px 32px rgba(0,0,0,0.6)' }}>
-          <DropdownItem icon={UserPlus} label="Invite People" color={colors.accent.primary} onClick={() => { onInvite(); setOpen(false); }} />
+          <DropdownItem icon={UserPlus} label="Invite People" color={colors.text.primary} onClick={() => { onInvite(); setOpen(false); }} />
           {isOwner && (
             <>
               <div className="my-1 h-px" style={{ background: 'rgba(255,255,255,0.06)' }} />

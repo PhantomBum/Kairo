@@ -37,7 +37,7 @@ function ChannelItem({ channel, active, onClick, onSettings, isOwner, index }) {
                 )}
               </button>
             </ContextMenuTrigger>
-            <ContextMenuContent className="w-52 p-1.5 rounded" style={{ background: colors.bg.float, border: 'none', boxShadow: '0 8px 16px rgba(0,0,0,0.24)' }}>
+            <ContextMenuContent className="w-52 p-1.5 rounded-lg" style={{ background: colors.bg.float, border: `1px solid ${colors.border.strong}`, boxShadow: '0 8px 32px rgba(0,0,0,0.6)' }}>
               <ContextMenuItem onClick={() => navigator.clipboard.writeText(channel.id)} className="text-[13px] gap-2 rounded-sm px-2 py-1.5" style={{ color: colors.text.secondary }}>
                 <Hash className="w-4 h-4 opacity-50" /> Copy Channel ID
               </ContextMenuItem>
