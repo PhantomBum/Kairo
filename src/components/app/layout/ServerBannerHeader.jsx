@@ -5,7 +5,7 @@ import { colors, shadows } from '@/components/app/design/tokens';
 function DropdownItem({ icon: Icon, label, color, onClick }) {
   return (
     <button onClick={onClick}
-      className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md text-[13px] transition-colors hover:bg-[rgba(255,255,255,0.05)]"
+      className="w-full flex items-center gap-2.5 px-2.5 py-[7px] rounded text-sm transition-colors hover:bg-[rgba(88,101,242,0.15)]"
       style={{ color: color || colors.text.secondary }}>
       <Icon className="w-4 h-4 opacity-60" /> {label}
     </button>
@@ -24,7 +24,6 @@ export default function ServerBannerHeader({ server, isOwner, onInvite, onSettin
     return () => window.removeEventListener('resize', check);
   }, []);
 
-  // Close dropdown on outside click / Escape
   useEffect(() => {
     if (!dropdownOpen) return;
     const handleClick = (e) => { if (dropdownRef.current && !dropdownRef.current.contains(e.target)) setDropdownOpen(false); };
@@ -34,77 +33,45 @@ export default function ServerBannerHeader({ server, isOwner, onInvite, onSettin
     return () => { document.removeEventListener('mousedown', handleClick); document.removeEventListener('keydown', handleKey); };
   }, [dropdownOpen]);
 
-  // Close on server change
   const prevId = useRef(server?.id);
   useEffect(() => {
     if (server?.id !== prevId.current) { setDropdownOpen(false); prevId.current = server?.id; }
   }, [server?.id]);
 
-  const bannerHeight = isMobile ? 80 : 110;
   const hasBanner = !!server?.banner_url;
   const accentColor = server?.banner_color || colors.accent.primary;
-  const parallaxOffset = isMobile ? 0 : scrollY * 0.3;
-
-  const bannerStyle = hasBanner
-    ? { backgroundImage: `url(${server.banner_url})`, backgroundSize: 'cover', backgroundPosition: `center ${-parallaxOffset}px` }
-    : { background: `linear-gradient(135deg, ${accentColor} 0%, ${accentColor}55 50%, ${colors.bg.surface} 100%)` };
 
   return (
     <div className="relative flex-shrink-0" ref={dropdownRef}>
-      {/* Banner area */}
+      {/* Server name header */}
       <button
         onClick={() => setDropdownOpen(!dropdownOpen)}
-        className="w-full relative overflow-hidden group cursor-pointer"
-        style={{ height: bannerHeight, ...bannerStyle, transition: 'filter 200ms ease' }}
-        onMouseEnter={e => { if (!isMobile) e.currentTarget.style.filter = 'brightness(1.08)'; }}
-        onMouseLeave={e => { e.currentTarget.style.filter = 'brightness(1)'; }}
-      >
-        {/* Vignette gradient */}
-        <div className="absolute inset-0 pointer-events-none"
-          style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.15) 40%, rgba(0,0,0,0.65) 100%)' }} />
-
-        {/* Invite button floating top-right */}
-        <div className="absolute top-2.5 right-2.5 z-10 flex gap-1.5" onClick={e => e.stopPropagation()}>
-          <button onClick={onInvite}
-            className="w-8 h-8 flex items-center justify-center rounded-full transition-colors hover:bg-[rgba(255,255,255,0.2)]"
-            style={{ background: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(8px)' }}>
-            <UserPlus className="w-4 h-4" style={{ color: '#fff' }} />
-          </button>
-        </div>
-
-        {/* Server name + dropdown arrow at bottom-left */}
-        <div className="absolute bottom-0 left-0 right-0 px-4 pb-3 pt-6 flex items-end justify-between">
-          <div className="flex items-center gap-1.5 min-w-0">
-            <span className="text-[15px] font-bold truncate" style={{ color: '#fff', textShadow: '0 1px 4px rgba(0,0,0,0.5)' }}>
-              {server?.name}
-            </span>
-            {dropdownOpen
-              ? <X className="w-4 h-4 flex-shrink-0" style={{ color: 'rgba(255,255,255,0.8)' }} />
-              : <ChevronDown className="w-4 h-4 flex-shrink-0" style={{ color: 'rgba(255,255,255,0.8)' }} />}
-          </div>
-        </div>
+        className="w-full h-12 px-4 flex items-center justify-between group cursor-pointer transition-colors hover:bg-[rgba(255,255,255,0.04)]"
+        style={{ 
+          background: hasBanner ? `linear-gradient(90deg, ${accentColor}22, transparent)` : 'transparent',
+          boxShadow: '0 1px 0 rgba(0,0,0,0.2), 0 1.5px 0 rgba(0,0,0,0.06)',
+        }}>
+        <span className="text-[15px] font-semibold truncate" style={{ color: colors.text.primary }}>
+          {server?.name}
+        </span>
+        {dropdownOpen
+          ? <X className="w-[18px] h-[18px] flex-shrink-0" style={{ color: colors.text.muted }} />
+          : <ChevronDown className="w-[18px] h-[18px] flex-shrink-0" style={{ color: colors.text.muted }} />}
       </button>
 
-      {/* Dropdown menu */}
+      {/* Dropdown */}
       {dropdownOpen && (
-        <div className="absolute left-0 right-0 z-50 p-1.5 k-fade-in"
-          style={{
-            top: bannerHeight,
-            background: colors.bg.modal,
-            border: `1px solid ${colors.border.light}`,
-            borderTop: 'none',
-            borderRadius: '0 0 12px 12px',
-            boxShadow: shadows.strong,
-          }}>
+        <div className="absolute left-2 right-2 z-50 p-1.5 rounded-lg k-fade-in"
+          style={{ top: 48, background: '#111214', boxShadow: '0 8px 16px rgba(0,0,0,0.24)' }}>
           <DropdownItem icon={UserPlus} label="Invite People" color={colors.accent.primary} onClick={() => { onInvite(); setDropdownOpen(false); }} />
           {isOwner && (
             <>
-              <div className="my-1 h-px" style={{ background: colors.border.light }} />
+              <div className="my-1 h-px" style={{ background: 'rgba(255,255,255,0.06)' }} />
               <DropdownItem icon={Settings} label="Server Settings" onClick={() => { onSettings(); setDropdownOpen(false); }} />
               <DropdownItem icon={BarChart3} label="Analytics" onClick={() => { onAnalytics(); setDropdownOpen(false); }} />
               <DropdownItem icon={Shield} label="Mod Panel" onClick={() => { onModPanel(); setDropdownOpen(false); }} />
               <DropdownItem icon={History} label="Backups" onClick={() => { onBackups?.(); setDropdownOpen(false); }} />
-              <div className="my-1 h-px" style={{ background: colors.border.light }} />
+              <div className="my-1 h-px" style={{ background: 'rgba(255,255,255,0.06)' }} />
               <DropdownItem icon={Plus} label="Create Channel" onClick={() => { onAddChannel(); setDropdownOpen(false); }} />
             </>
           )}
