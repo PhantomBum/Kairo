@@ -1,22 +1,22 @@
 import React from 'react';
 import { createPageUrl } from '@/utils';
-import { Hash, Volume2, Megaphone, Radio, MessageSquare, HelpCircle, Users, Pin, AtSign, Image, Phone, Video, Search, LayoutGrid, ShieldAlert } from 'lucide-react';
+import { Hash, Volume2, Megaphone, Radio, MessageSquare, HelpCircle, Users, Pin, AtSign, Image, Phone, Video, Search, LayoutGrid } from 'lucide-react';
 import { colors } from '@/components/app/design/tokens';
 
 const typeIcons = { text: Hash, voice: Volume2, announcement: Megaphone, stage: Radio, forum: MessageSquare, board: LayoutGrid };
 
-function HeaderButton({ icon: Icon, onClick, href, active, badge, title }) {
-  const Wrapper = href ? 'a' : 'button';
-  const props = href ? { href, title, 'aria-label': title } : { onClick, title, 'aria-label': title };
+function HeaderBtn({ icon: Icon, onClick, href, active, badge, title }) {
+  const Tag = href ? 'a' : 'button';
+  const props = href ? { href, title } : { onClick, title };
   return (
-    <Wrapper {...props} className="w-8 h-8 flex items-center justify-center rounded hover:bg-[rgba(255,255,255,0.1)] relative transition-colors"
+    <Tag {...props} className="w-8 h-8 flex items-center justify-center rounded hover:bg-[rgba(255,255,255,0.1)] relative transition-colors"
       style={{ color: active ? colors.text.primary : colors.text.muted }}>
       <Icon className="w-5 h-5" />
       {badge > 0 && (
         <div className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 px-1 rounded-full text-[10px] font-bold flex items-center justify-center"
           style={{ background: colors.danger, color: '#fff' }}>{badge}</div>
       )}
-    </Wrapper>
+    </Tag>
   );
 }
 
@@ -24,7 +24,6 @@ export default function ChatHeader({ channel, conversation, currentUserId, showM
   const label = isDM
     ? (conversation?.name || conversation?.participants?.find(p => p.user_id !== currentUserId)?.user_name || 'DM')
     : (channel?.name || '');
-
   const Icon = isDM ? AtSign : (typeIcons[channel?.type] || Hash);
 
   return (
@@ -44,18 +43,18 @@ export default function ChatHeader({ channel, conversation, currentUserId, showM
           </>
         )}
       </div>
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-0.5">
         {isDM && (
           <>
-            <HeaderButton icon={Phone} onClick={onVoiceCall} title="Start Voice Call" />
-            <HeaderButton icon={Video} onClick={onVideoCall} title="Start Video Call" />
+            <HeaderBtn icon={Phone} onClick={onVoiceCall} title="Start Voice Call" />
+            <HeaderBtn icon={Video} onClick={onVideoCall} title="Start Video Call" />
           </>
         )}
-        {onPinned && <HeaderButton icon={Pin} onClick={onPinned} badge={pinnedCount} title="Pinned Messages" />}
-        {onMediaGallery && <HeaderButton icon={Image} onClick={onMediaGallery} title="Media Gallery" />}
-        {onSearch && <HeaderButton icon={Search} onClick={onSearch} title="Search" />}
-        {!isDM && <HeaderButton icon={Users} onClick={onToggleMembers} active={showMembers} title="Member List" />}
-        <HeaderButton icon={HelpCircle} href={createPageUrl('FAQ')} title="Help & FAQ" />
+        {onPinned && <HeaderBtn icon={Pin} onClick={onPinned} badge={pinnedCount} title="Pinned Messages" />}
+        {onMediaGallery && <HeaderBtn icon={Image} onClick={onMediaGallery} title="Media Gallery" />}
+        {onSearch && <HeaderBtn icon={Search} onClick={onSearch} title="Search" />}
+        {!isDM && <HeaderBtn icon={Users} onClick={onToggleMembers} active={showMembers} title="Member List" />}
+        <HeaderBtn icon={HelpCircle} href={createPageUrl('FAQ')} title="Help & FAQ" />
       </div>
     </div>
   );

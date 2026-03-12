@@ -1,7 +1,7 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import { Search, Users, Plus, MessageSquare, BellOff, Copy, Bookmark, Pin, X } from 'lucide-react';
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuSeparator, ContextMenuTrigger } from '@/components/ui/context-menu';
-import { colors, shadows, glass } from '@/components/app/design/tokens';
+import { colors } from '@/components/app/design/tokens';
 import { useProfiles } from '@/components/app/providers/ProfileProvider';
 
 export default function DMSidebar({ conversations, activeId, onSelect, onFriends, onCreateGroup, onNoteToSelf, currentUserId, incomingRequestCount = 0, blockedUserIds = [] }) {
@@ -28,7 +28,6 @@ export default function DMSidebar({ conversations, activeId, onSelect, onFriends
   const isGroup = (c) => c.type === 'group' && c.participants?.length > 2;
 
   const filtered = (conversations || []).filter(c => {
-    // Filter out conversations with blocked users (except group DMs)
     if (c.type !== 'group' && blockedSet.size > 0) {
       const other = c.participants?.find(p => p.user_id !== currentUserId);
       if (other && blockedSet.has(other.user_id)) return false;
@@ -39,9 +38,9 @@ export default function DMSidebar({ conversations, activeId, onSelect, onFriends
 
   return (
     <div className="flex-1 flex flex-col min-h-0">
-      {/* Search header */}
-      <div className="h-12 px-3 flex items-center flex-shrink-0" style={{ borderBottom: `1px solid ${colors.border.default}` }}>
-        <div className="flex-1 flex items-center gap-2 px-2.5 py-1.5 rounded-xl" style={{ ...glass.card }}>
+      {/* Search */}
+      <div className="h-12 px-2.5 flex items-center flex-shrink-0" style={{ boxShadow: '0 1px 0 rgba(0,0,0,0.2), 0 1.5px 0 rgba(0,0,0,0.06)' }}>
+        <div className="flex-1 flex items-center gap-2 px-2 py-1 rounded" style={{ background: colors.bg.base }}>
           <Search className="w-4 h-4 flex-shrink-0" style={{ color: colors.text.disabled }} />
           <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Find or start a conversation"
             className="flex-1 bg-transparent text-[13px] outline-none" style={{ color: colors.text.primary }} />
@@ -50,29 +49,29 @@ export default function DMSidebar({ conversations, activeId, onSelect, onFriends
 
       {/* Quick actions */}
       <div className="px-2 pt-2 pb-1 space-y-px">
-        <button onClick={onFriends} className="w-full flex items-center gap-3 px-2.5 py-2 rounded-xl text-[13px] transition-colors hover:bg-[rgba(255,255,255,0.04)] relative"
+        <button onClick={onFriends} className="w-full flex items-center gap-3 px-2 py-[7px] rounded text-[15px] transition-colors hover:bg-[rgba(255,255,255,0.04)] relative"
           style={{ color: colors.text.secondary, fontWeight: 500 }}>
-          <Users className="w-4.5 h-4.5" style={{ color: colors.text.disabled }} /> Friends
+          <Users className="w-5 h-5" style={{ color: colors.text.disabled }} /> Friends
           {incomingRequestCount > 0 && (
             <span className="absolute right-2 min-w-[18px] h-[18px] px-1 rounded-full text-[11px] font-bold flex items-center justify-center" style={{ background: colors.danger, color: '#fff' }}>{incomingRequestCount}</span>
           )}
         </button>
-        <button onClick={onCreateGroup} className="w-full flex items-center gap-3 px-2.5 py-2 rounded-xl text-[13px] transition-colors hover:bg-[rgba(255,255,255,0.04)]"
+        <button onClick={onCreateGroup} className="w-full flex items-center gap-3 px-2 py-[7px] rounded text-[15px] transition-colors hover:bg-[rgba(255,255,255,0.04)]"
           style={{ color: colors.text.secondary, fontWeight: 500 }}>
-          <Plus className="w-4.5 h-4.5" style={{ color: colors.text.disabled }} /> New Group
+          <Plus className="w-5 h-5" style={{ color: colors.text.disabled }} /> New Group
         </button>
-        <button onClick={onNoteToSelf} className="w-full flex items-center gap-3 px-2.5 py-2 rounded-xl text-[13px] transition-colors hover:bg-[rgba(255,255,255,0.04)]"
+        <button onClick={onNoteToSelf} className="w-full flex items-center gap-3 px-2 py-[7px] rounded text-[15px] transition-colors hover:bg-[rgba(255,255,255,0.04)]"
           style={{ color: colors.text.secondary, fontWeight: 500 }}>
-          <Bookmark className="w-4.5 h-4.5" style={{ color: colors.text.disabled }} /> Note to Self
+          <Bookmark className="w-5 h-5" style={{ color: colors.text.disabled }} /> Note to Self
         </button>
       </div>
 
       {/* Label */}
       <div className="px-4 pt-4 pb-1">
-        <span className="text-[10px] font-bold uppercase tracking-[0.08em]" style={{ color: colors.text.disabled }}>Direct Messages</span>
+        <span className="text-[12px] font-bold uppercase tracking-[0.02em]" style={{ color: colors.text.muted }}>Direct Messages</span>
       </div>
 
-      {/* Conversation list */}
+      {/* List */}
       <div className="flex-1 overflow-y-auto scrollbar-none px-2 space-y-px">
         {filtered.map(c => {
           const label = getLabel(c);
@@ -85,44 +84,39 @@ export default function DMSidebar({ conversations, activeId, onSelect, onFriends
             <ContextMenu key={c.id}>
               <ContextMenuTrigger>
                 <button onClick={() => onSelect(c)}
-                  className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl transition-all group relative"
-                  style={{
-                    background: active ? colors.accent.subtle : 'transparent',
-                    border: active ? `1px solid ${colors.accent.muted}` : '1px solid transparent',
-                    boxShadow: active ? shadows.glow : 'none',
-                  }}>
+                  className="w-full flex items-center gap-2.5 px-2 py-[6px] rounded transition-colors group"
+                  style={{ background: active ? 'rgba(255,255,255,0.08)' : 'transparent' }}>
                   <div className="relative flex-shrink-0">
                     <div className="w-8 h-8 rounded-full flex items-center justify-center text-[12px] font-semibold overflow-hidden"
                       style={{ background: colors.bg.overlay, color: colors.text.muted }}>
                       {avatar ? <img src={avatar} className="w-full h-full object-cover" alt="" /> : group ? <Users className="w-4 h-4" /> : label.charAt(0).toUpperCase()}
                     </div>
                     {!group && <div className="absolute -bottom-0.5 -right-0.5 w-[12px] h-[12px] rounded-full border-[2.5px]" style={{ background: statusColor, borderColor: colors.bg.surface }} />}
-                    {group && <span className="absolute -bottom-1 -right-1 text-[8px] font-bold px-1 rounded-full" style={{ background: colors.bg.surface, color: colors.text.muted, border: `1px solid ${colors.border.default}` }}>{c.participants?.length}</span>}
+                    {group && <span className="absolute -bottom-1 -right-1 text-[8px] font-bold px-1 rounded-full" style={{ background: colors.bg.surface, color: colors.text.muted }}>{c.participants?.length}</span>}
                   </div>
                   <div className="flex-1 min-w-0 text-left">
-                    <div className="text-[14px] font-medium truncate" style={{ color: active ? colors.text.primary : colors.text.secondary }}>{label}</div>
+                    <div className="text-[15px] truncate" style={{ color: active ? '#fff' : colors.text.secondary, fontWeight: active ? 500 : 400 }}>{label}</div>
                     {c.last_message_preview && (
                       <div className="text-[12px] truncate" style={{ color: colors.text.muted }}>{c.last_message_preview}</div>
                     )}
                   </div>
-                  {/* Close button on hover */}
-                  <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
                     <X className="w-4 h-4" style={{ color: colors.text.disabled }} />
                   </div>
                 </button>
               </ContextMenuTrigger>
-              <ContextMenuContent className="w-52 p-1.5 rounded-xl" style={{ background: colors.bg.modal, border: `1px solid ${colors.border.light}`, boxShadow: shadows.strong }}>
-                <ContextMenuItem onClick={() => onSelect(c)} className="text-[13px] gap-2.5 rounded-md px-2.5 py-2" style={{ color: colors.text.secondary }}>
+              <ContextMenuContent className="w-52 p-1.5 rounded" style={{ background: colors.bg.float, border: 'none', boxShadow: '0 8px 16px rgba(0,0,0,0.24)' }}>
+                <ContextMenuItem onClick={() => onSelect(c)} className="text-[13px] gap-2 rounded-sm px-2 py-1.5" style={{ color: colors.text.secondary }}>
                   <MessageSquare className="w-4 h-4 opacity-50" /> Open
                 </ContextMenuItem>
-                <ContextMenuItem className="text-[13px] gap-2.5 rounded-md px-2.5 py-2" style={{ color: colors.text.secondary }}>
+                <ContextMenuItem className="text-[13px] gap-2 rounded-sm px-2 py-1.5" style={{ color: colors.text.secondary }}>
                   <Pin className="w-4 h-4 opacity-50" /> Pin
                 </ContextMenuItem>
-                <ContextMenuItem onClick={() => navigator.clipboard.writeText(c.id)} className="text-[13px] gap-2.5 rounded-md px-2.5 py-2" style={{ color: colors.text.secondary }}>
+                <ContextMenuItem onClick={() => navigator.clipboard.writeText(c.id)} className="text-[13px] gap-2 rounded-sm px-2 py-1.5" style={{ color: colors.text.secondary }}>
                   <Copy className="w-4 h-4 opacity-50" /> Copy ID
                 </ContextMenuItem>
-                <ContextMenuSeparator style={{ background: colors.border.light, margin: '4px 0' }} />
-                <ContextMenuItem className="text-[13px] gap-2.5 rounded-md px-2.5 py-2" style={{ color: colors.text.secondary }}>
+                <ContextMenuSeparator style={{ background: 'rgba(255,255,255,0.06)', margin: '4px 0' }} />
+                <ContextMenuItem className="text-[13px] gap-2 rounded-sm px-2 py-1.5" style={{ color: colors.text.secondary }}>
                   <BellOff className="w-4 h-4 opacity-50" /> Mute
                 </ContextMenuItem>
               </ContextMenuContent>
@@ -135,8 +129,8 @@ export default function DMSidebar({ conversations, activeId, onSelect, onFriends
             <p className="text-[14px] font-medium mb-1" style={{ color: colors.text.secondary }}>
               {search ? 'No results found' : 'No conversations yet'}
             </p>
-            <p className="text-[12px] leading-relaxed" style={{ color: colors.text.muted }}>
-              {search ? 'Try a different search term' : 'Start a conversation with friends or create a group chat'}
+            <p className="text-[12px]" style={{ color: colors.text.muted }}>
+              {search ? 'Try a different search term' : 'Start a conversation with friends or create a group'}
             </p>
           </div>
         )}

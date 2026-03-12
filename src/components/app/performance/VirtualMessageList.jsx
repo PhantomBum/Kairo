@@ -4,7 +4,7 @@ import MessageBubble from '@/components/app/chat/MessageBubble';
 import ImageLightbox from '@/components/app/chat/ImageLightbox';
 import ExternalLinkWarning from '@/components/app/shared/ExternalLinkWarning';
 import { AnimatePresence } from 'framer-motion';
-import { colors, shadows } from '@/components/app/design/tokens';
+import { colors } from '@/components/app/design/tokens';
 
 function dateFmt(d) {
   const date = new Date(d);
@@ -28,7 +28,6 @@ export default function VirtualMessageList({
   const [linkWarning, setLinkWarning] = useState(null);
   const skipLinkWarning = useRef(false);
 
-  // Load link warning preference
   useEffect(() => {
     try { skipLinkWarning.current = localStorage.getItem('kairo-skip-link-warn') === 'true'; } catch {}
   }, []);
@@ -58,17 +57,13 @@ export default function VirtualMessageList({
     return result;
   }, [messages]);
 
-  // Track the last message count to only auto-scroll when new messages arrive, not on edits
   const lastMsgCountRef = useRef(0);
   const prevAtBottomRef = useRef(true);
   useEffect(() => {
     const msgCount = messages.length;
     const isNewMessage = msgCount > lastMsgCountRef.current;
-    // Auto-scroll only when a NEW message arrives AND user was already at bottom
     if (isNewMessage && prevAtBottomRef.current) {
-      requestAnimationFrame(() => {
-        bottomRef.current?.scrollIntoView({ behavior: 'auto' });
-      });
+      requestAnimationFrame(() => { bottomRef.current?.scrollIntoView({ behavior: 'auto' }); });
     }
     lastMsgCountRef.current = msgCount;
     prevAtBottomRef.current = atBottom;
@@ -81,42 +76,41 @@ export default function VirtualMessageList({
 
   if (isLoading) return (
     <div className="flex-1 flex items-center justify-center">
-      <div className="w-6 h-6 border-2 rounded-full animate-spin" style={{ borderColor: colors.border.light, borderTopColor: colors.accent.primary }} />
+      <div className="w-6 h-6 border-2 rounded-full animate-spin" style={{ borderColor: 'rgba(255,255,255,0.06)', borderTopColor: colors.accent.primary }} />
     </div>
   );
 
   return (
     <div className="flex-1 relative min-h-0">
-      <div ref={containerRef} onScroll={onScroll} className="absolute inset-0 overflow-y-auto pb-2 scrollbar-none k-channel-fade" role="log" aria-label={`Messages in ${channelName}`}>
-        {/* Channel welcome — generous Kloak-style spacing */}
-        <div className="px-8 pt-20 pb-10">
-          <div className="w-[64px] h-[64px] rounded-2xl flex items-center justify-center mb-5"
-            style={{ background: `linear-gradient(135deg, ${colors.accent.subtle}, ${colors.accent.muted})` }}>
-            {isDM ? <MessageSquare className="w-7 h-7" style={{ color: colors.accent.primary }} /> : <Hash className="w-7 h-7" style={{ color: colors.accent.primary }} />}
+      <div ref={containerRef} onScroll={onScroll} className="absolute inset-0 overflow-y-auto pb-2 scrollbar-none" role="log" aria-label={`Messages in ${channelName}`}>
+        {/* Channel welcome */}
+        <div className="px-4 md:px-8 pt-16 pb-8">
+          <div className="w-[68px] h-[68px] rounded-full flex items-center justify-center mb-4"
+            style={{ background: colors.bg.overlay }}>
+            {isDM ? <MessageSquare className="w-8 h-8" style={{ color: '#fff' }} /> : <Hash className="w-8 h-8" style={{ color: '#fff' }} />}
           </div>
-          <h2 className="text-[28px] font-bold mb-2 tracking-tight" style={{ color: colors.text.primary }}>
+          <h2 className="text-[32px] font-bold mb-2" style={{ color: '#fff' }}>
             {isDM ? channelName : `Welcome to #${channelName}`}
           </h2>
-          <p className="text-[15px] leading-relaxed" style={{ color: colors.text.muted }}>
-            {isDM ? 'This is the very beginning of your conversation.' : `This is the beginning of the #${channelName} channel. Say hello!`}
+          <p className="text-[14px]" style={{ color: colors.text.muted }}>
+            {isDM ? 'This is the beginning of your direct message history.' : `This is the start of the #${channelName} channel.`}
           </p>
         </div>
 
         {items.map(item => {
           if (item.type === 'divider') {
             return (
-              <div key={item.key} className="flex items-center gap-4 my-6 mx-5" role="separator">
-                <div className="flex-1 h-px" style={{ background: colors.border.default }} />
-                <span className="text-[11px] font-medium px-3 py-0.5 rounded-full select-none"
-                  style={{ color: colors.text.muted, background: colors.bg.surface }}>{dateFmt(item.date)}</span>
-                <div className="flex-1 h-px" style={{ background: colors.border.default }} />
+              <div key={item.key} className="flex items-center gap-4 my-4 mx-4" role="separator">
+                <div className="flex-1 h-px" style={{ background: colors.border.strong }} />
+                <span className="text-[12px] font-semibold px-1 select-none" style={{ color: colors.text.muted }}>{dateFmt(item.date)}</span>
+                <div className="flex-1 h-px" style={{ background: colors.border.strong }} />
               </div>
             );
           }
           const msg = item.msg;
           const isOptimistic = optimisticIds?.has(msg.id);
           return (
-            <div key={item.key} className="k-msg-in" style={{ opacity: isOptimistic ? 0.6 : 1 }}>
+            <div key={item.key} className="k-msg-in" style={{ opacity: isOptimistic ? 0.5 : 1 }}>
               <MessageBubble
                 message={msg} compact={item.compact} isOwn={msg.author_id === currentUserId}
                 onReply={onReply} onEdit={onEdit} onDelete={onDelete} onReact={onReact} onPin={onPin}
@@ -126,7 +120,7 @@ export default function VirtualMessageList({
                 onLinkClick={handleLinkClick}
               />
               {isOptimistic && (
-                <div className="flex items-center gap-1.5 ml-[68px] -mt-0.5 mb-1">
+                <div className="flex items-center gap-1.5 ml-[72px] -mt-0.5 mb-1">
                   <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: colors.text.disabled }} />
                   <span className="text-[11px]" style={{ color: colors.text.disabled }}>Sending...</span>
                 </div>
@@ -137,14 +131,12 @@ export default function VirtualMessageList({
         <div ref={bottomRef} />
       </div>
 
-      {/* Jump to bottom */}
       {!atBottom && (
         <button onClick={() => bottomRef.current?.scrollIntoView({ behavior: 'smooth' })}
-          className="absolute bottom-4 left-1/2 -translate-x-1/2 h-9 px-4 rounded-full flex items-center gap-2"
-          style={{ background: colors.accent.primary, color: '#fff', boxShadow: shadows.medium }}
+          className="absolute bottom-4 left-1/2 -translate-x-1/2 h-8 px-4 rounded-full flex items-center gap-2 text-[13px] font-medium"
+          style={{ background: colors.bg.float, color: '#fff', boxShadow: '0 4px 12px rgba(0,0,0,0.32)' }}
           aria-label="Jump to latest messages">
-          <ArrowDown className="w-4 h-4" />
-          <span className="text-[13px] font-medium">New messages</span>
+          <ArrowDown className="w-4 h-4" /> New messages
         </button>
       )}
 
