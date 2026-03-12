@@ -60,6 +60,8 @@ import JumpToDate from '@/components/app/features/JumpToDate';
 import { useBadgeCheck } from '@/components/app/badges/useBadgeCheck';
 import BadgeNotification from '@/components/app/badges/BadgeNotification';
 import DMCallView, { IncomingCallOverlay, OutgoingCallOverlay } from '@/components/app/views/DMCallView';
+import TypingIndicator from '@/components/app/features/TypingIndicator';
+import ThemeProvider from '@/components/app/features/ThemeProvider';
 
 function ModalSuspense({ children }) {
   return <Suspense fallback={<div className="fixed inset-0 z-50 flex items-center justify-center" style={{ background: 'rgba(0,0,0,0.5)' }}><div className="w-6 h-6 border-2 rounded-full animate-spin" style={{ borderColor: 'rgba(255,255,255,0.1)', borderTopColor: '#5865F2' }} /></div>}>{children}</Suspense>;
@@ -523,8 +525,27 @@ export default function AppShell({ currentUser }) {
   const isAppOwner = currentUser.role === 'admin';
   const isFriendProfile = profileUserId ? friends.some(f => f.friend_id === profileUserId) : false;
 
+  // Typing indicator emission
+  const emitTyping = useCallback(async () => {
+    const targetId = activeConv?.id || activeChannel?.id;
+    if (!targetId || !currentUser?.id) return;
+    // Upsert typing indicator
+    const existing = await base44.entities.TypingIndicator.filter({ channel_id: targetId, user_id: currentUser.id });
+    if (existing.length > 0) {
+      await base44.entities.TypingIndicator.update(existing[0].id, { user_name: profile?.display_name || currentUser.full_name });
+    } else {
+      await base44.entities.TypingIndicator.create({ channel_id: targetId, user_id: currentUser.id, user_name: profile?.display_name || currentUser.full_name });
+    }
+    // Auto-cleanup after 5s
+    setTimeout(async () => {
+      const items = await base44.entities.TypingIndicator.filter({ channel_id: targetId, user_id: currentUser.id });
+      items.forEach(i => base44.entities.TypingIndicator.delete(i.id));
+    }, 5000);
+  }, [activeConv?.id, activeChannel?.id, currentUser?.id, profile?.display_name]);
+
   return (
     <div className="h-screen w-screen flex flex-col md:flex-row overflow-hidden" style={{ background: colors.bg.base }} {...swipeHandlers}>
+      <ThemeProvider theme={profile?.settings?.theme || 'dark'} fontScale={profile?.settings?.font_scaling} saturation={profile?.settings?.saturation} />
       <ConnectionBanner />
 
       {/* Desktop: always show. Mobile: show when sidebar toggled */}
