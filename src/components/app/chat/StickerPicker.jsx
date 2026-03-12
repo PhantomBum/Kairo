@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Sparkles, Star } from 'lucide-react';
+import { X, Sparkles, Star, Stamp } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { colors, shadows } from '@/components/app/design/tokens';
 
