@@ -109,6 +109,7 @@ export default function AppShell({ currentUser }) {
     const handler = (e) => {
       if (e.ctrlKey && e.shiftKey && e.key === 'M') { e.preventDefault(); setIsMuted(m => !m); }
       if (e.ctrlKey && e.shiftKey && e.key === 'D') { e.preventDefault(); setIsDeafened(d => !d); }
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') { e.preventDefault(); setModal('search'); }
       if (e.key === 'Escape' && modal) { e.preventDefault(); setModal(null); setProfileUserId(null); setChannelToEdit(null); }
     };
     window.addEventListener('keydown', handler);
@@ -241,8 +242,14 @@ export default function AppShell({ currentUser }) {
   }, [activeChannel?.id, activeConv?.id]);
 
   const pinMsg = useCallback(async (msg) => {
-    if (activeConv) { await base44.entities.DirectMessage.update(msg.id, { is_pinned: !msg.is_pinned }); qc.invalidateQueries({ queryKey: ['dmMessages', activeConv?.id] }); }
-    else { await base44.entities.Message.update(msg.id, { is_pinned: !msg.is_pinned }); qc.invalidateQueries({ queryKey: ['messages', activeChannel?.id] }); }
+    const newPinned = !msg.is_pinned;
+    if (activeConv) { await base44.entities.DirectMessage.update(msg.id, { is_pinned: newPinned }); qc.invalidateQueries({ queryKey: ['dmMessages', activeConv?.id] }); }
+    else { await base44.entities.Message.update(msg.id, { is_pinned: newPinned }); qc.invalidateQueries({ queryKey: ['messages', activeChannel?.id] }); }
+    // Brief golden highlight animation on pin
+    if (newPinned) {
+      const el = document.querySelector(`[data-msg-id="${msg.id}"]`);
+      if (el) { el.style.background = 'rgba(240,178,50,0.12)'; el.style.transition = 'background 0.3s'; setTimeout(() => { el.style.background = ''; }, 2000); }
+    }
   }, [activeChannel?.id, activeConv?.id]);
 
   const reactMsg = useCallback(async (msg, emoji) => {
