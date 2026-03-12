@@ -1,17 +1,25 @@
-import React from 'react';
-import { Check } from 'lucide-react';
+import React, { useState } from 'react';
+import { Check, Camera } from 'lucide-react';
 import { colors } from '@/components/app/design/tokens';
 
 export default function OverviewTab({ server, name, setName, desc, setDesc, isPublic, setIsPublic, serverSettings, setServerSettings, onSave, onUploadImg, saving }) {
+  const [saveText, setSaveText] = useState('Save Changes');
+  
+  const handleSave = async () => {
+    await onSave();
+    setSaveText('Saved!');
+    setTimeout(() => setSaveText('Save Changes'), 2000);
+  };
+
   return (
     <div className="space-y-5">
       <div className="flex gap-4 items-start">
-        <button onClick={() => onUploadImg('icon_url')} className="w-20 h-20 rounded-2xl flex items-center justify-center overflow-hidden flex-shrink-0 group relative"
-          style={{ background: colors.bg.elevated, border: `1px dashed ${colors.border.light}` }}>
-          {server?.icon_url ? <img src={server.icon_url} className="w-full h-full object-cover" alt="" />
-            : <span className="text-lg font-semibold" style={{ color: colors.text.muted }}>{server?.name?.slice(0, 2)}</span>}
+        <button onClick={() => onUploadImg('icon_url')} className="w-20 h-20 rounded-2xl flex items-center justify-center overflow-hidden flex-shrink-0 group relative transition-transform hover:scale-105"
+          style={{ background: server?.icon_url ? 'transparent' : colors.bg.elevated, border: server?.icon_url ? 'none' : `1px dashed ${colors.border.light}` }}>
+          {server?.icon_url ? <img src={server.icon_url} className="w-full h-full object-cover rounded-2xl" alt="Server icon" />
+            : <div className="flex flex-col items-center gap-1"><Camera className="w-5 h-5" style={{ color: colors.text.muted }} /><span className="text-[10px]" style={{ color: colors.text.disabled }}>Icon</span></div>}
           <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity rounded-2xl">
-            <span className="text-[11px] text-white font-medium">Edit</span>
+            <Camera className="w-5 h-5 text-white" />
           </div>
         </button>
         <div className="flex-1 space-y-3">
@@ -38,12 +46,19 @@ export default function OverviewTab({ server, name, setName, desc, setDesc, isPu
         </div>
       </div>
 
-      <button onClick={() => onUploadImg('banner_url')} className="w-full h-24 rounded-xl overflow-hidden relative group"
-        style={{ background: colors.bg.elevated, border: `1px dashed ${colors.border.light}` }}>
-        {server?.banner_url ? <img src={server.banner_url} className="w-full h-full object-cover" alt="" /> :
-          <div className="flex items-center justify-center h-full text-[13px]" style={{ color: colors.text.muted }}>Upload Banner (1500×500 recommended)</div>}
-        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-          <span className="text-[13px] text-white font-medium">Change Banner</span>
+      <button onClick={() => onUploadImg('banner_url')} className="w-full h-32 rounded-xl overflow-hidden relative group transition-all hover:brightness-110"
+        style={{ background: server?.banner_url ? 'transparent' : colors.bg.elevated, border: server?.banner_url ? 'none' : `1px dashed ${colors.border.light}` }}>
+        {server?.banner_url ? (
+          <img src={server.banner_url} className="w-full h-full object-cover rounded-xl" alt="Server banner" />
+        ) : (
+          <div className="flex flex-col items-center justify-center h-full gap-2">
+            <Camera className="w-6 h-6" style={{ color: colors.text.disabled }} />
+            <span className="text-[13px]" style={{ color: colors.text.muted }}>Upload Banner</span>
+            <span className="text-[11px]" style={{ color: colors.text.disabled }}>1500×500 recommended</span>
+          </div>
+        )}
+        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity rounded-xl">
+          <div className="flex items-center gap-2 text-white"><Camera className="w-5 h-5" /><span className="text-[13px] font-medium">Change Banner</span></div>
         </div>
       </button>
 
@@ -77,9 +92,9 @@ export default function OverviewTab({ server, name, setName, desc, setDesc, isPu
         </div>
       </div>
 
-      <button onClick={onSave} disabled={saving} className="px-6 py-2.5 rounded-xl text-[13px] font-semibold disabled:opacity-30 flex items-center gap-2"
-        style={{ background: colors.accent.primary, color: '#fff' }}>
-        {saving ? 'Saving...' : <><Check className="w-4 h-4" /> Save Changes</>}
+      <button onClick={handleSave} disabled={saving} className="px-6 py-2.5 rounded-xl text-[13px] font-semibold disabled:opacity-30 flex items-center gap-2 transition-all hover:brightness-110 active:scale-95"
+        style={{ background: saveText === 'Saved!' ? colors.success : colors.accent.primary, color: '#fff' }}>
+        {saving ? 'Saving...' : <><Check className="w-4 h-4" /> {saveText}</>}
       </button>
     </div>
   );
