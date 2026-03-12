@@ -285,7 +285,29 @@ export default function AppShell({ currentUser }) {
     qc.invalidateQueries({ queryKey: activeConv ? ['dmMessages', activeConv?.id] : ['messages', activeChannel?.id] });
   }, [currentUser.id, activeChannel?.id, activeConv?.id]);
 
+  // Desktop notification for new DMs
+  const lastDmCountRef = React.useRef(0);
+  useEffect(() => {
+    if (!profile?.settings?.desktop_notifs) return;
+    const count = dmMessages.length;
+    if (count > lastDmCountRef.current && lastDmCountRef.current > 0) {
+      const newest = dmMessages[dmMessages.length - 1];
+      if (newest?.author_id !== currentUser.id && 'Notification' in window && Notification.permission === 'granted') {
+        new Notification(newest.author_name || 'New Message', { body: newest.content?.slice(0, 100), icon: newest.author_avatar });
+      }
+    }
+    lastDmCountRef.current = count;
+  }, [dmMessages.length]);
+
   const handleStartDM = async (friend) => {
+    // Enforce DM privacy
+    const friendProfile = getProfile(friend.friend_id);
+    const privacy = friendProfile?.settings?.dm_privacy;
+    if (privacy === 'none') { alert(`${friend.friend_name} has DMs disabled.`); return; }
+    if (privacy === 'friends') {
+      const theirFriends = await base44.entities.Friendship.filter({ user_id: friend.friend_id, friend_id: currentUser.id, status: 'accepted' });
+      if (theirFriends.length === 0) { alert(`${friend.friend_name} only accepts DMs from friends.`); return; }
+    }
     const existing = conversations.find(c => c.participants?.some(p => p.user_id === friend.friend_id));
     if (existing) { setActiveConv(existing); setView('home'); return; }
     const conv = await base44.entities.Conversation.create({
