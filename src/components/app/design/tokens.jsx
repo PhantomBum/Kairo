@@ -1,52 +1,52 @@
-// KAIRO V2 DESIGN SYSTEM — Refined visual identity
-// Every color, spacing, radius, shadow, animation value must come from here
+// KAIRO V2 DESIGN SYSTEM — Lighter, breathable dark palette
+// Inspired by Kloak: charcoal tones, not pure black
 
 export const colors = {
-  // Backgrounds — deeper, more intentional
+  // Backgrounds — lighter charcoal scale
   bg: {
-    base: '#0c0c10',
-    surface: '#13131a',
-    elevated: '#1a1a24',
-    overlay: '#22222e',
-    modal: '#2a2a38',
-    hover: 'rgba(255,255,255,0.035)',
-    active: 'rgba(255,255,255,0.06)',
+    base: '#1a1b1e',        // darkest: server rail
+    surface: '#1e1f23',     // sidebar panels
+    elevated: '#25262b',    // chat area, main content
+    overlay: '#2c2d33',     // cards, dropdowns
+    modal: '#2c2d33',       // modals
+    hover: 'rgba(255,255,255,0.05)',
+    active: 'rgba(255,255,255,0.08)',
   },
-  // Accent — Kairo's signature purple, more saturated
+  // Accent — muted purple-blue
   accent: {
-    primary: '#8b5cf6',
-    hover: '#a78bfa',
-    active: '#7c3aed',
-    subtle: 'rgba(139,92,246,0.08)',
-    muted: 'rgba(139,92,246,0.16)',
-    glow: 'rgba(139,92,246,0.12)',
+    primary: '#6c7adb',
+    hover: '#8b96e9',
+    active: '#5b69c9',
+    subtle: 'rgba(108,122,219,0.1)',
+    muted: 'rgba(108,122,219,0.2)',
+    glow: 'rgba(108,122,219,0.12)',
   },
   // Status
   status: {
-    online: '#22c55e',
-    idle: '#eab308',
-    dnd: '#ef4444',
-    offline: '#6b7280',
-    invisible: '#6b7280',
+    online: '#3ba55d',
+    idle: '#faa81a',
+    dnd: '#ed4245',
+    offline: '#6b6d75',
+    invisible: '#6b6d75',
   },
   // Semantic
-  danger: '#ef4444',
-  warning: '#eab308',
-  success: '#22c55e',
-  info: '#6366f1',
-  // Text — better contrast hierarchy
+  danger: '#ed4245',
+  warning: '#faa81a',
+  success: '#3ba55d',
+  info: '#5865f2',
+  // Text — slightly warm off-whites
   text: {
-    primary: '#f8fafc',
-    secondary: '#cbd5e1',
-    muted: '#94a3b8',
-    disabled: '#475569',
-    link: '#38bdf8',
+    primary: '#f0f1f3',
+    secondary: '#a8aab2',
+    muted: '#8b8d95',
+    disabled: '#6b6d75',
+    link: '#6c7adb',
   },
-  // Borders
+  // Borders — visible but soft
   border: {
-    default: 'rgba(255,255,255,0.06)',
-    light: 'rgba(255,255,255,0.1)',
-    strong: 'rgba(255,255,255,0.16)',
+    default: '#3a3b42',
+    light: '#44454d',
+    strong: '#52535c',
   },
 };
 
@@ -56,26 +56,25 @@ export const spacing = {
 };
 
 export const radius = {
-  xs: '4px', sm: '8px', md: '12px', lg: '16px', xl: '24px', pill: '9999px',
+  xs: '6px', sm: '10px', md: '14px', lg: '18px', xl: '24px', pill: '9999px',
 };
 
 export const shadows = {
-  subtle: '0 1px 4px rgba(0,0,0,0.25), 0 0 1px rgba(0,0,0,0.12)',
-  medium: '0 4px 16px rgba(0,0,0,0.35), 0 0 1px rgba(0,0,0,0.12)',
-  strong: '0 8px 32px rgba(0,0,0,0.5), 0 0 1px rgba(0,0,0,0.18)',
-  glow: '0 0 24px rgba(139,92,246,0.12)',
-  accentGlow: '0 0 20px rgba(139,92,246,0.25), 0 0 60px rgba(139,92,246,0.08)',
+  subtle: '0 1px 3px rgba(0,0,0,0.2)',
+  medium: '0 4px 12px rgba(0,0,0,0.25)',
+  strong: '0 8px 24px rgba(0,0,0,0.35)',
+  glow: '0 0 20px rgba(108,122,219,0.1)',
+  accentGlow: '0 0 16px rgba(108,122,219,0.2)',
 };
 
-// Kairo glass styles — reusable frosted glass surfaces
 export const glass = {
-  rail: { background: 'rgba(255,255,255,0.03)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)', border: '1px solid rgba(255,255,255,0.06)' },
-  surface: { background: 'rgba(255,255,255,0.04)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', border: '1px solid rgba(255,255,255,0.06)' },
-  card: { background: 'rgba(255,255,255,0.035)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.05)' },
-  hover: { background: 'rgba(255,255,255,0.06)' },
-  active: { background: 'rgba(139,92,246,0.12)', border: '1px solid rgba(139,92,246,0.2)' },
-  bubble: { background: 'rgba(255,255,255,0.04)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.06)' },
-  bubbleOwn: { background: 'rgba(139,92,246,0.1)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', border: '1px solid rgba(139,92,246,0.18)' },
+  rail: { background: colors.bg.base, border: `1px solid ${colors.border.default}` },
+  surface: { background: colors.bg.surface, border: `1px solid ${colors.border.default}` },
+  card: { background: colors.bg.overlay, border: `1px solid ${colors.border.default}` },
+  hover: { background: colors.bg.hover },
+  active: { background: 'rgba(108,122,219,0.12)', border: `1px solid rgba(108,122,219,0.25)` },
+  bubble: { background: colors.bg.overlay, border: `1px solid ${colors.border.default}` },
+  bubbleOwn: { background: 'rgba(108,122,219,0.12)', border: '1px solid rgba(108,122,219,0.2)' },
 };
 
 export const typography = {
@@ -151,10 +150,10 @@ export const cssVariables = `
   --bg-surface: ${colors.bg.surface};
   --bg-elevated: ${colors.bg.elevated};
   --bg-overlay: ${colors.bg.overlay};
-  --bg-glass: rgba(255,255,255,0.03);
-  --bg-glass-hover: rgba(255,255,255,0.05);
-  --bg-glass-active: rgba(255,255,255,0.07);
-  --bg-glass-strong: rgba(255,255,255,0.08);
+  --bg-glass: rgba(255,255,255,0.04);
+  --bg-glass-hover: rgba(255,255,255,0.06);
+  --bg-glass-active: rgba(255,255,255,0.09);
+  --bg-glass-strong: rgba(255,255,255,0.1);
   --text-cream: ${colors.text.primary};
   --text-primary: ${colors.text.primary};
   --text-secondary: ${colors.text.secondary};
@@ -171,7 +170,7 @@ export const cssVariables = `
   --border: ${colors.border.default};
   --border-light: ${colors.border.light};
   --border-glow: ${colors.border.strong};
-  --glass-blur: 20px;
+  --glass-blur: 16px;
   --radius-sm: ${radius.sm};
   --radius-md: ${radius.md};
   --radius-lg: ${radius.lg};
