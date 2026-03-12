@@ -26,9 +26,9 @@ function renderText(text, onLinkClick) {
       const inner = segment.slice(3, -3);
       const firstLine = inner.indexOf('\n');
       const code = firstLine > -1 ? inner.slice(firstLine + 1) : inner;
-      return <pre key={si} className="px-3 py-2 rounded text-[13px] my-1 overflow-x-auto" style={{ background: '#2b2d31', color: colors.text.secondary, border: `1px solid ${colors.border.default}` }}><code>{code}</code></pre>;
+      return <pre key={si} className="px-3 py-2 rounded text-[13px] my-1 overflow-x-auto" style={{ background: colors.bg.base, color: colors.text.secondary, border: `1px solid ${colors.border.default}` }}><code>{code}</code></pre>;
     }
-    if (segment.match(/^`[^`]+`$/)) return <code key={si} className="px-1.5 py-0.5 rounded text-[13px]" style={{ background: '#2b2d31', color: colors.text.secondary }}>{segment.slice(1, -1)}</code>;
+    if (segment.match(/^`[^`]+`$/)) return <code key={si} className="px-1.5 py-0.5 rounded text-[13px]" style={{ background: colors.bg.base, color: colors.text.secondary }}>{segment.slice(1, -1)}</code>;
     return segment.split(/(https?:\/\/[^\s]+|@everyone|@here|\*\*[^*]+\*\*|\*[^*]+\*)/g).map((p, i) => {
       const key = `${si}-${i}`;
       if (p.match(/^https?:\/\//)) {

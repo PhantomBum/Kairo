@@ -41,7 +41,7 @@ function RailIcon({ active, unread, onClick, tooltip, badge, children }) {
         style={{
           width: 48, height: 48,
           borderRadius: active || hovered ? 16 : 24,
-          background: active ? colors.accent.primary : hovered ? colors.accent.primary : colors.bg.elevated,
+          background: active ? colors.accent.primary : hovered ? colors.accent.primary : colors.bg.surface,
           transition: 'border-radius 150ms ease, background 150ms ease',
         }}>
         {children}
@@ -56,7 +56,7 @@ function RailIcon({ active, unread, onClick, tooltip, badge, children }) {
 }
 
 function RailDivider() {
-  return <div className="w-8 h-[2px] rounded-full mx-auto my-0.5" style={{ background: colors.border.strong }} />;
+  return <div className="w-8 h-[2px] rounded-full mx-auto my-0.5" style={{ background: 'rgba(255,255,255,0.06)' }} />;
 }
 
 export default function ServerRailWithContext({ servers, activeServerId, onServerSelect, onHomeClick, onCreateServer, onDiscover, onElite, onLeaveServer, isHome, badge, currentUserId, isAppOwner, onAdminPanel }) {
@@ -133,10 +133,10 @@ export default function ServerRailWithContext({ servers, activeServerId, onServe
 
       {/* Add / Discover */}
       <RailIcon onClick={onCreateServer} tooltip="Add a Server">
-        <Plus className="w-5 h-5" style={{ color: colors.success }} />
+        <Plus className="w-5 h-5" style={{ color: colors.accent.primary }} />
       </RailIcon>
       <RailIcon onClick={onDiscover} tooltip="Explore Servers">
-        <Compass className="w-5 h-5" style={{ color: colors.success }} />
+        <Compass className="w-5 h-5" style={{ color: colors.accent.primary }} />
       </RailIcon>
 
       <div className="flex-1" />

@@ -87,9 +87,9 @@ export default function VirtualMessageList({
         <div className="px-4 md:px-8 pt-16 pb-8">
           <div className="w-[68px] h-[68px] rounded-full flex items-center justify-center mb-4"
             style={{ background: colors.bg.overlay }}>
-            {isDM ? <MessageSquare className="w-8 h-8" style={{ color: '#fff' }} /> : <Hash className="w-8 h-8" style={{ color: '#fff' }} />}
+            {isDM ? <MessageSquare className="w-8 h-8" style={{ color: colors.text.primary }} /> : <Hash className="w-8 h-8" style={{ color: colors.text.primary }} />}
           </div>
-          <h2 className="text-[32px] font-bold mb-2" style={{ color: '#fff' }}>
+          <h2 className="text-[32px] font-bold mb-2" style={{ color: colors.text.primary }}>
             {isDM ? channelName : `Welcome to #${channelName}`}
           </h2>
           <p className="text-[14px]" style={{ color: colors.text.muted }}>

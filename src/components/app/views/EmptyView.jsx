@@ -43,7 +43,7 @@ export default function EmptyView({ onCreateServer, onJoinServer, emptyServer, s
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }} className="w-full max-w-md">
         <div className="mb-12">
           <p className="text-[13px] font-medium mb-2" style={{ color: colors.text.disabled }}>{greeting.text} — {greeting.sub}</p>
-          <h1 className="text-[32px] font-bold tracking-tight" style={{ color: '#fff' }}>Kairo</h1>
+          <h1 className="text-[32px] font-bold tracking-tight" style={{ color: colors.text.primary }}>Kairo</h1>
           <div className="w-8 h-[3px] rounded-full mt-3" style={{ background: colors.accent.primary }} />
         </div>
 
@@ -55,7 +55,7 @@ export default function EmptyView({ onCreateServer, onJoinServer, emptyServer, s
               <Plus className="w-5 h-5 text-white" />
             </div>
             <div>
-              <p className="text-[14px] font-semibold" style={{ color: '#fff' }}>Create a server</p>
+              <p className="text-[14px] font-semibold" style={{ color: colors.text.primary }}>Create a server</p>
               <p className="text-[12px] mt-0.5" style={{ color: colors.text.disabled }}>Start something new</p>
             </div>
           </button>
@@ -67,7 +67,7 @@ export default function EmptyView({ onCreateServer, onJoinServer, emptyServer, s
               <Compass className="w-5 h-5" style={{ color: colors.text.muted }} />
             </div>
             <div>
-              <p className="text-[14px] font-semibold" style={{ color: '#fff' }}>Join a server</p>
+              <p className="text-[14px] font-semibold" style={{ color: colors.text.primary }}>Join a server</p>
               <p className="text-[12px] mt-0.5" style={{ color: colors.text.disabled }}>Got a code? Use it here</p>
             </div>
           </button>
