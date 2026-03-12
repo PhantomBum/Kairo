@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { createPageUrl } from '@/utils';
-import { Hash, Volume2, Megaphone, Radio, MessageSquare, HelpCircle, Users, Pin, AtSign, Image, Phone, Video, Search, LayoutGrid, Star, Heart } from 'lucide-react';
+import { Hash, Volume2, Megaphone, Radio, MessageSquare, Users, Pin, AtSign, Phone, Video, Search, LayoutGrid, Heart } from 'lucide-react';
 import { colors } from '@/components/app/design/tokens';
 import SupportDropdown from '@/components/app/features/SupportDropdown';
 
