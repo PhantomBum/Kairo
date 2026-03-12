@@ -20,15 +20,15 @@ function ChannelItem({ channel, active, onClick, onSettings, isOwner, index }) {
                 className="w-full flex items-center gap-2.5 px-2.5 py-[7px] rounded-xl text-[13px] group"
                 style={{
                   ...(active ? glass.active : {}),
-                  background: snapshot.isDragging ? 'rgba(255,255,255,0.06)' : active ? 'rgba(139,92,246,0.1)' : 'transparent',
-                  border: active ? '1px solid rgba(139,92,246,0.18)' : '1px solid transparent',
+                  background: snapshot.isDragging ? colors.bg.hover : active ? colors.accent.subtle : 'transparent',
+                  border: active ? `1px solid ${colors.accent.muted}` : '1px solid transparent',
                   color: active ? colors.text.primary : colors.text.muted,
                   fontWeight: active ? 600 : 400,
-                  boxShadow: active ? '0 0 12px rgba(139,92,246,0.08)' : 'none',
+                  boxShadow: active ? shadows.glow : 'none',
                   transition: 'all 150ms cubic-bezier(0.4,0,0.2,1)',
                 }}>
                 {isOwner && <GripVertical className="w-3 h-3 opacity-0 group-hover:opacity-30 flex-shrink-0" />}
-                <Icon className="w-[16px] h-[16px] flex-shrink-0" style={{ color: active ? colors.accent.hover : colors.text.disabled, transition: 'color 150ms cubic-bezier(0.4,0,0.2,1)' }} />
+                <Icon className="w-[16px] h-[16px] flex-shrink-0" style={{ color: active ? colors.accent.primary : colors.text.disabled, transition: 'color 150ms cubic-bezier(0.4,0,0.2,1)' }} />
                 <span className="truncate flex-1 text-left">{channel.name}</span>
                 {channel.is_nsfw && <ShieldAlert className="w-3 h-3 flex-shrink-0" style={{ color: '#f23f43', opacity: 0.6 }} />}
                 {channel.is_private && <Lock className="w-3 h-3 opacity-30" />}
@@ -40,7 +40,7 @@ function ChannelItem({ channel, active, onClick, onSettings, isOwner, index }) {
                 )}
               </button>
             </ContextMenuTrigger>
-            <ContextMenuContent className="w-52 p-1.5 rounded-xl" style={{ background: 'rgba(22,22,32,0.92)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.08)', boxShadow: shadows.strong }}>
+            <ContextMenuContent className="w-52 p-1.5 rounded-xl" style={{ background: colors.bg.modal, border: `1px solid ${colors.border.light}`, boxShadow: shadows.strong }}>
               <ContextMenuItem onClick={() => navigator.clipboard.writeText(channel.id)} className="text-[13px] gap-2.5 rounded-md px-2.5 py-2" style={{ color: colors.text.secondary }}>
                 <Hash className="w-4 h-4 opacity-50" /> Copy Channel ID
               </ContextMenuItem>
