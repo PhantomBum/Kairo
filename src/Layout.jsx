@@ -172,6 +172,22 @@ export default function Layout({ children }) {
         .k-rotate-hover:hover { transform: rotate(90deg); }
         .k-rotate-hover:active { transform: rotate(90deg) scale(0.9); }
 
+        /* Better select dropdowns — remove native Discord-like look */
+        select {
+          appearance: none;
+          -webkit-appearance: none;
+          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+          background-repeat: no-repeat;
+          background-position: right 10px center;
+          padding-right: 30px !important;
+          cursor: pointer;
+        }
+        select option {
+          background: #13131a;
+          color: #f8fafc;
+          padding: 8px 12px;
+        }
+
         /* Reduced motion — every animation snaps to end state instantly, no exceptions */
         @media (prefers-reduced-motion: reduce) {
           *, *::before, *::after {
