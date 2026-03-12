@@ -18,6 +18,31 @@ import InsightsTab from '@/components/app/server-settings/InsightsTab';
 import GrowthTab from '@/components/app/server-settings/GrowthTab';
 import IntegrationsTab from '@/components/app/server-settings/IntegrationsTab';
 
+function AppearanceSection({ bannerColor, setBannerColor, uploadImg, saveOverview, saving, server }) {
+  const [saveText, setSaveText] = useState('Save Appearance');
+  const handleSave = async () => { await saveOverview(); setSaveText('Saved!'); setTimeout(() => setSaveText('Save Appearance'), 2000); };
+  return (
+    <div className="space-y-4">
+      <div>
+        <label className="text-[11px] font-semibold uppercase tracking-wider block mb-1.5" style={{ color: colors.text.muted }}>Banner Color</label>
+        <div className="flex gap-3 items-center">
+          <input type="color" value={bannerColor} onChange={e => setBannerColor(e.target.value)} className="w-12 h-12 rounded-xl cursor-pointer" style={{ background: colors.bg.elevated, border: `1px solid ${colors.border.default}` }} />
+          <span className="text-[13px] font-mono" style={{ color: colors.text.secondary }}>{bannerColor}</span>
+        </div>
+      </div>
+      <div className="h-24 rounded-xl overflow-hidden" style={{ background: bannerColor }}>
+        {server?.banner_url && <img src={server.banner_url} className="w-full h-full object-cover" alt="" />}
+      </div>
+      <button onClick={() => uploadImg('icon_url')} className="w-full py-3 rounded-xl text-[13px] transition-all hover:brightness-110 active:scale-[0.99]" style={{ background: colors.bg.elevated, color: colors.text.secondary, border: `1px solid ${colors.border.default}` }}>Change Server Icon</button>
+      <button onClick={() => uploadImg('banner_url')} className="w-full py-3 rounded-xl text-[13px] transition-all hover:brightness-110 active:scale-[0.99]" style={{ background: colors.bg.elevated, color: colors.text.secondary, border: `1px solid ${colors.border.default}` }}>Change Server Banner</button>
+      <button onClick={handleSave} disabled={saving} className="px-6 py-2.5 rounded-xl text-[13px] font-semibold disabled:opacity-30 transition-all hover:brightness-110 active:scale-95"
+        style={{ background: saveText === 'Saved!' ? colors.success : colors.accent.primary, color: '#fff' }}>
+        {saving ? 'Saving...' : saveText}
+      </button>
+    </div>
+  );
+}
+
 function InvitesSection({ server }) {
   const [copied, setCopied] = useState(false);
   const url = `${window.location.origin}/invite/${server?.invite_code}`;
