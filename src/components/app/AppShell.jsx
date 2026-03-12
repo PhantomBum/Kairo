@@ -57,6 +57,8 @@ import StarredMessagesPanel from '@/components/app/features/StarredMessages';
 import QuickStatusPopup from '@/components/app/features/QuickStatusPopup';
 import ServerNotes from '@/components/app/features/ServerNotes';
 import JumpToDate from '@/components/app/features/JumpToDate';
+import { useBadgeCheck } from '@/components/app/badges/useBadgeCheck';
+import BadgeNotification from '@/components/app/badges/BadgeNotification';
 
 function ModalSuspense({ children }) {
   return <Suspense fallback={<div className="fixed inset-0 z-50 flex items-center justify-center" style={{ background: 'rgba(0,0,0,0.5)' }}><div className="w-6 h-6 border-2 rounded-full animate-spin" style={{ borderColor: 'rgba(255,255,255,0.1)', borderTopColor: '#5865F2' }} /></div>}>{children}</Suspense>;
