@@ -236,7 +236,7 @@ export default function ServerSettingsModal({ onClose, server, currentUserId }) 
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 flex items-center justify-center" style={{ background: 'rgba(0,0,0,0.8)' }} onClick={onClose}>
+      className="fixed inset-0 z-50 flex items-center justify-center" style={{ background: 'rgba(0,0,0,0.6)' }} onClick={onClose}>
       <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.97, opacity: 0 }}
         transition={{ type: 'spring', damping: 25, stiffness: 350 }}
         className="w-full h-[85vh] max-w-[900px] rounded-2xl overflow-hidden flex"
@@ -246,8 +246,8 @@ export default function ServerSettingsModal({ onClose, server, currentUserId }) 
         <div className="flex-1 flex flex-col min-w-0">
           <div className="flex items-center justify-between px-6 py-4 flex-shrink-0" style={{ borderBottom: `1px solid ${colors.border.default}` }}>
             <h2 className="text-[18px] font-bold capitalize" style={{ color: colors.text.primary }}>{tab.replace(/-/g, ' ')}</h2>
-            <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[rgba(255,255,255,0.06)]">
-              <X className="w-5 h-5" style={{ color: colors.text.muted }} />
+            <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-lg" style={{ ':hover': { background: colors.bg.hover } }}>
+              <X className="w-4 h-4" style={{ color: colors.text.disabled }} />
             </button>
           </div>
           <div className="flex-1 overflow-y-auto scrollbar-none p-6">
