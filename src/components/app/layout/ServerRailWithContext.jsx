@@ -27,14 +27,13 @@ function RailIcon({ active, unread, onClick, tooltip, badge, children }) {
   const [hovered, setHovered] = useState(false);
   return (
     <div className="relative flex items-center justify-center" onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
-      {/* Kairo: floating glow indicator instead of Discord's left pill */}
+      {/* Kloak: clean solid pill indicator — no glow, no shadow */}
       <motion.div className="absolute -left-0.5 top-1/2 rounded-full" initial={false}
         animate={{
           width: active ? 4 : 3,
-          height: active ? 28 : hovered ? 14 : unread ? 6 : 0,
+          height: active ? 28 : hovered ? 16 : unread ? 7 : 0,
           y: '-50%',
           opacity: active || hovered || unread ? 1 : 0,
-          boxShadow: active ? `0 0 8px ${colors.accent.primary}` : 'none',
         }}
         transition={{ duration: 0.2, ease: [0, 0, 0.2, 1] }}
         style={{ background: active ? colors.accent.primary : colors.text.primary }} />
@@ -45,17 +44,16 @@ function RailIcon({ active, unread, onClick, tooltip, badge, children }) {
         style={{
           width: 48, height: 48,
           borderRadius: active ? 14 : hovered ? 16 : 22,
-          ...glass.rail,
           background: active
-            ? `linear-gradient(135deg, ${colors.accent.primary}, ${colors.accent.active})`
+            ? colors.accent.primary
             : hovered ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.03)',
-          boxShadow: active ? shadows.accentGlow : hovered ? shadows.glow : 'none',
+          border: `1px solid ${active ? colors.accent.primary : colors.border.default}`,
           transition: 'border-radius 0.25s cubic-bezier(0,0,0.2,1), background 0.2s, box-shadow 0.2s',
         }}>
         {children}
         {badge > 0 && (
           <div className="absolute -bottom-0.5 -right-0.5 min-w-[16px] h-[16px] px-1 rounded-full text-[10px] font-bold flex items-center justify-center"
-            style={{ background: colors.danger, color: '#fff', boxShadow: '0 0 8px rgba(239,68,68,0.4)' }}>{badge > 99 ? '99+' : badge}</div>
+            style={{ background: colors.danger, color: '#fff' }}>{badge > 99 ? '99+' : badge}</div>
         )}
       </motion.button>
       <RailTooltip text={tooltip} visible={hovered} />
@@ -64,7 +62,7 @@ function RailIcon({ active, unread, onClick, tooltip, badge, children }) {
 }
 
 function ServerDivider() {
-  return <div className="w-6 h-[1px] rounded-full my-1.5" style={{ background: `linear-gradient(90deg, transparent, ${colors.border.light}, transparent)` }} />;
+  return <div className="w-6 h-[1px] rounded-full my-2" style={{ background: colors.border.default }} />;
 }
 
 export default function ServerRailWithContext({ servers, activeServerId, onServerSelect, onHomeClick, onCreateServer, onDiscover, onElite, onLeaveServer, isHome, badge, currentUserId }) {
@@ -90,12 +88,12 @@ export default function ServerRailWithContext({ servers, activeServerId, onServe
   };
 
   return (
-    <div className="w-[72px] flex-shrink-0 flex flex-col items-center py-3 gap-1.5 overflow-y-auto scrollbar-none"
+    <div className="w-[72px] flex-shrink-0 flex flex-col items-center py-3 gap-2 overflow-y-auto scrollbar-none"
       style={{ background: colors.bg.base, borderRight: `1px solid ${colors.border.default}` }} role="navigation" aria-label="Server list">
       <ContextMenu>
         <ContextMenuTrigger>
           <div><RailIcon active={isHome} onClick={onHomeClick} tooltip="Direct Messages" badge={badge}>
-            <Home className="w-6 h-6" style={{ color: isHome ? colors.text.primary : colors.text.muted }} />
+            <Home className="w-6 h-6" style={{ color: isHome ? '#fff' : colors.text.muted }} />
           </RailIcon></div>
         </ContextMenuTrigger>
         <ContextMenuContent className="w-52 p-1.5 rounded-xl" style={{ background: colors.bg.modal, border: `1px solid ${colors.border.light}`, boxShadow: shadows.strong }}>

@@ -17,18 +17,16 @@ function ChannelItem({ channel, active, onClick, onSettings, isOwner, index }) {
           <ContextMenu>
             <ContextMenuTrigger>
               <button onClick={() => onClick(channel)}
-                className="w-full flex items-center gap-2.5 px-2.5 py-[7px] rounded-xl text-[13px] group"
+                className="w-full flex items-center gap-2.5 px-2.5 py-[8px] rounded-lg text-[13px] group"
                 style={{
-                  ...(active ? glass.active : {}),
                   background: snapshot.isDragging ? colors.bg.hover : active ? colors.accent.subtle : 'transparent',
                   border: active ? `1px solid ${colors.accent.muted}` : '1px solid transparent',
                   color: active ? colors.text.primary : colors.text.muted,
                   fontWeight: active ? 600 : 400,
-                  boxShadow: active ? shadows.glow : 'none',
-                  transition: 'all 150ms cubic-bezier(0.4,0,0.2,1)',
+                  transition: 'all 120ms ease',
                 }}>
                 {isOwner && <GripVertical className="w-3 h-3 opacity-0 group-hover:opacity-30 flex-shrink-0" />}
-                <Icon className="w-[16px] h-[16px] flex-shrink-0" style={{ color: active ? colors.accent.primary : colors.text.disabled, transition: 'color 150ms cubic-bezier(0.4,0,0.2,1)' }} />
+                <Icon className="w-[16px] h-[16px] flex-shrink-0" style={{ color: active ? colors.accent.primary : colors.text.disabled, transition: 'color 120ms ease' }} />
                 <span className="truncate flex-1 text-left">{channel.name}</span>
                 {channel.is_nsfw && <ShieldAlert className="w-3 h-3 flex-shrink-0" style={{ color: '#f23f43', opacity: 0.6 }} />}
                 {channel.is_private && <Lock className="w-3 h-3 opacity-30" />}
@@ -65,9 +63,9 @@ function CategoryGroup({ category, channels, activeId, onSelect, onAdd, onSettin
       {(provided) => (
         <div ref={provided.innerRef} {...provided.draggableProps} className="mb-1">
           <div {...provided.dragHandleProps}>
-            <button onClick={() => setOpen(!open)} className="w-full flex items-center gap-1.5 px-1 pt-4 pb-1.5 group">
+            <button onClick={() => setOpen(!open)} className="w-full flex items-center gap-1.5 px-1 pt-5 pb-2 group">
               <ChevronDown className="w-3 h-3" style={{ color: colors.text.disabled, transform: open ? 'rotate(0deg)' : 'rotate(-90deg)', transition: 'transform 200ms cubic-bezier(0,0,0.2,1)' }} />
-              <span className="text-[10px] font-bold uppercase tracking-[0.08em] flex-1 text-left truncate" style={{ color: colors.text.disabled, letterSpacing: '0.08em' }}>{category.name}</span>
+              <span className="text-[10px] font-bold uppercase tracking-[0.06em] flex-1 text-left truncate" style={{ color: colors.text.disabled }}>{category.name}</span>
               {isOwner && <Plus onClick={e => { e.stopPropagation(); onAdd(category.id); }} className="w-[14px] h-[14px] opacity-0 group-hover:opacity-50 hover:opacity-100 cursor-pointer k-rotate-hover" style={{ color: colors.accent.hover }} />}
             </button>
           </div>
@@ -110,11 +108,9 @@ export default function DraggableChannelSidebar({ server, categories, channels, 
     const { source, destination, type, draggableId } = result;
 
     if (type === 'category') {
-      // Reorder categories
       const reordered = [...sorted];
       const [moved] = reordered.splice(source.index, 1);
       reordered.splice(destination.index, 0, moved);
-      // Update all positions
       const updates = reordered.map((cat, i) =>
         base44.entities.Category.update(cat.id, { position: i })
       );
@@ -122,23 +118,18 @@ export default function DraggableChannelSidebar({ server, categories, channels, 
       return;
     }
 
-    // Channel drag
     const chId = draggableId;
     const dstCatRaw = destination.droppableId.replace('cat-', '');
     const srcCatRaw = source.droppableId.replace('cat-', '');
     const newCategoryId = dstCatRaw === 'uncategorized' ? '' : dstCatRaw;
 
-    // Get channels in the destination category
     const dstChannels = dstCatRaw === 'uncategorized'
       ? uncategorized.filter(c => c.id !== chId)
       : (channels || []).filter(ch => ch.category_id === dstCatRaw && ch.id !== chId);
 
     const sortedDst = [...dstChannels].sort((a, b) => (a.position || 0) - (b.position || 0));
-
-    // Insert at destination index
     sortedDst.splice(destination.index, 0, { id: chId });
 
-    // Batch update all positions in destination
     const updates = sortedDst.map((ch, i) => {
       if (ch.id === chId) {
         return base44.entities.Channel.update(chId, { category_id: newCategoryId, position: i });
@@ -146,7 +137,6 @@ export default function DraggableChannelSidebar({ server, categories, channels, 
       return base44.entities.Channel.update(ch.id, { position: i });
     });
 
-    // If moved between categories, also reorder source category
     if (srcCatRaw !== dstCatRaw) {
       const srcChannels = srcCatRaw === 'uncategorized'
         ? uncategorized.filter(c => c.id !== chId)
@@ -162,7 +152,6 @@ export default function DraggableChannelSidebar({ server, categories, channels, 
 
   return (
     <div className="flex-1 flex flex-col min-h-0">
-      {/* Banner header */}
       <ServerBannerHeader
         server={server}
         isOwner={isOwner}
@@ -175,7 +164,6 @@ export default function DraggableChannelSidebar({ server, categories, channels, 
         onAddChannel={() => onAdd(sorted[0]?.id)}
       />
 
-      {/* Channel list */}
       <DragDropContext onDragEnd={onDragEnd}>
         <Droppable droppableId="categories" type="category">
           {(provided) => (
@@ -204,7 +192,7 @@ export default function DraggableChannelSidebar({ server, categories, channels, 
               ))}
               {isOwner && (
                 <button onClick={onAddCategory}
-                  className="w-full flex items-center gap-2 px-3 py-2 mt-2 rounded-xl text-[12px] font-medium transition-colors hover:bg-[rgba(255,255,255,0.04)]"
+                  className="w-full flex items-center gap-2 px-3 py-2 mt-3 rounded-lg text-[12px] font-medium transition-colors hover:bg-[rgba(255,255,255,0.04)]"
                   style={{ color: colors.text.disabled }}>
                   <Plus className="w-3.5 h-3.5 k-rotate-hover" /> Create Category
                 </button>

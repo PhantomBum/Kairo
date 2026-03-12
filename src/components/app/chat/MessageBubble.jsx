@@ -1,4 +1,4 @@
-import React, { useState, memo } from 'react';
+import React, { useState, memo, useMemo } from 'react';
 import { Reply, Pencil, Trash2, Copy, Pin, PinOff, Link, Smile, ChevronDown, ChevronUp, Bookmark, ArrowRight, Zap, UserPlus, LogOut } from 'lucide-react';
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuSeparator, ContextMenuTrigger } from '@/components/ui/context-menu';
 import ImageWithFallback from '@/components/app/shared/ImageWithFallback';
@@ -56,6 +56,22 @@ function CopyMenuItem({ text, label, icon: IconComp }) {
   );
 }
 
+// Kloak-style role badge pill
+function RoleBadgePill({ badges }) {
+  if (!badges?.length) return null;
+  const isOwner = badges.includes('owner');
+  const isAdmin = badges.includes('admin');
+  if (!isOwner && !isAdmin) return null;
+  const label = isOwner ? 'Owner' : 'Admin';
+  const color = isOwner ? colors.warning : colors.info;
+  return (
+    <span className="text-[10px] font-semibold px-1.5 py-[1px] rounded flex-shrink-0 leading-tight"
+      style={{ background: `${color}15`, color }}>
+      {label}
+    </span>
+  );
+}
+
 const SYSTEM_ICONS = { boost: Zap, join: UserPlus, leave: LogOut };
 
 const SystemMessage = memo(function SystemMessage({ message }) {
@@ -67,8 +83,8 @@ const SystemMessage = memo(function SystemMessage({ message }) {
   const accentColor = isBoost ? '#a855f7' : isJoin ? colors.success : isLeave ? colors.text.muted : colors.text.disabled;
   
   return (
-    <div className="flex items-center gap-3 py-1.5 px-4 k-msg-in" style={{ marginTop: '4px' }}>
-      <div className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: `${accentColor}15` }}>
+    <div className="flex items-center gap-3 py-1.5 px-5 k-msg-in" style={{ marginTop: '4px' }}>
+      <div className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: `${accentColor}12` }}>
         <Icon className="w-3.5 h-3.5" style={{ color: accentColor }} />
       </div>
       <span className="text-[13px]" style={{ color: colors.text.muted }}>
@@ -82,7 +98,6 @@ const SystemMessage = memo(function SystemMessage({ message }) {
 });
 
 const MessageBubble = memo(function MessageBubble({ message, compact, isOwn, onReply, onEdit, onDelete, onReact, onPin, currentUserId, onProfileClick, isEditing, onEditSave, onEditCancel, onImageClick, onLinkClick, onHighlight }) {
-  // Handle system messages separately
   if (message.type === 'system') return <SystemMessage message={message} />;
 
   const [hovered, setHovered] = useState(false);
@@ -95,7 +110,7 @@ const MessageBubble = memo(function MessageBubble({ message, compact, isOwn, onR
   const isDeleted = message.is_deleted;
   const authorName = isDeleted ? 'Deleted User' : (message.author_name || 'User');
 
-  // Role color
+  // Role color — vivid, confident, Kloak-style
   const roleColor = message.author_badges?.includes('owner') ? colors.warning
     : message.author_badges?.includes('admin') ? colors.info
     : colors.text.primary;
@@ -104,10 +119,10 @@ const MessageBubble = memo(function MessageBubble({ message, compact, isOwn, onR
     <ContextMenu>
       <ContextMenuTrigger>
         <div
-          className="relative group flex items-start gap-4 py-0.5 px-4 hover:bg-[rgba(255,255,255,0.02)]"
+          className="relative group flex items-start gap-4 py-[3px] px-5 hover:bg-[rgba(255,255,255,0.02)]"
           onMouseEnter={() => setHovered(true)}
           onMouseLeave={() => setHovered(false)}
-          style={{ marginTop: compact ? 0 : '1.0625rem' }}
+          style={{ marginTop: compact ? 0 : '1.125rem' }}
         >
           {/* Avatar column */}
           {compact ? (
@@ -120,7 +135,7 @@ const MessageBubble = memo(function MessageBubble({ message, compact, isOwn, onR
             <button
               onClick={() => !isDeleted && onProfileClick?.(message.author_id)}
               className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold flex-shrink-0 overflow-hidden hover:opacity-80 mt-0.5"
-              style={{ background: colors.bg.elevated, color: colors.text.muted }}
+              style={{ background: colors.bg.overlay, color: colors.text.muted }}
             >
               {isDeleted ? '👻' : message.author_avatar
                 ? <img src={message.author_avatar} className="w-full h-full object-cover" alt="" />
@@ -131,9 +146,9 @@ const MessageBubble = memo(function MessageBubble({ message, compact, isOwn, onR
 
           {/* Message body */}
           <div className="flex-1 min-w-0 overflow-hidden">
-            {/* Header line — only on non-compact */}
+            {/* Header line */}
             {!compact && (
-              <div className="flex items-baseline gap-2">
+              <div className="flex items-center gap-2">
                 <button
                   onClick={() => !isDeleted && onProfileClick?.(message.author_id)}
                   className="text-[15px] font-semibold hover:underline truncate max-w-[200px]"
@@ -141,12 +156,7 @@ const MessageBubble = memo(function MessageBubble({ message, compact, isOwn, onR
                 >
                   {authorName}
                 </button>
-                {!isDeleted && message.author_badges?.includes('owner') && (
-                  <span className="text-[9px] px-1.5 py-px rounded font-bold flex-shrink-0" style={{ background: `${colors.warning}18`, color: colors.warning }}>OWNER</span>
-                )}
-                {!isDeleted && message.author_badges?.includes('admin') && (
-                  <span className="text-[9px] px-1.5 py-px rounded font-bold flex-shrink-0" style={{ background: `${colors.info}18`, color: colors.info }}>ADMIN</span>
-                )}
+                {!isDeleted && <RoleBadgePill badges={message.author_badges} />}
                 <button
                   onClick={() => setShowFullTs(!showFullTs)}
                   className="text-[11px] tabular-nums select-none flex-shrink-0 hover:underline"
@@ -167,12 +177,12 @@ const MessageBubble = memo(function MessageBubble({ message, compact, isOwn, onR
               </div>
             )}
 
-            {/* Reply preview */}
+            {/* Reply preview — Kloak style: colored left bar */}
             {message.reply_preview && (
-              <div className="flex items-center gap-1.5 mb-0.5 cursor-pointer hover:opacity-80">
-                <div className="w-[2px] h-3 rounded-full flex-shrink-0" style={{ background: colors.accent.primary }} />
+              <div className="flex items-center gap-2 mb-1 cursor-pointer hover:opacity-80">
+                <div className="w-[2px] h-4 rounded-full flex-shrink-0" style={{ background: colors.accent.primary }} />
                 <span className="text-[12px] truncate" style={{ color: colors.text.muted }}>
-                  <span className="font-semibold" style={{ color: colors.text.secondary }}>{message.reply_preview.author_name}</span>
+                  <span className="font-semibold" style={{ color: colors.accent.primary }}>{message.reply_preview.author_name}</span>
                   {' '}{message.reply_preview.content?.slice(0, 80)}
                 </span>
               </div>
@@ -185,7 +195,7 @@ const MessageBubble = memo(function MessageBubble({ message, compact, isOwn, onR
               <div>
                 <textarea value={editText} onChange={e => setEditText(e.target.value)}
                   onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); saveFn(); } if (e.key === 'Escape') onEditCancel(); }}
-                  className="w-full text-[14px] rounded-lg px-3 py-2 outline-none resize-none" style={{ background: colors.bg.elevated, color: colors.text.primary, border: `1px solid ${colors.accent.primary}` }}
+                  className="w-full text-[14px] rounded-lg px-3 py-2 outline-none resize-none" style={{ background: colors.bg.overlay, color: colors.text.primary, border: `1px solid ${colors.accent.primary}` }}
                   rows={2} autoFocus />
                 <div className="text-[11px] mt-1" style={{ color: colors.text.disabled }}>
                   Escape to <button onClick={onEditCancel} className="underline" style={{ color: colors.text.link }}>cancel</button> · Enter to <button onClick={saveFn} className="underline" style={{ color: colors.text.link }}>save</button>
@@ -193,7 +203,7 @@ const MessageBubble = memo(function MessageBubble({ message, compact, isOwn, onR
               </div>
             ) : (
               <div className="relative">
-                <div className="text-[14px] leading-[1.375] whitespace-pre-wrap break-words" style={{ color: colors.text.secondary, maxHeight: isLong && !expanded ? '300px' : 'none' }}>
+                <div className="text-[14px] leading-[1.4] whitespace-pre-wrap break-words" style={{ color: colors.text.secondary, maxHeight: isLong && !expanded ? '300px' : 'none' }}>
                   {renderText(message.content, onLinkClick)}
                 </div>
                 {isLong && !expanded && (
@@ -215,32 +225,32 @@ const MessageBubble = memo(function MessageBubble({ message, compact, isOwn, onR
 
             {/* Attachments */}
             {!isDeleted && message.attachments?.length > 0 && (
-              <div className="flex flex-wrap gap-2 mt-1">
+              <div className="flex flex-wrap gap-2 mt-1.5">
                 {message.attachments.map((a, i) => {
                   const isGif = a.content_type === 'image/gif' || a.filename?.toLowerCase().endsWith('.gif') || a.url?.toLowerCase().includes('.gif');
                   if (a.content_type?.startsWith('image/') || isGif) return <ImageWithFallback key={i} src={a.url} alt={a.filename || 'image'} className="max-w-[400px] max-h-[300px] rounded cursor-pointer hover:brightness-110" style={{ border: `1px solid ${colors.border.default}` }} onClick={() => onImageClick?.(a.url, a.filename)} />;
                   if (a.content_type?.startsWith('video/') || a.url?.match(/\.(mp4|webm|mov|avi|mkv)(\?|$)/i)) return <VideoPlayer key={i} src={a.url} filename={a.filename} />;
                   if (a.content_type?.startsWith('audio/') || a.url?.match(/\.(mp3|wav|ogg|flac|aac)(\?|$)/i)) return <audio key={i} src={a.url} controls className="max-w-[300px]" />;
-                  return <a key={i} href={a.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-[13px] px-3 py-2 rounded hover:brightness-110" style={{ color: colors.text.secondary, background: colors.bg.elevated }}>📎 {a.filename || 'File'}</a>;
+                  return <a key={i} href={a.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-[13px] px-3 py-2 rounded hover:brightness-110" style={{ color: colors.text.secondary, background: colors.bg.overlay }}>📎 {a.filename || 'File'}</a>;
                 })}
               </div>
             )}
 
-            {/* Reactions */}
+            {/* Reactions — Kloak-style pills */}
             {!isDeleted && message.reactions?.length > 0 && (
-              <div className="flex flex-wrap gap-1 mt-1">
+              <div className="flex flex-wrap gap-1.5 mt-2">
                 {message.reactions.map((r, i) => {
                   const mine = r.users?.includes(currentUserId);
                   return (
                     <ReactionTooltip key={i} reaction={r}>
                       <button onClick={() => onReact(message, r.emoji)}
-                        className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[12px]"
+                        className="flex items-center gap-1 px-2 py-[3px] rounded-md text-[12px] transition-colors"
                         style={{
                           background: mine ? colors.accent.subtle : 'rgba(255,255,255,0.04)',
                           color: mine ? colors.accent.primary : colors.text.muted,
                           border: `1px solid ${mine ? colors.accent.muted : 'rgba(255,255,255,0.06)'}`,
                         }}>
-                        {r.emoji} <span className="font-medium">{r.count}</span>
+                        {r.emoji} <span className="font-medium tabular-nums">{r.count}</span>
                       </button>
                     </ReactionTooltip>
                   );
@@ -249,10 +259,10 @@ const MessageBubble = memo(function MessageBubble({ message, compact, isOwn, onR
             )}
           </div>
 
-          {/* Hover action bar */}
+          {/* Hover action bar — Kloak: clean, above message, right side */}
           {hovered && !isEditing && !isDeleted && (
-            <div className="absolute -top-3 right-4 flex items-center p-[2px] rounded-lg gap-[1px] z-10 k-fade-in"
-              style={{ background: colors.bg.elevated, border: `1px solid ${colors.border.default}`, boxShadow: shadows.medium }}
+            <div className="absolute -top-3.5 right-5 flex items-center p-[2px] rounded-lg gap-[1px] z-10 k-fade-in"
+              style={{ background: colors.bg.overlay, border: `1px solid ${colors.border.default}`, boxShadow: shadows.medium }}
               role="toolbar" aria-label="Message actions">
               {quickEmojis.map(e => <button key={e} onClick={() => onReact(message, e)} className="w-7 h-7 flex items-center justify-center rounded text-sm hover:bg-[rgba(255,255,255,0.06)]">{e}</button>)}
               <div className="w-px h-5 mx-0.5" style={{ background: colors.border.default }} />
@@ -268,7 +278,7 @@ const MessageBubble = memo(function MessageBubble({ message, compact, isOwn, onR
       </ContextMenuTrigger>
 
       {/* Context menu */}
-      <ContextMenuContent className="w-52 p-1 rounded-lg" style={{ background: colors.bg.elevated, border: `1px solid ${colors.border.default}`, boxShadow: shadows.strong }}>
+      <ContextMenuContent className="w-52 p-1 rounded-lg" style={{ background: colors.bg.overlay, border: `1px solid ${colors.border.default}`, boxShadow: shadows.strong }}>
         {!isDeleted && <>
           <div className="flex items-center gap-0.5 px-1 py-1 mb-1">
             {['👍', '❤️', '😂', '🔥', '👀', '✨'].map(e => (

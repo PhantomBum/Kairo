@@ -29,7 +29,6 @@ export default function ServerRailIcon({ server, active, unread, onClick, childr
   }, []);
 
   const accentColor = server?.banner_color || colors.accent.primary;
-  const hasGlow = active || hovered;
 
   return (
     <div className="relative flex items-center justify-center"
@@ -37,22 +36,20 @@ export default function ServerRailIcon({ server, active, unread, onClick, childr
       onMouseLeave={handleLeave}
       ref={iconRef}
     >
-      {/* Kairo: floating glow indicator */}
+      {/* Kloak: clean solid pill — no glow */}
       <motion.div
         className="absolute -left-0.5 top-1/2 rounded-full"
         initial={false}
         animate={{
           width: active ? 4 : 3,
-          height: active ? 28 : hovered ? 14 : unread ? 6 : 0,
+          height: active ? 28 : hovered ? 16 : unread ? 7 : 0,
           y: '-50%',
           opacity: active || hovered || unread ? 1 : 0,
-          boxShadow: active ? `0 0 8px ${accentColor}` : 'none',
         }}
         transition={{ duration: 0.2, ease: [0, 0, 0.2, 1] }}
         style={{ background: active ? accentColor : colors.text.primary }}
       />
 
-      {/* Glass icon button */}
       <motion.button
         onClick={onClick}
         className="relative overflow-hidden flex items-center justify-center"
@@ -64,20 +61,16 @@ export default function ServerRailIcon({ server, active, unread, onClick, childr
         style={{
           width: 48,
           height: 48,
-          ...glass.rail,
           background: active
-            ? `linear-gradient(135deg, ${accentColor}, ${accentColor}cc)`
+            ? accentColor
             : hovered ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.03)',
-          boxShadow: active
-            ? `0 0 16px ${accentColor}40, ${shadows.subtle}`
-            : hasGlow ? shadows.glow : 'none',
-          transition: 'background 0.2s, box-shadow 0.25s',
+          border: `1px solid ${active ? accentColor : colors.border.default}`,
+          transition: 'background 0.2s',
         }}
       >
         {children}
       </motion.button>
 
-      {/* Hover card */}
       {server && (
         <ServerHoverCard
           server={server}
