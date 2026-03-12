@@ -39,36 +39,36 @@ export default function DMSidebar({ conversations, activeId, onSelect, onFriends
   return (
     <div className="flex-1 flex flex-col min-h-0">
       {/* Search */}
-      <div className="h-12 px-2.5 flex items-center flex-shrink-0" style={{ boxShadow: '0 1px 0 rgba(0,0,0,0.4)' }}>
-        <div className="flex-1 flex items-center gap-2 px-2 py-1 rounded" style={{ background: colors.bg.overlay }}>
-          <Search className="w-4 h-4 flex-shrink-0" style={{ color: colors.text.disabled }} />
-          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Find or start a conversation"
-            className="flex-1 bg-transparent text-[13px] outline-none" style={{ color: colors.text.primary }} />
+      <div className="h-11 px-2 flex items-center flex-shrink-0" style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+        <div className="flex-1 flex items-center gap-1.5 px-2 py-[5px] rounded-md" style={{ background: colors.bg.overlay }}>
+          <Search className="w-3.5 h-3.5 flex-shrink-0" style={{ color: colors.text.disabled }} />
+          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Find a conversation"
+            className="flex-1 bg-transparent text-[12px] outline-none" style={{ color: colors.text.primary }} />
         </div>
       </div>
 
       {/* Quick actions */}
-      <div className="px-2 pt-2 pb-1 space-y-px">
-        <button onClick={onFriends} className="w-full flex items-center gap-3 px-2 py-[7px] rounded text-[15px] transition-colors hover:bg-[rgba(255,255,255,0.04)] relative"
+      <div className="px-2 pt-1.5 pb-0.5 space-y-px">
+        <button onClick={onFriends} className="w-full flex items-center gap-2.5 px-2 py-[5px] rounded-md text-[13px] transition-colors hover:bg-[rgba(255,255,255,0.04)] relative"
           style={{ color: colors.text.secondary, fontWeight: 500 }}>
-          <Users className="w-5 h-5" style={{ color: colors.text.disabled }} /> Friends
+          <Users className="w-4 h-4" style={{ color: colors.text.disabled }} /> Friends
           {incomingRequestCount > 0 && (
-            <span className="absolute right-2 min-w-[18px] h-[18px] px-1 rounded-full text-[11px] font-bold flex items-center justify-center" style={{ background: colors.danger, color: '#fff' }}>{incomingRequestCount}</span>
+            <span className="absolute right-2 min-w-[16px] h-4 px-0.5 rounded-full text-[10px] font-bold flex items-center justify-center" style={{ background: colors.danger, color: '#fff' }}>{incomingRequestCount}</span>
           )}
         </button>
-        <button onClick={onCreateGroup} className="w-full flex items-center gap-3 px-2 py-[7px] rounded text-[15px] transition-colors hover:bg-[rgba(255,255,255,0.04)]"
+        <button onClick={onCreateGroup} className="w-full flex items-center gap-2.5 px-2 py-[5px] rounded-md text-[13px] transition-colors hover:bg-[rgba(255,255,255,0.04)]"
           style={{ color: colors.text.secondary, fontWeight: 500 }}>
-          <Plus className="w-5 h-5" style={{ color: colors.text.disabled }} /> New Group
+          <Plus className="w-4 h-4" style={{ color: colors.text.disabled }} /> New Group
         </button>
-        <button onClick={onNoteToSelf} className="w-full flex items-center gap-3 px-2 py-[7px] rounded text-[15px] transition-colors hover:bg-[rgba(255,255,255,0.04)]"
+        <button onClick={onNoteToSelf} className="w-full flex items-center gap-2.5 px-2 py-[5px] rounded-md text-[13px] transition-colors hover:bg-[rgba(255,255,255,0.04)]"
           style={{ color: colors.text.secondary, fontWeight: 500 }}>
-          <Bookmark className="w-5 h-5" style={{ color: colors.text.disabled }} /> Note to Self
+          <Bookmark className="w-4 h-4" style={{ color: colors.text.disabled }} /> Note to Self
         </button>
       </div>
 
       {/* Label */}
-      <div className="px-4 pt-4 pb-1">
-        <span className="text-[12px] font-bold uppercase tracking-[0.02em]" style={{ color: colors.text.muted }}>Direct Messages</span>
+      <div className="px-3 pt-3 pb-0.5">
+        <span className="text-[11px] font-semibold uppercase tracking-wider" style={{ color: colors.text.disabled }}>Direct Messages</span>
       </div>
 
       {/* List */}
@@ -84,24 +84,24 @@ export default function DMSidebar({ conversations, activeId, onSelect, onFriends
             <ContextMenu key={c.id}>
               <ContextMenuTrigger>
                 <button onClick={() => onSelect(c)}
-                  className="w-full flex items-center gap-2.5 px-2 py-[6px] rounded transition-colors group"
-                  style={{ background: active ? 'rgba(255,255,255,0.08)' : 'transparent' }}>
+                  className="w-full flex items-center gap-2 px-2 py-[5px] rounded-md transition-colors group"
+                  style={{ background: active ? 'rgba(255,255,255,0.07)' : 'transparent' }}>
                   <div className="relative flex-shrink-0">
-                    <div className="w-8 h-8 rounded-full flex items-center justify-center text-[12px] font-semibold overflow-hidden"
+                    <div className="w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-semibold overflow-hidden"
                       style={{ background: colors.bg.overlay, color: colors.text.muted }}>
-                      {avatar ? <img src={avatar} className="w-full h-full object-cover" alt="" /> : group ? <Users className="w-4 h-4" /> : label.charAt(0).toUpperCase()}
+                      {avatar ? <img src={avatar} className="w-full h-full object-cover" alt="" /> : group ? <Users className="w-3.5 h-3.5" /> : label.charAt(0).toUpperCase()}
                     </div>
-                    {!group && <div className="absolute -bottom-0.5 -right-0.5 w-[12px] h-[12px] rounded-full border-[2.5px]" style={{ background: statusColor, borderColor: colors.bg.surface }} />}
-                    {group && <span className="absolute -bottom-1 -right-1 text-[8px] font-bold px-1 rounded-full" style={{ background: colors.bg.surface, color: colors.text.muted }}>{c.participants?.length}</span>}
+                    {!group && <div className="absolute -bottom-0.5 -right-0.5 w-[10px] h-[10px] rounded-full border-2" style={{ background: statusColor, borderColor: colors.bg.surface }} />}
+                    {group && <span className="absolute -bottom-1 -right-1 text-[7px] font-bold px-0.5 rounded-full" style={{ background: colors.bg.surface, color: colors.text.muted }}>{c.participants?.length}</span>}
                   </div>
                   <div className="flex-1 min-w-0 text-left">
-                    <div className="text-[15px] truncate" style={{ color: active ? colors.text.primary : colors.text.secondary, fontWeight: active ? 500 : 400 }}>{label}</div>
+                    <div className="text-[13px] truncate" style={{ color: active ? colors.text.primary : colors.text.secondary, fontWeight: active ? 500 : 400 }}>{label}</div>
                     {c.last_message_preview && (
-                      <div className="text-[12px] truncate" style={{ color: colors.text.muted }}>{c.last_message_preview}</div>
+                      <div className="text-[11px] truncate" style={{ color: colors.text.muted }}>{c.last_message_preview}</div>
                     )}
                   </div>
                   <div className="opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
-                    <X className="w-4 h-4" style={{ color: colors.text.disabled }} />
+                    <X className="w-3.5 h-3.5" style={{ color: colors.text.disabled }} />
                   </div>
                 </button>
               </ContextMenuTrigger>

@@ -584,9 +584,8 @@ export default function AppShell({ currentUser }) {
       />
       <ConnectionBanner />
 
-      {/* Desktop: always show. Mobile: show when sidebar toggled */}
-      <div className={`${showMobileSidebar ? 'flex absolute top-0 left-0 right-0 z-40' : 'hidden'} md:flex md:relative md:top-auto md:left-auto md:right-auto md:z-auto flex-row`}
-        style={showMobileSidebar ? { bottom: 56 } : undefined}
+      {/* Desktop: always show. Mobile: slide-in with backdrop */}
+      <div className={`${showMobileSidebar ? 'flex absolute inset-0 z-40' : 'hidden'} md:flex md:relative md:z-auto flex-row`}
         role="navigation" aria-label="Sidebar">
         <ServerRailWithContext servers={servers} activeServerId={activeServer?.id} onServerSelect={selectServer} onHomeClick={goHome}
           onCreateServer={() => setModal('create-server')} onDiscover={() => setModal('discover')}
@@ -596,7 +595,7 @@ export default function AppShell({ currentUser }) {
           onServerNotes={(id) => { setShowServerNotes(id); }}
           compact={profile?.settings?.compact_servers} />
 
-        <div className="w-[240px] flex-shrink-0 flex flex-col" style={{ background: colors.bg.surface }}>
+        <div className="w-[228px] flex-shrink-0 flex flex-col" style={{ background: colors.bg.surface }}>
           {view === 'server' ? (
             <DraggableChannelSidebar server={activeServer} categories={categories} channels={channels}
               activeId={activeChannel?.id} onSelect={(ch) => { setActiveChannel(ch); setShowMobileSidebar(false); }}
@@ -629,7 +628,7 @@ export default function AppShell({ currentUser }) {
         </div>
 
         {/* Mobile overlay backdrop */}
-        <div className="flex-1 md:hidden" onClick={() => setShowMobileSidebar(false)} />
+        {showMobileSidebar && <div className="flex-1 md:hidden" onClick={() => setShowMobileSidebar(false)} style={{ background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)' }} />}
       </div>
 
       <div className="flex-1 flex flex-col min-w-0 relative k-channel-fade" style={{ background: colors.bg.elevated }} role="main" key={activeChannel?.id || activeConv?.id || view}>

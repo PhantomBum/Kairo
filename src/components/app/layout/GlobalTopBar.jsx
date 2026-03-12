@@ -7,18 +7,18 @@ export default function GlobalTopBar({ onSearch }) {
   const [showSupport, setShowSupport] = useState(false);
 
   return (
-    <div className="h-12 px-4 flex items-center justify-end flex-shrink-0 gap-1"
-      style={{ boxShadow: '0 1px 0 rgba(0,0,0,0.4)', background: colors.bg.elevated }}>
+    <div className="h-11 px-3 flex items-center justify-end flex-shrink-0 gap-0.5"
+      style={{ borderBottom: '1px solid rgba(255,255,255,0.04)', background: colors.bg.elevated }}>
       <button onClick={onSearch}
-        className="w-8 h-8 flex items-center justify-center rounded hover:bg-[rgba(255,255,255,0.1)] transition-colors"
-        style={{ color: colors.text.muted }} title="Search">
-        <Search className="w-5 h-5" />
+        className="w-7 h-7 flex items-center justify-center rounded-md hover:bg-[rgba(255,255,255,0.06)] transition-colors"
+        style={{ color: colors.text.muted }} title="Search (Ctrl+K)">
+        <Search className="w-4 h-4" />
       </button>
       <div className="relative">
         <button onClick={() => setShowSupport(!showSupport)}
-          className="w-8 h-8 flex items-center justify-center rounded hover:bg-[rgba(255,255,255,0.1)] transition-colors"
-          style={{ color: '#3ba55c' }} title="Support">
-          <Heart className="w-[18px] h-[18px]" />
+          className="w-7 h-7 flex items-center justify-center rounded-md hover:bg-[rgba(255,255,255,0.06)] transition-colors"
+          style={{ color: colors.success }} title="Support">
+          <Heart className="w-4 h-4" />
         </button>
         {showSupport && <SupportDropdown onClose={() => setShowSupport(false)} />}
       </div>

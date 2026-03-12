@@ -34,24 +34,23 @@ export default function ServerRailIcon({ server, active, unread, onClick, childr
         className="absolute rounded-r-full"
         initial={false}
         animate={{
-          width: 4,
-          height: active ? 40 : hovered ? 20 : unread ? 8 : 0,
+          width: 3,
+          height: active ? 32 : hovered ? 16 : unread ? 6 : 0,
           opacity: active || hovered || unread ? 1 : 0,
         }}
-        transition={{ duration: 0.15, ease: 'easeOut' }}
-        style={{ background: colors.text.primary, left: -12, top: '50%', transform: 'translateY(-50%)' }}
+        transition={{ duration: 0.12, ease: 'easeOut' }}
+        style={{ background: colors.text.primary, left: -8, top: '50%', transform: 'translateY(-50%)' }}
       />
 
       <motion.button
         onClick={onClick}
         className="relative overflow-hidden flex items-center justify-center"
-        whileTap={{ scale: 0.92 }}
+        whileTap={{ scale: 0.94 }}
         style={{
-          width: 44, height: 44,
-          borderRadius: active || hovered ? 15 : 22,
-          background: active ? (server?.banner_color || colors.accent.primary) : hovered ? (server?.banner_color || colors.accent.primary) : colors.bg.surface,
-          transition: 'border-radius 150ms ease, background 150ms ease',
-          boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.03)',
+          width: 40, height: 40,
+          borderRadius: active || hovered ? 12 : 20,
+          background: active ? (server?.banner_color || colors.accent.primary) : hovered ? 'rgba(88,101,242,0.15)' : colors.bg.surface,
+          transition: 'border-radius 120ms ease, background 120ms ease',
         }}
       >
         {children}
