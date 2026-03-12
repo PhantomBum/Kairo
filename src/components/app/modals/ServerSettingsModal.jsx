@@ -121,23 +121,7 @@ export default function ServerSettingsModal({ onClose, server, currentUserId }) 
   const renderContent = () => {
     switch (tab) {
       case 'overview': return <OverviewTab server={server} name={name} setName={setName} desc={desc} setDesc={setDesc} isPublic={isPublic} setIsPublic={setIsPublic} serverSettings={serverSettings} setServerSettings={setServerSettings} onSave={saveOverview} onUploadImg={uploadImg} saving={saving} />;
-      case 'appearance': return (
-        <div className="space-y-4">
-          <div>
-            <label className="text-[11px] font-semibold uppercase tracking-wider block mb-1.5" style={{ color: colors.text.muted }}>Banner Color</label>
-            <div className="flex gap-3 items-center">
-              <input type="color" value={bannerColor} onChange={e => setBannerColor(e.target.value)} className="w-12 h-12 rounded-xl cursor-pointer" style={{ background: colors.bg.elevated, border: `1px solid ${colors.border.default}` }} />
-              <span className="text-[13px] font-mono" style={{ color: colors.text.secondary }}>{bannerColor}</span>
-            </div>
-          </div>
-          <div className="h-24 rounded-xl" style={{ background: bannerColor }} />
-          <button onClick={() => uploadImg('icon_url')} className="w-full py-3 rounded-xl text-[13px]" style={{ background: colors.bg.elevated, color: colors.text.secondary, border: `1px solid ${colors.border.default}` }}>Change Server Icon</button>
-          <button onClick={() => uploadImg('banner_url')} className="w-full py-3 rounded-xl text-[13px]" style={{ background: colors.bg.elevated, color: colors.text.secondary, border: `1px solid ${colors.border.default}` }}>Change Server Banner</button>
-          <button onClick={() => { setBannerColor(bannerColor); saveOverview(); }} disabled={saving} className="px-6 py-2.5 rounded-xl text-[13px] font-semibold disabled:opacity-30" style={{ background: colors.accent.primary, color: '#fff' }}>
-            {saving ? 'Saving...' : 'Save Appearance'}
-          </button>
-        </div>
-      );
+      case 'appearance': return <AppearanceSection bannerColor={bannerColor} setBannerColor={setBannerColor} uploadImg={uploadImg} saveOverview={saveOverview} saving={saving} server={server} />;
       case 'invites': return <InvitesSection server={server} />;
       case 'automod': return <AutoModTab serverId={server?.id} />;
       case 'sounds': return <SoundsTab serverId={server?.id} />;
