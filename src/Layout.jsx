@@ -56,6 +56,8 @@ export default function Layout({ children }) {
         @keyframes k-pin-glow { 0% { background: rgba(240,178,50,0.15); } 100% { background: transparent; } }
         .k-pin-highlight { animation: k-pin-glow 2s ease-out forwards; }
         .k-scale-in { animation: k-scale-in 100ms ease-out; }
+        @keyframes k-crown-shimmer { 0%, 90% { filter: brightness(1); } 95% { filter: brightness(1.5); } 100% { filter: brightness(1); } }
+        .k-crown-shimmer { animation: k-crown-shimmer 30s ease-in-out infinite; }
         .k-channel-fade { animation: k-fade-in 80ms ease-out; }
         .break-words { word-break: break-word; overflow-wrap: anywhere; }
         pre code { white-space: pre; word-break: normal; overflow-wrap: normal; }
