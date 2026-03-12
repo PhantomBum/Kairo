@@ -1,5 +1,5 @@
 import React from 'react';
-import { Settings, Palette, Link, Hash, FolderOpen, Shield, Users, Bot, ShieldAlert, FileText, Ban, Smile, Stamp, Volume2, BarChart3, TrendingUp, CreditCard, Zap, DollarSign, Webhook, History, AlertTriangle } from 'lucide-react';
+import { Settings, Palette, Link, Hash, FolderOpen, Shield, Users, Bot, ShieldAlert, FileText, Ban, Smile, Stamp, Volume2, BarChart3, TrendingUp, Webhook, AlertTriangle } from 'lucide-react';
 import { colors } from '@/components/app/design/tokens';
 
 const NAV = [

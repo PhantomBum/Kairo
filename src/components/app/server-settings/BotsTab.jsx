@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Bot, Search, Star, Users, Trash2, Settings, ChevronRight, Shield, Terminal, Sparkles } from 'lucide-react';
+import { Plus, Bot, Search, Star, Users, Trash2, ChevronRight, Shield } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { colors } from '@/components/app/design/tokens';
 

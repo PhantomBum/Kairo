@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Search, Crown, Shield, MoreVertical, UserMinus, Ban } from 'lucide-react';
+import { Search, Crown, UserMinus } from 'lucide-react';
 import { colors } from '@/components/app/design/tokens';
 import { useProfiles } from '@/components/app/providers/ProfileProvider';
 

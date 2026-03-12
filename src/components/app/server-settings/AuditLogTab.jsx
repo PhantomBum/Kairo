@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Search, Filter, UserPlus, UserMinus, Hash, Shield, Trash2, Pin, Settings, ChevronDown, ChevronRight } from 'lucide-react';
+import { Search, UserPlus, UserMinus, Hash, Shield, Trash2, Pin, Settings, ChevronDown, ChevronRight } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { colors } from '@/components/app/design/tokens';
 
