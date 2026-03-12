@@ -400,6 +400,16 @@ export default function AppShell({ currentUser }) {
   const currentMsgs = [...baseMsgs, ...filteredOptimistic];
   const currentLoading = isDM ? dmLoading : msgsLoading;
   const channelLabel = isDM ? (activeConv.name || activeConv.participants?.find(p => p.user_id !== currentUser.id)?.user_name || 'DM') : (activeChannel?.name || '');
+
+  const starMsg = useCallback((msg) => {
+    const key = `kairo-starred-${currentUser.id}`;
+    let starred = [];
+    try { starred = JSON.parse(localStorage.getItem(key) || '[]'); } catch {}
+    const exists = starred.some(m => m.id === msg.id);
+    const updated = exists ? starred.filter(m => m.id !== msg.id) : [...starred, { ...msg, channel_name: channelLabel }];
+    try { localStorage.setItem(key, JSON.stringify(updated)); } catch {}
+  }, [currentUser.id, channelLabel]);
+
   const pinnedCount = isDM ? dmMessages.filter(m => m.is_pinned).length : messages.filter(m => m.is_pinned).length;
   const isOwner = activeServer?.owner_id === currentUser.id || activeServer?.created_by === currentUser.email;
   const profileModal = profileUserId ? getProfile(profileUserId) : null;
