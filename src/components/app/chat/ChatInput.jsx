@@ -1,5 +1,5 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
-import { Plus, Send, X, Smile, Image, FileText, Film, Type, Stamp, ImageIcon } from 'lucide-react';
+import { Plus, Send, X, Smile, Image, FileText, Film, Type, Stamp } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { colors } from '@/components/app/design/tokens';
 import FormattingToolbar from '@/components/app/features/FormattingToolbar';
