@@ -42,6 +42,7 @@ import AnalyticsDashboardModal from '@/components/app/modals/AnalyticsDashboardM
 import ChannelSettingsModal from '@/components/app/modals/ChannelSettingsModal';
 import ServerBackupsModal from '@/components/app/modals/ServerBackupsModal';
 import InvitePreviewModal from '@/components/app/modals/InvitePreviewModal';
+import CreateCategoryModal from '@/components/app/modals/CreateCategoryModal';
 import AdvancedSearch from '@/components/app/features/AdvancedSearch';
 import MediaGallery from '@/components/app/features/MediaGallery';
 import PrivacyDashboard from '@/components/app/features/PrivacyDashboard';
@@ -181,6 +182,11 @@ export default function AppShell({ currentUser }) {
   const createChannel = useMutation({
     mutationFn: (data) => base44.entities.Channel.create({ ...data, server_id: activeServer.id, position: channels.length }),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['channels', activeServer?.id] }); setModal(null); },
+  });
+
+  const createCategory = useMutation({
+    mutationFn: (name) => base44.entities.Category.create({ server_id: activeServer.id, name, position: categories.length }),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['categories', activeServer?.id] }); setModal(null); },
   });
 
   const updateProfile = useMutation({
@@ -393,6 +399,7 @@ export default function AppShell({ currentUser }) {
             <DraggableChannelSidebar server={activeServer} categories={categories} channels={channels}
               activeId={activeChannel?.id} onSelect={(ch) => { setActiveChannel(ch); setShowMobileSidebar(false); }}
               onAdd={(catId) => { setModalData(catId); setModal('create-channel'); }}
+              onAddCategory={() => setModal('create-category')}
               onSettings={() => setModal('server-settings')} onInvite={() => setModal('invite')}
               onModPanel={() => setModal('mod-panel')} onAnalytics={() => setModal('analytics')} onBackups={() => setModal('server-backups')}
               onChannelSettings={(ch) => { setChannelToEdit(ch); setModal('channel-settings'); }}
@@ -466,6 +473,7 @@ export default function AppShell({ currentUser }) {
                   editingMessage={editingMsg} onEditSave={editMsg} onEditCancel={() => setEditingMsg(null)}
                   optimisticIds={optimisticIds} />
                 <ChatInput channelName={channelLabel} channelId={activeChannel?.id || activeConv?.id} serverId={activeServer?.id} replyTo={replyTo} onCancelReply={() => setReplyTo(null)} onSend={handleSend}
+                  members={isDM ? [] : members} getProfile={getProfile}
                   onEditLast={() => {
                     const myMsgs = currentMsgs.filter(m => m.author_id === currentUser.id && !m.is_deleted);
                     if (myMsgs.length > 0) setEditingMsg(myMsgs[myMsgs.length - 1]);
@@ -487,6 +495,7 @@ export default function AppShell({ currentUser }) {
         {modal === 'create-server' && <CreateServerModal onClose={() => setModal(null)} onCreate={(d) => createServer.mutate(d)} isCreating={createServer.isPending} />}
         {modal === 'join-server' && <JoinServerModal onClose={() => setModal(null)} onJoin={(c) => joinServer.mutate(c)} isJoining={joinServer.isPending} />}
         {modal === 'create-channel' && <CreateChannelModal onClose={() => setModal(null)} onCreate={(d) => createChannel.mutate(d)} categories={categories} defaultCategoryId={modalData} />}
+        {modal === 'create-category' && <CreateCategoryModal onClose={() => setModal(null)} onCreate={(name) => createCategory.mutate(name)} />}
         {modal === 'add-friend' && <AddFriendModal onClose={() => setModal(null)} currentUserId={currentUser.id} />}
         {modal === 'settings' && <SettingsModal onClose={() => setModal(null)} profile={profile} onUpdate={(d) => updateProfile.mutate(d)} onLogout={() => base44.auth.logout()} currentUser={currentUser} />}
         {modal === 'invite' && activeServer && <InviteModal onClose={() => setModal(null)} server={activeServer} />}
