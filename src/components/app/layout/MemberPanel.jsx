@@ -1,6 +1,6 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useProfiles } from '@/components/app/providers/ProfileProvider';
-import { Crown } from 'lucide-react';
+import { Crown, ChevronDown, ChevronRight } from 'lucide-react';
 import { colors } from '@/components/app/design/tokens';
 
 function MemberRow({ member, profile, isOwner, roleColor, onClick }) {
@@ -25,6 +25,28 @@ function MemberRow({ member, profile, isOwner, roleColor, onClick }) {
       <span className="text-[14px] truncate flex-1 text-left" style={{ color: roleColor || colors.text.secondary, fontWeight: 500 }}>{name}</span>
       {isOwner && <Crown className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#f0b232' }} />}
     </button>
+  );
+}
+
+function MemberGroup({ group, ownerId, onProfileClick }) {
+  const isOffline = group.label === 'Offline';
+  const [collapsed, setCollapsed] = useState(isOffline);
+  const Icon = collapsed ? ChevronRight : ChevronDown;
+
+  return (
+    <div className="mb-1">
+      <button onClick={() => setCollapsed(!collapsed)} className="w-full flex items-center gap-1.5 px-2 pt-4 pb-1 hover:opacity-80">
+        {group.color && <div className="w-0.5 h-3.5 rounded-full flex-shrink-0" style={{ background: group.color }} />}
+        <span className="text-[11px] font-bold uppercase tracking-[0.04em] flex-1 text-left" style={{ color: group.color || colors.text.muted }}>
+          {group.label} — {group.count}
+        </span>
+        <Icon className="w-3 h-3" style={{ color: colors.text.disabled }} />
+      </button>
+      {!collapsed && group.members.map(m => (
+        <MemberRow key={m.id} member={m} profile={m.profile} isOwner={m.user_id === ownerId}
+          roleColor={group.color} onClick={onProfileClick} />
+      ))}
+    </div>
   );
 }
 
@@ -73,17 +95,7 @@ export default function MemberPanel({ members, roles, ownerId, onProfileClick })
   return (
     <div className="w-[240px] flex-shrink-0 overflow-y-auto scrollbar-none px-2 pt-6 hidden md:block" style={{ background: colors.bg.surface }} role="complementary" aria-label="Member list">
       {grouped.map((group, gi) => (
-        <div key={gi} className="mb-1">
-          <div className="px-2 pt-4 pb-1">
-            <span className="text-[12px] font-bold uppercase tracking-[0.02em]" style={{ color: colors.text.muted }}>
-              {group.label} — {group.count}
-            </span>
-          </div>
-          {group.members.map(m => (
-            <MemberRow key={m.id} member={m} profile={m.profile} isOwner={m.user_id === ownerId}
-              roleColor={group.color} onClick={onProfileClick} />
-          ))}
-        </div>
+        <MemberGroup key={gi} group={group} ownerId={ownerId} onProfileClick={onProfileClick} />
       ))}
     </div>
   );

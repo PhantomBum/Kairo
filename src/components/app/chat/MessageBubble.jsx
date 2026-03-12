@@ -25,8 +25,14 @@ function renderText(text, onLinkClick) {
     if (segment.startsWith('```') && segment.endsWith('```')) {
       const inner = segment.slice(3, -3);
       const firstLine = inner.indexOf('\n');
+      const lang = firstLine > -1 ? inner.slice(0, firstLine).trim() : '';
       const code = firstLine > -1 ? inner.slice(firstLine + 1) : inner;
-      return <pre key={si} className="px-3 py-2 rounded text-[13px] my-1 overflow-x-auto" style={{ background: colors.bg.base, color: colors.text.secondary, border: `1px solid ${colors.border.default}` }}><code>{code}</code></pre>;
+      return (
+        <pre key={si} className="px-3 py-2 rounded text-[13px] my-1 overflow-x-auto" style={{ background: colors.bg.base, color: colors.text.secondary, border: `1px solid ${colors.border.default}`, maxWidth: '100%', whiteSpace: 'pre', overflowX: 'auto', wordBreak: 'normal', overflowWrap: 'normal' }}>
+          {lang && <div className="text-[10px] font-semibold uppercase mb-1 opacity-40">{lang}</div>}
+          <code style={{ whiteSpace: 'pre', wordBreak: 'normal', overflowWrap: 'normal' }}>{code}</code>
+        </pre>
+      );
     }
     if (segment.match(/^`[^`]+`$/)) return <code key={si} className="px-1.5 py-0.5 rounded text-[13px]" style={{ background: colors.bg.base, color: colors.text.secondary }}>{segment.slice(1, -1)}</code>;
     return segment.split(/(https?:\/\/[^\s]+|@everyone|@here|\*\*[^*]+\*\*|\*[^*]+\*)/g).map((p, i) => {
@@ -37,8 +43,17 @@ function renderText(text, onLinkClick) {
         return <a key={key} href={p} onClick={e => { if (onLinkClick) { e.preventDefault(); onLinkClick(p); } }} target="_blank" rel="noopener noreferrer" className="hover:underline" style={{ color: colors.text.link, wordBreak: 'break-all' }}>{p}</a>;
       }
       if (p === '@everyone' || p === '@here') return <span key={key} className="px-0.5 rounded" style={{ background: `${colors.accent.primary}20`, color: colors.accent.primary }}>{p}</span>;
+      if (p.match(/^@\w+/)) return <span key={key} className="px-0.5 rounded font-medium" style={{ background: `${colors.accent.primary}20`, color: colors.accent.primary }}>{p}</span>;
       if (p.match(/^\*\*.*\*\*$/)) return <strong key={key}>{p.slice(2, -2)}</strong>;
       if (p.match(/^\*.*\*$/)) return <em key={key}>{p.slice(1, -1)}</em>;
+      // Spoiler tags
+      if (p.match(/^\|\|.*\|\|$/)) {
+        const SpoilerTag = () => {
+          const [revealed, setRevealed] = React.useState(false);
+          return <span onClick={() => setRevealed(true)} className="px-1 rounded cursor-pointer" style={{ background: revealed ? 'rgba(255,255,255,0.06)' : colors.bg.base, color: revealed ? colors.text.secondary : 'transparent' }}>{p.slice(2, -2)}</span>;
+        };
+        return <SpoilerTag key={key} />;
+      }
       return p;
     });
   });

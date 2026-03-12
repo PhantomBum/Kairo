@@ -17,6 +17,7 @@ export default function ChatInput({ channelName, channelId, replyTo, onCancelRep
   });
   const [files, setFiles] = useState([]);
   const [sending, setSending] = useState(false);
+  const sendLockRef = useRef(null);
   const [uploading, setUploading] = useState(false);
   const [showEmoji, setShowEmoji] = useState(false);
   const [showGif, setShowGif] = useState(false);
@@ -61,6 +62,10 @@ export default function ChatInput({ channelName, channelId, replyTo, onCancelRep
   const handleSend = async () => {
     const trimmed = content.trim();
     if ((!trimmed && files.length === 0) || sending) return;
+    // Duplicate send lock — prevent double sends on slow connections
+    const lockId = `${trimmed}-${Date.now()}`;
+    if (sendLockRef.current && Date.now() - sendLockRef.current.ts < 2000 && sendLockRef.current.content === trimmed) return;
+    sendLockRef.current = { content: trimmed, ts: Date.now() };
     setSending(true);
     await onSend({ content: trimmed, attachments: files.length > 0 ? files : undefined, replyToId: replyTo?.id, replyPreview: replyTo ? { author_name: replyTo.author_name, content: replyTo.content?.slice(0, 80) } : undefined });
     setContent(''); setFiles([]); setSending(false); closePickers();
@@ -123,7 +128,7 @@ export default function ChatInput({ channelName, channelId, replyTo, onCancelRep
 
   const getIcon = (type) => { if (type?.startsWith('image/')) return Image; if (type?.startsWith('video/')) return Film; return FileText; };
   const charCount = content.length;
-  const nearLimit = charCount > 1800;
+  const nearLimit = charCount > 1500;
 
   const placeholder = replyTo ? `Reply to ${replyTo.author_name}...` : `Message ${channelName ? '#' + channelName : ''}`;
 
@@ -133,13 +138,16 @@ export default function ChatInput({ channelName, channelId, replyTo, onCancelRep
       onDragLeave={() => setDragging(false)}
       onDrop={e => { e.preventDefault(); setDragging(false); if (e.dataTransfer.files?.length) uploadFiles(e.dataTransfer.files); }}>
 
-      {/* Drop overlay */}
+      {/* Drop overlay — full colored, clear instructions */}
       {dragging && (
-        <div className="absolute inset-4 z-50 flex items-center justify-center rounded-xl pointer-events-none"
-          style={{ background: `${colors.accent.primary}12`, border: `2px dashed ${colors.accent.primary}60` }}>
+        <div className="absolute inset-0 z-50 flex items-center justify-center rounded-xl pointer-events-none"
+          style={{ background: 'rgba(88,101,242,0.15)', border: `2px dashed ${colors.accent.primary}`, backdropFilter: 'blur(4px)' }}>
           <div className="text-center">
-            <Plus className="w-10 h-10 mx-auto mb-2" style={{ color: colors.accent.primary }} />
-            <span className="text-[15px] font-semibold" style={{ color: colors.accent.primary }}>Drop files to upload</span>
+            <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-3" style={{ background: 'rgba(88,101,242,0.2)' }}>
+              <Plus className="w-8 h-8" style={{ color: colors.accent.primary }} />
+            </div>
+            <span className="text-[17px] font-bold block mb-1" style={{ color: '#fff' }}>Drop files to upload</span>
+            <span className="text-[13px]" style={{ color: colors.text.secondary }}>Images, videos, documents — up to 50MB</span>
           </div>
         </div>
       )}
@@ -156,16 +164,16 @@ export default function ChatInput({ channelName, channelId, replyTo, onCancelRep
       {/* Sticker picker */}
       {showSticker && <StickerPicker onSelect={handleStickerSelect} onClose={() => setShowSticker(false)} serverId={serverId} />}
 
-      {/* Reply bar */}
+      {/* Reply bar — taller, easier to read, clear close button */}
       {replyTo && (
-        <div className="flex items-center gap-2 px-4 py-2 mb-1 rounded-t-2xl" style={{ background: colors.bg.elevated, borderBottom: `1px solid ${colors.border.default}` }}>
-          <div className="w-1 h-5 rounded-full flex-shrink-0" style={{ background: colors.accent.primary }} />
+        <div className="flex items-center gap-3 px-4 py-3 mb-1 rounded-t-2xl" style={{ background: colors.bg.elevated, borderBottom: `1px solid ${colors.border.default}` }}>
+          <div className="w-1 h-6 rounded-full flex-shrink-0" style={{ background: colors.accent.primary }} />
           <span className="text-[13px] flex-1 truncate" style={{ color: colors.text.muted }}>
             Replying to <span className="font-semibold" style={{ color: colors.text.secondary }}>{replyTo.author_name}</span>
-            {replyTo.content && <span className="ml-1.5" style={{ color: colors.text.disabled }}>— {replyTo.content.slice(0, 60)}</span>}
+            {replyTo.content && <span className="ml-1.5" style={{ color: colors.text.disabled }}>— {replyTo.content.slice(0, 80)}</span>}
           </span>
-          <button onClick={onCancelReply} className="w-6 h-6 flex items-center justify-center rounded hover:bg-[rgba(255,255,255,0.06)]">
-            <X className="w-4 h-4" style={{ color: colors.text.muted }} />
+          <button onClick={onCancelReply} className="w-7 h-7 flex items-center justify-center rounded-md hover:bg-[rgba(237,66,69,0.12)] transition-colors" title="Cancel reply">
+            <X className="w-4 h-4" style={{ color: colors.danger }} />
           </button>
         </div>
       )}
@@ -209,11 +217,23 @@ export default function ChatInput({ channelName, channelId, replyTo, onCancelRep
       <div className="flex items-end gap-2 px-4 py-3 rounded-2xl transition-all"
         style={{ background: 'rgba(255,255,255,0.035)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.06)' }}>
         <button onClick={() => fileRef.current?.click()}
-          className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-[rgba(255,255,255,0.06)] flex-shrink-0 mb-0.5"
+          className="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-[rgba(255,255,255,0.06)] flex-shrink-0 mb-0.5"
           title="Upload file"><Plus className="w-5 h-5" style={{ color: colors.text.muted }} /></button>
         <input ref={fileRef} type="file" accept="image/*,video/*,audio/*,.gif,.mp4,.webm,.mov,.mp3,.wav,.ogg,.pdf,.txt,.zip,.rar,.doc,.docx,.xls,.xlsx" onChange={e => { if (e.target.files?.length) uploadFiles(e.target.files); if (fileRef.current) fileRef.current.value = ''; }} className="hidden" multiple />
         <textarea ref={inputRef} value={content}
           onChange={e => handleContentChange(e.target.value)}
+          onPaste={e => {
+            // Preserve line breaks on paste
+            const pasted = e.clipboardData.getData('text/plain');
+            if (pasted && pasted.includes('\n')) {
+              e.preventDefault();
+              const start = e.target.selectionStart;
+              const end = e.target.selectionEnd;
+              const newVal = content.slice(0, start) + pasted + content.slice(end);
+              setContent(newVal);
+              requestAnimationFrame(() => { inputRef.current.selectionStart = inputRef.current.selectionEnd = start + pasted.length; });
+            }
+          }}
           onKeyDown={e => {
             if (e.key === 'Enter' && !e.shiftKey && !showSlash && !showMention) { e.preventDefault(); handleSend(); }
             if (e.key === 'ArrowUp' && !content.trim() && onEditLast) { e.preventDefault(); onEditLast(); }
@@ -224,16 +244,16 @@ export default function ChatInput({ channelName, channelId, replyTo, onCancelRep
           style={{ color: colors.text.primary, lineHeight: '22px', caretColor: colors.accent.primary }} rows={1} />
         {nearLimit && <span className="text-[11px] mb-1 flex-shrink-0 tabular-nums" style={{ color: charCount > 2000 ? colors.danger : colors.warning }}>{2000 - charCount}</span>}
         <button onClick={() => { closePickers(); setShowGif(!showGif); }}
-          className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-[rgba(255,255,255,0.06)] flex-shrink-0 mb-0.5"
+          className="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-[rgba(255,255,255,0.06)] flex-shrink-0 mb-0.5"
           title="GIF"><span className="text-[12px] font-bold" style={{ color: showGif ? colors.text.primary : colors.text.muted }}>GIF</span></button>
         <button onClick={() => { closePickers(); setShowSticker(!showSticker); }}
-          className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-[rgba(255,255,255,0.06)] flex-shrink-0 mb-0.5"
+          className="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-[rgba(255,255,255,0.06)] flex-shrink-0 mb-0.5"
           title="Sticker"><Stamp className="w-5 h-5" style={{ color: showSticker ? colors.text.primary : colors.text.muted }} /></button>
         <button onClick={() => { closePickers(); setShowFormatting(!showFormatting); }}
-          className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-[rgba(255,255,255,0.06)] flex-shrink-0 mb-0.5"
+          className="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-[rgba(255,255,255,0.06)] flex-shrink-0 mb-0.5"
           title="Formatting"><Type className="w-5 h-5" style={{ color: showFormatting ? colors.text.primary : colors.text.muted }} /></button>
         <button onClick={() => { closePickers(); setShowEmoji(!showEmoji); }}
-          className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-[rgba(255,255,255,0.06)] flex-shrink-0 mb-0.5"
+          className="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-[rgba(255,255,255,0.06)] flex-shrink-0 mb-0.5"
           title="Emoji"><Smile className="w-5 h-5" style={{ color: showEmoji ? colors.text.primary : colors.text.muted }} /></button>
         <button onClick={handleSend} disabled={(!content.trim() && files.length === 0) || sending}
           className="w-8 h-8 flex items-center justify-center rounded-lg flex-shrink-0 mb-0.5 disabled:opacity-20"
