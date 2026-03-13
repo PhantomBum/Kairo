@@ -20,7 +20,7 @@ function dateFmt(d) {
 export default function VirtualMessageList({
   messages, currentUserId, channelName, isLoading, isDM,
   onReply, onEdit, onDelete, onReact, onPin, onStar, onForward, onProfileClick,
-  editingMessage, onEditSave, onEditCancel, optimisticIds
+  editingMessage, onEditSave, onEditCancel, optimisticIds, members, getProfile
 }) {
   const containerRef = useRef(null);
   const bottomRef = useRef(null);
@@ -145,6 +145,8 @@ export default function VirtualMessageList({
                 isEditing={editingMessage?.id === msg.id} onEditSave={onEditSave} onEditCancel={onEditCancel}
                 onImageClick={(src, name) => setLightbox({ src, name })}
                 onLinkClick={handleLinkClick}
+                members={members}
+                getProfile={getProfile}
               />
               {isOptimistic && (
                 <div className="flex items-center gap-1.5 ml-[72px] -mt-0.5 mb-1">
