@@ -77,22 +77,24 @@ export default function KairoEliteModal({ onClose, profile, hasElite }) {
         {tier === 'elite' ? (
           <>
             {/* Elite Hero */}
-            <div className="relative p-5 rounded-2xl overflow-hidden" style={{ background: 'linear-gradient(135deg, rgba(201,180,123,0.08), rgba(164,123,201,0.06))', border: '1px solid rgba(201,180,123,0.15)' }}>
-              <div className="absolute top-0 right-0 w-32 h-32 opacity-10" style={{ background: 'radial-gradient(circle, var(--accent-amber), transparent)' }} />
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-12 h-12 rounded-2xl flex items-center justify-center" style={{ background: 'rgba(201,180,123,0.15)', border: '1px solid rgba(201,180,123,0.2)' }}>
-                  <Crown className="w-6 h-6" style={{ color: '#c9b47b' }} />
+            <div className="relative p-5 rounded-2xl overflow-hidden flex" style={{ background: 'linear-gradient(135deg, rgba(201,180,123,0.08), rgba(164,123,201,0.06))', border: '1px solid rgba(201,180,123,0.15)' }}>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(201,180,123,0.15)', border: '1px solid rgba(201,180,123,0.2)' }}>
+                    <Crown className="w-6 h-6" style={{ color: '#c9b47b' }} />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-bold" style={{ color: colors.text.primary }}>Kairo Elite</h3>
+                    <p className="text-[11px]" style={{ color: '#c9b47b' }}>Premium membership</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="text-lg font-bold" style={{ color: colors.text.primary }}>Kairo Elite</h3>
-                  <p className="text-[11px]" style={{ color: '#c9b47b' }}>Premium membership</p>
+                <div className="flex items-baseline gap-1 mb-1">
+                  <span className="text-3xl font-bold" style={{ color: colors.text.primary }}>$9.99</span>
+                  <span className="text-sm" style={{ color: colors.text.muted }}>/month</span>
                 </div>
+                <p className="text-[12px]" style={{ color: colors.text.secondary }}>Unlock the full Kairo experience</p>
               </div>
-              <div className="flex items-baseline gap-1 mb-1">
-                <span className="text-3xl font-bold" style={{ color: colors.text.primary }}>$9.99</span>
-                <span className="text-sm" style={{ color: colors.text.muted }}>/month</span>
-              </div>
-              <p className="text-[12px]" style={{ color: colors.text.secondary }}>Unlock the full Kairo experience</p>
+              <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/697a93eea52ff0ef8406c21a/1cff4e4e7_generated_image.png" alt="" className="w-28 h-28 rounded-xl object-cover flex-shrink-0 ml-3 opacity-90" />
             </div>
 
             <div className="grid grid-cols-2 gap-2">
@@ -124,22 +126,24 @@ export default function KairoEliteModal({ onClose, profile, hasElite }) {
         ) : (
           <>
             {/* Admin Hero */}
-            <div className="relative p-5 rounded-2xl overflow-hidden" style={{ background: 'linear-gradient(135deg, rgba(88,101,242,0.1), rgba(123,97,255,0.06))', border: '1px solid rgba(88,101,242,0.2)' }}>
-              <div className="absolute top-0 right-0 w-32 h-32 opacity-10" style={{ background: 'radial-gradient(circle, #5865F2, transparent)' }} />
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-12 h-12 rounded-2xl flex items-center justify-center" style={{ background: 'rgba(88,101,242,0.15)', border: '1px solid rgba(88,101,242,0.25)' }}>
-                  <Shield className="w-6 h-6" style={{ color: colors.accent.primary }} />
+            <div className="relative p-5 rounded-2xl overflow-hidden flex" style={{ background: 'linear-gradient(135deg, rgba(88,101,242,0.1), rgba(123,97,255,0.06))', border: '1px solid rgba(88,101,242,0.2)' }}>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(88,101,242,0.15)', border: '1px solid rgba(88,101,242,0.25)' }}>
+                    <Shield className="w-6 h-6" style={{ color: colors.accent.primary }} />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-bold" style={{ color: colors.text.primary }}>Kairo Admin</h3>
+                    <p className="text-[11px]" style={{ color: colors.accent.primary }}>Platform administrator tier</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="text-lg font-bold" style={{ color: colors.text.primary }}>Kairo Admin</h3>
-                  <p className="text-[11px]" style={{ color: colors.accent.primary }}>Platform administrator tier</p>
+                <div className="flex items-baseline gap-1 mb-1">
+                  <span className="text-3xl font-bold" style={{ color: colors.text.primary }}>∞</span>
+                  <span className="text-sm" style={{ color: colors.text.muted }}>Everything. Forever.</span>
                 </div>
+                <p className="text-[12px]" style={{ color: colors.text.secondary }}>Elite × 10 — for Kairo administrators only</p>
               </div>
-              <div className="flex items-baseline gap-1 mb-1">
-                <span className="text-3xl font-bold" style={{ color: colors.text.primary }}>∞</span>
-                <span className="text-sm" style={{ color: colors.text.muted }}>Everything. Forever.</span>
-              </div>
-              <p className="text-[12px]" style={{ color: colors.text.secondary }}>Elite × 10 — for Kairo administrators only</p>
+              <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/697a93eea52ff0ef8406c21a/60a21bba2_generated_image.png" alt="" className="w-28 h-28 rounded-xl object-cover flex-shrink-0 ml-3 opacity-90" />
             </div>
 
             <div className="grid grid-cols-2 gap-2">
