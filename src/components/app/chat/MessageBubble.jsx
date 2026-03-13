@@ -126,7 +126,7 @@ const SystemMessage = memo(function SystemMessage({ message }) {
   );
 });
 
-const MessageBubble = memo(function MessageBubble({ message, compact, isOwn, onReply, onEdit, onDelete, onReact, onPin, onStar, onForward, currentUserId, onProfileClick, isEditing, onEditSave, onEditCancel, onImageClick, onLinkClick, onHighlight, members, getProfile }) {
+const MessageBubble = memo(function MessageBubble({ message, compact, isOwn, onReply, onEdit, onDelete, onReact, onPin, onStar, onForward, currentUserId, onProfileClick, isEditing, roleColor,
   if (message.type === 'system') return <SystemMessage message={message} />;
 
   const [hovered, setHovered] = useState(false);
