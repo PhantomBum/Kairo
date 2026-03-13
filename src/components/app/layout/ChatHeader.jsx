@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
-import { Hash, Volume2, Megaphone, Radio, MessageSquare, Users, Pin, AtSign, Phone, Video, Search, LayoutGrid, Heart } from 'lucide-react';
+import { Hash, Volume2, Megaphone, Radio, MessageSquare, Users, Pin, AtSign, Phone, Video, Search, LayoutGrid, MoreHorizontal, Star, Image, HelpCircle, Heart } from 'lucide-react';
 import { colors } from '@/components/app/design/tokens';
 import SupportDropdown from '@/components/app/features/SupportDropdown';
 
@@ -23,6 +23,15 @@ function HeaderBtn({ icon: Icon, onClick, href, active, badge, title }) {
 
 export default function ChatHeader({ channel, conversation, currentUserId, showMembers, onToggleMembers, isDM, onPinned, pinnedCount, onMediaGallery, onVoiceCall, onVideoCall, serverName, onSearch, onStarred }) {
   const [showSupport, setShowSupport] = useState(false);
+  const [showMore, setShowMore] = useState(false);
+  const moreRef = useRef(null);
+
+  useEffect(() => {
+    if (!showMore) return;
+    const handler = (e) => { if (moreRef.current && !moreRef.current.contains(e.target)) setShowMore(false); };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [showMore]);
   const label = isDM
     ? (conversation?.name || conversation?.participants?.find(p => p.user_id !== currentUserId)?.user_name || 'DM')
     : (channel?.name || '');
@@ -55,10 +64,35 @@ export default function ChatHeader({ channel, conversation, currentUserId, showM
         {onPinned && <HeaderBtn icon={Pin} onClick={onPinned} badge={pinnedCount} title="Pinned Messages" />}
         {onSearch && <HeaderBtn icon={Search} onClick={onSearch} title="Search" />}
         {!isDM && <HeaderBtn icon={Users} onClick={onToggleMembers} active={showMembers} title="Member List" />}
-        <button onClick={() => setShowSupport(!showSupport)} className="w-8 h-8 flex items-center justify-center rounded hover:bg-[rgba(255,255,255,0.1)] transition-colors group relative"
-          style={{ color: '#3ba55c' }}>
-          <Heart className="w-[18px] h-[18px]" />
-        </button>
+        {/* More dropdown */}
+        <div className="relative" ref={moreRef}>
+          <HeaderBtn icon={MoreHorizontal} onClick={() => setShowMore(!showMore)} active={showMore} title="More" />
+          {showMore && (
+            <div className="absolute right-0 top-full mt-1 w-48 py-1.5 rounded-lg z-50 k-fade-in"
+              style={{ background: colors.bg.float, border: `1px solid ${colors.border.strong}`, boxShadow: '0 8px 32px rgba(0,0,0,0.6)' }}>
+              {onStarred && (
+                <button onClick={() => { onStarred(); setShowMore(false); }}
+                  className="w-full flex items-center gap-2.5 px-3 py-2 text-[13px] rounded-md mx-auto transition-colors hover:bg-[rgba(88,101,242,0.15)]"
+                  style={{ color: colors.text.secondary }}>
+                  <Star className="w-4 h-4 opacity-60" /> Starred Messages
+                </button>
+              )}
+              {onMediaGallery && (
+                <button onClick={() => { onMediaGallery(); setShowMore(false); }}
+                  className="w-full flex items-center gap-2.5 px-3 py-2 text-[13px] rounded-md mx-auto transition-colors hover:bg-[rgba(88,101,242,0.15)]"
+                  style={{ color: colors.text.secondary }}>
+                  <Image className="w-4 h-4 opacity-60" /> Media Gallery
+                </button>
+              )}
+              <div className="h-px mx-2 my-1" style={{ background: 'rgba(255,255,255,0.06)' }} />
+              <button onClick={() => { setShowMore(false); setShowSupport(!showSupport); }}
+                className="w-full flex items-center gap-2.5 px-3 py-2 text-[13px] rounded-md mx-auto transition-colors hover:bg-[rgba(88,101,242,0.15)]"
+                style={{ color: colors.text.secondary }}>
+                <HelpCircle className="w-4 h-4 opacity-60" /> FAQ & Support
+              </button>
+            </div>
+          )}
+        </div>
         {showSupport && <SupportDropdown onClose={() => setShowSupport(false)} />}
       </div>
     </div>
