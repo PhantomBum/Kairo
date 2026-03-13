@@ -4,7 +4,7 @@ import { colors } from '@/components/app/design/tokens';
 
 export default function SupportDropdown({ onClose }) {
   const [copied, setCopied] = useState(false);
-  const cashAppTag = 'YOUR_CASHAPP_TAG';
+  const cashAppTag = 'Y$PHXNTOM711';
   const buyMeCoffeeLink = 'YOUR_BUYMEACOFFEE_LINK';
 
   const handleCopyTag = () => {
