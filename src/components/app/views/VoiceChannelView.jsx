@@ -384,6 +384,13 @@ export default function VoiceChannelView({ channel, currentUser, isMuted, isDeaf
           </div>
         )}
       </div>
+
+      {/* Screen share confirmation popup */}
+      <AnimatePresence>
+        {showScreenShareConfirm && (
+          <ScreenSharePopup onConfirm={doToggleScreenShare} onCancel={() => setShowScreenShareConfirm(false)} />
+        )}
+      </AnimatePresence>
     </div>
   );
 }
