@@ -13,7 +13,7 @@ function MemberRow({ member, profile, isOwner, roleColor, onClick }) {
   return (
     <button onClick={() => onClick?.(member.user_id)}
       className="w-full flex items-center gap-3 px-2 py-1 rounded transition-colors hover:bg-[rgba(255,255,255,0.06)] group"
-      style={{ opacity: isOnline ? 1 : 0.3 }}>
+      style={{ opacity: isOnline ? 1 : 0.45 }}>
       <div className="relative flex-shrink-0">
         <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold overflow-hidden"
           style={{ background: colors.bg.overlay, color: colors.text.primary }}>
@@ -29,8 +29,7 @@ function MemberRow({ member, profile, isOwner, roleColor, onClick }) {
 }
 
 function MemberGroup({ group, ownerId, onProfileClick }) {
-  const isOffline = group.label === 'Offline';
-  const [collapsed, setCollapsed] = useState(isOffline);
+  const [collapsed, setCollapsed] = useState(false);
   const Icon = collapsed ? ChevronRight : ChevronDown;
 
   return (
@@ -72,10 +71,9 @@ export default function MemberPanel({ members, roles, ownerId, onProfileClick })
       }
     });
     const remaining = enriched.filter(m => !assigned.has(m.id));
-    const online = remaining.filter(m => m.profile?.is_online);
-    const offline = remaining.filter(m => !m.profile?.is_online);
-    if (online.length > 0) groups.push({ label: 'Online', color: null, members: online, count: online.length });
-    if (offline.length > 0) groups.push({ label: 'Offline', color: null, members: offline, count: offline.length });
+    // Sort: online first, then offline
+    const sorted = remaining.sort((a, b) => (b.profile?.is_online ? 1 : 0) - (a.profile?.is_online ? 1 : 0));
+    if (sorted.length > 0) groups.push({ label: 'Members', color: null, members: sorted, count: sorted.length });
     return groups;
   }, [enriched, hoistedRoles]);
 
