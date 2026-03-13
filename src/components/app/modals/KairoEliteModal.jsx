@@ -9,7 +9,7 @@ const ELITE_PERKS = [
   { icon: Palette, label: '6 Profile Themes', desc: 'Dark, Midnight, Warm, Ocean, Forest, Sunset' },
   { icon: Upload, label: '100MB File Uploads', desc: 'Upload larger files in chat' },
   { icon: Shield, label: 'Elite Badge', desc: 'Exclusive badge on your profile' },
-  { icon: Zap, label: 'Profile Visitor Count', desc: 'See who viewed your profile' },
+  { icon: Zap, label: 'Priority Support', desc: 'Fast-track support for Elite members' },
   { icon: Star, label: 'Animated Gradient Themes', desc: 'Premium animated profile gradients' },
   { icon: Volume2, label: 'HD Voice & Video', desc: 'Higher quality voice and video calls' },
   { icon: Gift, label: 'Monthly Credits', desc: '500 credits every month' },
@@ -24,7 +24,7 @@ const ADMIN_PERKS = [
   { icon: Flame, label: 'All Badges Unlocked', desc: 'Every badge in Kairo, permanently' },
   { icon: Crown, label: 'Kairo Admin Badge', desc: 'Exclusive admin-only badge' },
   { icon: Rocket, label: 'Infinite Server Boosts', desc: 'Boost any server without limits' },
-  { icon: Eye, label: 'Admin Panel Access', desc: 'Full platform management tools' },
+  { icon: Eye, label: 'Profile Visitor Count', desc: 'See who viewed your profile' },
   { icon: Lock, label: 'Bypass All Restrictions', desc: 'No slowmode, no NSFW gates, no limits' },
   { icon: Gift, label: 'Unlimited Credits', desc: '999,999 credits, auto-refreshing' },
   { icon: Cpu, label: 'Priority Processing', desc: 'Fastest message delivery & uploads' },
@@ -89,7 +89,7 @@ export default function KairoEliteModal({ onClose, profile, hasElite }) {
                   </div>
                 </div>
                 <div className="flex items-baseline gap-1 mb-1">
-                  <span className="text-3xl font-bold" style={{ color: colors.text.primary }}>$9.99</span>
+                  <span className="text-3xl font-bold" style={{ color: colors.text.primary }}>$5</span>
                   <span className="text-sm" style={{ color: colors.text.muted }}>/month</span>
                 </div>
                 <p className="text-[12px]" style={{ color: colors.text.secondary }}>Unlock the full Kairo experience</p>
