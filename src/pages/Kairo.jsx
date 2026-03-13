@@ -8,11 +8,12 @@ import { colors } from '@/components/app/design/tokens';
 function KairoInner() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [needsAuth, setNeedsAuth] = useState(false);
 
   useEffect(() => {
     const init = async () => {
       const isAuth = await base44.auth.isAuthenticated();
-      if (!isAuth) { base44.auth.redirectToLogin(); return; }
+      if (!isAuth) { setNeedsAuth(true); setLoading(false); return; }
       const me = await base44.auth.me();
       const profiles = await base44.entities.UserProfile.filter({ user_email: me.email });
       // Check if this is the platform owner (admin role = first user / app creator)
