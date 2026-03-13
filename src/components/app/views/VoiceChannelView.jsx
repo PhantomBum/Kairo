@@ -5,6 +5,8 @@ import { useProfiles } from '@/components/app/providers/ProfileProvider';
 import { motion, AnimatePresence } from 'framer-motion';
 import { colors } from '@/components/app/design/tokens';
 import useAgora from '@/components/app/hooks/useAgora';
+import ScreenSharePopup from '@/components/app/views/ScreenSharePopup';
+import MicTestPanel from '@/components/app/views/MicTestPanel';
 
 const QUALITY_MAP = {
   excellent: { label: 'Excellent', color: colors.status.online, bars: 4 },
@@ -99,6 +101,9 @@ export default function VoiceChannelView({ channel, currentUser, isMuted, isDeaf
   const agora = useAgora();
 
   const [showDevices, setShowDevices] = useState(false);
+  const [showScreenShareConfirm, setShowScreenShareConfirm] = useState(false);
+  const [showMicTest, setShowMicTest] = useState(false);
+  const [wasDeafenedBeforeTest, setWasDeafenedBeforeTest] = useState(false);
   const [audioInputs, setAudioInputs] = useState([]);
   const [audioOutputs, setAudioOutputs] = useState([]);
   const [selectedInput, setSelectedInput] = useState('');
@@ -177,13 +182,35 @@ export default function VoiceChannelView({ channel, currentUser, isMuted, isDeaf
     onDisconnect?.();
   };
 
-  // Screen sharing: toggle Agora screen share + update VoiceState
-  const toggleScreenShare = async () => {
+  // Screen sharing: show confirmation popup first, then toggle
+  const handleScreenShareClick = () => {
+    if (agora.screenSharing) {
+      // Stop sharing immediately — no popup needed
+      doToggleScreenShare();
+    } else {
+      setShowScreenShareConfirm(true);
+    }
+  };
+  const doToggleScreenShare = async () => {
     if (!agora.joined) return;
+    setShowScreenShareConfirm(false);
     await agora.toggleScreenShare();
     const newVal = !agora.screenSharing;
     const states = await base44.entities.VoiceState.filter({ channel_id: channel.id, user_id: currentUser.id });
     if (states[0]) await base44.entities.VoiceState.update(states[0].id, { is_streaming: newVal });
+  };
+
+  // Mic test: auto-deafen when opening, restore when closing
+  const handleMicTestOpen = () => {
+    setWasDeafenedBeforeTest(isDeafened);
+    if (!isDeafened) onToggleDeafen(); // auto-deafen
+    setShowMicTest(true);
+  };
+  const handleMicTestClose = () => {
+    setShowMicTest(false);
+  };
+  const handleRestoreDeafen = () => {
+    if (!wasDeafenedBeforeTest && isDeafened) onToggleDeafen(); // undeafen if it was auto-set
   };
 
   // Sync mute/deafen state to DB
@@ -334,11 +361,19 @@ export default function VoiceChannelView({ channel, currentUser, isMuted, isDeaf
                 </motion.div>
               )}
             </AnimatePresence>
+            {/* Mic test panel */}
+            <AnimatePresence>
+              {showMicTest && (
+                <MicTestPanel onClose={handleMicTestClose} wasDeafened={wasDeafenedBeforeTest} onRestoreDeafen={handleRestoreDeafen} />
+              )}
+            </AnimatePresence>
+
             <div className="flex items-start justify-center gap-4">
               <ControlButton icon={isMuted ? MicOff : Mic} active={isMuted} onClick={onToggleMute} label={isMuted ? 'Unmute' : 'Mute'} />
               <ControlButton icon={isDeafened ? HeadphoneOff : Headphones} active={isDeafened} onClick={onToggleDeafen} label={isDeafened ? 'Undeafen' : 'Deafen'} />
               <ControlButton icon={Settings} active={showDevices} onClick={() => setShowDevices(!showDevices)} label="Devices" />
-              <ControlButton icon={agora.screenSharing ? MonitorOff : Monitor} active={agora.screenSharing} onClick={toggleScreenShare} label={agora.screenSharing ? 'Stop Share' : 'Share Screen'} />
+              <ControlButton icon={Mic} onClick={handleMicTestOpen} label="Test Mic" />
+              <ControlButton icon={agora.screenSharing ? MonitorOff : Monitor} active={agora.screenSharing} onClick={handleScreenShareClick} label={agora.screenSharing ? 'Stop Share' : 'Share Screen'} />
               <ControlButton icon={PhoneOff} danger onClick={handleDisconnect} label="Leave" />
             </div>
           </div>
