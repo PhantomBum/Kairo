@@ -80,6 +80,26 @@ function KairoInner() {
     );
   }
 
+  if (needsAuth) {
+    return (
+      <div className="h-screen w-screen flex items-center justify-center" style={{ background: colors.bg.base }}>
+        <div className="text-center k-fade-in">
+          <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/697a93eea52ff0ef8406c21a/e96e433dc_generated_image.png"
+            alt="Kairo" className="w-16 h-16 rounded-2xl mx-auto mb-5 object-cover" />
+          <h1 className="text-2xl font-bold mb-2" style={{ color: colors.text.primary }}>Welcome to Kairo</h1>
+          <p className="text-sm mb-6" style={{ color: colors.text.muted }}>Sign in to start chatting</p>
+          <button onClick={() => base44.auth.redirectToLogin(window.location.href)}
+            className="px-8 py-2.5 rounded-lg text-sm font-semibold text-white transition-colors"
+            style={{ background: colors.accent.primary }}
+            onMouseEnter={e => e.target.style.background = colors.accent.hover}
+            onMouseLeave={e => e.target.style.background = colors.accent.primary}>
+            Sign In
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return <AppShell currentUser={user} />;
 }
 
