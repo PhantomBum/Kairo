@@ -21,7 +21,12 @@ function isMediaUrl(url) {
   return null;
 }
 
-function renderText(text, onLinkClick) {
+function hasMention(text) {
+  if (!text) return false;
+  return /@everyone|@here|@\w+/.test(text);
+}
+
+function renderText(text, onLinkClick, onMentionClick) {
   if (!text) return null;
   return text.split(/(```[\s\S]*?```|`[^`]+`)/g).map((segment, si) => {
     if (segment.startsWith('```') && segment.endsWith('```')) {
@@ -37,15 +42,24 @@ function renderText(text, onLinkClick) {
       );
     }
     if (segment.match(/^`[^`]+`$/)) return <code key={si} className="px-1.5 py-0.5 rounded text-[13px]" style={{ background: colors.bg.base, color: colors.text.secondary }}>{segment.slice(1, -1)}</code>;
-    return segment.split(/(https?:\/\/[^\s]+|@everyone|@here|\*\*[^*]+\*\*|\*[^*]+\*)/g).map((p, i) => {
+    return segment.split(/(https?:\/\/[^\s]+|@everyone|@here|@\w+|\*\*[^*]+\*\*|\*[^*]+\*)/g).map((p, i) => {
       const key = `${si}-${i}`;
       if (p.match(/^https?:\/\//)) {
         const mediaType = isMediaUrl(p);
         if (mediaType === 'gif' || mediaType === 'image') return <img key={key} src={p} alt="embedded" className="max-w-[400px] max-h-[280px] rounded-lg mt-1 block" style={{ border: `1px solid ${colors.border.default}` }} loading="lazy" decoding="async" />;
         return <a key={key} href={p} onClick={e => { if (onLinkClick) { e.preventDefault(); onLinkClick(p); } }} target="_blank" rel="noopener noreferrer" className="hover:underline" style={{ color: colors.text.link, wordBreak: 'break-all' }}>{p}</a>;
       }
-      if (p === '@everyone' || p === '@here') return <span key={key} className="px-0.5 rounded font-medium" style={{ background: `${colors.accent.primary}20`, color: colors.accent.primary }}>{p}</span>;
-      if (p.match(/^@\w+/)) return <span key={key} className="px-0.5 rounded font-medium" style={{ background: `${colors.accent.primary}20`, color: colors.accent.primary }}>{p}</span>;
+      if (p === '@everyone' || p === '@here') return <span key={key} className="px-1 rounded font-semibold cursor-default" style={{ background: `${colors.accent.primary}25`, color: colors.accent.primary }}>{p}</span>;
+      if (p.match(/^@\w+/)) {
+        const username = p.slice(1);
+        return (
+          <span key={key} className="px-1 rounded font-semibold cursor-pointer hover:underline"
+            style={{ background: `${colors.accent.primary}20`, color: colors.accent.primary }}
+            onClick={() => onMentionClick?.(username)}>
+            {p}
+          </span>
+        );
+      }
       if (p.match(/^\*\*.*\*\*$/)) return <strong key={key}>{p.slice(2, -2)}</strong>;
       if (p.match(/^\*.*\*$/)) return <em key={key}>{p.slice(1, -1)}</em>;
       if (p.match(/^\|\|.*\|\|$/)) {
@@ -112,7 +126,7 @@ const SystemMessage = memo(function SystemMessage({ message }) {
   );
 });
 
-const MessageBubble = memo(function MessageBubble({ message, compact, isOwn, onReply, onEdit, onDelete, onReact, onPin, onStar, onForward, currentUserId, onProfileClick, isEditing, onEditSave, onEditCancel, onImageClick, onLinkClick, onHighlight }) {
+const MessageBubble = memo(function MessageBubble({ message, compact, isOwn, onReply, onEdit, onDelete, onReact, onPin, onStar, onForward, currentUserId, onProfileClick, isEditing, onEditSave, onEditCancel, onImageClick, onLinkClick, onHighlight, members, getProfile }) {
   if (message.type === 'system') return <SystemMessage message={message} />;
 
   const [hovered, setHovered] = useState(false);
@@ -124,8 +138,20 @@ const MessageBubble = memo(function MessageBubble({ message, compact, isOwn, onR
   const isLong = (message.content || '').split('\n').length > MAX_LINES || (message.content || '').length > 1500;
   const isDeleted = message.is_deleted;
   const authorName = isDeleted ? 'Deleted User' : (message.author_name || 'User');
-  const roleColor = message.author_badges?.includes('owner') ? '#faa61a'
-    : message.author_badges?.includes('admin') ? '#5865F2' : colors.text.primary;
+  const mentioned = hasMention(message.content);
+  const mentionBg = mentioned ? 'rgba(88,101,242,0.06)' : undefined;
+  const mentionBorder = mentioned ? `2px solid rgba(88,101,242,0.25)` : undefined;
+
+  // Resolve a @username mention to a user profile click
+  const handleMentionClick = (username) => {
+    if (!members || !onProfileClick) return;
+    const found = members.find(m => {
+      const p = getProfile?.(m.user_id);
+      const dn = p?.display_name || m.user_email?.split('@')[0] || '';
+      return dn.toLowerCase() === username.toLowerCase();
+    });
+    if (found) onProfileClick(found.user_id);
+  };
 
   return (
     <ContextMenu>
@@ -133,7 +159,7 @@ const MessageBubble = memo(function MessageBubble({ message, compact, isOwn, onR
         <div className="relative group flex items-start gap-4 py-[3px] px-4 hover:bg-[rgba(255,255,255,0.02)]"
           data-msg-id={message.id}
           onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}
-          style={{ marginTop: compact ? 0 : '1.125rem' }}>
+          style={{ marginTop: compact ? 0 : '1.125rem', background: mentionBg, borderLeft: mentionBorder }}>
 
           {/* Avatar or compact timestamp */}
           {compact ? (
@@ -205,7 +231,7 @@ const MessageBubble = memo(function MessageBubble({ message, compact, isOwn, onR
               <div className="relative">
                 <div className={`whitespace-pre-wrap break-words ${isEmojiOnly(message.content) ? 'text-[42px] leading-[1.2]' : 'text-[15px] leading-[1.375]'}`}
                   style={{ color: colors.text.secondary, maxHeight: isLong && !expanded ? '300px' : 'none' }}>
-                  {renderText(message.content, onLinkClick)}
+                  {renderText(message.content, onLinkClick, handleMentionClick)}
                 </div>
                 {isLong && !expanded && (
                   <button onClick={() => setExpanded(true)} className="flex items-center gap-1 text-[13px] font-medium hover:underline mt-0.5" style={{ color: colors.text.link }}>

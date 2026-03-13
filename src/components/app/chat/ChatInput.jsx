@@ -101,7 +101,9 @@ export default function ChatInput({ channelName, channelId, replyTo, onCancelRep
     const cursorPos = inputRef.current?.selectionStart || content.length;
     const textBefore = content.slice(0, cursorPos);
     const textAfter = content.slice(cursorPos);
-    const newBefore = textBefore.replace(/@(\w*)$/, `@${member.displayName} `);
+    // Special mentions: @everyone, @here
+    const mentionText = member.special ? member.displayName : member.displayName;
+    const newBefore = textBefore.replace(/@(\w*)$/, `@${mentionText} `);
     setContent(newBefore + textAfter);
     setShowMention(false);
     inputRef.current?.focus();
