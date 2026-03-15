@@ -169,37 +169,37 @@ const effects = {
       return { stars };
     },
     draw(ctx, w, h, t, dt, s) {
-      for (const st of s.stars) {
-        st.x += st.vx * dt * 0.06; st.y += st.vy * dt * 0.06;
-        st.rot += st.rotSpeed * dt * 0.06;
-        if (st.x < -10) st.x = w + 5; if (st.x > w + 10) st.x = -5;
-        if (st.y < -10) st.y = h + 5; if (st.y > h + 10) st.y = -5;
-        const twinkle = 0.5 + Math.sin(t * st.twinkleSpeed + st.twinklePhase) * 0.5;
-        const alpha = st.alpha * (0.4 + twinkle * 0.6);
-        if (st.hasTrail) {
+      for (const star of s.stars) {
+        star.x += star.vx * dt * 0.06; star.y += star.vy * dt * 0.06;
+        star.rot += star.rotSpeed * dt * 0.06;
+        if (star.x < -10) star.x = w + 5; if (star.x > w + 10) star.x = -5;
+        if (star.y < -10) star.y = h + 5; if (star.y > h + 10) star.y = -5;
+        const twinkle = 0.5 + Math.sin(t * star.twinkleSpeed + star.twinklePhase) * 0.5;
+        const alpha = star.alpha * (0.4 + twinkle * 0.6);
+        if (star.hasTrail) {
           ctx.save();
           ctx.globalAlpha = alpha * 0.15;
           ctx.strokeStyle = '#ffd700';
           ctx.lineWidth = 0.5;
           ctx.beginPath();
-          ctx.moveTo(st.x - st.vx * 40, st.y - st.vy * 40);
-          ctx.lineTo(st.x, st.y);
+          ctx.moveTo(star.x - star.vx * 40, star.y - star.vy * 40);
+          ctx.lineTo(star.x, star.y);
           ctx.stroke();
           ctx.globalAlpha = 1;
           ctx.restore();
         }
-        ctx.save(); ctx.translate(st.x, st.y); ctx.rotate(st.rot);
-        const g = ctx.createRadialGradient(0, 0, 0, 0, 0, st.size);
+        ctx.save(); ctx.translate(star.x, star.y); ctx.rotate(star.rot);
+        const g = ctx.createRadialGradient(0, 0, 0, 0, 0, star.size);
         g.addColorStop(0, `rgba(255,235,130,${alpha})`);
         g.addColorStop(0.5, `rgba(255,215,0,${alpha * 0.7})`);
         g.addColorStop(1, `rgba(218,165,32,${alpha * 0.3})`);
         ctx.fillStyle = g;
-        starPath(ctx, 0, 0, st.size, st.size * 0.4, 5);
+        starPath(ctx, 0, 0, star.size, star.size * 0.4, 5);
         ctx.fill();
         if (twinkle > 0.85) {
-          ctx.shadowColor = 'rgba(255,215,0,0.8)'; ctx.shadowBlur = st.size * 2;
+          ctx.shadowColor = 'rgba(255,215,0,0.8)'; ctx.shadowBlur = star.size * 2;
           ctx.fillStyle = `rgba(255,245,200,${(twinkle - 0.85) * 6})`;
-          starPath(ctx, 0, 0, st.size * 0.6, st.size * 0.25, 5);
+          starPath(ctx, 0, 0, star.size * 0.6, star.size * 0.25, 5);
           ctx.fill(); ctx.shadowBlur = 0;
         }
         ctx.restore();
@@ -670,22 +670,22 @@ const effects = {
         g.addColorStop(1, `rgba(${cr},${cg},${cb},0)`);
         ctx.fillStyle = g; ctx.beginPath(); ctx.arc(n.x, n.y, n.r * pulse, 0, TAU); ctx.fill();
       }
-      for (const st of s.farStars) {
-        const alpha = 0.3 + Math.sin(t * st.speed + st.twinkle) * 0.25;
+      for (const farStar of s.farStars) {
+        const alpha = 0.3 + Math.sin(t * farStar.speed + farStar.twinkle) * 0.25;
         ctx.fillStyle = `rgba(255,255,255,${alpha})`;
-        ctx.beginPath(); ctx.arc(st.x, st.y, st.size, 0, TAU); ctx.fill();
+        ctx.beginPath(); ctx.arc(farStar.x, farStar.y, farStar.size, 0, TAU); ctx.fill();
       }
-      for (const st of s.nearStars) {
-        st.x += st.vx * dt * 0.06;
-        if (st.x < -5) st.x = w + 3; if (st.x > w + 5) st.x = -3;
-        const alpha = 0.5 + Math.sin(t * st.speed + st.twinkle) * 0.3;
+      for (const nearStar of s.nearStars) {
+        nearStar.x += nearStar.vx * dt * 0.06;
+        if (nearStar.x < -5) nearStar.x = w + 3; if (nearStar.x > w + 5) nearStar.x = -3;
+        const alpha = 0.5 + Math.sin(t * nearStar.speed + nearStar.twinkle) * 0.3;
         ctx.fillStyle = `rgba(255,255,255,${alpha})`;
-        ctx.beginPath(); ctx.arc(st.x, st.y, st.size, 0, TAU); ctx.fill();
-        if (st.bloom) {
-          const bloom = Math.sin(t * st.speed * 0.5 + st.twinkle) * 0.5 + 0.5;
-          ctx.shadowColor = `rgba(200,210,255,${bloom * 0.6})`; ctx.shadowBlur = st.size * 6;
+        ctx.beginPath(); ctx.arc(nearStar.x, nearStar.y, nearStar.size, 0, TAU); ctx.fill();
+        if (nearStar.bloom) {
+          const bloom = Math.sin(t * nearStar.speed * 0.5 + nearStar.twinkle) * 0.5 + 0.5;
+          ctx.shadowColor = `rgba(200,210,255,${bloom * 0.6})`; ctx.shadowBlur = nearStar.size * 6;
           ctx.fillStyle = `rgba(220,230,255,${bloom * 0.3})`;
-          ctx.beginPath(); ctx.arc(st.x, st.y, st.size * 1.5, 0, TAU); ctx.fill();
+          ctx.beginPath(); ctx.arc(nearStar.x, nearStar.y, nearStar.size * 1.5, 0, TAU); ctx.fill();
           ctx.shadowBlur = 0;
         }
       }

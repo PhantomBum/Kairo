@@ -59,21 +59,18 @@ export default function KairoLoadingScreen({ onReady, username, isLoading }) {
     }
   }, [isLoading, username]);
 
-  // When ready: fill to 100%, then fade out
+  // When ready: fill to 100%, then fade out. Do NOT clear the timeout on effect re-run
+  // or the transition would never complete (parent re-renders change deps, cleanup cancels timeout).
   useEffect(() => {
     if (!onReady || readyRef.current) return;
     if (!isLoading) {
       readyRef.current = true;
       setProgress(100);
-      if (reducedMotion.current) {
-        const t = setTimeout(() => { setShowContent(false); onReady(); }, 100);
-        return () => clearTimeout(t);
-      }
-      const t = setTimeout(() => {
+      const delay = reducedMotion.current ? 100 : 300;
+      setTimeout(() => {
         setShowContent(false);
         onReady();
-      }, 300);
-      return () => clearTimeout(t);
+      }, delay);
     }
   }, [onReady, isLoading]);
 

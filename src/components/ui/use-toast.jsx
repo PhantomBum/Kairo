@@ -142,7 +142,7 @@ function toast({ ...props }) {
 }
 
 function useToast() {
-  const [state, setState] = useState(memoryState);
+  const [state, setState] = useState(() => memoryState);
 
   useEffect(() => {
     listeners.push(setState);
@@ -152,10 +152,10 @@ function useToast() {
         listeners.splice(index, 1);
       }
     };
-  }, [state]);
+  }, []);
 
   return {
-    ...state,
+    toasts: Array.isArray(state?.toasts) ? state.toasts : [],
     toast,
     dismiss: (toastId) => dispatch({ type: actionTypes.DISMISS_TOAST, toastId }),
   };

@@ -363,7 +363,7 @@ img::before {
   .compact-tap { min-height: 36px; min-width: 36px; }
 }
 
-/* Z-index hierarchy: menus 900, tooltips 950, modals 1000 — prevents overlap bugs */
+/* Z-index hierarchy: connection banner 35, mobile panels 40, menus 900, tooltips 950, modals 1000, toasts 1100 */
 [data-radix-popper-content-wrapper],
 [data-radix-context-menu-content],
 [data-radix-dropdown-menu-content] { z-index: 900 !important; }
@@ -371,6 +371,10 @@ img::before {
 .kairo-modal-backdrop,
 [data-radix-dialog-content] { z-index: 1000 !important; }
 [data-radix-dialog-overlay] { z-index: 999 !important; }
+
+/* Layout containment — prevent overlap and overflow */
+.h-screen.w-screen.flex { overflow: hidden; }
+.h-screen.w-screen.flex > .flex-1 { min-width: 0; overflow: hidden; }
 
 /* Bottom-sheet modals on mobile */
 @media (max-width: 767px) {

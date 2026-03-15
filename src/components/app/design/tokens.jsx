@@ -1,44 +1,44 @@
 /**
- * Kairo Design System — Kloak-inspired Dark
- * Deep, rich blacks. Muted accents. Private, focused, minimal.
+ * Kairo Design System — V2 Lighter Charcoal
+ * Breathable charcoal scale, muted purple-blue accent. Clean, minimal.
  */
 
-/* Backgrounds — deep void layers */
-const BG_VOID = '#060608';
-const BG_BASE = '#0a0a0f';
-const BG_SURFACE = '#0d0d12';
-const BG_ELEVATED = '#111118';
-const BG_RAISED = '#16161d';
-const BG_FLOAT = '#1a1a23';
-const BG_OVERLAY = '#1e1e28';
+/* Backgrounds — lighter charcoal (V2 style) */
+const BG_VOID = '#1a1b1e';
+const BG_BASE = '#1a1b1e';
+const BG_SURFACE = '#1e1f23';
+const BG_ELEVATED = '#25262b';
+const BG_RAISED = '#2c2d33';
+const BG_FLOAT = '#2c2d33';
+const BG_OVERLAY = '#2c2d33';
 
-/* Borders — subtle, barely there */
-const BORDER_FAINT = 'rgba(255,255,255,0.04)';
-const BORDER_SUBTLE = 'rgba(255,255,255,0.06)';
-const BORDER_MEDIUM = 'rgba(255,255,255,0.08)';
-const BORDER_STRONG = 'rgba(255,255,255,0.12)';
+/* Borders — visible, soft */
+const BORDER_FAINT = '#3a3b42';
+const BORDER_SUBTLE = '#44454d';
+const BORDER_MEDIUM = '#52535c';
+const BORDER_STRONG = '#5c5d66';
 
-/* Text — clear, slightly cool */
-const TEXT_PRIMARY = '#e4e4e8';
-const TEXT_SECONDARY = '#8b8b96';
-const TEXT_MUTED = '#5c5c66';
-const TEXT_FAINT = '#3a3a40';
+/* Text — warm off-whites */
+const TEXT_PRIMARY = '#f0f1f3';
+const TEXT_SECONDARY = '#a8aab2';
+const TEXT_MUTED = '#8b8d95';
+const TEXT_FAINT = '#6b6d75';
 
-/* Accent — muted teal */
-const ACCENT_PRIMARY = '#22c9b3';
-const ACCENT_BRIGHT = '#4dd4c0';
-const ACCENT_DIM = 'rgba(34,201,179,0.15)';
-const ACCENT_GLOW = 'rgba(34,201,179,0.25)';
+/* Accent — muted purple-blue */
+const ACCENT_PRIMARY = '#6c7adb';
+const ACCENT_BRIGHT = '#8b96e9';
+const ACCENT_DIM = 'rgba(108,122,219,0.15)';
+const ACCENT_GLOW = 'rgba(108,122,219,0.25)';
 
 /* Semantic */
-const COLOR_SUCCESS = '#2ecc71';
-const COLOR_WARNING = '#e6b84c';
-const COLOR_DANGER = '#e74c3c';
-const COLOR_INFO = '#5b8def';
+const COLOR_SUCCESS = '#3ba55d';
+const COLOR_WARNING = '#faa81a';
+const COLOR_DANGER = '#ed4245';
+const COLOR_INFO = '#5865f2';
 
 /* Special surfaces */
-const SURFACE_GLASS = 'rgba(255,255,255,0.02)';
-const SURFACE_BRAND = 'rgba(34,201,179,0.08)';
+const SURFACE_GLASS = 'rgba(255,255,255,0.05)';
+const SURFACE_BRAND = 'rgba(108,122,219,0.12)';
 
 export const colors = {
   bg: {
@@ -75,7 +75,7 @@ export const colors = {
     dim: ACCENT_DIM,
     glow: ACCENT_GLOW,
     hover: ACCENT_BRIGHT,
-    active: '#22b8a3',
+    active: '#5b69c9',
     subtle: ACCENT_DIM,
     muted: ACCENT_DIM,
   },
@@ -283,7 +283,7 @@ export const cssVariables = `
   --accent-blue: ${COLOR_INFO};
   --accent-green: ${COLOR_SUCCESS};
   --accent-red: ${COLOR_DANGER};
-  --accent-purple: #5eead4;
+  --accent-purple: #8b96e9;
   --accent-amber: ${COLOR_WARNING};
   --accent-glow: ${ACCENT_GLOW};
   --border: ${BORDER_SUBTLE};

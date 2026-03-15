@@ -85,14 +85,14 @@ export default function VirtualizedList({
 
   // Handle scroll
   const handleScroll = useCallback((e) => {
-    const { scrollTop: st, scrollHeight, clientHeight } = e.target;
-    setScrollTop(st);
+    const { scrollTop: scrollTopVal, scrollHeight, clientHeight } = e.target;
+    setScrollTop(scrollTopVal);
     
-    const atBottom = scrollHeight - st - clientHeight < 50;
+    const atBottom = scrollHeight - scrollTopVal - clientHeight < 50;
     setIsAtBottom(atBottom);
     
     // Load more when near top (for chat-style loading)
-    if (st < 100 && hasMore && !isLoading && loadMore) {
+    if (scrollTopVal < 100 && hasMore && !isLoading && loadMore) {
       loadMore();
     }
     

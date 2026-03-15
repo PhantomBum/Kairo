@@ -96,7 +96,7 @@ export default function Layout({ children }) {
         }
         [data-radix-popper-content-wrapper] [role="menuitem"]:hover,
         [data-radix-popper-content-wrapper] [role="menuitem"][data-highlighted] {
-          background: rgba(123,108,246,0.15) !important;
+          background: rgba(108,122,219,0.2) !important;
           color: #fff !important;
         }
         [data-radix-popper-content-wrapper] [role="menuitem"]:active { transform: scale(0.98) !important; }
