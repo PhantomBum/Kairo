@@ -36,7 +36,7 @@ export default function BadgeNotification({ badge, onDismiss }) {
             <Icon className="w-5 h-5" style={{ color: cfg.color }} />
           </div>
           <div className="min-w-0">
-            <p className="text-[10px] font-bold uppercase tracking-wider" style={{ color: rarity.color }}>
+            <p className="text-[11px] font-bold uppercase tracking-wider" style={{ color: rarity.color }}>
               Badge Earned — {rarity.label}
             </p>
             <p className="text-[13px] font-bold truncate" style={{ color: colors.text.primary }}>{cfg.label}</p>

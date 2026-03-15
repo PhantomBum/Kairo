@@ -19,7 +19,7 @@ export default function ServerNotes({ serverId, onClose }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.5)' }} onClick={onClose}>
-      <div className="w-full max-w-[400px] rounded-2xl overflow-hidden" style={{ background: colors.bg.surface, border: `1px solid ${colors.border.light}`, boxShadow: '0 8px 32px rgba(0,0,0,0.6)' }} onClick={e => e.stopPropagation()}>
+      <div className="w-full max-w-[400px] max-h-[80vh] rounded-2xl overflow-y-auto" style={{ background: colors.bg.surface, border: `1px solid ${colors.border.light}`, boxShadow: '0 8px 32px rgba(0,0,0,0.6)' }} onClick={e => e.stopPropagation()}>
         <div className="flex items-center justify-between px-5 py-4" style={{ borderBottom: `1px solid ${colors.border.default}` }}>
           <div className="flex items-center gap-2">
             <StickyNote className="w-4 h-4" style={{ color: colors.warning }} />

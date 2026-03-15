@@ -30,7 +30,7 @@ export default function IntegrationsTab({ serverId }) {
   };
 
   const remove = async (wh) => {
-    if (!confirm(`Delete webhook "${wh.name}"?`)) return;
+    if (!confirm(`Delete the "${wh.name}" webhook? Integrations using it will stop working.`)) return;
     await base44.entities.ServerWebhook.delete(wh.id);
     setWebhooks(p => p.filter(x => x.id !== wh.id));
   };

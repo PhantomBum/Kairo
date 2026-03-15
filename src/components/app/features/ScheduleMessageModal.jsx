@@ -66,7 +66,7 @@ export default function ScheduleMessageModal({ onClose, channelId, serverId, cur
         )}
         <button onClick={handleSchedule} disabled={!content.trim() || !date || !time || saving}
           className="w-full py-3 rounded-xl text-[14px] font-semibold flex items-center justify-center gap-2 disabled:opacity-30"
-          style={{ background: colors.accent.primary, color: '#fff' }}>
+          style={{ background: colors.accent.primary, color: '#0d1117' }}>
           <Send className="w-4 h-4" />
           {saving ? 'Scheduling...' : 'Schedule Message'}
         </button>

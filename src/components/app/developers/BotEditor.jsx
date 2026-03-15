@@ -45,7 +45,7 @@ export default function BotEditor({ bot, onSave, onBack, onDelete }) {
   };
 
   const regenerateToken = async () => {
-    if (!confirm('Regenerate token? This will invalidate the current token.')) return;
+    if (!confirm('Regenerate this token? The current one will stop working immediately.')) return;
     const token = 'KBot.' + Math.random().toString(36).substring(2, 10) + '.' + Math.random().toString(36).substring(2, 18);
     await onSave(bot.id, { token });
   };
@@ -102,27 +102,27 @@ export default function BotEditor({ bot, onSave, onBack, onDelete }) {
       {tab === 'general' && (
         <div className="space-y-4 rounded-2xl p-6" style={{ background: 'var(--bg-glass)', border: '1px solid var(--border)' }}>
           <div>
-            <label className="text-[10px] font-semibold uppercase tracking-[0.06em] block mb-1.5" style={{ color: 'var(--text-muted)' }}>Bot Name</label>
+            <label className="text-[11px] font-semibold uppercase tracking-[0.06em] block mb-1.5" style={{ color: 'var(--text-muted)' }}>Bot Name</label>
             <input value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))} className="w-full px-3 py-2.5 rounded-xl text-sm outline-none" style={{ background: 'var(--bg-glass-strong)', color: 'var(--text-primary)', border: '1px solid var(--border)' }} />
           </div>
           <div>
-            <label className="text-[10px] font-semibold uppercase tracking-[0.06em] block mb-1.5" style={{ color: 'var(--text-muted)' }}>Description</label>
+            <label className="text-[11px] font-semibold uppercase tracking-[0.06em] block mb-1.5" style={{ color: 'var(--text-muted)' }}>Description</label>
             <textarea value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))} rows={3} className="w-full px-3 py-2.5 rounded-xl text-sm outline-none resize-none" style={{ background: 'var(--bg-glass-strong)', color: 'var(--text-primary)', border: '1px solid var(--border)' }} />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="text-[10px] font-semibold uppercase tracking-[0.06em] block mb-1.5" style={{ color: 'var(--text-muted)' }}>Category</label>
+              <label className="text-[11px] font-semibold uppercase tracking-[0.06em] block mb-1.5" style={{ color: 'var(--text-muted)' }}>Category</label>
               <select value={form.category} onChange={e => setForm(p => ({ ...p, category: e.target.value }))} className="w-full px-3 py-2.5 rounded-xl text-sm outline-none" style={{ background: 'var(--bg-glass-strong)', color: 'var(--text-primary)', border: '1px solid var(--border)' }}>
                 {['moderation', 'fun', 'utility', 'music', 'economy', 'leveling', 'welcoming', 'productivity'].map(c => <option key={c} value={c} className="capitalize">{c}</option>)}
               </select>
             </div>
             <div>
-              <label className="text-[10px] font-semibold uppercase tracking-[0.06em] block mb-1.5" style={{ color: 'var(--text-muted)' }}>Prefix</label>
+              <label className="text-[11px] font-semibold uppercase tracking-[0.06em] block mb-1.5" style={{ color: 'var(--text-muted)' }}>Prefix</label>
               <input value={form.prefix} onChange={e => setForm(p => ({ ...p, prefix: e.target.value }))} className="w-full px-3 py-2.5 rounded-xl text-sm outline-none" style={{ background: 'var(--bg-glass-strong)', color: 'var(--text-primary)', border: '1px solid var(--border)' }} />
             </div>
           </div>
           <div>
-            <label className="text-[10px] font-semibold uppercase tracking-[0.06em] block mb-1.5" style={{ color: 'var(--text-muted)' }}>Tags (comma separated)</label>
+            <label className="text-[11px] font-semibold uppercase tracking-[0.06em] block mb-1.5" style={{ color: 'var(--text-muted)' }}>Tags (comma separated)</label>
             <input value={form.tags} onChange={e => setForm(p => ({ ...p, tags: e.target.value }))} placeholder="moderation, fun, games" className="w-full px-3 py-2.5 rounded-xl text-sm outline-none" style={{ background: 'var(--bg-glass-strong)', color: 'var(--text-primary)', border: '1px solid var(--border)' }} />
           </div>
           <div className="flex items-center justify-between py-2">
@@ -134,7 +134,7 @@ export default function BotEditor({ bot, onSave, onBack, onDelete }) {
 
           {/* Token */}
           <div className="p-4 rounded-xl" style={{ background: 'rgba(201,123,123,0.04)', border: '1px solid rgba(201,123,123,0.15)' }}>
-            <label className="text-[10px] font-semibold uppercase tracking-[0.06em] block mb-2" style={{ color: 'var(--accent-red)' }}>Bot Token (keep secret!)</label>
+            <label className="text-[11px] font-semibold uppercase tracking-[0.06em] block mb-2" style={{ color: 'var(--accent-red)' }}>Bot Token (keep secret!)</label>
             <div className="flex items-center gap-2">
               <code className="flex-1 text-[11px] font-mono p-2 rounded-lg overflow-x-auto" style={{ background: 'var(--bg-deep)', color: 'var(--text-muted)' }}>
                 {showToken ? bot.token : '••••••••••••••••••••••'}

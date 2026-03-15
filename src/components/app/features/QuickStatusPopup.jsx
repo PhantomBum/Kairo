@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { X } from 'lucide-react';
-import { colors } from '@/components/app/design/tokens';
+import { colors, radius, shadows } from '@/components/app/design/tokens';
 
 const STATUSES = [
   { id: 'online', label: 'Online', color: colors.status.online },
@@ -41,12 +41,12 @@ export default function QuickStatusPopup({ currentStatus, customStatus, onSave, 
   };
 
   return (
-    <div ref={popupRef} className="absolute bottom-full left-0 mb-2 w-[260px] rounded-xl p-3 k-scale-in z-50"
-      style={{ background: colors.bg.float, border: `1px solid ${colors.border.strong}`, boxShadow: '0 8px 32px rgba(0,0,0,0.6)' }}
+    <div ref={popupRef} className="absolute bottom-full left-0 mb-2 w-[260px] p-4 k-scale-in z-50"
+      style={{ background: colors.bg.float, border: `1px solid ${colors.border.strong}`, borderRadius: radius.xl, boxShadow: shadows.floating }}
       onClick={e => e.stopPropagation()}>
       <div className="flex items-center justify-between mb-2">
         <span className="text-[12px] font-semibold uppercase tracking-wider" style={{ color: colors.text.muted }}>Set Status</span>
-        <button onClick={onClose} className="w-5 h-5 flex items-center justify-center rounded hover:bg-[rgba(255,255,255,0.06)]">
+        <button onClick={onClose} className="w-5 h-5 flex items-center justify-center rounded-md hover:bg-[rgba(255,255,255,0.06)] transition-all duration-[120ms] ease-out active:scale-[0.93]">
           <X className="w-3 h-3" style={{ color: colors.text.disabled }} />
         </button>
       </div>
@@ -56,7 +56,7 @@ export default function QuickStatusPopup({ currentStatus, customStatus, onSave, 
           <button key={s.id} onClick={() => { setSelected(s.id); handleSave(s.id, text, emoji); }}
             className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-[13px] transition-colors"
             style={{ background: selected === s.id ? 'rgba(255,255,255,0.06)' : 'transparent', color: colors.text.primary }}>
-            <div className="w-3 h-3 rounded-full flex-shrink-0" style={{ background: s.color }} />
+            <div className="w-[10px] h-[10px] rounded-full flex-shrink-0 border-2" style={{ background: s.color, borderColor: s.color }} />
             {s.label}
           </button>
         ))}
@@ -71,7 +71,7 @@ export default function QuickStatusPopup({ currentStatus, customStatus, onSave, 
 
       {recent.length > 0 && (
         <div>
-          <span className="text-[10px] font-semibold uppercase tracking-wider block mb-1 px-1" style={{ color: colors.text.disabled }}>Recent</span>
+          <span className="text-[11px] font-semibold uppercase tracking-wider block mb-1 px-1" style={{ color: colors.text.disabled }}>Recent</span>
           {recent.slice(0, 3).map((r, i) => (
             <button key={i} onClick={() => { setText(r); handleSave(selected, r, ''); }}
               className="w-full text-left px-2 py-1.5 rounded-md text-[12px] truncate hover:bg-[rgba(255,255,255,0.04)]"

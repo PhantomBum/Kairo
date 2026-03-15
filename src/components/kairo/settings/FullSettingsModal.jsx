@@ -35,7 +35,7 @@ function AccountSettings({ profile, settings, onUpdate }) {
     username: profile?.username || '',
     bio: profile?.bio || '',
     pronouns: profile?.pronouns || '',
-    accent_color: profile?.accent_color || '#5865f2',
+    accent_color: profile?.accent_color || '#2dd4bf',
     youtube_channel: profile?.youtube_channel || { url: '', show_icon: true },
     badges: profile?.badges || [],
     avatar_url: profile?.avatar_url || ''
@@ -50,7 +50,7 @@ function AccountSettings({ profile, settings, onUpdate }) {
       username: profile?.username || '',
       bio: profile?.bio || '',
       pronouns: profile?.pronouns || '',
-      accent_color: profile?.accent_color || '#5865f2',
+      accent_color: profile?.accent_color || '#2dd4bf',
       youtube_channel: profile?.youtube_channel || { url: '', show_icon: true },
       badges: profile?.badges || [],
       avatar_url: profile?.avatar_url || ''
@@ -299,7 +299,7 @@ function AccountSettings({ profile, settings, onUpdate }) {
               username: profile?.username || '',
               bio: profile?.bio || '',
               pronouns: profile?.pronouns || '',
-              accent_color: profile?.accent_color || '#5865f2',
+              accent_color: profile?.accent_color || '#2dd4bf',
               youtube_channel: profile?.youtube_channel || { url: '', show_icon: true },
               badges: profile?.badges || []
             })}
@@ -1015,7 +1015,7 @@ export default function FullSettingsModal({ isOpen, onClose, profile, userSettin
       case 'sessions':
         return <SessionsSettings settings={userSettings} />;
       default:
-        return <div className="flex items-center justify-center h-full text-zinc-500">Coming soon...</div>;
+        return <div className="flex items-center justify-center h-full text-zinc-500">No additional settings for this section.</div>;
     }
   };
 

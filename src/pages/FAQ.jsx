@@ -1,81 +1,76 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { Search, ChevronDown, ChevronUp, ThumbsUp, ThumbsDown } from 'lucide-react';
-import { base44 } from '@/api/base44Client';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
+import { Search, ChevronDown, MessageCircle, Crown, Shield, Users, Cpu, CreditCard, HelpCircle } from 'lucide-react';
 import PageShell from '@/components/app/shared/PageShell';
 
+const C = {
+  bg: '#18181c', surface: '#1e1e23', elevated: '#26262d', overlay: '#2e2e37',
+  accent: '#2dd4bf', text: '#e8edf5', textSec: '#9aaabb', muted: '#5d7a8a',
+  border: '#33333d', success: '#3ba55d',
+};
+
 const FAQ_DATA = [
-  { cat: 'Getting Started', items: [
-    { id: 'gs1', q: 'How do I create an account?', a: 'Click "Get Started" on the homepage or visit the app and you\'ll be prompted to sign up with your email. It only takes a few seconds.' },
-    { id: 'gs2', q: 'How do I create a server?', a: 'Click the "+" button in the server rail on the left side, choose a template or start from scratch, name your server, and you\'re good to go.' },
-    { id: 'gs3', q: 'How do I invite friends?', a: 'Open your server settings, click "Invite People", and share the unique invite code or link with your friends.' },
-    { id: 'gs4', q: 'How do I change my display name and avatar?', a: 'Go to Settings > Profile. You can change your display name, upload an avatar, set a banner, write a bio, and add pronouns.' },
+  { cat: 'General', icon: HelpCircle, items: [
+    { q: 'What is Kairo?', a: 'Kairo is a free, private communication platform. Think of it like Discord, but built from the ground up with your privacy as the foundation. No ads, no tracking, no data selling.' },
+    { q: 'Is Kairo really free?', a: 'Yes, completely. Kairo is free forever. Paid options are Lite at $0.99/month and Elite at $2.99/month — both entirely optional and exist to support the project, not as a paywall.' },
+    { q: 'How is Kairo different from Discord?', a: 'Kairo is private by default. You can sign up without an email using a Secret Key. We have Ghost Mode, encrypted secret chats, and we never collect, sell, or monetize your data.' },
+    { q: 'Who made Kairo?', a: 'Kairo is built by a single developer. It\'s an independent project, not a corporation. That\'s why it stays true to its values.' },
   ]},
-  { cat: 'Servers', items: [
-    { id: 'sv1', q: 'How many servers can I join?', a: 'You can join up to 100 servers. Elite members can join up to 200.' },
-    { id: 'sv2', q: 'How do I set up roles?', a: 'Go to Server Settings > Roles. Create roles, assign colors, set permissions, and drag to reorder hierarchy.' },
-    { id: 'sv3', q: 'Can I transfer server ownership?', a: 'Currently, server ownership cannot be transferred. The original creator remains the owner.' },
-    { id: 'sv4', q: 'How do channel categories work?', a: 'Categories group channels together. Right-click a category to add channels, rename it, or collapse/expand it.' },
+  { cat: 'Account', icon: Shield, items: [
+    { q: 'How do I create an account?', a: 'Visit kairo.app and click Sign Up. You can register with email, Google, or a Secret Key (no personal info needed).' },
+    { q: 'What is a Secret Key account?', a: 'A Secret Key account requires zero personal information — no email, no phone number. A cryptographic key is generated for you. It\'s the most private way to use Kairo.' },
+    { q: 'What if I lose my Secret Key?', a: 'If you lose your Secret Key, your account is gone forever. There is no recovery, no password reset, nothing. That\'s the tradeoff for maximum privacy.' },
+    { q: 'How do I change my username or avatar?', a: 'Go to Settings > Profile. You can update your display name, username, avatar, banner, bio, and pronouns anytime.' },
+    { q: 'How do I delete my account?', a: 'Go to Settings > Account and scroll to the bottom. Click "Delete Account" and confirm. This is permanent and cannot be undone.' },
   ]},
-  { cat: 'Voice & Video', items: [
-    { id: 'vv1', q: 'Why can\'t others hear me?', a: 'Check your microphone permissions in browser settings, make sure you\'re not muted (Ctrl+Shift+M), and check input device in Voice settings.' },
-    { id: 'vv2', q: 'How do I share my screen?', a: 'Join a voice channel, then click the screen share button. You can share your entire screen or a specific window.' },
-    { id: 'vv3', q: 'What is Stage mode?', a: 'Stage channels are for presentations — speakers talk while the audience listens. Great for events, Q&As, and performances.' },
+  { cat: 'Elite', icon: Crown, items: [
+    { q: 'What does Kairo Elite include?', a: 'Animated avatars & banners, 500MB file uploads, 4000-character messages, HD 1080p video, 25-person group calls, custom chat backgrounds, read receipts, message scheduling, vanity profile URLs, and more.' },
+    { q: 'How much does Elite cost?', a: 'Kairo Elite is $2.99/month. Lite is $0.99/month. We also give out Elite for free regularly — the goal was never to make money.' },
+    { q: 'How do I cancel Elite?', a: 'Visit the Elite page or Settings > Subscription. Click "Cancel Subscription." Your benefits remain until the end of the billing period.' },
+    { q: 'Do I need Elite to use Kairo?', a: 'Absolutely not. Free Kairo is genuinely great and always will be. Elite is for people who want extra perks or want to support the project.' },
   ]},
-  { cat: 'Elite', items: [
-    { id: 'el1', q: 'What does Kairo Elite include?', a: 'Animated avatars, 100MB uploads, exclusive badges, HD voice/video, 500 monthly credits, extended message limits, custom backgrounds, and more.' },
-    { id: 'el2', q: 'How much does Elite cost?', a: 'Kairo Elite is $9.99/month. You can manage your subscription from the Elite page.' },
-    { id: 'el3', q: 'How do I cancel Elite?', a: 'Visit the Elite subscription page and click "Cancel Subscription". Your benefits remain active until the end of the billing period.' },
+  { cat: 'Servers', icon: Users, items: [
+    { q: 'How do I create a server?', a: 'Click the "+" button in the server rail on the left side. Choose a template or start from scratch, name your server, and invite friends.' },
+    { q: 'How many servers can I join?', a: 'You can join up to 100 servers on the free plan, or 200 with Elite.' },
+    { q: 'How do roles and permissions work?', a: 'Go to Server Settings > Roles. Create roles with custom colors and permissions. Drag to reorder the hierarchy. Higher roles override lower ones.' },
+    { q: 'How do I invite people to my server?', a: 'Click the invite button in your server. You\'ll get a unique link you can share. You can set it to expire or limit uses.' },
   ]},
-  { cat: 'Bots', items: [
-    { id: 'bt1', q: 'How do I create a bot?', a: 'Visit the Developer Portal at /developers. Create a new bot, configure its commands using the visual builder, and deploy it to your servers.' },
-    { id: 'bt2', q: 'How do I add a bot to my server?', a: 'Browse the Bot Marketplace at /bots, find a bot you like, and click "Add to Server" to install it.' },
-    { id: 'bt3', q: 'Can I publish my bot?', a: 'Yes! Once your bot is ready, submit it to the marketplace from the developer portal. Popular bots can earn a verified badge.' },
+  { cat: 'Privacy', icon: Shield, items: [
+    { q: 'Does Kairo sell my data?', a: 'No. Never. We don\'t sell, share, or monetize your data in any way. That\'s a core promise.' },
+    { q: 'What is Ghost Mode?', a: 'Ghost Mode makes you completely invisible. No one can see you\'re online. You can browse, read messages, and listen to voice channels without anyone knowing.' },
+    { q: 'What are Secret Chats?', a: 'Secret Chats use end-to-end encryption. Messages are never stored on our servers and disappear when the session ends.' },
+    { q: 'How do I block someone?', a: 'Right-click their name and select Block User. They won\'t be able to DM you, see your status, or interact with you.' },
   ]},
-  { cat: 'Privacy & Security', items: [
-    { id: 'ps1', q: 'How do I block someone?', a: 'Right-click their name and select "Block User". They won\'t be able to DM you or see your online status.' },
-    { id: 'ps2', q: 'Can I make my profile private?', a: 'Go to Settings > Privacy. You can control who can DM you, send friend requests, and see your activity.' },
-    { id: 'ps3', q: 'Is my data encrypted?', a: 'All data is transmitted over encrypted connections (TLS). Your messages are stored securely on our servers.' },
-  ]},
-  { cat: 'Billing', items: [
-    { id: 'bl1', q: 'What payment methods are accepted?', a: 'We accept all major credit/debit cards through Stripe. More payment methods coming soon.' },
-    { id: 'bl2', q: 'How do I get a refund?', a: 'Contact support through the Support page with your billing details and reason for the refund request.' },
-    { id: 'bl3', q: 'What are credits?', a: 'Credits are Kairo\'s virtual currency used in the shop to purchase profile decorations, nameplates, sticker packs, and more.' },
+  { cat: 'Technical', icon: Cpu, items: [
+    { q: 'What browsers does Kairo support?', a: 'Kairo works in all modern browsers: Chrome, Firefox, Safari, Edge. For the best experience, use the latest version of Chrome or Edge.' },
+    { q: 'Can I install Kairo as an app?', a: 'Yes! Kairo is a PWA (Progressive Web App). In Chrome, click the install icon in the address bar to add it to your device.' },
+    { q: 'Why can\'t others hear me in voice?', a: 'Check your browser microphone permissions, make sure you\'re not muted (Ctrl+Shift+M), and verify the correct input device in Settings > Voice & Video.' },
+    { q: 'How do I report a bug?', a: 'Visit the Support page and use the Bug Report tab. Include steps to reproduce the issue and we\'ll look into it.' },
   ]},
 ];
 
-function FAQItem({ item }) {
-  const [open, setOpen] = useState(false);
-  const [rated, setRated] = useState(null);
+function Accordion({ item, isOpen, onToggle }) {
+  const contentRef = useRef(null);
+  const [height, setHeight] = useState(0);
 
-  const handleRate = async (helpful) => {
-    setRated(helpful);
-    const isAuth = await base44.auth.isAuthenticated();
-    if (isAuth) {
-      const user = await base44.auth.me();
-      base44.entities.FAQRating.create({ question_id: item.id, user_id: user.id, helpful });
+  useEffect(() => {
+    if (isOpen && contentRef.current) {
+      setHeight(contentRef.current.scrollHeight);
+    } else {
+      setHeight(0);
     }
-  };
+  }, [isOpen]);
 
   return (
-    <div className="rounded-xl transition-all" style={{ background: open ? 'var(--bg-glass-active, rgba(255,255,255,0.07))' : 'var(--bg-glass, rgba(255,255,255,0.03))', border: '1px solid var(--border, rgba(255,255,255,0.04))' }}>
-      <button onClick={() => setOpen(!open)} className="w-full flex items-center justify-between p-4 text-left">
-        <span className="text-sm font-medium pr-4" style={{ color: 'var(--text-cream, #e8e4d9)' }}>{item.q}</span>
-        {open ? <ChevronUp className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--text-muted)' }} /> : <ChevronDown className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--text-muted)' }} />}
+    <div className="rounded-xl overflow-hidden" style={{ background: isOpen ? 'rgba(255,255,255,0.04)' : 'rgba(255,255,255,0.02)', border: `1px solid ${isOpen ? C.accent + '30' : C.border}` }}>
+      <button onClick={onToggle} className="w-full flex items-center justify-between p-4 text-left group">
+        <span className="text-[14px] font-medium pr-4" style={{ color: C.text }}>{item.q}</span>
+        <ChevronDown className="w-4 h-4 flex-shrink-0 transition-transform" style={{ color: C.muted, transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)' }} />
       </button>
-      {open && (
-        <div className="px-4 pb-4">
-          <p className="text-[13px] leading-relaxed mb-3" style={{ color: 'var(--text-secondary, #8a8778)' }}>{item.a}</p>
-          <div className="flex items-center gap-2">
-            <span className="text-[10px]" style={{ color: 'var(--text-faint)' }}>Was this helpful?</span>
-            <button onClick={() => handleRate(true)} className={`p-1 rounded-md transition-colors ${rated === true ? 'bg-[rgba(123,201,164,0.15)]' : 'hover:bg-[rgba(255,255,255,0.05)]'}`}>
-              <ThumbsUp className="w-3 h-3" style={{ color: rated === true ? 'var(--accent-green)' : 'var(--text-muted)' }} />
-            </button>
-            <button onClick={() => handleRate(false)} className={`p-1 rounded-md transition-colors ${rated === false ? 'bg-[rgba(201,123,123,0.15)]' : 'hover:bg-[rgba(255,255,255,0.05)]'}`}>
-              <ThumbsDown className="w-3 h-3" style={{ color: rated === false ? 'var(--accent-red)' : 'var(--text-muted)' }} />
-            </button>
-          </div>
+      <div style={{ height, overflow: 'hidden', transition: 'height 200ms ease' }}>
+        <div ref={contentRef} className="px-4 pb-4">
+          <p className="text-[13px] leading-relaxed" style={{ color: C.textSec }}>{item.a}</p>
         </div>
-      )}
+      </div>
     </div>
   );
 }
@@ -83,13 +78,14 @@ function FAQItem({ item }) {
 export default function FAQ() {
   const [search, setSearch] = useState('');
   const [activeCat, setActiveCat] = useState(null);
+  const [openId, setOpenId] = useState(null);
 
   const filtered = useMemo(() => {
-    if (!search.trim() && !activeCat) return FAQ_DATA;
+    const s = search.toLowerCase().trim();
     return FAQ_DATA.map(cat => ({
       ...cat,
       items: cat.items.filter(i => {
-        const matchSearch = !search.trim() || i.q.toLowerCase().includes(search.toLowerCase()) || i.a.toLowerCase().includes(search.toLowerCase());
+        const matchSearch = !s || i.q.toLowerCase().includes(s) || i.a.toLowerCase().includes(s);
         const matchCat = !activeCat || cat.cat === activeCat;
         return matchSearch && matchCat;
       })
@@ -98,41 +94,60 @@ export default function FAQ() {
 
   return (
     <PageShell title="FAQ">
-      <div className="max-w-3xl mx-auto">
+      <div className="max-w-[720px] mx-auto">
         <div className="text-center mb-10">
-          <h1 className="text-3xl sm:text-4xl font-bold mb-3" style={{ color: 'var(--text-cream)', fontFamily: 'monospace' }}>Frequently Asked Questions</h1>
-          <p className="text-sm" style={{ color: 'var(--text-muted)' }}>Find answers to common questions about Kairo</p>
+          <h1 className="text-[36px] md:text-[44px] font-extrabold tracking-tight mb-3" style={{ color: C.text }}>
+            Frequently Asked Questions
+          </h1>
+          <p className="text-[16px]" style={{ color: C.muted }}>Find answers to common questions about Kairo</p>
         </div>
 
         <div className="relative mb-6">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'var(--text-muted)' }} />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: C.muted }} />
           <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search questions..."
-            className="w-full pl-10 pr-4 py-3 rounded-xl text-sm outline-none" style={{ background: 'var(--bg-glass)', color: 'var(--text-primary)', border: '1px solid var(--border)' }} />
+            className="w-full pl-11 pr-4 py-3.5 rounded-xl text-[14px] outline-none transition-colors focus:ring-2" autoFocus
+            style={{ background: C.elevated, color: C.text, border: `1px solid ${C.border}`, '--tw-ring-color': C.accent }} />
         </div>
 
         <div className="flex flex-wrap gap-2 mb-8">
-          <button onClick={() => setActiveCat(null)} className="px-3 py-1.5 rounded-full text-[11px] font-medium transition-colors"
-            style={{ background: !activeCat ? 'var(--text-cream)' : 'var(--bg-glass)', color: !activeCat ? 'var(--bg-deep)' : 'var(--text-secondary)', border: '1px solid var(--border)' }}>All</button>
+          <button onClick={() => setActiveCat(null)} className="px-3.5 py-2 rounded-lg text-[12px] font-semibold transition-colors"
+            style={{ background: !activeCat ? C.accent : C.elevated, color: !activeCat ? '#fff' : C.muted }}>All</button>
           {FAQ_DATA.map(c => (
-            <button key={c.cat} onClick={() => setActiveCat(c.cat === activeCat ? null : c.cat)} className="px-3 py-1.5 rounded-full text-[11px] font-medium transition-colors"
-              style={{ background: activeCat === c.cat ? 'var(--text-cream)' : 'var(--bg-glass)', color: activeCat === c.cat ? 'var(--bg-deep)' : 'var(--text-secondary)', border: '1px solid var(--border)' }}>{c.cat}</button>
+            <button key={c.cat} onClick={() => setActiveCat(activeCat === c.cat ? null : c.cat)}
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-[12px] font-semibold transition-colors"
+              style={{ background: activeCat === c.cat ? C.accent : C.elevated, color: activeCat === c.cat ? '#fff' : C.muted }}>
+              <c.icon className="w-3.5 h-3.5" /> {c.cat}
+            </button>
           ))}
         </div>
 
         <div className="space-y-8">
           {filtered.map(cat => (
             <div key={cat.cat}>
-              <h3 className="text-[11px] font-semibold uppercase tracking-[0.1em] mb-3" style={{ color: 'var(--text-muted)', fontFamily: 'monospace' }}>{cat.cat}</h3>
+              <div className="flex items-center gap-2 mb-3">
+                <cat.icon className="w-4 h-4" style={{ color: C.accent }} />
+                <h3 className="text-[12px] font-bold uppercase tracking-wider" style={{ color: C.muted }}>{cat.cat}</h3>
+              </div>
               <div className="space-y-2">
-                {cat.items.map(item => <FAQItem key={item.id} item={item} />)}
+                {cat.items.map((item, i) => {
+                  const id = `${cat.cat}-${i}`;
+                  return <Accordion key={id} item={item} isOpen={openId === id} onToggle={() => setOpenId(openId === id ? null : id)} />;
+                })}
               </div>
             </div>
           ))}
           {filtered.length === 0 && (
-            <div className="text-center py-12">
-              <p className="text-sm" style={{ color: 'var(--text-muted)' }}>No results found. Try a different search term.</p>
+            <div className="text-center py-16">
+              <p className="text-[15px] mb-2" style={{ color: C.muted }}>No results found</p>
+              <p className="text-[13px]" style={{ color: C.muted }}>Try a different search term</p>
             </div>
           )}
+        </div>
+
+        <div className="text-center mt-12 py-8 rounded-2xl" style={{ background: C.elevated, border: `1px solid ${C.border}` }}>
+          <MessageCircle className="w-6 h-6 mx-auto mb-3" style={{ color: C.accent }} />
+          <p className="text-[15px] font-bold mb-1" style={{ color: C.text }}>Can't find your answer?</p>
+          <a href="/Support" className="text-[14px] font-semibold hover:underline" style={{ color: C.accent }}>Contact Support</a>
         </div>
       </div>
     </PageShell>

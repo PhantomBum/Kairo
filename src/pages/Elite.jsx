@@ -1,27 +1,49 @@
 import React, { useState, useEffect } from 'react';
-import { Crown, Check, Sparkles, Palette, Upload, Shield, Zap, Star, Volume2, Gift, Users, MessageSquare, Image, Globe, X } from 'lucide-react';
+import { Crown, Check, X, Sparkles, Palette, Upload, Shield, Zap, Star, Volume2, Gift, Users, MessageSquare, Image, Globe, Clock, Eye, Bookmark } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import PageShell from '@/components/app/shared/PageShell';
 
-const PERKS = [
-  { icon: Sparkles, label: 'Animated Avatar & Banner', desc: 'Upload GIFs for your profile', free: false },
-  { icon: Palette, label: '6 Profile Themes', desc: 'Dark, Midnight, Warm, Ocean, Forest, Sunset', free: false },
-  { icon: Upload, label: '100MB File Uploads', desc: 'Upload larger files in chat', free: '8MB' },
-  { icon: Shield, label: 'Elite Badge + All Badges', desc: 'Exclusive badge collection on your profile', free: false },
-  { icon: Zap, label: 'Profile Visitor Count', desc: 'See who viewed your profile', free: false },
-  { icon: Star, label: 'Animated Gradient Themes', desc: 'Premium animated profile gradients', free: false },
-  { icon: Volume2, label: 'HD Voice & Video', desc: 'Higher quality voice and video calls', free: 'Standard' },
-  { icon: Gift, label: '500 Monthly Credits', desc: '500 credits every month', free: '0' },
-  { icon: Users, label: 'Group DMs up to 25', desc: 'Larger groups with custom icons', free: '10' },
-  { icon: MessageSquare, label: '4000 Char Messages', desc: 'Extended message character limit', free: '2000' },
-  { icon: Image, label: 'Custom Backgrounds', desc: 'Personalize your chat background', free: false },
-  { icon: Globe, label: 'Custom Profile URL', desc: 'Get a unique vanity URL', free: false },
+const C = {
+  bg: '#18181c', surface: '#1e1e23', elevated: '#26262d', overlay: '#2e2e37',
+  accent: '#2dd4bf', text: '#e8edf5', textSec: '#9aaabb', muted: '#5d7a8a',
+  border: '#33333d', success: '#3ba55d', danger: '#ed4245',
+};
+
+const FEATURES = [
+  { icon: Sparkles, title: 'Animated Avatar & Banner', desc: 'Upload GIFs that bring your profile to life. Stand out in every conversation.' },
+  { icon: Palette, title: 'Custom Chat Backgrounds', desc: 'Personalize your chat with beautiful backgrounds. Choose from our gallery or upload your own.' },
+  { icon: Upload, title: '500MB File Uploads', desc: 'Share large files, high-res images, and long videos without compression.' },
+  { icon: MessageSquare, title: '4,000 Character Messages', desc: 'Write longer messages without hitting the limit. Perfect for discussions and documentation.' },
+  { icon: Volume2, title: 'HD 1080p Video', desc: 'Crystal clear video calls at full HD resolution. See every detail.' },
+  { icon: Users, title: '25-Person Group Calls', desc: 'Bigger group calls for larger friend groups and team meetings.' },
+  { icon: Star, title: '16 Profile Effects', desc: 'Exclusive animated effects for your profile. Sparkles, fire, neon glow, and more.' },
+  { icon: Eye, title: 'Read Receipts', desc: 'Know when your messages have been read. Blue checkmarks appear on seen messages.' },
+  { icon: Clock, title: 'Message Scheduling', desc: 'Schedule messages to send later. Perfect for reminders and announcements.' },
+  { icon: Globe, title: 'Vanity Profile URL', desc: 'Claim your unique kairo.app/username URL. Share your profile with style.' },
+  { icon: Gift, title: '500 Monthly Credits', desc: 'Receive 500 credits every month to spend in the shop on decorations and collectibles.' },
+  { icon: Shield, title: 'Elite Badge', desc: 'A distinguished badge on your profile showing your support for Kairo.' },
+  { icon: Bookmark, title: 'Global Emoji & Stickers', desc: 'Use custom emoji and sticker packs from any server, anywhere on Kairo.' },
+  { icon: Zap, title: 'Priority Support', desc: 'Get faster responses from the support team when you need help.' },
 ];
 
-const TESTIMONIALS = [
-  { name: 'Alex M.', text: 'Elite is worth every penny. The animated avatar alone makes my profile stand out!', avatar: '🎮' },
-  { name: 'Sarah K.', text: 'HD voice quality is incredible for our gaming sessions. Can\'t go back to standard.', avatar: '🎧' },
-  { name: 'Jordan P.', text: 'The monthly credits let me collect all the best profile decorations. Love it.', avatar: '✨' },
+const COMPARISON = [
+  { name: 'File uploads', free: '150MB', lite: '200MB', elite: '500MB' },
+  { name: 'Message length', free: '2,000 chars', lite: '2,500 chars', elite: '4,000 chars' },
+  { name: 'Voice quality', free: '160kbps', lite: '192kbps', elite: '320kbps' },
+  { name: 'Video quality', free: '720p', lite: '720p', elite: '1080p HD' },
+  { name: 'Group call size', free: '15', lite: '20', elite: '25' },
+  { name: 'Server limit', free: '100', lite: '100', elite: '200' },
+  { name: 'Profile effects', free: '10', lite: '11', elite: '16' },
+  { name: 'Community themes', free: '5', lite: '5', elite: 'Unlimited' },
+  { name: 'GIF avatar', free: true, lite: true, elite: true },
+  { name: 'Animated GIF banner', free: false, lite: false, elite: true },
+  { name: 'Chat backgrounds', free: false, lite: false, elite: true },
+  { name: 'Read receipts', free: false, lite: false, elite: true },
+  { name: 'Message scheduling', free: false, lite: false, elite: true },
+  { name: 'Vanity URL', free: false, lite: false, elite: true },
+  { name: 'Monthly credits', free: '0', lite: '0', elite: '500' },
+  { name: 'Elite badge', free: false, lite: false, elite: true },
+  { name: 'Priority support', free: false, lite: false, elite: true },
 ];
 
 export default function Elite() {
@@ -31,111 +53,148 @@ export default function Elite() {
   const [subscribing, setSubscribing] = useState(false);
 
   useEffect(() => {
-    const init = async () => {
+    (async () => {
       const isAuth = await base44.auth.isAuthenticated();
       if (!isAuth) return;
       const me = await base44.auth.me();
       setUser(me);
-      const profiles = await base44.entities.UserProfile.filter({ user_email: me.email });
-      if (profiles[0]) { setProfile(profiles[0]); setHasElite(profiles[0].badges?.includes('premium') || false); }
-    };
-    init();
+      try {
+        const profiles = await base44.entities.UserProfile.filter({ user_email: me.email });
+        if (profiles[0]) { setProfile(profiles[0]); setHasElite(profiles[0].badges?.includes('premium') || false); }
+      } catch {}
+    })();
   }, []);
 
   const handleSubscribe = async () => {
-    if (window.self !== window.top) { alert('Checkout works only from a published app. Please open the app directly.'); return; }
+    if (!user) { window.location.href = '/register'; return; }
+    if (window.self !== window.top) { alert('Checkout works only from a published app.'); return; }
     setSubscribing(true);
-    const res = await base44.functions.invoke('stripeCheckout', { type: 'elite_subscription' });
-    if (res.data?.url) window.location.href = res.data.url;
+    try {
+      const res = await base44.functions?.invoke?.('stripeCheckout', { type: 'elite_subscription' });
+      if (res?.data?.url) window.location.href = res.data.url;
+    } catch {}
     setSubscribing(false);
   };
 
   return (
     <PageShell title="Elite">
-      <div className="max-w-4xl mx-auto">
-        {/* Hero */}
-        <div className="text-center mb-12">
-          <div className="w-20 h-20 rounded-3xl mx-auto mb-6 flex items-center justify-center" style={{ background: 'linear-gradient(135deg, rgba(201,180,123,0.15), rgba(164,123,201,0.1))', border: '1px solid rgba(201,180,123,0.2)', boxShadow: '0 0 60px rgba(201,180,123,0.08)' }}>
-            <Crown className="w-10 h-10" style={{ color: 'var(--accent-amber)' }} />
-          </div>
-          <h1 className="text-3xl sm:text-5xl font-bold mb-3" style={{ color: 'var(--text-cream)', fontFamily: 'monospace' }}>Kairo Elite</h1>
-          <p className="text-sm mb-6" style={{ color: 'var(--text-muted)' }}>Unlock the full Kairo experience</p>
-          <div className="flex items-baseline justify-center gap-1 mb-6">
-            <span className="text-5xl font-bold" style={{ color: 'var(--text-cream)' }}>$9.99</span>
-            <span className="text-lg" style={{ color: 'var(--text-muted)' }}>/month</span>
-          </div>
-          {hasElite ? (
-            <div className="inline-flex items-center gap-2 px-6 py-3 rounded-xl" style={{ background: 'rgba(123,201,164,0.08)', border: '1px solid rgba(123,201,164,0.15)' }}>
-              <Check className="w-5 h-5" style={{ color: 'var(--accent-green)' }} />
-              <span className="text-sm font-medium" style={{ color: 'var(--accent-green)' }}>You're an Elite member!</span>
+      <div className="max-w-[900px] mx-auto">
+        <div className="text-center mb-16 relative">
+          <div className="absolute inset-0 pointer-events-none" style={{ background: `radial-gradient(ellipse 60% 50% at 50% 30%, ${C.accent}10, transparent)` }} />
+          <div className="relative">
+            <div className="w-24 h-24 rounded-3xl mx-auto mb-6 flex items-center justify-center"
+              style={{ background: `linear-gradient(135deg, ${C.accent}, ${C.accent}cc)`, boxShadow: `0 0 80px ${C.accent}30` }}>
+              <Crown className="w-12 h-12 text-white" />
             </div>
-          ) : (
-            <button onClick={handleSubscribe} disabled={subscribing}
-              className="px-8 py-3.5 rounded-xl text-base font-semibold inline-flex items-center gap-2 transition-all hover:brightness-110 disabled:opacity-50"
-              style={{ background: 'linear-gradient(135deg, #c9b47b, #c4a882)', color: '#000' }}>
-              <Crown className="w-5 h-5" />
-              {subscribing ? 'Redirecting...' : 'Subscribe to Elite'}
-            </button>
-          )}
+            <h1 className="text-[44px] md:text-[56px] font-extrabold tracking-tight mb-4" style={{ color: C.text }}>Kairo Elite</h1>
+            <p className="text-[18px] mb-8 max-w-[440px] mx-auto" style={{ color: C.muted }}>
+              Premium perks that make Kairo even better. Support the project while looking great doing it.
+            </p>
+            <div className="flex items-baseline justify-center gap-1 mb-8">
+              <span className="text-[56px] font-extrabold" style={{ color: C.text }}>$2.99</span>
+              <span className="text-[18px]" style={{ color: C.muted }}>/month</span>
+            </div>
+            {hasElite ? (
+              <div className="inline-flex items-center gap-3 px-6 py-3.5 rounded-xl" style={{ background: `${C.success}10`, border: `1px solid ${C.success}25` }}>
+                <div className="w-6 h-6 rounded-full flex items-center justify-center" style={{ background: C.success }}>
+                  <Check className="w-4 h-4 text-white" />
+                </div>
+                <span className="text-[15px] font-semibold" style={{ color: C.success }}>You're an Elite member!</span>
+              </div>
+            ) : (
+              <button onClick={handleSubscribe} disabled={subscribing}
+                className="px-10 py-4 rounded-xl text-[16px] font-semibold text-white transition-all hover:brightness-110 hover:scale-[1.02] disabled:opacity-50"
+                style={{ background: C.accent, boxShadow: `0 0 40px ${C.accent}30` }}>
+                <Crown className="w-5 h-5 inline mr-2" />
+                {subscribing ? 'Redirecting to checkout...' : 'Subscribe to Elite'}
+              </button>
+            )}
+          </div>
         </div>
 
-        {/* Comparison Table */}
         <div className="mb-16">
-          <h2 className="text-lg font-bold text-center mb-6" style={{ color: 'var(--text-cream)', fontFamily: 'monospace' }}>Free vs Elite</h2>
-          <div className="rounded-2xl overflow-hidden" style={{ border: '1px solid var(--border)' }}>
-            <div className="grid grid-cols-3 p-4" style={{ background: 'var(--bg-glass-strong)', borderBottom: '1px solid var(--border)' }}>
-              <span className="text-[11px] font-semibold uppercase tracking-[0.08em]" style={{ color: 'var(--text-muted)', fontFamily: 'monospace' }}>Feature</span>
-              <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-center" style={{ color: 'var(--text-muted)', fontFamily: 'monospace' }}>Free</span>
-              <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-center" style={{ color: 'var(--accent-amber)', fontFamily: 'monospace' }}>Elite</span>
+          <h2 className="text-[28px] font-extrabold text-center mb-10" style={{ color: C.text }}>Everything you get</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {FEATURES.map((f, i) => (
+              <div key={i} className="p-5 rounded-xl transition-all hover:translate-y-[-2px]" style={{ background: C.surface, border: `1px solid ${C.border}` }}>
+                <div className="flex items-start gap-4">
+                  <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: `${C.accent}12` }}>
+                    <f.icon className="w-5 h-5" style={{ color: C.accent }} />
+                  </div>
+                  <div>
+                    <h3 className="text-[15px] font-bold mb-1" style={{ color: C.text }}>{f.title}</h3>
+                    <p className="text-[13px] leading-relaxed" style={{ color: C.muted }}>{f.desc}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="mb-16">
+          <h2 className="text-[28px] font-extrabold text-center mb-8" style={{ color: C.text }}>Free vs Lite vs Elite</h2>
+          <div className="rounded-2xl overflow-hidden" style={{ border: `1px solid ${C.border}` }}>
+            <div className="grid grid-cols-[1fr_100px_100px_100px] p-4" style={{ background: C.elevated, borderBottom: `1px solid ${C.border}` }}>
+              <span className="text-[12px] font-bold uppercase tracking-wider" style={{ color: C.muted }}>Feature</span>
+              <span className="text-[12px] font-bold uppercase tracking-wider text-center" style={{ color: C.muted }}>Free</span>
+              <span className="text-[12px] font-bold uppercase tracking-wider text-center" style={{ color: C.muted }}>Lite</span>
+              <span className="text-[12px] font-bold uppercase tracking-wider text-center" style={{ color: C.accent }}>Elite</span>
             </div>
-            {PERKS.map((p, i) => (
-              <div key={i} className="grid grid-cols-3 p-3 items-center" style={{ background: i % 2 === 0 ? 'transparent' : 'var(--bg-glass)', borderBottom: i < PERKS.length - 1 ? '1px solid var(--border)' : 'none' }}>
-                <div className="flex items-center gap-2">
-                  <p.icon className="w-3.5 h-3.5" style={{ color: 'var(--accent-amber)' }} />
-                  <span className="text-[12px]" style={{ color: 'var(--text-primary)' }}>{p.label}</span>
+            {COMPARISON.map((f, i) => (
+              <div key={i} className="grid grid-cols-[1fr_100px_100px_100px] p-3.5 items-center"
+                style={{ borderBottom: i < COMPARISON.length - 1 ? `1px solid ${C.border}` : 'none' }}>
+                <span className="text-[13px]" style={{ color: C.text }}>{f.name}</span>
+                <div className="text-center">
+                  {f.free === true ? <Check className="w-4 h-4 mx-auto" style={{ color: C.success }} />
+                    : f.free === false ? <X className="w-4 h-4 mx-auto" style={{ color: C.muted }} />
+                    : <span className="text-[12px]" style={{ color: C.textSec }}>{f.free}</span>}
                 </div>
                 <div className="text-center">
-                  {p.free === false ? <X className="w-3.5 h-3.5 mx-auto" style={{ color: 'var(--accent-red)' }} /> : <span className="text-[11px]" style={{ color: 'var(--text-muted)' }}>{p.free}</span>}
+                  {f.lite === true ? <Check className="w-4 h-4 mx-auto" style={{ color: C.success }} />
+                    : f.lite === false ? <X className="w-4 h-4 mx-auto" style={{ color: C.muted }} />
+                    : <span className="text-[12px]" style={{ color: C.textSec }}>{f.lite}</span>}
                 </div>
                 <div className="text-center">
-                  <Check className="w-3.5 h-3.5 mx-auto" style={{ color: 'var(--accent-green)' }} />
+                  {f.elite === true ? <Check className="w-4 h-4 mx-auto" style={{ color: C.accent }} />
+                    : <span className="text-[12px] font-medium" style={{ color: C.accent }}>{f.elite}</span>}
                 </div>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Testimonials */}
-        <div className="mb-12">
-          <h2 className="text-lg font-bold text-center mb-6" style={{ color: 'var(--text-cream)', fontFamily: 'monospace' }}>What Elite Members Say</h2>
-          <div className="grid sm:grid-cols-3 gap-4">
-            {TESTIMONIALS.map((t, i) => (
-              <div key={i} className="p-5 rounded-2xl" style={{ background: 'var(--bg-glass)', border: '1px solid var(--border)' }}>
-                <div className="text-2xl mb-3">{t.avatar}</div>
-                <p className="text-[12px] mb-3 leading-relaxed" style={{ color: 'var(--text-secondary)' }}>"{t.text}"</p>
-                <p className="text-[11px] font-medium" style={{ color: 'var(--text-cream)' }}>{t.name}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Subscription management for Elite users */}
         {hasElite && profile && (
-          <div className="rounded-2xl p-6" style={{ background: 'var(--bg-glass)', border: '1px solid var(--border)' }}>
-            <h3 className="text-sm font-semibold mb-4" style={{ color: 'var(--text-cream)', fontFamily: 'monospace' }}>Your Subscription</h3>
-            <div className="grid sm:grid-cols-2 gap-4">
-              <div className="p-3 rounded-xl" style={{ background: 'var(--bg-glass-strong)' }}>
-                <p className="text-[10px] uppercase tracking-[0.08em] mb-1" style={{ color: 'var(--text-muted)', fontFamily: 'monospace' }}>Plan</p>
-                <p className="text-sm font-medium" style={{ color: 'var(--accent-amber)' }}>Kairo Elite — $9.99/mo</p>
+          <div className="rounded-2xl p-6 md:p-8" style={{ background: C.surface, border: `1px solid ${C.border}` }}>
+            <h3 className="text-[18px] font-bold mb-5" style={{ color: C.text }}>Your Subscription</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-5">
+              <div className="p-4 rounded-xl" style={{ background: C.elevated }}>
+                <p className="text-[11px] uppercase tracking-wider font-bold mb-1" style={{ color: C.muted }}>Plan</p>
+                <p className="text-[14px] font-semibold" style={{ color: C.accent }}>Kairo Elite</p>
               </div>
-              <div className="p-3 rounded-xl" style={{ background: 'var(--bg-glass-strong)' }}>
-                <p className="text-[10px] uppercase tracking-[0.08em] mb-1" style={{ color: 'var(--text-muted)', fontFamily: 'monospace' }}>Status</p>
-                <p className="text-sm font-medium" style={{ color: 'var(--accent-green)' }}>Active</p>
+              <div className="p-4 rounded-xl" style={{ background: C.elevated }}>
+                <p className="text-[11px] uppercase tracking-wider font-bold mb-1" style={{ color: C.muted }}>Price</p>
+                <p className="text-[14px] font-semibold" style={{ color: C.text }}>$2.99/month</p>
+              </div>
+              <div className="p-4 rounded-xl" style={{ background: C.elevated }}>
+                <p className="text-[11px] uppercase tracking-wider font-bold mb-1" style={{ color: C.muted }}>Status</p>
+                <p className="text-[14px] font-semibold" style={{ color: C.success }}>Active</p>
               </div>
             </div>
-            <button className="mt-4 px-4 py-2 rounded-xl text-[12px] font-medium transition-colors hover:bg-[rgba(201,123,123,0.1)]" style={{ color: 'var(--accent-red)', border: '1px solid rgba(201,123,123,0.2)' }}>
+            <button className="px-5 py-2.5 rounded-xl text-[13px] font-medium transition-colors hover:bg-[rgba(237,66,69,0.08)]"
+              style={{ color: C.danger, border: `1px solid ${C.danger}25` }}>
               Cancel Subscription
             </button>
+          </div>
+        )}
+
+        {!hasElite && (
+          <div className="text-center py-12">
+            <button onClick={handleSubscribe} disabled={subscribing}
+              className="px-10 py-4 rounded-xl text-[16px] font-semibold text-white transition-all hover:brightness-110 disabled:opacity-50"
+              style={{ background: C.accent }}>
+              {subscribing ? 'Redirecting...' : 'Subscribe to Elite — $2.99/month'}
+            </button>
+            <p className="text-[13px] mt-3" style={{ color: C.muted }}>Cancel anytime. No commitments.</p>
           </div>
         )}
       </div>

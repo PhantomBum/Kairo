@@ -1,67 +1,86 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { base44 } from '@/api/base44Client';
 import { ProfileProvider } from '@/components/app/providers/ProfileProvider';
 import ErrorBoundary from '@/components/app/shared/ErrorBoundary';
 import AppShell from '@/components/app/AppShell';
 import { colors } from '@/components/app/design/tokens';
+import LandingPage from '@/components/landing/LandingPage';
 
 function KairoInner() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [needsAuth, setNeedsAuth] = useState(false);
+  const [initError, setInitError] = useState(null);
 
   useEffect(() => {
     const init = async () => {
-      const isAuth = await base44.auth.isAuthenticated();
-      if (!isAuth) { setNeedsAuth(true); setLoading(false); return; }
-      const me = await base44.auth.me();
-      const profiles = await base44.entities.UserProfile.filter({ user_email: me.email });
-      // Check if this is the platform owner (admin role = first user / app creator)
-      const isOwner = me.role === 'admin';
-      if (profiles.length === 0) {
-        const ownerBadges = isOwner ? ['owner', 'admin', 'premium', 'verified', 'partner', 'early_supporter', 'developer', 'moderator'] : [];
-        await base44.entities.UserProfile.create({
-          user_id: me.id, user_email: me.email,
-          display_name: me.full_name || me.email.split('@')[0],
-          username: me.email.split('@')[0],
-          status: 'online', is_online: true,
-          badges: ownerBadges,
-        });
-        // Grant owner lifetime credits
-        if (isOwner) {
-          const existingCredits = await base44.entities.UserCredits.filter({ user_id: me.id });
-          if (existingCredits.length === 0) {
-            await base44.entities.UserCredits.create({ user_id: me.id, user_email: me.email, balance: 999999, lifetime_earned: 999999, is_kairo_owner: true, has_nitro: true });
+      try {
+        const isAuth = await base44.auth.isAuthenticated();
+        if (!isAuth) { setNeedsAuth(true); setLoading(false); return; }
+        const me = await base44.auth.me();
+        if (!me) { setNeedsAuth(true); setLoading(false); return; }
+
+        let profiles = [];
+        try {
+          profiles = await base44.entities.UserProfile.filter({ user_email: me.email });
+        } catch (e) {
+          console.warn('Profile fetch failed, continuing with empty:', e);
+        }
+
+        const isOwner = me.role === 'admin';
+        try {
+          if (profiles.length === 0) {
+            const ownerBadges = isOwner ? ['owner', 'admin', 'premium', 'verified', 'partner', 'early_supporter', 'developer', 'moderator'] : [];
+            await base44.entities.UserProfile.create({
+              user_id: me.id, user_email: me.email,
+              display_name: me.full_name || me.email.split('@')[0],
+              username: me.email.split('@')[0],
+              status: 'online', is_online: true,
+              badges: ownerBadges,
+            });
+            if (isOwner) {
+              const existingCredits = await base44.entities.UserCredits.filter({ user_id: me.id });
+              if (existingCredits.length === 0) {
+                await base44.entities.UserCredits.create({ user_id: me.id, user_email: me.email, balance: 999999, lifetime_earned: 999999, is_kairo_owner: true, has_nitro: true });
+              }
+            }
+          } else {
+            const updateData = { is_online: true, status: profiles[0].status === 'offline' ? 'online' : profiles[0].status, last_seen: new Date().toISOString() };
+            if (isOwner && !profiles[0].badges?.includes('owner')) {
+              updateData.badges = ['owner', 'admin', 'premium', 'verified', 'partner', 'early_supporter', 'developer', 'moderator'];
+            }
+            await base44.entities.UserProfile.update(profiles[0].id, updateData);
+            if (isOwner) {
+              const existingCredits = await base44.entities.UserCredits.filter({ user_id: me.id });
+              if (existingCredits.length === 0) {
+                await base44.entities.UserCredits.create({ user_id: me.id, user_email: me.email, balance: 999999, lifetime_earned: 999999, is_kairo_owner: true, has_nitro: true });
+              } else if (!existingCredits[0].is_kairo_owner) {
+                await base44.entities.UserCredits.update(existingCredits[0].id, { balance: 999999, is_kairo_owner: true, has_nitro: true });
+              }
+            }
           }
+        } catch (profileErr) {
+          console.warn('Profile setup failed, continuing anyway:', profileErr);
         }
-      } else {
-        const updateData = { is_online: true, status: profiles[0].status === 'offline' ? 'online' : profiles[0].status, last_seen: new Date().toISOString() };
-        // Ensure owner always has all badges & perks
-        if (isOwner && !profiles[0].badges?.includes('owner')) {
-          updateData.badges = ['owner', 'admin', 'premium', 'verified', 'partner', 'early_supporter', 'developer', 'moderator'];
-        }
-        await base44.entities.UserProfile.update(profiles[0].id, updateData);
-        // Ensure owner credits exist
-        if (isOwner) {
-          const existingCredits = await base44.entities.UserCredits.filter({ user_id: me.id });
-          if (existingCredits.length === 0) {
-            await base44.entities.UserCredits.create({ user_id: me.id, user_email: me.email, balance: 999999, lifetime_earned: 999999, is_kairo_owner: true, has_nitro: true });
-          } else if (!existingCredits[0].is_kairo_owner) {
-            await base44.entities.UserCredits.update(existingCredits[0].id, { balance: 999999, is_kairo_owner: true, has_nitro: true });
-          }
-        }
+
+        setUser({ id: me.id, email: me.email, full_name: me.full_name, role: me.role });
+        setLoading(false);
+      } catch (err) {
+        console.error('Kairo init failed:', err);
+        setInitError(err.message || 'Something went wrong loading Kairo. Try refreshing.');
+        setLoading(false);
       }
-      setUser({ id: me.id, email: me.email, full_name: me.full_name, role: me.role });
-      setLoading(false);
     };
     init();
     return () => {
       const cleanup = async () => {
-        const isAuth = await base44.auth.isAuthenticated();
-        if (!isAuth) return;
-        const me = await base44.auth.me();
-        const profiles = await base44.entities.UserProfile.filter({ user_email: me.email });
-        if (profiles[0]) await base44.entities.UserProfile.update(profiles[0].id, { is_online: false, last_seen: new Date().toISOString() });
+        try {
+          const isAuth = await base44.auth.isAuthenticated();
+          if (!isAuth) return;
+          const me = await base44.auth.me();
+          const profiles = await base44.entities.UserProfile.filter({ user_email: me.email });
+          if (profiles[0]) await base44.entities.UserProfile.update(profiles[0].id, { is_online: false, last_seen: new Date().toISOString() });
+        } catch (e) { /* ignore cleanup errors */ }
       };
       cleanup();
     };
@@ -81,20 +100,33 @@ function KairoInner() {
   }
 
   if (needsAuth) {
+    return <LandingPage />;
+  }
+
+  if (initError) {
     return (
       <div className="h-screen w-screen flex items-center justify-center" style={{ background: colors.bg.base }}>
-        <div className="text-center k-fade-in">
-          <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/697a93eea52ff0ef8406c21a/e96e433dc_generated_image.png"
-            alt="Kairo" className="w-16 h-16 rounded-2xl mx-auto mb-5 object-cover" />
-          <h1 className="text-2xl font-bold mb-2" style={{ color: colors.text.primary }}>Welcome to Kairo</h1>
-          <p className="text-sm mb-6" style={{ color: colors.text.muted }}>Sign in to start chatting</p>
-          <button onClick={() => base44.auth.redirectToLogin(window.location.href)}
-            className="px-8 py-2.5 rounded-lg text-sm font-semibold text-white transition-colors"
-            style={{ background: colors.accent.primary }}
-            onMouseEnter={e => e.target.style.background = colors.accent.hover}
-            onMouseLeave={e => e.target.style.background = colors.accent.primary}>
-            Sign In
-          </button>
+        <div className="text-center max-w-sm px-6">
+          <div className="mx-auto mb-4 w-14 h-14 rounded-2xl flex items-center justify-center" style={{ background: 'rgba(237,66,69,0.1)' }}>
+            <span className="text-2xl">⚠</span>
+          </div>
+          <h1 className="text-xl font-bold mb-2" style={{ color: colors.text.primary }}>Something went wrong on our end</h1>
+          <p className="text-sm mb-2" style={{ color: colors.text.muted }}>{initError}</p>
+          <p className="text-xs mb-6 font-mono px-3 py-2 rounded-lg" style={{ background: 'rgba(255,255,255,0.04)', color: colors.text.muted }}>
+            Check the browser console (F12) for details
+          </p>
+          <div className="flex gap-3 justify-center">
+            <button onClick={() => window.location.reload()}
+              className="px-6 py-2.5 rounded-lg text-sm font-semibold text-white"
+              style={{ background: colors.accent.primary }}>
+              Retry
+            </button>
+            <button onClick={() => { window.location.href = '/login'; }}
+              className="px-6 py-2.5 rounded-lg text-sm font-semibold"
+              style={{ color: colors.text.secondary, border: `1px solid ${colors.border?.default || '#33333d'}` }}>
+              Sign In
+            </button>
+          </div>
         </div>
       </div>
     );

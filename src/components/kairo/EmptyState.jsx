@@ -1,19 +1,78 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { 
-  MessageCircle, Users, Plus, Compass, UserPlus, Hash,
-  Server, Inbox, Search
+import {
+  MessageCircle, Users, Hash, Inbox, Search, Mic,
+  Bot, Calendar, Bookmark, Pin, Bell,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
 
-const illustrations = {
-  noServers: Server,
-  noChannels: Hash,
-  noDMs: MessageCircle,
-  noFriends: Users,
-  noMessages: Inbox,
-  noResults: Search
+const P = {
+  elevated: '#26262d', floating: '#2e2e37',
+  textPrimary: '#f0eff4', textSecondary: '#a09fad', muted: '#68677a',
+  accent: '#2dd4bf',
+};
+
+const configs = {
+  noMessages: {
+    icon: Hash,
+    title: (ctx) => `This is the very beginning of #${ctx || 'channel'}.`,
+    description: 'Say something — break the ice!',
+  },
+  noDMs: {
+    icon: MessageCircle,
+    title: 'No messages yet.',
+    description: "Send someone a message and say hey.",
+  },
+  noFriends: {
+    icon: Users,
+    title: 'No friends added yet.',
+    description: "They're out there somewhere.",
+  },
+  noNotifications: {
+    icon: Bell,
+    title: "You're all caught up.",
+    description: 'Enjoy the quiet.',
+  },
+  noPins: {
+    icon: Pin,
+    title: 'Nothing pinned here yet.',
+    description: 'Pin important messages so they stay easy to find.',
+  },
+  noResults: {
+    icon: Search,
+    title: "Nothing came up.",
+    description: 'Try different words or check your spelling.',
+  },
+  noVoice: {
+    icon: Mic,
+    title: "Nobody's here yet.",
+    description: "Jump in and someone will follow.",
+  },
+  noBots: {
+    icon: Bot,
+    title: 'No bots here yet.',
+    description: 'Add one from the marketplace.',
+  },
+  noEvents: {
+    icon: Calendar,
+    title: 'Nothing planned yet.',
+    description: 'Create an event to get things started.',
+  },
+  noBookmarks: {
+    icon: Bookmark,
+    title: 'Nothing saved yet.',
+    description: 'Bookmark messages to find them later.',
+  },
+  noServers: {
+    icon: Inbox,
+    title: 'No servers yet.',
+    description: 'Create or join a server to start chatting.',
+  },
+  noChannels: {
+    icon: Hash,
+    title: 'No channels.',
+    description: 'Create a channel to start conversations.',
+  },
 };
 
 export default function EmptyState({
@@ -24,78 +83,50 @@ export default function EmptyState({
   actionLabel,
   secondaryAction,
   secondaryActionLabel,
-  className
+  context,
+  className,
 }) {
-  const Icon = illustrations[type] || Inbox;
-
-  const defaultContent = {
-    noServers: {
-      title: 'No servers yet',
-      description: 'Create a server to start chatting with your community'
-    },
-    noChannels: {
-      title: 'No channels',
-      description: 'Create a channel to start conversations'
-    },
-    noDMs: {
-      title: 'No conversations',
-      description: 'Start a conversation with friends'
-    },
-    noFriends: {
-      title: 'No friends yet',
-      description: 'Add friends to start chatting'
-    },
-    noMessages: {
-      title: 'No messages yet',
-      description: 'Start the conversation!'
-    },
-    noResults: {
-      title: 'No results found',
-      description: 'Try a different search term'
-    }
-  };
-
-  const content = defaultContent[type] || {};
+  const cfg = configs[type] || configs.noMessages;
+  const Icon = cfg.icon;
+  const displayTitle = title || (typeof cfg.title === 'function' ? cfg.title(context) : cfg.title);
+  const displayDesc = description || cfg.description;
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      className={cn(
-        "flex flex-col items-center justify-center py-16 px-6 text-center",
-        className
-      )}
-    >
-      <div className="w-20 h-20 mb-6 rounded-2xl bg-zinc-800/50 flex items-center justify-center">
-        <Icon className="w-10 h-10 text-zinc-600" />
+      transition={{ duration: 0.3, ease: 'easeOut' }}
+      className={cn("flex flex-col items-center justify-center py-16 px-6 text-center", className)}
+      style={{ gap: 24 }}>
+
+      <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
+        style={{ color: P.muted }}>
+        <Icon className="w-12 h-12" />
       </div>
-      
-      <h3 className="text-lg font-semibold text-zinc-300 mb-2">
-        {title || content.title}
+
+      <h3 className="text-[16px] font-semibold" style={{ color: P.textPrimary }}>
+        {displayTitle}
       </h3>
-      
-      <p className="text-sm text-zinc-500 max-w-xs mb-6">
-        {description || content.description}
+
+      <p className="text-[14px] max-w-[280px] leading-relaxed" style={{ color: P.muted }}>
+        {displayDesc}
       </p>
 
       {(action || secondaryAction) && (
-        <div className="flex flex-col sm:flex-row gap-3">
+        <div className="flex gap-3">
           {action && (
-            <Button
-              onClick={action}
-              className="bg-indigo-500 hover:bg-indigo-600"
-            >
+            <button onClick={action}
+              className="h-10 px-4 py-2.5 rounded-md text-[13px] font-medium transition-all duration-[120ms] ease-out hover:opacity-90 active:scale-[0.97]"
+              style={{ background: P.accent, color: '#0d1117' }}>
               {actionLabel || 'Get Started'}
-            </Button>
+            </button>
           )}
           {secondaryAction && (
-            <Button
-              onClick={secondaryAction}
-              variant="secondary"
-              className="bg-zinc-800 hover:bg-zinc-700"
-            >
+            <button onClick={secondaryAction}
+              className="h-10 px-4 py-2.5 rounded-md text-[13px] font-medium transition-all duration-[120ms] ease-out hover:bg-[rgba(255,255,255,0.06)] active:scale-[0.97]"
+              style={{ background: P.elevated, color: P.textSecondary, border: '1px solid rgba(255,255,255,0.08)' }}>
               {secondaryActionLabel || 'Learn More'}
-            </Button>
+            </button>
           )}
         </div>
       )}

@@ -55,7 +55,7 @@ export default function BotCommandBuilder({ bot, onSave }) {
                 <GripVertical className="w-3.5 h-3.5" style={{ color: 'var(--text-faint)' }} />
                 <div className="flex-1 min-w-0">
                   <span className="text-sm font-mono" style={{ color: cmd.name ? 'var(--text-cream)' : 'var(--text-faint)' }}>/{cmd.name || 'unnamed'}</span>
-                  {cmd.description && <span className="text-[10px] ml-2" style={{ color: 'var(--text-muted)' }}>{cmd.description}</span>}
+                  {cmd.description && <span className="text-[11px] ml-2" style={{ color: 'var(--text-muted)' }}>{cmd.description}</span>}
                 </div>
                 <div className="flex items-center gap-1">
                   <button onClick={e => { e.stopPropagation(); updateCommand(cmd.id, { enabled: !cmd.enabled }); }}
@@ -72,12 +72,12 @@ export default function BotCommandBuilder({ bot, onSave }) {
                 <div className="px-4 pb-4 space-y-3" style={{ borderTop: '1px solid var(--border)' }}>
                   <div className="grid grid-cols-2 gap-3 pt-3">
                     <div>
-                      <label className="text-[9px] font-semibold uppercase tracking-[0.08em] block mb-1" style={{ color: 'var(--text-muted)', fontFamily: 'monospace' }}>Command Name</label>
+                      <label className="text-[11px] font-semibold uppercase tracking-[0.08em] block mb-1" style={{ color: 'var(--text-muted)', fontFamily: 'monospace' }}>Command Name</label>
                       <input value={cmd.name} onChange={e => updateCommand(cmd.id, { name: e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, '') })}
                         placeholder="greet" className="w-full px-2.5 py-1.5 rounded-lg text-[12px] outline-none font-mono" style={{ background: 'var(--bg-glass-strong)', color: 'var(--text-primary)', border: '1px solid var(--border)' }} />
                     </div>
                     <div>
-                      <label className="text-[9px] font-semibold uppercase tracking-[0.08em] block mb-1" style={{ color: 'var(--text-muted)', fontFamily: 'monospace' }}>Description</label>
+                      <label className="text-[11px] font-semibold uppercase tracking-[0.08em] block mb-1" style={{ color: 'var(--text-muted)', fontFamily: 'monospace' }}>Description</label>
                       <input value={cmd.description} onChange={e => updateCommand(cmd.id, { description: e.target.value })}
                         placeholder="Greet a user" className="w-full px-2.5 py-1.5 rounded-lg text-[12px] outline-none" style={{ background: 'var(--bg-glass-strong)', color: 'var(--text-primary)', border: '1px solid var(--border)' }} />
                     </div>
@@ -85,8 +85,8 @@ export default function BotCommandBuilder({ bot, onSave }) {
                   {/* Parameters */}
                   <div>
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-[9px] font-semibold uppercase tracking-[0.08em]" style={{ color: 'var(--text-muted)', fontFamily: 'monospace' }}>Parameters</span>
-                      <button onClick={() => addParam(cmd.id)} className="text-[10px] flex items-center gap-1" style={{ color: 'var(--accent-blue)' }}><Plus className="w-3 h-3" />Add</button>
+                      <span className="text-[11px] font-semibold uppercase tracking-[0.08em]" style={{ color: 'var(--text-muted)', fontFamily: 'monospace' }}>Parameters</span>
+                      <button onClick={() => addParam(cmd.id)} className="text-[11px] flex items-center gap-1" style={{ color: 'var(--accent-blue)' }}><Plus className="w-3 h-3" />Add</button>
                     </div>
                     {(cmd.parameters || []).map((p, idx) => (
                       <div key={idx} className="flex items-center gap-2 mb-1.5">
@@ -97,7 +97,7 @@ export default function BotCommandBuilder({ bot, onSave }) {
                           {PARAM_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
                         </select>
                         <button onClick={() => updateParam(cmd.id, idx, { required: !p.required })}
-                          className="text-[9px] px-2 py-1 rounded-lg" style={{ background: p.required ? 'rgba(201,123,123,0.1)' : 'var(--bg-glass-strong)', color: p.required ? 'var(--accent-red)' : 'var(--text-muted)', border: '1px solid var(--border)' }}>
+                          className="text-[11px] px-2 py-1 rounded-lg" style={{ background: p.required ? 'rgba(201,123,123,0.1)' : 'var(--bg-glass-strong)', color: p.required ? 'var(--accent-red)' : 'var(--text-muted)', border: '1px solid var(--border)' }}>
                           {p.required ? 'Required' : 'Optional'}
                         </button>
                         <button onClick={() => removeParam(cmd.id, idx)} className="p-0.5"><Trash2 className="w-3 h-3" style={{ color: 'var(--accent-red)' }} /></button>

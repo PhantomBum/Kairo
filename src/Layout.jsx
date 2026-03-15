@@ -11,32 +11,41 @@ export default function Layout({ children }) {
   return (
     <div className="min-h-screen" style={{ background: 'var(--k-bg-base)' }} lang="en">
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
         :root { ${cssVariables} }
 
         body {
-          background: var(--k-bg-base);
-          color: var(--k-text-primary);
-          font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+          background: var(--bg-base);
+          color: var(--text-primary);
+          font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+          font-size: 15px;
+          line-height: 1.5;
           -webkit-font-smoothing: antialiased;
           -moz-osx-font-smoothing: grayscale;
           text-rendering: optimizeLegibility;
-          font-size: 14px;
-          line-height: 1.43;
         }
 
-        * { border-color: var(--k-border); }
-        ::selection { background: rgba(88,101,242,0.3); color: #fff; }
+        * { border-color: var(--border-subtle); }
+        ::selection { background: var(--accent-dim); color: var(--text-primary); }
 
-        ::-webkit-scrollbar { width: 6px; }
+        /* Scrollbars — 4px, transparent track, fade after scroll */
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.06); border-radius: 6px; }
-        ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.1); }
+        ::-webkit-scrollbar-thumb {
+          background: var(--border-medium);
+          border-radius: var(--radius-full);
+          transition: background 0.3s ease;
+        }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
         .scrollbar-none::-webkit-scrollbar { display: none; }
         .scrollbar-none { -ms-overflow-style: none; scrollbar-width: none; }
 
-        :focus-visible { outline: 2px solid var(--k-accent); outline-offset: 2px; }
+        :focus-visible {
+          outline: 2px solid var(--accent-primary);
+          outline-offset: 2px;
+          border-radius: inherit;
+        }
         :focus:not(:focus-visible) { outline: none; }
 
         @keyframes k-shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
@@ -49,22 +58,22 @@ export default function Layout({ children }) {
         @keyframes k-fade-in { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes k-scale-in { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
 
-        .k-msg-in { animation: k-msg-in 100ms ease-out both; }
+        .k-msg-in { animation: k-msg-in 150ms ease-out both; }
         @keyframes k-speaking-pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(59,165,93,0.4); } 50% { box-shadow: 0 0 0 4px rgba(59,165,93,0); } }
         .k-speaking-ring { animation: k-speaking-pulse 1.5s ease-in-out infinite; }
-        .k-fade-in { animation: k-fade-in 100ms ease-out; }
+        .k-fade-in { animation: k-fade-in 80ms ease-out; }
         @keyframes k-pin-glow { 0% { background: rgba(240,178,50,0.15); } 100% { background: transparent; } }
         .k-pin-highlight { animation: k-pin-glow 2s ease-out forwards; }
-        .k-scale-in { animation: k-scale-in 100ms ease-out; }
+        .k-scale-in { animation: k-scale-in 120ms ease-out; }
         @keyframes k-crown-shimmer { 0%, 90% { filter: brightness(1); } 95% { filter: brightness(1.5); } 100% { filter: brightness(1); } }
         .k-crown-shimmer { animation: k-crown-shimmer 30s ease-in-out infinite; }
-        .k-channel-fade { animation: k-fade-in 80ms ease-out; }
+        .k-channel-fade { animation: k-fade-in 60ms ease-out; }
         .break-words { word-break: break-word; overflow-wrap: anywhere; }
         pre code { white-space: pre; word-break: normal; overflow-wrap: normal; }
         pre { max-width: 100%; overflow-x: auto; }
 
         button, a, [role="button"], [role="tab"], [role="menuitem"] {
-          transition: background 100ms ease, color 100ms ease, opacity 100ms ease;
+          transition: background 80ms ease, color 80ms ease, opacity 80ms ease;
         }
         button:active:not(:disabled), [role="button"]:active:not(:disabled) { transform: scale(0.98); }
 
@@ -87,7 +96,7 @@ export default function Layout({ children }) {
         }
         [data-radix-popper-content-wrapper] [role="menuitem"]:hover,
         [data-radix-popper-content-wrapper] [role="menuitem"][data-highlighted] {
-          background: rgba(88,101,242,0.15) !important;
+          background: rgba(123,108,246,0.15) !important;
           color: #fff !important;
         }
         [data-radix-popper-content-wrapper] [role="menuitem"]:active { transform: scale(0.98) !important; }
@@ -102,7 +111,7 @@ export default function Layout({ children }) {
           background-repeat: no-repeat; background-position: right 10px center;
           padding-right: 30px !important; cursor: pointer;
         }
-        select option { background: #0a0a0a; color: #fff; padding: 8px 12px; }
+        select option { background: #18181c; color: #f0eff4; padding: 8px 12px; }
 
         @media (prefers-reduced-motion: reduce), .reduced-motion {
           *, *::before, *::after {
@@ -118,9 +127,9 @@ export default function Layout({ children }) {
         @supports (padding-bottom: env(safe-area-inset-bottom)) { .safe-bottom { padding-bottom: env(safe-area-inset-bottom); } }
         @media (pointer: coarse) { button, a, [role="button"] { min-height: 44px; min-width: 44px; } }
 
-        /* Toast positioning — higher to avoid input overlap */
+        /* Toast positioning — higher to avoid input overlap, 220ms slide */
         [data-sonner-toaster] { bottom: 80px !important; }
-        [data-sonner-toast] { font-size: 13px !important; padding: 10px 14px !important; }
+        [data-sonner-toast] { font-size: 13px !important; padding: 10px 14px !important; animation-duration: 220ms !important; }
 
         /* Mobile viewport fix for Android keyboard */
         @supports (height: 100dvh) { .h-screen-safe { height: 100dvh; } }

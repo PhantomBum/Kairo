@@ -12,12 +12,12 @@ function StatCard({ icon: Icon, label, value, change, color }) {
     <div className="p-3.5 rounded-xl" style={{ background: 'var(--bg-glass)', border: '1px solid var(--border)' }}>
       <div className="flex items-center gap-2 mb-2">
         <Icon className="w-3.5 h-3.5" style={{ color }} />
-        <span className="text-[10px] uppercase tracking-wider font-mono" style={{ color: 'var(--text-muted)' }}>{label}</span>
+        <span className="text-[11px] uppercase tracking-wider font-mono" style={{ color: 'var(--text-muted)' }}>{label}</span>
       </div>
       <div className="flex items-end justify-between">
         <span className="text-2xl font-bold font-mono" style={{ color: 'var(--text-cream)' }}>{value}</span>
         {change !== undefined && (
-          <div className="flex items-center gap-0.5 text-[10px]" style={{ color: isUp ? 'var(--accent-green)' : 'var(--accent-red)' }}>
+          <div className="flex items-center gap-0.5 text-[11px]" style={{ color: isUp ? 'var(--accent-green)' : 'var(--accent-red)' }}>
             {isUp ? <ArrowUp className="w-2.5 h-2.5" /> : <ArrowDown className="w-2.5 h-2.5" />}
             {Math.abs(change)}%
           </div>
@@ -152,7 +152,7 @@ export default function AnalyticsDashboardModal({ onClose, server }) {
 
           {/* Message trend */}
           <div className="p-4 rounded-xl" style={{ background: 'var(--bg-glass)', border: '1px solid var(--border)' }}>
-            <h3 className="text-[10px] uppercase tracking-wider font-mono mb-3" style={{ color: 'var(--text-muted)' }}>Message Trend (14 days)</h3>
+            <h3 className="text-[11px] uppercase tracking-wider font-mono mb-3" style={{ color: 'var(--text-muted)' }}>Message Trend (14 days)</h3>
             <ResponsiveContainer width="100%" height={180}>
               <AreaChart data={messageVolume}>
                 <defs><linearGradient id="msgGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#7bc9a4" stopOpacity={0.3} /><stop offset="95%" stopColor="#7bc9a4" stopOpacity={0} /></linearGradient></defs>
@@ -166,7 +166,7 @@ export default function AnalyticsDashboardModal({ onClose, server }) {
 
           {/* Active hours */}
           <div className="p-4 rounded-xl" style={{ background: 'var(--bg-glass)', border: '1px solid var(--border)' }}>
-            <h3 className="text-[10px] uppercase tracking-wider font-mono mb-3" style={{ color: 'var(--text-muted)' }}>Most Active Hours</h3>
+            <h3 className="text-[11px] uppercase tracking-wider font-mono mb-3" style={{ color: 'var(--text-muted)' }}>Most Active Hours</h3>
             <ResponsiveContainer width="100%" height={140}>
               <BarChart data={activeHours}>
                 <XAxis dataKey="hour" tick={{ fill: '#555248', fontSize: 8, fontFamily: 'monospace' }} axisLine={false} tickLine={false} interval={2} />
@@ -180,7 +180,7 @@ export default function AnalyticsDashboardModal({ onClose, server }) {
 
         {tab === 'members' && <>
           <div className="p-4 rounded-xl" style={{ background: 'var(--bg-glass)', border: '1px solid var(--border)' }}>
-            <h3 className="text-[10px] uppercase tracking-wider font-mono mb-3" style={{ color: 'var(--text-muted)' }}>Member Growth (30 days)</h3>
+            <h3 className="text-[11px] uppercase tracking-wider font-mono mb-3" style={{ color: 'var(--text-muted)' }}>Member Growth (30 days)</h3>
             <ResponsiveContainer width="100%" height={200}>
               <LineChart data={memberGrowth}>
                 <XAxis dataKey="date" tick={{ fill: '#555248', fontSize: 8, fontFamily: 'monospace' }} axisLine={false} tickLine={false} interval={4} />
@@ -192,18 +192,18 @@ export default function AnalyticsDashboardModal({ onClose, server }) {
           </div>
 
           <div className="p-4 rounded-xl" style={{ background: 'var(--bg-glass)', border: '1px solid var(--border)' }}>
-            <h3 className="text-[10px] uppercase tracking-wider font-mono mb-3" style={{ color: 'var(--text-muted)' }}>Top Contributors</h3>
+            <h3 className="text-[11px] uppercase tracking-wider font-mono mb-3" style={{ color: 'var(--text-muted)' }}>Top Contributors</h3>
             <div className="space-y-2">
               {topPosters.map((p, i) => (
                 <div key={i} className="flex items-center gap-3">
-                  <span className="text-[10px] font-mono w-4 text-right" style={{ color: 'var(--text-faint)' }}>#{i + 1}</span>
+                  <span className="text-[11px] font-mono w-4 text-right" style={{ color: 'var(--text-faint)' }}>#{i + 1}</span>
                   <div className="flex-1 flex items-center gap-2 min-w-0">
                     <span className="text-[12px] truncate" style={{ color: 'var(--text-primary)' }}>{p.name}</span>
                     <div className="flex-1 h-1.5 rounded-full overflow-hidden" style={{ background: 'var(--bg-overlay)' }}>
                       <div className="h-full rounded-full" style={{ width: `${(p.count / (topPosters[0]?.count || 1)) * 100}%`, background: CHART_COLORS[i % CHART_COLORS.length] }} />
                     </div>
                   </div>
-                  <span className="text-[10px] font-mono" style={{ color: 'var(--text-muted)' }}>{p.count}</span>
+                  <span className="text-[11px] font-mono" style={{ color: 'var(--text-muted)' }}>{p.count}</span>
                 </div>
               ))}
             </div>
@@ -212,7 +212,7 @@ export default function AnalyticsDashboardModal({ onClose, server }) {
 
         {tab === 'messages' && <>
           <div className="p-4 rounded-xl" style={{ background: 'var(--bg-glass)', border: '1px solid var(--border)' }}>
-            <h3 className="text-[10px] uppercase tracking-wider font-mono mb-3" style={{ color: 'var(--text-muted)' }}>Top Channels</h3>
+            <h3 className="text-[11px] uppercase tracking-wider font-mono mb-3" style={{ color: 'var(--text-muted)' }}>Top Channels</h3>
             <ResponsiveContainer width="100%" height={200}>
               <BarChart data={topChannels} layout="vertical">
                 <XAxis type="number" tick={{ fill: '#555248', fontSize: 9, fontFamily: 'monospace' }} axisLine={false} tickLine={false} />
@@ -224,7 +224,7 @@ export default function AnalyticsDashboardModal({ onClose, server }) {
           </div>
 
           <div className="p-4 rounded-xl" style={{ background: 'var(--bg-glass)', border: '1px solid var(--border)' }}>
-            <h3 className="text-[10px] uppercase tracking-wider font-mono mb-3" style={{ color: 'var(--text-muted)' }}>Message Volume by Day</h3>
+            <h3 className="text-[11px] uppercase tracking-wider font-mono mb-3" style={{ color: 'var(--text-muted)' }}>Message Volume by Day</h3>
             <ResponsiveContainer width="100%" height={180}>
               <BarChart data={messageVolume}>
                 <XAxis dataKey="date" tick={{ fill: '#555248', fontSize: 8, fontFamily: 'monospace' }} axisLine={false} tickLine={false} />
@@ -238,7 +238,7 @@ export default function AnalyticsDashboardModal({ onClose, server }) {
 
         {tab === 'engagement' && <>
           <div className="p-4 rounded-xl" style={{ background: 'var(--bg-glass)', border: '1px solid var(--border)' }}>
-            <h3 className="text-[10px] uppercase tracking-wider font-mono mb-3" style={{ color: 'var(--text-muted)' }}>Popular Emoji</h3>
+            <h3 className="text-[11px] uppercase tracking-wider font-mono mb-3" style={{ color: 'var(--text-muted)' }}>Popular Emoji</h3>
             {emojiUsage.length > 0 ? (
               <div className="grid grid-cols-4 gap-2">
                 {emojiUsage.map((e, i) => (
@@ -248,7 +248,7 @@ export default function AnalyticsDashboardModal({ onClose, server }) {
                       <div className="h-1 rounded-full overflow-hidden" style={{ background: 'var(--bg-overlay)' }}>
                         <div className="h-full rounded-full" style={{ width: `${(e.count / (emojiUsage[0]?.count || 1)) * 100}%`, background: CHART_COLORS[i % CHART_COLORS.length] }} />
                       </div>
-                      <span className="text-[9px] font-mono" style={{ color: 'var(--text-muted)' }}>{e.count} uses</span>
+                      <span className="text-[11px] font-mono" style={{ color: 'var(--text-muted)' }}>{e.count} uses</span>
                     </div>
                   </div>
                 ))}
@@ -260,13 +260,13 @@ export default function AnalyticsDashboardModal({ onClose, server }) {
 
           <div className="grid grid-cols-2 gap-3">
             <div className="p-4 rounded-xl" style={{ background: 'var(--bg-glass)', border: '1px solid var(--border)' }}>
-              <h3 className="text-[10px] uppercase tracking-wider font-mono mb-2" style={{ color: 'var(--text-muted)' }}>Avg. Messages/Day</h3>
+              <h3 className="text-[11px] uppercase tracking-wider font-mono mb-2" style={{ color: 'var(--text-muted)' }}>Avg. Messages/Day</h3>
               <span className="text-xl font-bold font-mono" style={{ color: 'var(--text-cream)' }}>
                 {totalMsgs > 0 ? Math.round(totalMsgs / Math.max(1, Math.ceil((Date.now() - new Date(messages[messages.length - 1]?.created_date || Date.now()).getTime()) / 86400000))) : 0}
               </span>
             </div>
             <div className="p-4 rounded-xl" style={{ background: 'var(--bg-glass)', border: '1px solid var(--border)' }}>
-              <h3 className="text-[10px] uppercase tracking-wider font-mono mb-2" style={{ color: 'var(--text-muted)' }}>Peak Hour</h3>
+              <h3 className="text-[11px] uppercase tracking-wider font-mono mb-2" style={{ color: 'var(--text-muted)' }}>Peak Hour</h3>
               <span className="text-xl font-bold font-mono" style={{ color: 'var(--text-cream)' }}>
                 {activeHours.reduce((max, h) => h.messages > max.messages ? h : max, { messages: 0, hour: 'N/A' }).hour}
               </span>
@@ -275,7 +275,7 @@ export default function AnalyticsDashboardModal({ onClose, server }) {
 
           {topChannels.length > 0 && (
             <div className="p-4 rounded-xl" style={{ background: 'var(--bg-glass)', border: '1px solid var(--border)' }}>
-              <h3 className="text-[10px] uppercase tracking-wider font-mono mb-3" style={{ color: 'var(--text-muted)' }}>Channel Distribution</h3>
+              <h3 className="text-[11px] uppercase tracking-wider font-mono mb-3" style={{ color: 'var(--text-muted)' }}>Channel Distribution</h3>
               <ResponsiveContainer width="100%" height={160}>
                 <PieChart>
                   <Pie data={topChannels.slice(0, 6)} cx="50%" cy="50%" outerRadius={60} innerRadius={30} dataKey="messages" paddingAngle={2}>
@@ -288,7 +288,7 @@ export default function AnalyticsDashboardModal({ onClose, server }) {
                 {topChannels.slice(0, 6).map((c, i) => (
                   <div key={i} className="flex items-center gap-1.5">
                     <div className="w-2 h-2 rounded-full" style={{ background: CHART_COLORS[i % CHART_COLORS.length] }} />
-                    <span className="text-[9px] font-mono" style={{ color: 'var(--text-muted)' }}>#{c.name}</span>
+                    <span className="text-[11px] font-mono" style={{ color: 'var(--text-muted)' }}>#{c.name}</span>
                   </div>
                 ))}
               </div>

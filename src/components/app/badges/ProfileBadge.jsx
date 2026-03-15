@@ -49,8 +49,8 @@ export default function ProfileBadge({ badge, size = 'md' }) {
           <div className="px-3 py-2 rounded-lg text-center"
             style={{ background: '#0e0e0e', border: `1px solid ${colors.border.strong}`, boxShadow: '0 8px 24px rgba(0,0,0,0.7)' }}>
             <p className="text-[11px] font-bold whitespace-nowrap" style={{ color: cfg.color }}>{cfg.label}</p>
-            <p className="text-[10px] whitespace-nowrap" style={{ color: colors.text.muted }}>{cfg.desc}</p>
-            <p className="text-[9px] font-semibold mt-0.5" style={{ color: rarity.color }}>{rarity.label}</p>
+            <p className="text-[11px] whitespace-nowrap" style={{ color: colors.text.muted }}>{cfg.desc}</p>
+            <p className="text-[11px] font-semibold mt-0.5" style={{ color: rarity.color }}>{rarity.label}</p>
           </div>
           <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-[1px] w-0 h-0"
             style={{ borderLeft: '5px solid transparent', borderRight: '5px solid transparent', borderTop: '5px solid #0e0e0e' }} />

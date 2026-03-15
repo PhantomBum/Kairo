@@ -32,12 +32,12 @@ export default function BotAutoResponders({ bot, onSave }) {
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-[9px] font-semibold uppercase tracking-[0.08em] block mb-1" style={{ color: 'var(--text-muted)', fontFamily: 'monospace' }}>Trigger</label>
+              <label className="text-[11px] font-semibold uppercase tracking-[0.08em] block mb-1" style={{ color: 'var(--text-muted)', fontFamily: 'monospace' }}>Trigger</label>
               <input value={r.trigger} onChange={e => update(r.id, { trigger: e.target.value })} placeholder="hello"
                 className="w-full px-2.5 py-1.5 rounded-lg text-[12px] outline-none" style={{ background: 'var(--bg-glass-strong)', color: 'var(--text-primary)', border: '1px solid var(--border)' }} />
             </div>
             <div>
-              <label className="text-[9px] font-semibold uppercase tracking-[0.08em] block mb-1" style={{ color: 'var(--text-muted)', fontFamily: 'monospace' }}>Match Type</label>
+              <label className="text-[11px] font-semibold uppercase tracking-[0.08em] block mb-1" style={{ color: 'var(--text-muted)', fontFamily: 'monospace' }}>Match Type</label>
               <select value={r.match_type} onChange={e => update(r.id, { match_type: e.target.value })}
                 className="w-full px-2.5 py-1.5 rounded-lg text-[12px] outline-none" style={{ background: 'var(--bg-glass-strong)', color: 'var(--text-primary)', border: '1px solid var(--border)' }}>
                 {MATCH_TYPES.map(t => <option key={t} value={t}>{t.replace('_', ' ')}</option>)}
@@ -45,7 +45,7 @@ export default function BotAutoResponders({ bot, onSave }) {
             </div>
           </div>
           <div>
-            <label className="text-[9px] font-semibold uppercase tracking-[0.08em] block mb-1" style={{ color: 'var(--text-muted)', fontFamily: 'monospace' }}>Response</label>
+            <label className="text-[11px] font-semibold uppercase tracking-[0.08em] block mb-1" style={{ color: 'var(--text-muted)', fontFamily: 'monospace' }}>Response</label>
             <textarea value={r.response} onChange={e => update(r.id, { response: e.target.value })} rows={2} placeholder="Hey there! 👋"
               className="w-full px-2.5 py-1.5 rounded-lg text-[12px] outline-none resize-none" style={{ background: 'var(--bg-glass-strong)', color: 'var(--text-primary)', border: '1px solid var(--border)' }} />
           </div>

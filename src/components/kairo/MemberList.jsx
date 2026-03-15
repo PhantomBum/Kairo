@@ -1,213 +1,252 @@
-import React from 'react';
-import { Crown, Shield, ShieldCheck, MessageCircle, Ban } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import React, { useState, useRef, useEffect } from 'react';
+import { Crown, MessageCircle, Ban, UserPlus, Copy, Flag, MoreHorizontal, UserCheck, X } from 'lucide-react';
 import UserBadges from './UserBadges';
 import {
-  ContextMenu,
-  ContextMenuContent,
-  ContextMenuItem,
-  ContextMenuSeparator,
-  ContextMenuTrigger,
-  ContextMenuSub,
-  ContextMenuSubContent,
-  ContextMenuSubTrigger,
+  ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuSeparator,
+  ContextMenuTrigger, ContextMenuSub, ContextMenuSubContent, ContextMenuSubTrigger,
 } from "@/components/ui/context-menu";
-import {
-  HoverCard,
-  HoverCardContent,
-  HoverCardTrigger,
-} from "@/components/ui/hover-card";
 
-const statusColors = {
-  online: 'bg-emerald-500',
-  idle: 'bg-amber-500',
-  dnd: 'bg-rose-500',
-  invisible: 'bg-zinc-500',
-  offline: 'bg-zinc-600'
+const P = {
+  base: '#111820', surface: '#161f2c', elevated: '#1b2535',
+  floating: '#263446', border: '#ffffff18',
+  textPrimary: '#e8edf5', textSecondary: '#9aaabb', muted: '#5d7a8a',
+  accent: '#2dd4bf', danger: '#f87171', success: '#34d399',
+  warning: '#fbbf24',
 };
 
-function MemberItem({ member, isOwner, highestRole, onMessage, onProfile }) {
-  const roleColor = highestRole?.color || '#a1a1aa';
+const statusDot = {
+  online: P.success, idle: P.warning, dnd: P.danger,
+  invisible: '#747f8d', offline: '#747f8d',
+};
+
+function ProfileHoverCard({ member, anchorRect, onClose, onMessage }) {
+  const ref = useRef(null);
+  const roleColor = member.highestRole?.color || P.textSecondary;
+
+  useEffect(() => {
+    const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) onClose(); };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [onClose]);
+
+  const top = anchorRect ? Math.min(anchorRect.top, window.innerHeight - 420) : 100;
 
   return (
-    <ContextMenu>
-      <ContextMenuTrigger>
-        <HoverCard openDelay={400}>
-          <HoverCardTrigger asChild>
-            <button className="w-full flex items-center gap-2 px-2 py-1 rounded cursor-pointer hover:bg-white/5 transition-colors group text-left">
-              {/* Avatar with status */}
-              <div className="relative flex-shrink-0">
-                <div className="w-8 h-8 rounded-full overflow-hidden bg-zinc-700">
-                  {member.avatar_override || member.user_avatar ? (
-                    <img 
-                      src={member.avatar_override || member.user_avatar} 
-                      alt="" 
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-indigo-500 text-white text-xs font-medium">
-                      {(member.nickname || member.user_name)?.charAt(0)}
-                    </div>
-                  )}
-                </div>
-                <div className={cn(
-                  "absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-[#0c0c0d]",
-                  statusColors[member.status] || statusColors.offline
-                )} />
-              </div>
+    <div ref={ref} className="fixed z-[60] w-[300px]"
+      style={{
+        right: 252, top,
+        animation: 'profileCardIn 200ms cubic-bezier(0.34, 1.56, 0.64, 1)',
+      }}>
+      <div className="rounded-2xl overflow-hidden" style={{ background: P.floating, border: `1px solid ${P.border}`, boxShadow: '0 12px 40px rgba(0,0,0,0.6)' }}>
+        {/* Banner */}
+        <div className="h-16" style={{
+          background: member.banner_url
+            ? `url(${member.banner_url}) center/cover`
+            : `linear-gradient(135deg, ${roleColor}50, ${P.accent}30)`,
+        }} />
 
-              {/* Name */}
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-1">
-                  <span 
-                    className="text-sm truncate"
-                    style={{ color: roleColor }}
-                  >
-                    {member.nickname || member.user_name}
+        {/* Avatar */}
+        <div className="px-4 -mt-8">
+          <div className="relative inline-block">
+            <div className="w-16 h-16 rounded-full overflow-hidden border-[3px] shadow-lg"
+              style={{ borderColor: P.floating, background: P.surface }}>
+              {member.avatar_override || member.user_avatar ? (
+                <img src={member.avatar_override || member.user_avatar} alt="" className="w-full h-full object-cover" />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-xl font-semibold"
+                  style={{ background: `${roleColor}30`, color: roleColor }}>
+                  {(member.nickname || member.user_name)?.charAt(0)}
+                </div>
+              )}
+            </div>
+            <div className="absolute bottom-0 right-0 w-5 h-5 rounded-full border-[3px]"
+              style={{ borderColor: P.floating, background: statusDot[member.status] || statusDot.offline }} />
+          </div>
+        </div>
+
+        {/* Info */}
+        <div className="p-4 pt-2 space-y-3">
+          <div>
+            <h3 className="text-[16px] font-bold" style={{ color: P.textPrimary }}>
+              {member.nickname || member.user_name}
+              {member.user_id === member._ownerId && <Crown className="w-3.5 h-3.5 text-amber-400 inline ml-1.5" />}
+            </h3>
+            <p className="text-[13px]" style={{ color: P.muted }}>{member.user_name}</p>
+            {member.pronouns && <p className="text-[12px]" style={{ color: P.muted }}>{member.pronouns}</p>}
+          </div>
+
+          {member.custom_status && (
+            <p className="text-[13px]" style={{ color: P.textSecondary }}>{member.custom_status}</p>
+          )}
+
+          {member.bio && (
+            <div className="pt-2" style={{ borderTop: `1px solid ${P.border}` }}>
+              <p className="text-[11px] font-semibold uppercase tracking-wider mb-1" style={{ color: P.textPrimary }}>About Me</p>
+              <p className="text-[13px] leading-relaxed" style={{ color: P.textSecondary }}>{member.bio}</p>
+            </div>
+          )}
+
+          {member.joined_date && (
+            <div className="pt-2" style={{ borderTop: `1px solid ${P.border}` }}>
+              <p className="text-[11px] font-semibold uppercase tracking-wider mb-1" style={{ color: P.textPrimary }}>Member Since</p>
+              <p className="text-[12px]" style={{ color: P.muted }}>{new Date(member.joined_date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
+            </div>
+          )}
+
+          {/* Roles */}
+          {member.roles?.length > 0 && (
+            <div className="pt-2" style={{ borderTop: `1px solid ${P.border}` }}>
+              <p className="text-[11px] font-semibold uppercase tracking-wider mb-1.5" style={{ color: P.textPrimary }}>Roles</p>
+              <div className="flex flex-wrap gap-1">
+                {member.roles.map((role) => (
+                  <span key={role.id} className="px-2 py-0.5 rounded text-[11px] font-medium"
+                    style={{ backgroundColor: `${role.color}20`, color: role.color }}>
+                    {role.name}
                   </span>
-                  {isOwner && (
-                    <Crown className="w-3 h-3 text-amber-400 flex-shrink-0" />
-                  )}
-                </div>
+                ))}
               </div>
+            </div>
+          )}
+
+          {/* Private Note */}
+          <div className="pt-2" style={{ borderTop: `1px solid ${P.border}` }}>
+            <input type="text" placeholder="Click to add a note"
+              className="w-full bg-transparent text-[12px] outline-none placeholder:text-[12px]"
+              style={{ color: P.textSecondary, caretColor: P.accent, '::placeholder': { color: P.muted } }} />
+          </div>
+
+          {/* Actions */}
+          <div className="flex gap-2 pt-1">
+            <button onClick={() => onMessage?.(member)}
+              className="flex-1 h-8 rounded-lg text-[13px] font-medium transition-colors"
+              style={{ background: P.accent, color: '#fff' }}>
+              Message
             </button>
-          </HoverCardTrigger>
-          <HoverCardContent 
-            side="left" 
-            className="w-72 p-0 bg-zinc-900/95 backdrop-blur-xl border-zinc-800/80 shadow-2xl rounded-2xl overflow-hidden"
-          >
-            {/* Banner */}
-            <div 
-              className="h-20"
-              style={{ 
-                background: member.banner_url 
-                  ? `url(${member.banner_url}) center/cover`
-                  : `linear-gradient(135deg, ${roleColor}40, ${roleColor}10)`
-              }}
-            />
-            
-            {/* Avatar */}
-            <div className="px-4 -mt-10">
-              <div className="relative inline-block">
-                <div className="w-20 h-20 rounded-2xl overflow-hidden border-4 border-zinc-900 bg-zinc-800 shadow-xl">
-                  {member.avatar_override || member.user_avatar ? (
-                    <img 
-                      src={member.avatar_override || member.user_avatar} 
-                      alt="" 
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-violet-500 to-indigo-600 text-white text-2xl font-medium">
-                      {(member.nickname || member.user_name)?.charAt(0)}
-                    </div>
-                  )}
-                </div>
-                <div className={cn(
-                  "absolute bottom-1 right-1 w-5 h-5 rounded-full border-4 border-zinc-900",
-                  statusColors[member.status] || statusColors.offline
-                )} />
-              </div>
-            </div>
-
-            {/* Info */}
-            <div className="p-4 pt-3">
-              <h3 className="font-semibold text-white text-lg">
-                {member.nickname || member.user_name}
-              </h3>
-              <p className="text-sm text-zinc-500">{member.user_name}</p>
-              
-              {member.bio && (
-                <div className="mt-3 pt-3 border-t border-zinc-800/50">
-                  <p className="text-sm text-zinc-400 leading-relaxed">{member.bio}</p>
-                </div>
-              )}
-
-              {/* Roles */}
-              {member.roles?.length > 0 && (
-                <div className="mt-3 pt-3 border-t border-zinc-800/50">
-                  <div className="flex flex-wrap gap-1.5">
-                    {member.roles.map((role) => (
-                      <span
-                        key={role.id}
-                        className="px-2 py-0.5 rounded-lg text-xs font-medium"
-                        style={{ 
-                          backgroundColor: `${role.color}15`,
-                          color: role.color
-                        }}
-                      >
-                        {role.name}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          </HoverCardContent>
-        </HoverCard>
-      </ContextMenuTrigger>
-      <ContextMenuContent className="w-48 bg-zinc-900/95 backdrop-blur-xl border-zinc-800/80 rounded-xl p-1">
-        <ContextMenuItem 
-          onClick={() => onProfile?.(member)}
-          className="text-zinc-300 focus:bg-zinc-800 rounded-lg"
-        >
-          View Profile
-        </ContextMenuItem>
-        <ContextMenuItem 
-          onClick={() => onMessage?.(member)}
-          className="text-zinc-300 focus:bg-zinc-800 rounded-lg"
-        >
-          <MessageCircle className="w-4 h-4 mr-2 text-zinc-500" />
-          Message
-        </ContextMenuItem>
-        <ContextMenuSeparator className="bg-zinc-800/50 my-1" />
-        <ContextMenuSub>
-          <ContextMenuSubTrigger className="text-zinc-300 focus:bg-zinc-800 rounded-lg">
-            Roles
-          </ContextMenuSubTrigger>
-          <ContextMenuSubContent className="bg-zinc-900/95 backdrop-blur-xl border-zinc-800/80 rounded-xl p-1">
-            <ContextMenuItem className="text-zinc-300 focus:bg-zinc-800 rounded-lg">
-              Add Role...
-            </ContextMenuItem>
-          </ContextMenuSubContent>
-        </ContextMenuSub>
-        <ContextMenuSeparator className="bg-zinc-800/50 my-1" />
-        <ContextMenuItem className="text-amber-400 focus:bg-amber-500/10 rounded-lg">
-          Timeout
-        </ContextMenuItem>
-        <ContextMenuItem className="text-rose-400 focus:bg-rose-500/10 rounded-lg">
-          <Ban className="w-4 h-4 mr-2" />
-          Ban
-        </ContextMenuItem>
-      </ContextMenuContent>
-    </ContextMenu>
+            <button className="w-8 h-8 rounded-lg flex items-center justify-center transition-colors hover:bg-[rgba(255,255,255,0.06)]"
+              style={{ background: P.elevated }}>
+              <MoreHorizontal className="w-4 h-4" style={{ color: P.muted }} />
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 
-export default function MemberList({ 
-  members = [], 
-  roles = [], 
-  ownerId,
-  onMemberMessage,
-  onMemberProfile 
-}) {
+function MemberItem({ member, isOwner, highestRole, onMessage, onProfile, ownerId }) {
+  const roleColor = highestRole?.color || P.textSecondary;
+  const [hoverCard, setHoverCard] = useState(null);
+  const hoverTimer = useRef(null);
+  const rowRef = useRef(null);
+
+  const startHover = () => {
+    hoverTimer.current = setTimeout(() => {
+      const rect = rowRef.current?.getBoundingClientRect();
+      setHoverCard(rect);
+    }, 500);
+  };
+  const endHover = () => { clearTimeout(hoverTimer.current); };
+  const closeCard = () => setHoverCard(null);
+
+  return (
+    <>
+      <ContextMenu>
+        <ContextMenuTrigger>
+          <button ref={rowRef}
+            onMouseEnter={startHover} onMouseLeave={endHover}
+            onClick={() => onProfile?.(member)}
+            className="w-full flex items-center gap-2.5 px-2 h-10 rounded-md cursor-pointer transition-colors group text-left"
+            style={{ ':hover': { background: P.elevated } }}
+            onMouseOver={e => e.currentTarget.style.background = P.elevated}
+            onMouseOut={e => e.currentTarget.style.background = 'transparent'}>
+            {/* Avatar with status ring */}
+            <div className="relative flex-shrink-0">
+              <div className="w-8 h-8 rounded-full overflow-hidden" style={{ background: P.surface }}>
+                {member.avatar_override || member.user_avatar ? (
+                  <img src={member.avatar_override || member.user_avatar} alt="" className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-xs font-semibold"
+                    style={{ background: `${roleColor}25`, color: roleColor }}>
+                    {(member.nickname || member.user_name)?.charAt(0)}
+                  </div>
+                )}
+              </div>
+              <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2"
+                style={{ borderColor: P.surface, background: statusDot[member.status] || statusDot.offline }} />
+            </div>
+
+            {/* Name + role badge */}
+            <div className="flex-1 min-w-0 flex items-center gap-1.5">
+              <span className="text-[13px] font-medium truncate" style={{ color: roleColor }}>
+                {member.nickname || member.user_name}
+              </span>
+              {isOwner && <Crown className="w-3 h-3 text-amber-400 flex-shrink-0" />}
+              {highestRole && highestRole.name !== 'Online' && highestRole.name !== 'Offline' && (
+                <span className="px-1.5 py-[1px] rounded text-[11px] font-medium flex-shrink-0"
+                  style={{ background: `${highestRole.color}20`, color: highestRole.color }}>
+                  {highestRole.name}
+                </span>
+              )}
+            </div>
+          </button>
+        </ContextMenuTrigger>
+        <ContextMenuContent className="w-52 p-1.5 rounded-xl"
+          style={{ background: P.floating, border: `1px solid ${P.border}`, boxShadow: '0 8px 32px rgba(0,0,0,0.6)' }}>
+          <ContextMenuItem onClick={() => onProfile?.(member)} className="text-[13px] gap-2.5 rounded-lg px-2.5 py-2"
+            style={{ color: P.textSecondary }}>View Profile</ContextMenuItem>
+          <ContextMenuItem onClick={() => onMessage?.(member)} className="text-[13px] gap-2.5 rounded-lg px-2.5 py-2"
+            style={{ color: P.textSecondary }}>
+            <MessageCircle className="w-4 h-4 opacity-50" /> Message
+          </ContextMenuItem>
+          <ContextMenuItem onClick={() => navigator.clipboard.writeText(member.user_id || '')} className="text-[13px] gap-2.5 rounded-lg px-2.5 py-2"
+            style={{ color: P.textSecondary }}>
+            <Copy className="w-4 h-4 opacity-50" /> Copy User ID
+          </ContextMenuItem>
+          <ContextMenuSeparator style={{ background: P.border, margin: '4px 0' }} />
+          <ContextMenuSub>
+            <ContextMenuSubTrigger className="text-[13px] gap-2.5 rounded-lg px-2.5 py-2" style={{ color: P.textSecondary }}>Roles</ContextMenuSubTrigger>
+            <ContextMenuSubContent className="p-1.5 rounded-xl" style={{ background: P.floating, border: `1px solid ${P.border}` }}>
+              <ContextMenuItem className="text-[13px] rounded-lg px-2.5 py-2" style={{ color: P.textSecondary }}>Add Role...</ContextMenuItem>
+            </ContextMenuSubContent>
+          </ContextMenuSub>
+          <ContextMenuSeparator style={{ background: P.border, margin: '4px 0' }} />
+          <ContextMenuItem className="text-[13px] gap-2.5 rounded-lg px-2.5 py-2" style={{ color: P.danger }}>
+            <Ban className="w-4 h-4 opacity-60" /> Ban
+          </ContextMenuItem>
+          <ContextMenuItem className="text-[13px] gap-2.5 rounded-lg px-2.5 py-2" style={{ color: P.danger }}>
+            <Flag className="w-4 h-4 opacity-60" /> Report
+          </ContextMenuItem>
+        </ContextMenuContent>
+      </ContextMenu>
+
+      {hoverCard && (
+        <ProfileHoverCard
+          member={{ ...member, _ownerId: ownerId }}
+          anchorRect={hoverCard}
+          onClose={closeCard}
+          onMessage={onMessage}
+        />
+      )}
+    </>
+  );
+}
+
+export default function MemberList({ members = [], roles = [], ownerId, onMemberMessage, onMemberProfile }) {
+  const [offlineExpanded, setOfflineExpanded] = useState(false);
+
+  const onlineCount = members.filter(m => m.status && m.status !== 'offline' && m.status !== 'invisible').length;
+
   const groupedMembers = React.useMemo(() => {
     const groups = {};
     const sortedRoles = [...roles].sort((a, b) => (b.position || 0) - (a.position || 0));
-    
-    // Create groups for hoisted roles
-    sortedRoles.filter(r => r.is_hoisted).forEach(role => {
-      groups[role.id] = { role, members: [] };
-    });
-    
-    // Always create Online and Offline groups
-    groups['online'] = { role: { id: 'online', name: 'Online', color: '#10b981' }, members: [] };
-    groups['offline'] = { role: { id: 'offline', name: 'Offline', color: '#52525b' }, members: [] };
-    
+
+    sortedRoles.filter(r => r.is_hoisted).forEach(role => { groups[role.id] = { role, members: [] }; });
+    groups['online'] = { role: { id: 'online', name: 'Online', color: P.success }, members: [] };
+    groups['offline'] = { role: { id: 'offline', name: 'Offline', color: '#747f8d' }, members: [] };
+
     members.forEach(member => {
       const memberRoleIds = member.role_ids || [];
       let placed = false;
-      
-      // Try to place in hoisted role group
       for (const role of sortedRoles.filter(r => r.is_hoisted)) {
         if (memberRoleIds.includes(role.id)) {
           groups[role.id].members.push({ ...member, highestRole: role });
@@ -215,68 +254,64 @@ export default function MemberList({
           break;
         }
       }
-      
-      // If not in hoisted role, place by online status
       if (!placed) {
         const isOnline = member.status && member.status !== 'offline' && member.status !== 'invisible';
-        const groupKey = isOnline ? 'online' : 'offline';
-        groups[groupKey].members.push({
-          ...member,
-          highestRole: sortedRoles.find(r => memberRoleIds.includes(r.id)) || null
+        groups[isOnline ? 'online' : 'offline'].members.push({
+          ...member, highestRole: sortedRoles.find(r => memberRoleIds.includes(r.id)) || null,
         });
       }
     });
-    
-    // Return groups with members, prioritizing Online then Offline
+
     const result = [];
-    
-    // Add hoisted role groups first
     sortedRoles.filter(r => r.is_hoisted).forEach(role => {
-      if (groups[role.id]?.members.length > 0) {
-        result.push(groups[role.id]);
-      }
+      if (groups[role.id]?.members.length > 0) result.push(groups[role.id]);
     });
-    
-    // Add Online group
-    if (groups['online'].members.length > 0) {
-      result.push(groups['online']);
-    }
-    
-    // Add Offline group last
-    if (groups['offline'].members.length > 0) {
-      result.push(groups['offline']);
-    }
-    
+    if (groups['online'].members.length > 0) result.push(groups['online']);
+    if (groups['offline'].members.length > 0) result.push({ ...groups['offline'], collapsed: true });
     return result;
   }, [members, roles]);
 
   return (
-    <div className="w-60 h-full bg-[#0c0c0d] border-l border-white/[0.04] overflow-y-auto scrollbar-thin">
-      {/* Header */}
-      <div className="sticky top-0 z-10 px-4 py-3 bg-[#0c0c0d]">
-        <h2 className="text-[11px] font-semibold uppercase tracking-wide text-zinc-500">Members — {members.length}</h2>
+    <div className="w-60 h-full overflow-y-auto scrollbar-none" style={{ background: P.surface }}>
+      {/* Header with counts */}
+      <div className="sticky top-0 z-10 px-4 py-3" style={{ background: P.surface }}>
+        <span className="text-[11px] font-medium" style={{ color: P.muted }}>
+          {onlineCount} Online · {members.length} Members
+        </span>
       </div>
-      
-      <div className="p-2 space-y-4">
-        {groupedMembers.map((group) => (
-          <div key={group.role.id}>
-            <h3 className="px-2 mb-1 text-[9px] font-medium uppercase tracking-wider text-zinc-600">
-              {group.role.name} — {group.members.length}
-            </h3>
-            <div className="space-y-0">
-              {group.members.map((member, idx) => (
-                <MemberItem
-                  key={member.user_id || member.id || `member-${idx}`}
-                  member={member}
-                  isOwner={member.user_id === ownerId}
+
+      <div className="px-2 pb-4 space-y-3">
+        {groupedMembers.map((group) => {
+          const isOffline = group.role.id === 'offline';
+          const showMembers = isOffline ? offlineExpanded : true;
+
+          return (
+            <div key={group.role.id}>
+              <button
+                onClick={isOffline ? () => setOfflineExpanded(e => !e) : undefined}
+                className="flex items-center gap-2 px-2 mb-1 w-full text-left"
+                style={{ cursor: isOffline ? 'pointer' : 'default' }}>
+                <div className="w-0.5 h-3 rounded-full flex-shrink-0" style={{ background: group.role.color }} />
+                <span className="text-[10px] font-semibold uppercase tracking-[0.08em]"
+                  style={{ color: P.muted }}>
+                  {group.role.name} — {group.members.length}
+                </span>
+                {isOffline && (
+                  <span className="ml-auto text-[10px]" style={{ color: P.muted }}>
+                    {offlineExpanded ? '▾' : '▸'}
+                  </span>
+                )}
+              </button>
+              {showMembers && group.members.map((member, idx) => (
+                <MemberItem key={member.user_id || member.id || `m-${idx}`}
+                  member={member} isOwner={member.user_id === ownerId}
                   highestRole={member.highestRole}
-                  onMessage={onMemberMessage}
-                  onProfile={onMemberProfile}
-                />
+                  onMessage={onMemberMessage} onProfile={onMemberProfile}
+                  ownerId={ownerId} />
               ))}
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

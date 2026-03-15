@@ -11,7 +11,7 @@ export default function ScreenSharePopup({ onConfirm, onCancel }) {
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.92 }}
         transition={{ duration: 0.15 }}
-        className="w-[380px] rounded-xl overflow-hidden"
+        className="w-[380px] max-w-[calc(100vw-32px)] rounded-xl overflow-hidden"
         style={{ background: colors.bg.modal, border: `1px solid ${colors.border.strong}`, boxShadow: '0 16px 64px rgba(0,0,0,0.7)' }}>
 
         {/* Header accent bar */}
@@ -21,7 +21,7 @@ export default function ScreenSharePopup({ onConfirm, onCancel }) {
           {/* Icon */}
           <div className="flex items-center justify-center mb-4">
             <div className="w-14 h-14 rounded-2xl flex items-center justify-center"
-              style={{ background: 'rgba(88,101,242,0.1)', border: `1px solid rgba(88,101,242,0.2)` }}>
+              style={{ background: 'rgba(123,108,246,0.1)', border: `1px solid rgba(123,108,246,0.2)` }}>
               <Monitor className="w-7 h-7" style={{ color: colors.accent.primary }} />
             </div>
           </div>

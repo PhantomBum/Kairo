@@ -49,7 +49,7 @@ export default function GrowthTab({ members }) {
           {growth.days.map((d, i) => (
             <div key={i} className="flex-1 rounded-t transition-all hover:opacity-80 group relative"
               style={{ height: `${Math.max((d.count / growth.maxDay) * 100, 3)}%`, background: d.count > 0 ? colors.accent.primary : colors.bg.overlay }}>
-              <div className="absolute -top-7 left-1/2 -translate-x-1/2 px-1.5 py-0.5 rounded text-[9px] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
+              <div className="absolute -top-7 left-1/2 -translate-x-1/2 px-1.5 py-0.5 rounded text-[11px] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
                 style={{ background: colors.bg.modal, color: colors.text.primary }}>{d.label}: {d.count}</div>
             </div>
           ))}
@@ -62,7 +62,7 @@ export default function GrowthTab({ members }) {
         <div className="space-y-2">
           {growth.recentJoins.map(m => (
             <div key={m.id} className="flex items-center gap-2.5 text-[12px]">
-              <div className="w-6 h-6 rounded-full flex items-center justify-center text-[10px]" style={{ background: colors.bg.overlay, color: colors.text.muted }}>
+              <div className="w-6 h-6 rounded-full flex items-center justify-center text-[11px]" style={{ background: colors.bg.overlay, color: colors.text.muted }}>
                 {(m.user_email || '?').charAt(0).toUpperCase()}
               </div>
               <span className="flex-1 truncate" style={{ color: colors.text.primary }}>{m.user_email?.split('@')[0] || 'User'}</span>

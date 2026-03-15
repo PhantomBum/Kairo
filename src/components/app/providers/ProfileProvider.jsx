@@ -26,8 +26,10 @@ export function ProfileProvider({ children }) {
     return map[id] || map[String(id).toLowerCase()] || null;
   }, [map]);
 
+  const value = useMemo(() => ({ profiles, map, getProfile, refresh: refetch }), [profiles, map, getProfile, refetch]);
+
   return (
-    <Ctx.Provider value={{ profiles, map, getProfile, refresh: refetch }}>
+    <Ctx.Provider value={value}>
       {children}
     </Ctx.Provider>
   );

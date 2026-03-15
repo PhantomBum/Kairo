@@ -108,7 +108,7 @@ export function ExportBlueprintModal({ server, isOpen, onClose }) {
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="relative w-full max-w-lg mx-4 bg-[#121214] rounded-xl shadow-2xl overflow-hidden max-h-[85vh] flex flex-col"
+        className="relative w-full max-w-lg mx-4 bg-[#121214] rounded-xl shadow-2xl overflow-y-auto max-h-[85vh] flex flex-col"
       >
         <div className="p-6 border-b border-zinc-800">
           <div className="flex items-center justify-between">

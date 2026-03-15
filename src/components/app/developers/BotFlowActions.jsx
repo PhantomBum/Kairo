@@ -112,7 +112,7 @@ export default function BotFlowActions({ bot, onSave }) {
             <div className="px-4 pb-4 space-y-4" style={{ borderTop: '1px solid var(--border)' }}>
               {/* Trigger */}
               <div className="pt-3">
-                <label className="text-[9px] font-semibold uppercase tracking-[0.08em] block mb-1.5" style={{ color: 'var(--accent-green)', fontFamily: 'monospace' }}>Trigger</label>
+                <label className="text-[11px] font-semibold uppercase tracking-[0.08em] block mb-1.5" style={{ color: 'var(--accent-green)', fontFamily: 'monospace' }}>Trigger</label>
                 <div className="grid grid-cols-2 gap-2">
                   <select value={flow.trigger_type} onChange={e => updateFlow(flow.id, { trigger_type: e.target.value })}
                     className="px-2.5 py-1.5 rounded-lg text-[12px] outline-none" style={{ background: 'var(--bg-glass-strong)', color: 'var(--text-primary)', border: '1px solid var(--border)' }}>
@@ -127,10 +127,10 @@ export default function BotFlowActions({ bot, onSave }) {
               {/* Conditions */}
               <div>
                 <div className="flex items-center justify-between mb-1.5">
-                  <label className="text-[9px] font-semibold uppercase tracking-[0.08em] flex items-center gap-1" style={{ color: 'var(--accent-amber)', fontFamily: 'monospace' }}>
+                  <label className="text-[11px] font-semibold uppercase tracking-[0.08em] flex items-center gap-1" style={{ color: 'var(--accent-amber)', fontFamily: 'monospace' }}>
                     <Filter className="w-3 h-3" /> Conditions
                   </label>
-                  <button onClick={() => addCondition(flow.id)} className="text-[10px] flex items-center gap-1" style={{ color: 'var(--accent-blue)' }}><Plus className="w-3 h-3" />Add</button>
+                  <button onClick={() => addCondition(flow.id)} className="text-[11px] flex items-center gap-1" style={{ color: 'var(--accent-blue)' }}><Plus className="w-3 h-3" />Add</button>
                 </div>
                 {(flow.conditions || []).map((cond, idx) => (
                   <div key={idx} className="flex items-center gap-2 mb-1.5">
@@ -153,10 +153,10 @@ export default function BotFlowActions({ bot, onSave }) {
               {/* Actions */}
               <div>
                 <div className="flex items-center justify-between mb-1.5">
-                  <label className="text-[9px] font-semibold uppercase tracking-[0.08em] flex items-center gap-1" style={{ color: 'var(--accent-blue)', fontFamily: 'monospace' }}>
+                  <label className="text-[11px] font-semibold uppercase tracking-[0.08em] flex items-center gap-1" style={{ color: 'var(--accent-blue)', fontFamily: 'monospace' }}>
                     <ArrowRight className="w-3 h-3" /> Actions
                   </label>
-                  <button onClick={() => addAction(flow.id)} className="text-[10px] flex items-center gap-1" style={{ color: 'var(--accent-blue)' }}><Plus className="w-3 h-3" />Add</button>
+                  <button onClick={() => addAction(flow.id)} className="text-[11px] flex items-center gap-1" style={{ color: 'var(--accent-blue)' }}><Plus className="w-3 h-3" />Add</button>
                 </div>
                 {flow.actions.map((action, idx) => (
                   <div key={idx} className="flex items-center gap-2 mb-2 p-2 rounded-lg" style={{ background: 'var(--bg-glass-strong)', border: '1px solid var(--border)' }}>

@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Server, Globe, LogIn, Eye, Trash2, Edit3, Plus, Hash, Volume2 } from 'lucide-react';
+import { Server, Globe, LogIn, Eye, Trash2, Edit3, Plus, Hash, Volume2, Star, StarOff } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { colors } from '@/components/app/design/tokens';
+import moment from 'moment';
 
 export default function AdminServers({ allServers, allMembers, allProfiles, enrichedUsers, search, onRefresh, showFeedback, currentUser }) {
   const [editingServer, setEditingServer] = useState(null);
@@ -23,7 +24,7 @@ export default function AdminServers({ allServers, allMembers, allProfiles, enri
   };
 
   const handleDeleteServer = async (s) => {
-    if (!confirm(`Permanently delete "${s.name}" and all its data?`)) return;
+    if (!confirm(`Permanently delete "${s.name}"? This deletes all its data and can't be undone.`)) return;
     const serverMembers = allMembers.filter(m => m.server_id === s.id);
     for (const m of serverMembers) await base44.entities.ServerMember.delete(m.id);
     const channels = await base44.entities.Channel.filter({ server_id: s.id });
@@ -47,6 +48,18 @@ export default function AdminServers({ allServers, allMembers, allProfiles, enri
     onRefresh();
   };
 
+  const handleFeatureOnDiscovery = async (s) => {
+    await base44.entities.Server.update(s.id, { is_featured: true, is_public: true });
+    showFeedback(`Featured ${s.name} on Discovery`);
+    onRefresh();
+  };
+
+  const handleRemoveFromDiscovery = async (s) => {
+    await base44.entities.Server.update(s.id, { is_featured: false });
+    showFeedback(`Removed ${s.name} from Discovery`);
+    onRefresh();
+  };
+
   const handleAddChannel = async () => {
     if (!addingChannel || !channelForm.name.trim()) return;
     await base44.entities.Channel.create({ server_id: addingChannel, name: channelForm.name.trim(), type: channelForm.type, position: 0 });
@@ -65,7 +78,6 @@ export default function AdminServers({ allServers, allMembers, allProfiles, enri
 
   return (
     <div className="space-y-1">
-      {/* Inline edit form */}
       {editingServer && (
         <div className="p-4 rounded-xl mb-3 space-y-3 k-fade-in" style={{ background: colors.bg.elevated, border: `1px solid ${colors.accent.subtle}` }}>
           <p className="text-[12px] font-semibold uppercase tracking-wider" style={{ color: colors.accent.primary }}>Edit Server</p>
@@ -84,7 +96,6 @@ export default function AdminServers({ allServers, allMembers, allProfiles, enri
         </div>
       )}
 
-      {/* Add channel form */}
       {addingChannel && (
         <div className="p-4 rounded-xl mb-3 space-y-3 k-fade-in" style={{ background: colors.bg.elevated, border: `1px solid ${colors.accent.subtle}` }}>
           <p className="text-[12px] font-semibold uppercase tracking-wider" style={{ color: colors.success }}>Add Channel to {allServers.find(s => s.id === addingChannel)?.name}</p>
@@ -112,6 +123,7 @@ export default function AdminServers({ allServers, allMembers, allProfiles, enri
         const onlineInServer = serverMembers.filter(m => { const prof = allProfiles.find(p => p.user_id === m.user_id); return prof?.is_online; });
         const owner = enrichedUsers.find(u => u.id === s.owner_id);
         const amMember = serverMembers.some(m => m.user_email === currentUser.email);
+        const isFeatured = s.is_featured;
         return (
           <div key={s.id} className="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors hover:bg-[rgba(255,255,255,0.02)] group">
             <div className="w-9 h-9 rounded-xl overflow-hidden flex items-center justify-center text-[12px] font-semibold flex-shrink-0"
@@ -119,20 +131,34 @@ export default function AdminServers({ allServers, allMembers, allProfiles, enri
               {s.icon_url ? <img src={s.icon_url} className="w-full h-full object-cover" alt="" /> : (s.name || '?').slice(0, 2).toUpperCase()}
             </div>
             <div className="flex-1 min-w-0">
-              <span className="text-[13px] font-semibold truncate block" style={{ color: colors.text.primary }}>{s.name}</span>
+              <div className="flex items-center gap-1.5">
+                <span className="text-[13px] font-semibold truncate" style={{ color: colors.text.primary }}>{s.name}</span>
+                {isFeatured && <Star className="w-3 h-3 flex-shrink-0" style={{ color: '#f0b232' }} />}
+              </div>
               <div className="flex items-center gap-2">
                 <span className="text-[11px]" style={{ color: colors.text.disabled }}>{serverMembers.length} members · {onlineInServer.length} online</span>
-                {owner && <span className="text-[10px]" style={{ color: colors.text.disabled }}>· Owner: {owner.displayName}</span>}
+                {owner && <span className="text-[11px]" style={{ color: colors.text.disabled }}>· Owner: {owner.displayName}</span>}
+                {s.created_date && <span className="text-[11px]" style={{ color: colors.text.disabled }}>· {moment(s.created_date).format('MMM D, YYYY')}</span>}
               </div>
             </div>
-            {s.is_public && <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ background: 'rgba(59,165,93,0.12)', color: colors.status.online }}>Public</span>}
+            {s.is_public && <span className="text-[11px] px-2 py-0.5 rounded-full" style={{ background: 'rgba(59,165,93,0.12)', color: colors.status.online }}>Public</span>}
+            {s.boost_level > 0 && <span className="text-[11px] px-2 py-0.5 rounded-full" style={{ background: 'rgba(240,178,50,0.12)', color: '#f0b232' }}>Lvl {s.boost_level}</span>}
             <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
-              <button onClick={() => startEdit(s)} className="p-1.5 rounded-md transition-colors hover:bg-[rgba(88,101,242,0.15)]" title="Edit server">
+              <button onClick={() => startEdit(s)} className="p-1.5 rounded-md transition-colors hover:bg-[rgba(123,108,246,0.15)]" title="Edit server">
                 <Edit3 className="w-3.5 h-3.5" style={{ color: colors.accent.primary }} />
               </button>
               <button onClick={() => setAddingChannel(s.id)} className="p-1.5 rounded-md transition-colors hover:bg-[rgba(59,165,93,0.12)]" title="Add channel">
                 <Plus className="w-3.5 h-3.5" style={{ color: colors.success }} />
               </button>
+              {isFeatured ? (
+                <button onClick={() => handleRemoveFromDiscovery(s)} className="p-1.5 rounded-md transition-colors hover:bg-[rgba(237,66,69,0.12)]" title="Remove from Discovery">
+                  <StarOff className="w-3.5 h-3.5" style={{ color: colors.danger }} />
+                </button>
+              ) : (
+                <button onClick={() => handleFeatureOnDiscovery(s)} className="p-1.5 rounded-md transition-colors hover:bg-[rgba(240,178,50,0.12)]" title="Feature on Discovery">
+                  <Star className="w-3.5 h-3.5" style={{ color: '#f0b232' }} />
+                </button>
+              )}
               {!amMember && (
                 <button onClick={() => handleAdminJoinServer(s.id)} className="p-1.5 rounded-md transition-colors hover:bg-[rgba(59,165,93,0.12)]" title="Join as admin">
                   <LogIn className="w-3.5 h-3.5" style={{ color: colors.success }} />

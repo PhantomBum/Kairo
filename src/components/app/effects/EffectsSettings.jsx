@@ -42,7 +42,7 @@ export default function EffectsSettings({ currentEffect = 'none', hasElite = fal
       <div>
         <p className="text-[11px] font-bold uppercase tracking-wider mb-2" style={{ color: colors.text.muted }}>Preview</p>
         <div className="h-20 rounded-lg overflow-hidden relative"
-          style={{ background: bannerUrl ? `url(${bannerUrl}) center/cover` : `linear-gradient(135deg, ${accentColor || '#5865F2'}, ${accentColor || '#5865F2'}60 60%, ${colors.bg.modal})` }}>
+          style={{ background: bannerUrl ? `url(${bannerUrl}) center/cover` : `linear-gradient(135deg, ${accentColor || '#2dd4bf'}, ${accentColor || '#2dd4bf'}60 60%, ${colors.bg.modal})` }}>
           {selected !== 'none' && <ProfileEffectCanvas effect={selected} width={500} height={80} />}
         </div>
         <p className="text-[11px] mt-1.5" style={{ color: colors.text.muted }}>

@@ -15,7 +15,9 @@ function useRateLimit(maxActions, windowMs) {
 export function useOptimisticMessages() {
   const [optimisticMsgs, setOptimisticMsgs] = useState([]);
   const [optimisticIds, setOptimisticIds] = useState(new Set());
-  const checkRate = useRateLimit(5, 5000); // 5 msgs per 5 seconds
+  const [failedIds, setFailedIds] = useState(new Set());
+  const failedPayloads = useRef(new Map());
+  const checkRate = useRateLimit(5, 5000);
 
   const addOptimistic = useCallback((msg) => {
     if (!checkRate()) return { allowed: false };
@@ -23,10 +25,11 @@ export function useOptimisticMessages() {
     const optimisticMsg = { ...msg, id: tempId, created_date: new Date().toISOString() };
     setOptimisticMsgs(prev => [...prev, optimisticMsg]);
     setOptimisticIds(prev => new Set([...prev, tempId]));
-    // Auto-expire optimistic messages after 15s to prevent ghosts
     setTimeout(() => {
       setOptimisticMsgs(prev => prev.filter(m => m.id !== tempId));
       setOptimisticIds(prev => { const next = new Set(prev); next.delete(tempId); return next; });
+      setFailedIds(prev => { const next = new Set(prev); next.delete(tempId); return next; });
+      failedPayloads.current.delete(tempId);
     }, 15000);
     return { allowed: true, tempId };
   }, [checkRate]);
@@ -34,14 +37,32 @@ export function useOptimisticMessages() {
   const confirmOptimistic = useCallback((tempId) => {
     setOptimisticMsgs(prev => prev.filter(m => m.id !== tempId));
     setOptimisticIds(prev => { const next = new Set(prev); next.delete(tempId); return next; });
+    setFailedIds(prev => { const next = new Set(prev); next.delete(tempId); return next; });
+    failedPayloads.current.delete(tempId);
   }, []);
 
-  const revertOptimistic = useCallback((tempId) => {
-    setOptimisticMsgs(prev => prev.filter(m => m.id !== tempId));
+  const revertOptimistic = useCallback((tempId, payload) => {
     setOptimisticIds(prev => { const next = new Set(prev); next.delete(tempId); return next; });
+    setFailedIds(prev => new Set([...prev, tempId]));
+    if (payload) failedPayloads.current.set(tempId, { ...payload, _tempId: tempId });
   }, []);
 
-  return { optimisticMsgs, optimisticIds, addOptimistic, confirmOptimistic, revertOptimistic };
+  const retryFailed = useCallback((tempId) => {
+    const payload = failedPayloads.current.get(tempId);
+    if (!payload) return null;
+    setFailedIds(prev => { const next = new Set(prev); next.delete(tempId); return next; });
+    setOptimisticIds(prev => new Set([...prev, tempId]));
+    failedPayloads.current.delete(tempId);
+    return payload;
+  }, []);
+
+  const clearFailed = useCallback((tempId) => {
+    setOptimisticMsgs(prev => prev.filter(m => m.id !== tempId));
+    setFailedIds(prev => { const next = new Set(prev); next.delete(tempId); return next; });
+    failedPayloads.current.delete(tempId);
+  }, []);
+
+  return { optimisticMsgs, optimisticIds, failedIds, addOptimistic, confirmOptimistic, revertOptimistic, retryFailed, clearFailed };
 }
 
 export function useOptimisticReaction() {

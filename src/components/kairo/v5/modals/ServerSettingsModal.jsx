@@ -237,7 +237,7 @@ export default function ServerSettingsModal({ isOpen, onClose, server, members =
           {activeTab === 'members' && <MembersTab server={server} members={members} />}
           {!['overview', 'roles', 'members'].includes(activeTab) && (
             <div className="text-center py-12">
-              <p className="text-zinc-500">Coming soon</p>
+              <p className="text-zinc-500">No additional settings for this section.</p>
             </div>
           )}
         </div>

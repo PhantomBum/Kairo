@@ -68,7 +68,7 @@ export default function MentionPicker({ filter, members, onSelect, profiles }) {
               <button key={m.id} onClick={() => onSelect(m)}
                 onMouseEnter={() => setSelectedIdx(i)}
                 className="w-full flex items-center gap-3 px-3 py-2.5 text-left transition-colors"
-                style={{ background: i === selectedIdx ? 'rgba(88,101,242,0.12)' : 'transparent' }}>
+                style={{ background: i === selectedIdx ? 'rgba(123,108,246,0.12)' : 'transparent' }}>
                 <div className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0"
                   style={{ background: `${colors.accent.primary}20` }}>
                   <Icon className="w-4 h-4" style={{ color: colors.accent.primary }} />
@@ -84,7 +84,7 @@ export default function MentionPicker({ filter, members, onSelect, profiles }) {
             <button key={m.id || m.user_id} onClick={() => onSelect(m)}
               onMouseEnter={() => setSelectedIdx(i)}
               className="w-full flex items-center gap-3 px-3 py-2 text-left transition-colors"
-              style={{ background: i === selectedIdx ? 'rgba(88,101,242,0.1)' : 'transparent' }}>
+              style={{ background: i === selectedIdx ? 'rgba(123,108,246,0.1)' : 'transparent' }}>
               <div className="w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-semibold overflow-hidden flex-shrink-0"
                 style={{ background: colors.bg.elevated, color: colors.text.muted }}>
                 {m.avatar ? <img src={m.avatar} className="w-full h-full object-cover" alt="" /> : m.displayName.charAt(0).toUpperCase()}

@@ -2,13 +2,44 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="https://base44.com/logo_v2.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content" />
+    <meta name="theme-color" content="#141417" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Kairo" />
+    <link rel="apple-touch-icon" href="/favicon.svg" />
     <link rel="manifest" href="/manifest.json" />
-    <title>Base44 APP</title>
+    <title>Kairo</title>
+    <style>
+      html, body { background: #0f0f12; margin: 0; overscroll-behavior: none; overflow: hidden; height: 100%; }
+      #root { height: 100%; }
+      #app-error { display: none; color: #a09fad; font-family: Inter, system-ui, sans-serif;
+        text-align: center; padding-top: 20vh; }
+      #app-error h1 { color: #f0eff4; font-size: 20px; margin-bottom: 8px; }
+      #app-error p { font-size: 14px; margin-bottom: 16px; }
+      #app-error button { background: #7c6df0; color: #fff; border: none; padding: 10px 24px;
+        border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; }
+      @supports (padding: env(safe-area-inset-bottom)) {
+        .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
+        .safe-top { padding-top: env(safe-area-inset-top); }
+      }
+    </style>
   </head>
   <body>
     <div id="root"></div>
+    <div id="app-error">
+      <h1>Kairo failed to load</h1>
+      <p id="app-error-msg">Something went wrong. Check the console (F12) for details.</p>
+      <button onclick="location.reload()">Reload</button>
+    </div>
     <script type="module" src="/src/main.jsx"></script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js').catch(() => {});
+        });
+      }
+    </script>
   </body>
 </html>

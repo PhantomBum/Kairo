@@ -1,0 +1,16 @@
+{
+  "name": "Kairo",
+  "short_name": "Kairo",
+  "description": "The next generation communication platform",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#18181c",
+  "background_color": "#18181c",
+  "icons": [
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ],
+  "categories": ["social", "communication"],
+  "scope": "/",
+  "lang": "en"
+}

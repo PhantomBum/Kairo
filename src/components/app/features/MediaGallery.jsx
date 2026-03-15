@@ -66,8 +66,8 @@ export default function MediaGallery({ onClose, messages = [], channelName }) {
                 <img src={item.url} className="w-full h-full object-cover" alt={item.filename || 'Image'} loading="lazy" />
                 <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-2">
                   <div className="flex-1 min-w-0">
-                    <p className="text-[10px] truncate text-white/80">{item.author}</p>
-                    <p className="text-[9px] text-white/50">{new Date(item.date).toLocaleDateString()}</p>
+                    <p className="text-[11px] truncate text-white/80">{item.author}</p>
+                    <p className="text-[11px] text-white/50">{new Date(item.date).toLocaleDateString()}</p>
                   </div>
                 </div>
               </button>
@@ -82,7 +82,7 @@ export default function MediaGallery({ onClose, messages = [], channelName }) {
                 <video src={item.url} controls className="w-full aspect-video" />
                 <div className="p-2">
                   <p className="text-[12px] truncate" style={{ color: colors.text.secondary }}>{item.filename || 'Video'}</p>
-                  <p className="text-[10px]" style={{ color: colors.text.muted }}>{item.author} · {new Date(item.date).toLocaleDateString()}</p>
+                  <p className="text-[11px]" style={{ color: colors.text.muted }}>{item.author} · {new Date(item.date).toLocaleDateString()}</p>
                 </div>
               </div>
             ))}

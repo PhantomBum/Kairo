@@ -135,7 +135,7 @@ export default function RolesTab({ roles, members, onAddRole, onUpdateRole, onDe
             style={{ background: colors.accent.primary, color: '#fff' }}><Plus className="w-4 h-4" /></button>
         </div>
 
-        <p className="text-[10px] font-bold uppercase tracking-wider px-1 mb-1" style={{ color: colors.text.disabled }}>Templates</p>
+        <p className="text-[11px] font-bold uppercase tracking-wider px-1 mb-1" style={{ color: colors.text.disabled }}>Templates</p>
         <div className="flex flex-wrap gap-1 mb-3">
           {ROLE_TEMPLATES.map(t => (
             <button key={t.name} onClick={() => onAddRole(t.name, t.color)}
@@ -170,7 +170,7 @@ export default function RolesTab({ roles, members, onAddRole, onUpdateRole, onDe
             <div className="flex items-center gap-3 mb-2">
               <div className="w-8 h-8 rounded-full" style={{ background: getGradient(editing) || editing.color }} />
               <h3 className="text-[16px] font-bold" style={roleStyle(editing)}>{editing.name}</h3>
-              {editing.is_default && <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ background: colors.bg.overlay, color: colors.text.muted }}>Default</span>}
+              {editing.is_default && <span className="text-[11px] px-2 py-0.5 rounded-full" style={{ background: colors.bg.overlay, color: colors.text.muted }}>Default</span>}
             </div>
 
             {!editing.is_default && (

@@ -48,13 +48,13 @@ function PinCard({ message, onUnpin, onJump }) {
       <div className="p-3">
         {/* Author row */}
         <div className="flex items-center gap-2 mb-2">
-          <div className="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-semibold overflow-hidden flex-shrink-0"
+          <div className="w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-semibold overflow-hidden flex-shrink-0"
             style={{ background: colors.bg.overlay, color: colors.text.muted }}>
             {message.author_avatar ? <img src={message.author_avatar} className="w-full h-full object-cover" alt="" /> : (message.author_name || 'U')[0].toUpperCase()}
           </div>
           <div className="flex-1 min-w-0">
             <span className="text-[12px] font-semibold block truncate" style={{ color: colors.text.primary }}>{message.author_name}</span>
-            <span className="text-[10px]" style={{ color: colors.text.disabled }}>{new Date(message.created_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' })}</span>
+            <span className="text-[11px]" style={{ color: colors.text.disabled }}>{new Date(message.created_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' })}</span>
           </div>
         </div>
 
@@ -73,7 +73,7 @@ function PinCard({ message, onUnpin, onJump }) {
             {a.content_type?.startsWith('audio/') ? <Music className="w-4 h-4 flex-shrink-0" style={{ color: '#f0b232' }} /> : <FileText className="w-4 h-4 flex-shrink-0" style={{ color: colors.accent.primary }} />}
             <div className="flex-1 min-w-0">
               <span className="text-[12px] font-medium block truncate" style={{ color: colors.text.primary }}>{a.filename || 'File'}</span>
-              {a.size && <span className="text-[10px]" style={{ color: colors.text.disabled }}>{(a.size / 1024).toFixed(1)} KB</span>}
+              {a.size && <span className="text-[11px]" style={{ color: colors.text.disabled }}>{(a.size / 1024).toFixed(1)} KB</span>}
             </div>
             <Download className="w-3.5 h-3.5 flex-shrink-0" style={{ color: colors.text.muted }} />
           </a>
@@ -92,12 +92,12 @@ function PinCard({ message, onUnpin, onJump }) {
         {/* Action buttons */}
         <div className="flex items-center gap-1.5 mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
           {onJump && (
-            <button onClick={() => onJump(message)} className="flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-medium hover:bg-[rgba(255,255,255,0.06)]"
+            <button onClick={() => onJump(message)} className="flex items-center gap-1 px-2 py-1 rounded-md text-[11px] font-medium hover:bg-[rgba(255,255,255,0.06)]"
               style={{ color: colors.text.link }}>
               <ExternalLink className="w-3 h-3" /> Jump
             </button>
           )}
-          <button onClick={() => onUnpin(message)} className="flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-medium hover:bg-[rgba(237,66,69,0.08)]"
+          <button onClick={() => onUnpin(message)} className="flex items-center gap-1 px-2 py-1 rounded-md text-[11px] font-medium hover:bg-[rgba(237,66,69,0.08)]"
             style={{ color: colors.danger }}>
             <PinOff className="w-3 h-3" /> Unpin
           </button>

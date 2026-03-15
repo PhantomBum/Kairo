@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { WifiOff, Wifi, AlertCircle } from 'lucide-react';
+import { WifiOff, Wifi } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { colors } from '@/components/app/design/tokens';
 
@@ -10,6 +10,7 @@ export default function ConnectionBanner() {
   const [retrying, setRetrying] = useState(false);
   const retryCount = useRef(0);
   const retryTimer = useRef(null);
+  const reconnectTimer = useRef(null);
 
   useEffect(() => {
     const onOnline = () => {
@@ -17,7 +18,8 @@ export default function ConnectionBanner() {
       retryCount.current = 0;
       if (wasOffline) {
         setShowReconnected(true);
-        setTimeout(() => setShowReconnected(false), 3000);
+        clearTimeout(reconnectTimer.current);
+        reconnectTimer.current = setTimeout(() => setShowReconnected(false), 3000);
       }
       setWasOffline(false);
       setRetrying(false);
@@ -28,7 +30,8 @@ export default function ConnectionBanner() {
     return () => {
       window.removeEventListener('online', onOnline);
       window.removeEventListener('offline', onOffline);
-      if (retryTimer.current) clearTimeout(retryTimer.current);
+      clearTimeout(retryTimer.current);
+      clearTimeout(reconnectTimer.current);
     };
   }, [wasOffline]);
 
@@ -36,14 +39,14 @@ export default function ConnectionBanner() {
     if (retrying) return;
     setRetrying(true);
     retryCount.current++;
-    // Exponential backoff: 1s, 2s, 4s, max 8s
     const delay = Math.min(1000 * Math.pow(2, retryCount.current - 1), 8000);
     retryTimer.current = setTimeout(() => {
       if (navigator.onLine) {
         setOnline(true);
         setWasOffline(false);
         setShowReconnected(true);
-        setTimeout(() => setShowReconnected(false), 3000);
+        clearTimeout(reconnectTimer.current);
+        reconnectTimer.current = setTimeout(() => setShowReconnected(false), 3000);
       }
       setRetrying(false);
     }, delay);
@@ -61,7 +64,7 @@ export default function ConnectionBanner() {
           style={{ background: colors.danger }}
           role="alert" aria-live="assertive">
           <WifiOff className="w-4 h-4 text-white flex-shrink-0" />
-          <span className="text-[13px] font-medium text-white">No connection — messages will send when you reconnect</span>
+          <span className="text-[13px] font-medium text-white">You're offline. Messages will send when you reconnect.</span>
           <button onClick={handleRetry} disabled={retrying}
             className="ml-2 px-3 py-1 rounded-md text-[12px] font-semibold text-white hover:bg-[rgba(255,255,255,0.25)] disabled:opacity-50"
             style={{ background: 'rgba(255,255,255,0.2)' }}>
@@ -79,7 +82,7 @@ export default function ConnectionBanner() {
           style={{ background: colors.success }}
           role="status">
           <Wifi className="w-4 h-4 text-white flex-shrink-0" />
-          <span className="text-[13px] font-medium text-white">Connected — you're back online</span>
+          <span className="text-[13px] font-medium text-white">You're back online!</span>
         </motion.div>
       )}
     </AnimatePresence>

@@ -398,7 +398,7 @@ export default function SettingsModal({ isOpen, onClose, profile, onUpdateProfil
       default:
         return (
           <div className="flex flex-col items-center justify-center h-full text-zinc-500">
-            <p>Coming soon...</p>
+            <p>No additional settings for this section.</p>
           </div>
         );
     }

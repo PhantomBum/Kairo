@@ -91,6 +91,10 @@ export default function VideoPlayer({ src, filename, poster, maxWidth = 400, max
     return () => document.removeEventListener('fullscreenchange', onFSChange);
   }, []);
 
+  useEffect(() => {
+    return () => clearTimeout(hideTimer.current);
+  }, []);
+
   const handleMouseMove = () => {
     setShowControls(true);
     clearTimeout(hideTimer.current);

@@ -24,7 +24,7 @@ function RailIcon({ active, onClick, tooltip, badge, children }) {
         }}>
         {children}
         {badge > 0 && (
-          <div className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 rounded-full text-[9px] font-bold flex items-center justify-center"
+          <div className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 rounded-full text-[11px] font-bold flex items-center justify-center"
             style={{ background: colors.danger, color: '#fff' }}>{badge > 9 ? '9+' : badge}</div>
         )}
       </button>

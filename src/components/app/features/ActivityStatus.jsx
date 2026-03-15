@@ -6,7 +6,7 @@ import ModalWrapper from '@/components/app/modals/ModalWrapper';
 const TYPES = [
   { id: 'playing', label: 'Playing', icon: Gamepad2, color: '#23a55a' },
   { id: 'listening', label: 'Listening to', icon: Music, color: '#1DB954' },
-  { id: 'watching', label: 'Watching', icon: Eye, color: '#5865f2' },
+  { id: 'watching', label: 'Watching', icon: Eye, color: '#2dd4bf' },
   { id: 'streaming', label: 'Streaming', icon: Radio, color: '#f23f43' },
   { id: 'competing', label: 'Competing in', icon: Trophy, color: '#f0b232' },
 ];
@@ -35,7 +35,7 @@ export default function ActivityStatus({ onClose, profile, onUpdate }) {
             <button key={t.id} onClick={() => setType(t.id)} className="flex flex-col items-center gap-1.5 p-2.5 rounded-lg transition-colors"
               style={{ background: type === t.id ? `${t.color}15` : colors.bg.elevated, border: `2px solid ${type === t.id ? t.color : 'transparent'}` }}>
               <t.icon className="w-5 h-5" style={{ color: type === t.id ? t.color : colors.text.muted }} />
-              <span className="text-[10px]" style={{ color: type === t.id ? t.color : colors.text.muted }}>{t.label.split(' ')[0]}</span>
+              <span className="text-[11px]" style={{ color: type === t.id ? t.color : colors.text.muted }}>{t.label.split(' ')[0]}</span>
             </button>
           ))}
         </div>

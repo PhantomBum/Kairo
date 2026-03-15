@@ -29,7 +29,7 @@ export default function ServerLeaderboard({ server, members }) {
     if (i === 0) return <Crown className="w-4 h-4" style={{ color: '#c9b47b' }} />;
     if (i === 1) return <Medal className="w-4 h-4" style={{ color: '#b0b0b0' }} />;
     if (i === 2) return <Medal className="w-4 h-4" style={{ color: '#cd7f32' }} />;
-    return <span className="text-[10px] font-mono w-4 text-center" style={{ color: 'var(--text-faint)' }}>{i + 1}</span>;
+    return <span className="text-[11px] font-mono w-4 text-center" style={{ color: 'var(--text-faint)' }}>{i + 1}</span>;
   };
 
   if (loading) return (
@@ -58,8 +58,8 @@ export default function ServerLeaderboard({ server, members }) {
                   style={{ width: isFirst ? 56 : 44, height: isFirst ? 56 : 44, background: 'var(--bg-glass-strong)', color: 'var(--text-muted)', border: `2px solid ${idx === 0 ? '#c9b47b' : idx === 1 ? '#b0b0b0' : '#cd7f32'}` }}>
                   {u.avatar ? <img src={u.avatar} className="w-full h-full object-cover" /> : (u.name || '?').charAt(0).toUpperCase()}
                 </div>
-                <span className="text-[10px] font-medium truncate max-w-[60px]" style={{ color: 'var(--text-cream)' }}>{u.name}</span>
-                <span className="text-[9px] font-mono" style={{ color: 'var(--accent-amber)' }}>{u.xp.toLocaleString()} XP</span>
+                <span className="text-[11px] font-medium truncate max-w-[60px]" style={{ color: 'var(--text-cream)' }}>{u.name}</span>
+                <span className="text-[11px] font-mono" style={{ color: 'var(--accent-amber)' }}>{u.xp.toLocaleString()} XP</span>
               </div>
             );
           })}
@@ -73,14 +73,14 @@ export default function ServerLeaderboard({ server, members }) {
           return (
             <div key={u.id} className="flex items-center gap-3 px-3 py-2 rounded-xl transition-colors" style={{ background: i < 3 ? 'var(--bg-glass)' : 'transparent' }}>
               <div className="w-5 flex items-center justify-center">{rankIcon(i)}</div>
-              <div className="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-medium overflow-hidden"
+              <div className="w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-medium overflow-hidden"
                 style={{ background: 'var(--bg-glass-strong)', color: 'var(--text-muted)' }}>
                 {u.avatar ? <img src={u.avatar} className="w-full h-full object-cover" /> : (u.name || '?').charAt(0).toUpperCase()}
               </div>
               <div className="flex-1 min-w-0">
                 <span className="text-[12px] truncate" style={{ color: i < 3 ? 'var(--text-cream)' : 'var(--text-primary)' }}>{u.name}</span>
               </div>
-              <div className="flex items-center gap-3 text-[10px] font-mono" style={{ color: 'var(--text-muted)' }}>
+              <div className="flex items-center gap-3 text-[11px] font-mono" style={{ color: 'var(--text-muted)' }}>
                 <span>{u.messages} msgs</span>
                 <span className="font-semibold" style={{ color: 'var(--accent-amber)' }}>{u.xp.toLocaleString()} XP</span>
               </div>

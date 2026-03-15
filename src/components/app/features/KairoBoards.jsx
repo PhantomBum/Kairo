@@ -4,7 +4,7 @@ import { Plus, X, GripVertical, Calendar, Tag, User, CheckSquare, Square } from 
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { colors, shadows } from '@/components/app/design/tokens';
 
-const LABEL_COLORS = ['#f23f43', '#f0b232', '#23a55a', '#5865f2', '#eb459e', '#7c5cbf', '#00a8fc'];
+const LABEL_COLORS = ['#f87171', '#fbbf24', '#34d399', '#2dd4bf', '#eb459e', '#7c5cbf', '#60a5fa'];
 
 function CardModal({ card, onClose, onUpdate, onDelete, members }) {
   const [title, setTitle] = useState(card.title);
@@ -73,7 +73,7 @@ export default function KairoBoards({ channel, serverId }) {
       b = await base44.entities.Board.create({
         channel_id: channel.id, server_id: serverId,
         columns: [
-          { id: 'todo', name: 'To Do', color: '#5865f2', position: 0 },
+          { id: 'todo', name: 'To Do', color: '#2dd4bf', position: 0 },
           { id: 'progress', name: 'In Progress', color: '#f0b232', position: 1 },
           { id: 'done', name: 'Done', color: '#23a55a', position: 2 },
         ]
@@ -144,8 +144,8 @@ export default function KairoBoards({ channel, serverId }) {
                               <p className="text-[13px] font-medium" style={{ color: colors.text.primary }}>{card.title}</p>
                               {(card.due_date || card.checklist?.length > 0) && (
                                 <div className="flex items-center gap-2 mt-2">
-                                  {card.due_date && <span className="flex items-center gap-1 text-[10px]" style={{ color: colors.text.muted }}><Calendar className="w-3 h-3" />{new Date(card.due_date).toLocaleDateString()}</span>}
-                                  {card.checklist?.length > 0 && <span className="flex items-center gap-1 text-[10px]" style={{ color: colors.text.muted }}><CheckSquare className="w-3 h-3" />{card.checklist.filter(c=>c.done).length}/{card.checklist.length}</span>}
+                                  {card.due_date && <span className="flex items-center gap-1 text-[11px]" style={{ color: colors.text.muted }}><Calendar className="w-3 h-3" />{new Date(card.due_date).toLocaleDateString()}</span>}
+                                  {card.checklist?.length > 0 && <span className="flex items-center gap-1 text-[11px]" style={{ color: colors.text.muted }}><CheckSquare className="w-3 h-3" />{card.checklist.filter(c=>c.done).length}/{card.checklist.length}</span>}
                                 </div>
                               )}
                             </div>

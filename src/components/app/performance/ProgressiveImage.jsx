@@ -22,9 +22,9 @@ export default function ProgressiveImage({ src, alt, className, style, onClick }
     return (
       <div ref={ref} className={`relative overflow-hidden flex flex-col items-center justify-center gap-1 ${className || ''}`} style={{ ...style, background: 'var(--bg-glass-strong)', minHeight: 80 }}>
         <ImageOff className="w-5 h-5 opacity-30" style={{ color: 'var(--text-muted)' }} />
-        <span className="text-[10px]" style={{ color: 'var(--text-muted)' }}>Failed to load</span>
+        <span className="text-[11px]" style={{ color: 'var(--text-muted)' }}>Failed to load</span>
         <button onClick={(e) => { e.stopPropagation(); setError(false); setLoaded(false); }}
-          className="flex items-center gap-1 text-[10px] px-2 py-0.5 rounded hover:bg-[rgba(255,255,255,0.06)]" style={{ color: 'var(--text-muted)' }}>
+          className="flex items-center gap-1 text-[11px] px-2 py-0.5 rounded hover:bg-[rgba(255,255,255,0.06)]" style={{ color: 'var(--text-muted)' }}>
           <RefreshCw className="w-3 h-3" /> Retry
         </button>
       </div>

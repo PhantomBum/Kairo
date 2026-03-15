@@ -24,13 +24,13 @@ export default function BotWelcomeLeave({ bot, onSave }) {
         {welcome.enabled && (
           <>
             <div>
-              <label className="text-[9px] font-semibold uppercase tracking-[0.08em] block mb-1" style={{ color: 'var(--text-muted)', fontFamily: 'monospace' }}>Channel Message</label>
+              <label className="text-[11px] font-semibold uppercase tracking-[0.08em] block mb-1" style={{ color: 'var(--text-muted)', fontFamily: 'monospace' }}>Channel Message</label>
               <textarea value={welcome.message} onChange={e => setWelcome(p => ({ ...p, message: e.target.value }))} rows={3}
                 placeholder="Welcome {user} to {server}! 🎉" className="w-full px-3 py-2 rounded-xl text-sm outline-none resize-none" style={{ background: 'var(--bg-glass-strong)', color: 'var(--text-primary)', border: '1px solid var(--border)' }} />
-              <p className="text-[9px] mt-1" style={{ color: 'var(--text-faint)' }}>Use {'{user}'} for username, {'{server}'} for server name</p>
+              <p className="text-[11px] mt-1" style={{ color: 'var(--text-faint)' }}>Use {'{user}'} for username, {'{server}'} for server name</p>
             </div>
             <div>
-              <label className="text-[9px] font-semibold uppercase tracking-[0.08em] block mb-1" style={{ color: 'var(--text-muted)', fontFamily: 'monospace' }}>DM Message (optional)</label>
+              <label className="text-[11px] font-semibold uppercase tracking-[0.08em] block mb-1" style={{ color: 'var(--text-muted)', fontFamily: 'monospace' }}>DM Message (optional)</label>
               <textarea value={welcome.dm_message} onChange={e => setWelcome(p => ({ ...p, dm_message: e.target.value }))} rows={2}
                 placeholder="Welcome to the server! Check out #rules" className="w-full px-3 py-2 rounded-xl text-sm outline-none resize-none" style={{ background: 'var(--bg-glass-strong)', color: 'var(--text-primary)', border: '1px solid var(--border)' }} />
             </div>
@@ -43,7 +43,7 @@ export default function BotWelcomeLeave({ bot, onSave }) {
         <Toggle label="Enabled" value={leave.enabled} onChange={v => setLeave(p => ({ ...p, enabled: v }))} />
         {leave.enabled && (
           <div>
-            <label className="text-[9px] font-semibold uppercase tracking-[0.08em] block mb-1" style={{ color: 'var(--text-muted)', fontFamily: 'monospace' }}>Leave Message</label>
+            <label className="text-[11px] font-semibold uppercase tracking-[0.08em] block mb-1" style={{ color: 'var(--text-muted)', fontFamily: 'monospace' }}>Leave Message</label>
             <textarea value={leave.message} onChange={e => setLeave(p => ({ ...p, message: e.target.value }))} rows={2}
               placeholder="{user} has left the server. Goodbye! 👋" className="w-full px-3 py-2 rounded-xl text-sm outline-none resize-none" style={{ background: 'var(--bg-glass-strong)', color: 'var(--text-primary)', border: '1px solid var(--border)' }} />
           </div>

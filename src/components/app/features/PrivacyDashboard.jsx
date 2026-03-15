@@ -188,7 +188,7 @@ export default function PrivacyDashboard({ onClose, profile, currentUser, onUpda
                 </div>
                 <button className="px-4 py-2 rounded-lg text-[13px] font-semibold" style={{ background: colors.danger, color: '#fff' }}
                   onClick={async () => {
-                    if (!confirm('Are you absolutely sure? This will permanently delete your account and ALL your data. This action CANNOT be undone.')) return;
+                    if (!confirm("Delete your account? This removes everything \u2014 messages, servers, friends \u2014 and it can't be undone.")) return;
                     if (!confirm('FINAL WARNING: Type "yes" after clicking OK to confirm deletion.')) return;
                     // Delete profile, messages, DMs, friendships
                     const [msgs, dms, friends, profs] = await Promise.all([

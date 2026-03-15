@@ -102,11 +102,11 @@ export default function ServerBackupsModal({ onClose, server, currentUser }) {
     }
 
     setRestoring(null);
-    alert('Server restored successfully. Refresh to see changes.');
+    alert('Server restored! Refresh to see the changes.');
   };
 
   const deleteBackup = async (backup) => {
-    if (!confirm(`Delete backup "${backup.name}"?`)) return;
+    if (!confirm(`Delete the "${backup.name}" backup? You won't be able to restore from it.`)) return;
     await base44.entities.ServerBackup.delete(backup.id);
     loadBackups();
   };
@@ -157,7 +157,7 @@ export default function ServerBackupsModal({ onClose, server, currentUser }) {
                         {moment(b.created_date).fromNow()} by {b.created_by_name || 'Unknown'}
                       </span>
                     </div>
-                    <span className="text-[10px]" style={{ color: colors.text.disabled }}>
+                    <span className="text-[11px]" style={{ color: colors.text.disabled }}>
                       {b.snapshot?.channels?.length || 0} channels · {b.snapshot?.categories?.length || 0} categories · {b.snapshot?.roles?.length || 0} roles
                     </span>
                   </div>

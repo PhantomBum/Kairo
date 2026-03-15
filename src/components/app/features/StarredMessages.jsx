@@ -53,8 +53,8 @@ export default function StarredMessagesPanel({ onClose, currentUserId, onJumpToM
               {starred.map(msg => (
                 <div key={msg.id} className="group rounded-xl p-3 transition-colors hover:bg-[rgba(255,255,255,0.03)]" style={{ background: colors.bg.overlay }}>
                   <div className="flex items-center gap-2 mb-1.5">
-                    <div className="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-semibold overflow-hidden" style={{ background: colors.bg.elevated, color: colors.text.muted }}>
-                      {msg.author_avatar ? <img src={msg.author_avatar} className="w-full h-full object-cover" alt="" /> : (msg.author_name || 'U').charAt(0).toUpperCase()}
+                    <div className="w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-semibold overflow-hidden" style={{ background: colors.bg.elevated, color: colors.text.muted }}>
+                      {msg.author_avatar ? <img src={msg.author_avatar} className="w-full h-full object-cover" alt="" onError={(e) => { e.target.style.display = 'none'; }} /> : (msg.author_name || 'U').charAt(0).toUpperCase()}
                     </div>
                     <span className="text-[13px] font-medium" style={{ color: colors.text.primary }}>{msg.author_name}</span>
                     <span className="text-[11px]" style={{ color: colors.text.disabled }}>{new Date(msg.created_date).toLocaleDateString()}</span>
@@ -64,7 +64,7 @@ export default function StarredMessagesPanel({ onClose, currentUserId, onJumpToM
                       </span>
                     )}
                   </div>
-                  <p className="text-[13px] break-words" style={{ color: colors.text.secondary }}>{msg.content?.slice(0, 200)}{msg.content?.length > 200 ? '...' : ''}</p>
+                  <p className="text-[13px] truncate" style={{ color: colors.text.secondary }}>{msg.content?.slice(0, 200)}{msg.content?.length > 200 ? '...' : ''}</p>
                   <div className="flex items-center gap-1 mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button onClick={() => { onJumpToMessage?.(msg); onClose(); }} className="text-[11px] px-2 py-1 rounded-md flex items-center gap-1 hover:bg-[rgba(255,255,255,0.06)]" style={{ color: colors.text.link }}>
                       <ExternalLink className="w-3 h-3" /> Jump

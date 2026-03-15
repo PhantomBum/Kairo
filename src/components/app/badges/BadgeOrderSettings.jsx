@@ -65,9 +65,9 @@ export default function BadgeOrderSettings({ badges = [], badgeOrder = [], onSav
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-[12px] font-semibold" style={{ color: colors.text.primary }}>{cfg.label}</p>
-                          <p className="text-[10px]" style={{ color: colors.text.muted }}>{cfg.desc}</p>
+                          <p className="text-[11px]" style={{ color: colors.text.muted }}>{cfg.desc}</p>
                         </div>
-                        <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full"
+                        <span className="text-[11px] font-bold px-1.5 py-0.5 rounded-full"
                           style={{ background: `${rarity.color}18`, color: rarity.color }}>
                           {rarity.label}
                         </span>

@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { Plus, Trash2, Eye, EyeOff, Image, Link } from 'lucide-react';
 
-const COLOR_PRESETS = ['#5865f2', '#eb459e', '#57f287', '#fee75c', '#ed4245', '#ffffff', '#7c5cbf', '#00a8fc'];
+const COLOR_PRESETS = ['#2dd4bf', '#eb459e', '#57f287', '#fee75c', '#ed4245', '#ffffff', '#7c5cbf', '#00a8fc'];
 
 function EmbedPreview({ embed }) {
   return (
-    <div className="rounded-lg overflow-hidden" style={{ borderLeft: `4px solid ${embed.color || '#5865f2'}`, background: 'var(--bg-elevated)' }}>
+    <div className="rounded-lg overflow-hidden" style={{ borderLeft: `4px solid ${embed.color || '#2dd4bf'}`, background: 'var(--bg-elevated)' }}>
       <div className="p-3 space-y-2">
         {embed.author_name && (
           <div className="flex items-center gap-2">
@@ -29,7 +29,7 @@ function EmbedPreview({ embed }) {
         {embed.footer && (
           <div className="flex items-center gap-2 pt-1" style={{ borderTop: '1px solid var(--border)' }}>
             {embed.footer_icon && <img src={embed.footer_icon} className="w-4 h-4 rounded-full" alt="" />}
-            <span className="text-[10px]" style={{ color: 'var(--text-muted)' }}>{embed.footer}</span>
+            <span className="text-[11px]" style={{ color: 'var(--text-muted)' }}>{embed.footer}</span>
           </div>
         )}
       </div>
@@ -44,7 +44,7 @@ export default function BotEmbedBuilder({ bot, onSave }) {
   const [saving, setSaving] = useState(false);
 
   const addEmbed = () => {
-    const embed = { id: Date.now().toString(), name: 'New Embed', title: '', description: '', color: '#5865f2', fields: [], author_name: '', footer: '' };
+    const embed = { id: Date.now().toString(), name: 'New Embed', title: '', description: '', color: '#2dd4bf', fields: [], author_name: '', footer: '' };
     setEmbeds(p => [...p, embed]);
     setSelected(embed.id);
   };
@@ -90,7 +90,7 @@ export default function BotEmbedBuilder({ bot, onSave }) {
             <button key={e.id} onClick={() => setSelected(e.id)}
               className="px-3 py-1.5 rounded-lg text-[11px] font-medium whitespace-nowrap flex items-center gap-2 transition-colors"
               style={{ background: selected === e.id ? 'var(--bg-glass-active)' : 'var(--bg-glass)', color: selected === e.id ? 'var(--text-cream)' : 'var(--text-muted)', border: '1px solid var(--border)' }}>
-              <div className="w-2 h-2 rounded-full" style={{ background: e.color || '#5865f2' }} />
+              <div className="w-2 h-2 rounded-full" style={{ background: e.color || '#2dd4bf' }} />
               {e.name || 'Unnamed'}
               <button onClick={(ev) => { ev.stopPropagation(); removeEmbed(e.id); }} className="ml-1 hover:opacity-100 opacity-40">
                 <Trash2 className="w-2.5 h-2.5" />
@@ -113,34 +113,34 @@ export default function BotEmbedBuilder({ bot, onSave }) {
           {/* Editor */}
           <div className="space-y-3 rounded-2xl p-4" style={{ background: 'var(--bg-glass)', border: '1px solid var(--border)' }}>
             <div>
-              <label className="text-[9px] font-semibold uppercase tracking-[0.08em] block mb-1" style={{ color: 'var(--text-muted)', fontFamily: 'monospace' }}>Template Name</label>
+              <label className="text-[11px] font-semibold uppercase tracking-[0.08em] block mb-1" style={{ color: 'var(--text-muted)', fontFamily: 'monospace' }}>Template Name</label>
               <input value={current.name || ''} onChange={e => updateEmbed(current.id, { name: e.target.value })}
                 className="w-full px-2.5 py-1.5 rounded-lg text-[12px] outline-none" style={{ background: 'var(--bg-glass-strong)', color: 'var(--text-primary)', border: '1px solid var(--border)' }} />
             </div>
             <div>
-              <label className="text-[9px] font-semibold uppercase tracking-[0.08em] block mb-1" style={{ color: 'var(--text-muted)', fontFamily: 'monospace' }}>Color</label>
+              <label className="text-[11px] font-semibold uppercase tracking-[0.08em] block mb-1" style={{ color: 'var(--text-muted)', fontFamily: 'monospace' }}>Color</label>
               <div className="flex items-center gap-2">
                 {COLOR_PRESETS.map(c => (
                   <button key={c} onClick={() => updateEmbed(current.id, { color: c })}
                     className="w-6 h-6 rounded-full transition-transform hover:scale-110"
                     style={{ background: c, border: current.color === c ? '2px solid var(--text-cream)' : '2px solid transparent' }} />
                 ))}
-                <input type="color" value={current.color || '#5865f2'} onChange={e => updateEmbed(current.id, { color: e.target.value })}
+                <input type="color" value={current.color || '#2dd4bf'} onChange={e => updateEmbed(current.id, { color: e.target.value })}
                   className="w-6 h-6 rounded-full cursor-pointer border-0" />
               </div>
             </div>
             <div>
-              <label className="text-[9px] font-semibold uppercase tracking-[0.08em] block mb-1" style={{ color: 'var(--text-muted)', fontFamily: 'monospace' }}>Author Name</label>
+              <label className="text-[11px] font-semibold uppercase tracking-[0.08em] block mb-1" style={{ color: 'var(--text-muted)', fontFamily: 'monospace' }}>Author Name</label>
               <input value={current.author_name || ''} onChange={e => updateEmbed(current.id, { author_name: e.target.value })} placeholder="Bot Name"
                 className="w-full px-2.5 py-1.5 rounded-lg text-[12px] outline-none" style={{ background: 'var(--bg-glass-strong)', color: 'var(--text-primary)', border: '1px solid var(--border)' }} />
             </div>
             <div>
-              <label className="text-[9px] font-semibold uppercase tracking-[0.08em] block mb-1" style={{ color: 'var(--text-muted)', fontFamily: 'monospace' }}>Title</label>
+              <label className="text-[11px] font-semibold uppercase tracking-[0.08em] block mb-1" style={{ color: 'var(--text-muted)', fontFamily: 'monospace' }}>Title</label>
               <input value={current.title || ''} onChange={e => updateEmbed(current.id, { title: e.target.value })} placeholder="Embed title"
                 className="w-full px-2.5 py-1.5 rounded-lg text-[12px] outline-none" style={{ background: 'var(--bg-glass-strong)', color: 'var(--text-primary)', border: '1px solid var(--border)' }} />
             </div>
             <div>
-              <label className="text-[9px] font-semibold uppercase tracking-[0.08em] block mb-1" style={{ color: 'var(--text-muted)', fontFamily: 'monospace' }}>Description</label>
+              <label className="text-[11px] font-semibold uppercase tracking-[0.08em] block mb-1" style={{ color: 'var(--text-muted)', fontFamily: 'monospace' }}>Description</label>
               <textarea value={current.description || ''} onChange={e => updateEmbed(current.id, { description: e.target.value })} rows={3}
                 placeholder="Embed description..." className="w-full px-2.5 py-1.5 rounded-lg text-[12px] outline-none resize-none"
                 style={{ background: 'var(--bg-glass-strong)', color: 'var(--text-primary)', border: '1px solid var(--border)' }} />
@@ -149,8 +149,8 @@ export default function BotEmbedBuilder({ bot, onSave }) {
             {/* Fields */}
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <label className="text-[9px] font-semibold uppercase tracking-[0.08em]" style={{ color: 'var(--text-muted)', fontFamily: 'monospace' }}>Fields</label>
-                <button onClick={() => addField(current.id)} className="text-[10px] flex items-center gap-1" style={{ color: 'var(--accent-blue)' }}><Plus className="w-3 h-3" />Add</button>
+                <label className="text-[11px] font-semibold uppercase tracking-[0.08em]" style={{ color: 'var(--text-muted)', fontFamily: 'monospace' }}>Fields</label>
+                <button onClick={() => addField(current.id)} className="text-[11px] flex items-center gap-1" style={{ color: 'var(--accent-blue)' }}><Plus className="w-3 h-3" />Add</button>
               </div>
               {(current.fields || []).map((f, idx) => (
                 <div key={idx} className="flex items-start gap-2 mb-2">
@@ -161,7 +161,7 @@ export default function BotEmbedBuilder({ bot, onSave }) {
                       className="px-2 py-1 rounded-lg text-[11px] outline-none" style={{ background: 'var(--bg-glass-strong)', color: 'var(--text-primary)', border: '1px solid var(--border)' }} />
                   </div>
                   <button onClick={() => updateField(current.id, idx, { inline: !f.inline })}
-                    className="text-[9px] px-2 py-1 rounded-lg whitespace-nowrap" style={{ background: f.inline ? 'rgba(123,164,201,0.1)' : 'var(--bg-glass-strong)', color: f.inline ? 'var(--accent-blue)' : 'var(--text-muted)', border: '1px solid var(--border)' }}>
+                    className="text-[11px] px-2 py-1 rounded-lg whitespace-nowrap" style={{ background: f.inline ? 'rgba(123,164,201,0.1)' : 'var(--bg-glass-strong)', color: f.inline ? 'var(--accent-blue)' : 'var(--text-muted)', border: '1px solid var(--border)' }}>
                     {f.inline ? 'Inline' : 'Full'}
                   </button>
                   <button onClick={() => removeField(current.id, idx)} className="p-0.5 mt-1"><Trash2 className="w-3 h-3" style={{ color: 'var(--accent-red)' }} /></button>
@@ -170,12 +170,12 @@ export default function BotEmbedBuilder({ bot, onSave }) {
             </div>
 
             <div>
-              <label className="text-[9px] font-semibold uppercase tracking-[0.08em] block mb-1" style={{ color: 'var(--text-muted)', fontFamily: 'monospace' }}>Image URL</label>
+              <label className="text-[11px] font-semibold uppercase tracking-[0.08em] block mb-1" style={{ color: 'var(--text-muted)', fontFamily: 'monospace' }}>Image URL</label>
               <input value={current.image || ''} onChange={e => updateEmbed(current.id, { image: e.target.value })} placeholder="https://..."
                 className="w-full px-2.5 py-1.5 rounded-lg text-[12px] outline-none" style={{ background: 'var(--bg-glass-strong)', color: 'var(--text-primary)', border: '1px solid var(--border)' }} />
             </div>
             <div>
-              <label className="text-[9px] font-semibold uppercase tracking-[0.08em] block mb-1" style={{ color: 'var(--text-muted)', fontFamily: 'monospace' }}>Footer</label>
+              <label className="text-[11px] font-semibold uppercase tracking-[0.08em] block mb-1" style={{ color: 'var(--text-muted)', fontFamily: 'monospace' }}>Footer</label>
               <input value={current.footer || ''} onChange={e => updateEmbed(current.id, { footer: e.target.value })} placeholder="Footer text"
                 className="w-full px-2.5 py-1.5 rounded-lg text-[12px] outline-none" style={{ background: 'var(--bg-glass-strong)', color: 'var(--text-primary)', border: '1px solid var(--border)' }} />
             </div>
@@ -184,7 +184,7 @@ export default function BotEmbedBuilder({ bot, onSave }) {
           {/* Preview */}
           {showPreview && (
             <div className="space-y-2">
-              <p className="text-[9px] font-semibold uppercase tracking-[0.08em]" style={{ color: 'var(--text-muted)', fontFamily: 'monospace' }}>Preview</p>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.08em]" style={{ color: 'var(--text-muted)', fontFamily: 'monospace' }}>Preview</p>
               <div className="p-4 rounded-2xl" style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)' }}>
                 <EmbedPreview embed={current} />
               </div>

@@ -35,7 +35,7 @@ export default function EmojiTab({ serverId, type = 'emoji' }) {
   };
 
   const deleteItem = async (item) => {
-    if (!confirm(`Delete :${item.name}:?`)) return;
+    if (!confirm(`Delete :${item.name}:? It'll be gone for good.`)) return;
     await entity.delete(item.id);
     setItems(p => p.filter(i => i.id !== item.id));
   };

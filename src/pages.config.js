@@ -47,12 +47,15 @@
  *
  * The mainPage value must match a key in the PAGES object exactly.
  */
+import About from './pages/About';
 import BotMarketplace from './pages/BotMarketplace';
+import Changelog from './pages/Changelog';
 import Developers from './pages/Developers';
 import Elite from './pages/Elite';
 import FAQ from './pages/FAQ';
 import Invite from './pages/Invite';
 import Kairo from './pages/Kairo';
+import Pricing from './pages/Pricing';
 import Spaces from './pages/Spaces';
 import Status from './pages/Status';
 import Support from './pages/Support';
@@ -60,12 +63,15 @@ import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
+    "About": About,
     "BotMarketplace": BotMarketplace,
+    "Changelog": Changelog,
     "Developers": Developers,
     "Elite": Elite,
     "FAQ": FAQ,
     "Invite": Invite,
     "Kairo": Kairo,
+    "Pricing": Pricing,
     "Spaces": Spaces,
     "Status": Status,
     "Support": Support,

@@ -29,7 +29,7 @@ export default function AdminEditUser({ user, profileMap, onBack, onRefresh, sho
         custom_status_text: profile.custom_status?.text || '',
         custom_status_emoji: profile.custom_status?.emoji || '',
         pronouns: profile.pronouns || '',
-        accent_color: profile.accent_color || '#5865F2',
+        accent_color: profile.accent_color || '#2dd4bf',
         badges: profile.badges || [],
       });
     }
@@ -110,7 +110,7 @@ export default function AdminEditUser({ user, profileMap, onBack, onRefresh, sho
         <div>
           <label className="text-[11px] font-semibold uppercase tracking-wider mb-1 block" style={{ color: colors.text.disabled }}>Accent Color</label>
           <div className="flex items-center gap-2">
-            <input type="color" value={form.accent_color || '#5865F2'} onChange={e => setForm({ ...form, accent_color: e.target.value })}
+            <input type="color" value={form.accent_color || '#2dd4bf'} onChange={e => setForm({ ...form, accent_color: e.target.value })}
               className="w-8 h-8 rounded cursor-pointer border-0 p-0" />
             <span className="text-[12px]" style={{ color: colors.text.muted }}>{form.accent_color}</span>
           </div>
@@ -142,7 +142,7 @@ export default function AdminEditUser({ user, profileMap, onBack, onRefresh, sho
               style={{
                 background: form.badges.includes(badge) ? colors.accent.subtle : 'rgba(255,255,255,0.03)',
                 color: form.badges.includes(badge) ? colors.accent.primary : colors.text.disabled,
-                border: `1px solid ${form.badges.includes(badge) ? 'rgba(88,101,242,0.3)' : colors.border.default}`,
+                border: `1px solid ${form.badges.includes(badge) ? 'rgba(123,108,246,0.3)' : colors.border.default}`,
               }}>
               {badge.replace(/_/g, ' ')}
             </button>

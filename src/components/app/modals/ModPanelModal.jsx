@@ -33,7 +33,7 @@ export default function ModPanelModal({ onClose, server }) {
   }, [server?.id]);
 
   const banMember = async (m) => {
-    if (!confirm(`Ban ${m.user_email}?`)) return;
+    if (!confirm(`Ban ${m.user_email}? They won't be able to rejoin unless you lift the ban.`)) return;
     await base44.entities.ServerMember.update(m.id, { is_banned: true, ban_reason: 'Banned by moderator' });
     await base44.entities.AuditLog.create({ server_id: server.id, action_type: 'member_ban', actor_id: 'mod', actor_name: 'Moderator', target_id: m.user_id, target_type: 'user', target_name: m.user_email });
     setMembers(ms => ms.map(x => x.id === m.id ? { ...x, is_banned: true } : x));
@@ -91,12 +91,12 @@ export default function ModPanelModal({ onClose, server }) {
                   ].map(s => (
                     <div key={s.label} className="p-3 rounded-xl text-center" style={{ background: 'var(--bg-glass)', border: '1px solid var(--border)' }}>
                       <div className="text-2xl font-bold font-mono" style={{ color: s.color }}>{s.value}</div>
-                      <div className="text-[10px]" style={{ color: 'var(--text-muted)' }}>{s.label}</div>
+                      <div className="text-[11px]" style={{ color: 'var(--text-muted)' }}>{s.label}</div>
                     </div>
                   ))}
                 </div>
                 <div>
-                  <h4 className="text-[10px] font-semibold uppercase tracking-[0.08em] mb-2" style={{ color: 'var(--text-muted)', fontFamily: 'monospace' }}>Recent Actions</h4>
+                  <h4 className="text-[11px] font-semibold uppercase tracking-[0.08em] mb-2" style={{ color: 'var(--text-muted)', fontFamily: 'monospace' }}>Recent Actions</h4>
                   <div className="space-y-1">
                     {auditLogs.slice(0, 10).map(log => {
                       const Icon = actionIcons[log.action_type] || Shield;
@@ -106,7 +106,7 @@ export default function ModPanelModal({ onClose, server }) {
                           <span className="text-[11px] flex-1" style={{ color: 'var(--text-primary)' }}>
                             <span style={{ color: 'var(--text-cream)' }}>{log.actor_name}</span> {log.action_type.replace(/_/g, ' ')} {log.target_name && <span style={{ color: 'var(--text-secondary)' }}>→ {log.target_name}</span>}
                           </span>
-                          <span className="text-[9px] font-mono" style={{ color: 'var(--text-faint)' }}>{new Date(log.created_date).toLocaleDateString()}</span>
+                          <span className="text-[11px] font-mono" style={{ color: 'var(--text-faint)' }}>{new Date(log.created_date).toLocaleDateString()}</span>
                         </div>
                       );
                     })}
@@ -118,19 +118,19 @@ export default function ModPanelModal({ onClose, server }) {
             {tab === 'members' && (
               <div className="space-y-3">
                 {banned.length > 0 && <>
-                  <h4 className="text-[10px] font-semibold uppercase tracking-[0.08em]" style={{ color: 'var(--accent-red)', fontFamily: 'monospace' }}>Banned — {banned.length}</h4>
+                  <h4 className="text-[11px] font-semibold uppercase tracking-[0.08em]" style={{ color: 'var(--accent-red)', fontFamily: 'monospace' }}>Banned — {banned.length}</h4>
                   {banned.map(m => (
                     <div key={m.id} className="flex items-center gap-3 px-3 py-2.5 rounded-xl" style={{ background: 'rgba(201,123,123,0.05)', border: '1px solid rgba(201,123,123,0.1)' }}>
                       <Ban className="w-3.5 h-3.5" style={{ color: 'var(--accent-red)' }} />
                       <span className="text-sm flex-1" style={{ color: 'var(--text-primary)' }}>{m.user_email}</span>
-                      <button onClick={() => unbanMember(m)} className="text-[10px] px-2 py-1 rounded-lg" style={{ background: 'var(--bg-glass)', color: 'var(--accent-green)' }}>Unban</button>
+                      <button onClick={() => unbanMember(m)} className="text-[11px] px-2 py-1 rounded-lg" style={{ background: 'var(--bg-glass)', color: 'var(--accent-green)' }}>Unban</button>
                     </div>
                   ))}
                 </>}
-                <h4 className="text-[10px] font-semibold uppercase tracking-[0.08em]" style={{ color: 'var(--text-muted)', fontFamily: 'monospace' }}>All Members — {members.filter(m => !m.is_banned).length}</h4>
+                <h4 className="text-[11px] font-semibold uppercase tracking-[0.08em]" style={{ color: 'var(--text-muted)', fontFamily: 'monospace' }}>All Members — {members.filter(m => !m.is_banned).length}</h4>
                 {members.filter(m => !m.is_banned).map(m => (
                   <div key={m.id} className="flex items-center gap-3 px-3 py-2.5 rounded-xl" style={{ background: 'var(--bg-glass)' }}>
-                    <div className="w-7 h-7 rounded-full flex items-center justify-center text-[10px]" style={{ background: 'var(--bg-glass-strong)', color: 'var(--text-muted)' }}>
+                    <div className="w-7 h-7 rounded-full flex items-center justify-center text-[11px]" style={{ background: 'var(--bg-glass-strong)', color: 'var(--text-muted)' }}>
                       {(m.user_email || 'U').charAt(0).toUpperCase()}
                     </div>
                     <span className="text-sm flex-1 truncate" style={{ color: 'var(--text-primary)' }}>{m.user_email}</span>
@@ -158,8 +158,8 @@ export default function ModPanelModal({ onClose, server }) {
                           {log.action_type.replace(/_/g, ' ')}{' '}
                           {log.target_name && <span style={{ color: 'var(--text-secondary)' }}>{log.target_name}</span>}
                         </p>
-                        {log.reason && <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>Reason: {log.reason}</p>}
-                        <p className="text-[9px] font-mono mt-0.5" style={{ color: 'var(--text-faint)' }}>{new Date(log.created_date).toLocaleString()}</p>
+                        {log.reason && <p className="text-[11px]" style={{ color: 'var(--text-muted)' }}>Reason: {log.reason}</p>}
+                        <p className="text-[11px] font-mono mt-0.5" style={{ color: 'var(--text-faint)' }}>{new Date(log.created_date).toLocaleString()}</p>
                       </div>
                     </div>
                   );
@@ -180,7 +180,7 @@ export default function ModPanelModal({ onClose, server }) {
                   <div key={i} className="flex items-center justify-between px-3 py-3 rounded-xl" style={{ background: 'var(--bg-glass)', border: '1px solid var(--border)' }}>
                     <div>
                       <p className="text-[12px] font-medium" style={{ color: 'var(--text-cream)' }}>{rule.label}</p>
-                      <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>{rule.desc}</p>
+                      <p className="text-[11px]" style={{ color: 'var(--text-muted)' }}>{rule.desc}</p>
                     </div>
                     <button className="w-10 h-5 rounded-full relative transition-colors" style={{ background: 'var(--bg-overlay)' }}>
                       <div className="absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white transition-transform" />

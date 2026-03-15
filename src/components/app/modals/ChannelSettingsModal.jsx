@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQueryClient } from '@tanstack/react-query';
 import { Trash2, Lock, Clock, Shield, Hash, MessageSquare, Bell } from 'lucide-react';
@@ -13,25 +13,48 @@ export default function ChannelSettingsModal({ onClose, channel, onDelete }) {
   const [nsfw, setNsfw] = useState(channel?.is_nsfw || false);
   const [priv, setPriv] = useState(channel?.is_private || false);
   const [userLimit, setUserLimit] = useState(channel?.user_limit || 0);
+
+  useEffect(() => {
+    if (!channel) return;
+    setName(channel.name || '');
+    setDesc(channel.description || '');
+    setSlowMode(channel.slow_mode_seconds || 0);
+    setNsfw(channel.is_nsfw || false);
+    setPriv(channel.is_private || false);
+    setUserLimit(channel.user_limit || 0);
+  }, [channel]);
   const [saving, setSaving] = useState(false);
   const [confirmDel, setConfirmDel] = useState(false);
 
   const isVoice = channel?.type === 'voice' || channel?.type === 'stage';
 
   const save = async () => {
+    if (!channel?.id) return;
     setSaving(true);
-    await base44.entities.Channel.update(channel.id, {
-      name, description: desc, slow_mode_seconds: slowMode,
-      is_nsfw: nsfw, is_private: priv, user_limit: userLimit || undefined,
-    });
-    qc.invalidateQueries({ queryKey: ['channels'] });
-    setSaving(false); onClose();
+    try {
+      await base44.entities.Channel.update(channel.id, {
+        name, description: desc, slow_mode_seconds: slowMode,
+        is_nsfw: nsfw, is_private: priv, user_limit: userLimit || undefined,
+      });
+      qc.invalidateQueries({ queryKey: channel?.server_id ? ['channels', channel.server_id] : ['channels'] });
+      onClose();
+    } catch (err) {
+      console.error('Channel save failed:', err);
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleDelete = async () => {
-    await base44.entities.Channel.delete(channel.id);
-    qc.invalidateQueries({ queryKey: ['channels'] });
-    onDelete?.(); onClose();
+    if (!channel?.id) return;
+    try {
+      await base44.entities.Channel.delete(channel.id);
+      qc.invalidateQueries({ queryKey: channel?.server_id ? ['channels', channel.server_id] : ['channels'] });
+      onDelete?.();
+      onClose();
+    } catch (err) {
+      console.error('Channel delete failed:', err);
+    }
   };
 
   return (

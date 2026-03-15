@@ -41,9 +41,9 @@ export default class ErrorBoundary extends React.Component {
             <div className="w-14 h-14 rounded-2xl mx-auto mb-5 flex items-center justify-center" style={{ background: `${colors.danger}15` }}>
               <AlertTriangle className="w-7 h-7" style={{ color: colors.danger }} />
             </div>
-            <h2 className="text-[18px] font-bold mb-2" style={{ color: colors.text.primary }}>Something went wrong</h2>
+            <h2 className="text-[18px] font-bold mb-2" style={{ color: colors.text.primary }}>Something went wrong on our end</h2>
             <p className="text-[14px] mb-4" style={{ color: colors.text.muted }}>
-              An unexpected error occurred.
+              Try refreshing the page — it usually works the second time.
             </p>
             {this.state.error?.message && (
               <p className="text-[12px] font-mono px-3 py-2 rounded-lg mb-5 break-words" style={{ background: colors.bg.overlay, color: colors.text.disabled, border: `1px solid ${colors.border.default}` }}>

@@ -1,15 +1,23 @@
-import React, { useState, memo } from 'react';
-import { Reply, Pencil, Trash2, Copy, Pin, PinOff, Link, ChevronDown, ChevronUp, Bookmark, ArrowRight, Zap, UserPlus, LogOut, Star, Forward } from 'lucide-react';
+import React, { useState, memo, useRef, useCallback } from 'react';
+import { Reply, Pencil, Trash2, Copy, Pin, PinOff, Link, ChevronDown, ChevronUp, Bookmark, ArrowRight, Zap, UserPlus, LogOut, Star, Forward, Smile, MoreHorizontal, Flag, BellOff, FileText, Sparkles, MessageSquare, ExternalLink, Clock, AlertCircle, RotateCcw } from 'lucide-react';
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuSeparator, ContextMenuTrigger } from '@/components/ui/context-menu';
 import ImageWithFallback from '@/components/app/shared/ImageWithFallback';
 import ReactionTooltip from '@/components/app/shared/ReactionTooltip';
 import VideoPlayer from '@/components/app/chat/VideoPlayer';
+import EmojiPicker from '@/components/app/chat/EmojiPicker';
 import { colors } from '@/components/app/design/tokens';
 import { BADGE_CONFIG } from '@/components/app/badges/badgeConfig';
 
+const P = {
+  base: colors.bg.base, surface: colors.bg.surface, elevated: colors.bg.elevated,
+  floating: colors.bg.float, border: colors.border.subtle,
+  textPrimary: colors.text.primary, textSecondary: colors.text.secondary, muted: colors.text.muted,
+  accent: colors.accent.primary, danger: colors.danger, warning: colors.warning,
+  link: colors.accent.bright,
+};
+
 function ts(d) { return new Date(d).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }); }
 function fullTs(d) { return new Date(d).toLocaleString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit' }); }
-function dateStr(d) { return new Date(d).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' }); }
 
 function isMediaUrl(url) {
   if (!url) return null;
@@ -35,37 +43,69 @@ function renderText(text, onLinkClick, onMentionClick) {
       const lang = firstLine > -1 ? inner.slice(0, firstLine).trim() : '';
       const code = firstLine > -1 ? inner.slice(firstLine + 1) : inner;
       return (
-        <pre key={si} className="px-3 py-2 rounded-lg text-[13px] my-1.5 overflow-x-auto" style={{ background: colors.bg.base, color: colors.text.secondary, border: `1px solid ${colors.border.default}`, maxWidth: '100%', whiteSpace: 'pre', overflowX: 'auto', wordBreak: 'normal', overflowWrap: 'normal' }}>
-          {lang && <div className="text-[10px] font-semibold uppercase mb-1 opacity-40">{lang}</div>}
-          <code style={{ whiteSpace: 'pre', wordBreak: 'normal', overflowWrap: 'normal' }}>{code}</code>
+        <pre key={si} className="relative group/code px-3 py-2 rounded-[10px] text-[13px] my-1.5 overflow-x-auto"
+          style={{ background: 'var(--bg-void)', color: P.textSecondary, border: '1px solid var(--border-subtle)' }}>
+          {lang && <div className="absolute top-2 right-2 text-[10px] font-medium uppercase" style={{ color: 'var(--text-muted)' }}>{lang}</div>}
+          <code style={{ whiteSpace: 'pre', wordBreak: 'normal' }}>{code}</code>
+          <button onClick={async (e) => {
+            e.stopPropagation();
+            try {
+              await navigator.clipboard.writeText(code);
+            } catch {
+              const ta = document.createElement('textarea');
+              ta.value = code;
+              ta.style.position = 'fixed';
+              ta.style.opacity = '0';
+              document.body.appendChild(ta);
+              ta.select();
+              document.execCommand('copy');
+              document.body.removeChild(ta);
+            }
+          }}
+            className="absolute top-2 right-2 px-2 py-1 rounded text-[11px] font-medium opacity-0 group-hover/code:opacity-100 transition-opacity"
+            style={{ background: P.elevated, color: P.muted, border: `1px solid ${P.border}` }}>
+            Copy
+          </button>
         </pre>
       );
     }
-    if (segment.match(/^`[^`]+`$/)) return <code key={si} className="px-1.5 py-0.5 rounded text-[13px]" style={{ background: colors.bg.base, color: colors.text.secondary }}>{segment.slice(1, -1)}</code>;
-    return segment.split(/(https?:\/\/[^\s]+|@everyone|@here|@\w+|\*\*[^*]+\*\*|\*[^*]+\*)/g).map((p, i) => {
+    if (segment.match(/^`[^`]+`$/)) {
+      return <code key={si} className="px-1.5 py-0.5 rounded text-[13px]" style={{ background: P.base, color: P.textSecondary }}>{segment.slice(1, -1)}</code>;
+    }
+    return segment.split(/(https?:\/\/[^\s]+|@everyone|@here|@\w+|\*\*[^*]+\*\*|\*[^*]+\*|__[^_]+__|~~[^~]+~~|\|\|[^|]+\|\||#[\w-]+)/g).map((p, i) => {
       const key = `${si}-${i}`;
       if (p.match(/^https?:\/\//)) {
         const mediaType = isMediaUrl(p);
-        if (mediaType === 'gif' || mediaType === 'image') return <img key={key} src={p} alt="embedded" className="max-w-[400px] max-h-[280px] rounded-lg mt-1 block" style={{ border: `1px solid ${colors.border.default}` }} loading="lazy" decoding="async" />;
-        return <a key={key} href={p} onClick={e => { if (onLinkClick) { e.preventDefault(); onLinkClick(p); } }} target="_blank" rel="noopener noreferrer" className="hover:underline" style={{ color: colors.text.link, wordBreak: 'break-all' }}>{p}</a>;
+        if (mediaType === 'gif' || mediaType === 'image') {
+          return <img key={key} src={p} alt="embedded" className="max-w-[400px] max-h-[280px] rounded-lg mt-1 block cursor-pointer hover:brightness-110" style={{ border: `1px solid ${P.border}` }} loading="lazy" onError={(e) => { e.target.style.display = 'none'; }} />;
+        }
+        return <a key={key} href={p} onClick={e => { if (onLinkClick) { e.preventDefault(); onLinkClick(p); } }} target="_blank" rel="noopener noreferrer" className="hover:underline" style={{ color: 'var(--accent-bright)', wordBreak: 'break-all' }}>{p}</a>;
       }
-      if (p === '@everyone' || p === '@here') return <span key={key} className="px-1 rounded font-semibold cursor-default" style={{ background: `${colors.accent.primary}25`, color: colors.accent.primary }}>{p}</span>;
+      if (p === '@everyone' || p === '@here') return <span key={key} className="px-1 rounded font-semibold cursor-default" style={{ background: `${P.accent}20`, color: P.accent }}>{p}</span>;
       if (p.match(/^@\w+/)) {
         const username = p.slice(1);
-        return (
-          <span key={key} className="px-1 rounded font-semibold cursor-pointer hover:underline"
-            style={{ background: `${colors.accent.primary}20`, color: colors.accent.primary }}
-            onClick={() => onMentionClick?.(username)}>
-            {p}
-          </span>
-        );
+        return <span key={key} className="px-1 rounded font-semibold cursor-pointer hover:underline" style={{ background: `${P.accent}15`, color: P.accent }} onClick={() => onMentionClick?.(username)}>{p}</span>;
       }
+      if (p.match(/^#[\w-]+$/)) return <span key={key} className="px-0.5 rounded font-medium cursor-pointer hover:underline" style={{ color: P.accent }}>{p}</span>;
       if (p.match(/^\*\*.*\*\*$/)) return <strong key={key}>{p.slice(2, -2)}</strong>;
       if (p.match(/^\*.*\*$/)) return <em key={key}>{p.slice(1, -1)}</em>;
+      if (p.match(/^__.*__$/)) return <u key={key}>{p.slice(2, -2)}</u>;
+      if (p.match(/^~~.*~~$/)) return <s key={key} style={{ color: P.muted }}>{p.slice(2, -2)}</s>;
       if (p.match(/^\|\|.*\|\|$/)) {
         const SpoilerTag = () => {
           const [revealed, setRevealed] = React.useState(false);
-          return <span onClick={() => setRevealed(true)} className="px-1 rounded cursor-pointer" style={{ background: revealed ? 'rgba(255,255,255,0.06)' : colors.bg.base, color: revealed ? colors.text.secondary : 'transparent' }}>{p.slice(2, -2)}</span>;
+          return (
+            <span onClick={() => setRevealed(true)} className="px-1 rounded cursor-pointer transition-all duration-200 select-none"
+              style={{
+                background: revealed ? 'rgba(255,255,255,0.06)' : P.base,
+                color: revealed ? P.textSecondary : 'transparent',
+                filter: revealed ? 'none' : 'blur(6px)',
+                userSelect: revealed ? 'text' : 'none',
+              }}
+              aria-hidden={!revealed}>
+              {p.slice(2, -2)}
+            </span>
+          );
         };
         return <SpoilerTag key={key} />;
       }
@@ -74,7 +114,7 @@ function renderText(text, onLinkClick, onMentionClick) {
   });
 }
 
-const MAX_LINES = 20;
+const MAX_LINES = 25;
 const EMOJI_ONLY_REGEX = /^(\p{Emoji_Presentation}|\p{Extended_Pictographic}[\uFE0F\u200D]*){1,3}$/u;
 function isEmojiOnly(text) {
   if (!text) return false;
@@ -82,10 +122,8 @@ function isEmojiOnly(text) {
   return stripped.length <= 12 && EMOJI_ONLY_REGEX.test(stripped);
 }
 
-/* Badge icons inline after username — uses centralized badge config */
 function InlineBadges({ badges }) {
   if (!badges?.length) return null;
-  // Show max 3 inline in chat
   const shown = badges.slice(0, 3);
   return (
     <span className="inline-flex items-center gap-0.5 ml-1">
@@ -99,13 +137,77 @@ function InlineBadges({ badges }) {
   );
 }
 
-/* YouTube icon inline */
-function YouTubeIcon({ url, show }) {
-  if (!url || show === false) return null;
+function MoreDropdown({ message, isOwn, onReply, onPin, onStar, onForward, onDelete, onEdit, onMarkMoment }) {
+  const [open, setOpen] = useState(false);
+  const ref = React.useRef(null);
+
+  React.useEffect(() => {
+    if (!open) return;
+    const close = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
+    document.addEventListener('mousedown', close);
+    return () => document.removeEventListener('mousedown', close);
+  }, [open]);
+
   return (
-    <a href={url} target="_blank" rel="noopener noreferrer" className="inline-flex ml-0.5 hover:opacity-80" title="YouTube Channel">
-      <svg className="w-4 h-4" viewBox="0 0 24 24" fill="#FF0000"><path d="M23.5 6.2a3 3 0 00-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 00.5 6.2 31.4 31.4 0 000 12a31.4 31.4 0 00.5 5.8 3 3 0 002.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 002.1-2.1A31.4 31.4 0 0024 12a31.4 31.4 0 00-.5-5.8zM9.6 15.6V8.4l6.3 3.6-6.3 3.6z"/></svg>
-    </a>
+    <div className="relative" ref={ref}>
+      <button onClick={() => setOpen(!open)}
+        className="w-7 h-7 flex items-center justify-center rounded-md hover:bg-[rgba(255,255,255,0.1)]"
+        title="More">
+        <MoreHorizontal className="w-4 h-4" style={{ color: P.muted }} />
+      </button>
+      {open && (
+        <div className="absolute right-0 top-full mt-1 w-52 py-1.5 px-1.5 rounded-xl z-50 k-fade-in"
+          style={{ background: P.floating, border: `1px solid ${P.border}`, boxShadow: '0 8px 32px rgba(0,0,0,0.6)' }}>
+          <button onClick={() => { navigator.clipboard.writeText(message.content || ''); setOpen(false); }}
+            className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-[13px] font-medium transition-colors hover:bg-[rgba(255,255,255,0.06)]"
+            style={{ color: P.textSecondary }}>
+            <Copy className="w-4 h-4 opacity-60" /> Copy Text
+          </button>
+          <button onClick={() => { navigator.clipboard.writeText(message.id); setOpen(false); }}
+            className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-[13px] font-medium transition-colors hover:bg-[rgba(255,255,255,0.06)]"
+            style={{ color: P.textSecondary }}>
+            <Link className="w-4 h-4 opacity-60" /> Copy Message Link
+          </button>
+          <button onClick={() => setOpen(false)}
+            className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-[13px] font-medium transition-colors hover:bg-[rgba(255,255,255,0.06)]"
+            style={{ color: P.textSecondary }}>
+            <BellOff className="w-4 h-4 opacity-60" /> Mark Unread
+          </button>
+          {onForward && (
+            <button onClick={() => { onForward(message); setOpen(false); }}
+              className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-[13px] font-medium transition-colors hover:bg-[rgba(255,255,255,0.06)]"
+              style={{ color: P.textSecondary }}>
+              <Forward className="w-4 h-4 opacity-60" /> Forward
+            </button>
+          )}
+          <button onClick={() => setOpen(false)}
+            className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-[13px] font-medium transition-colors hover:bg-[rgba(255,255,255,0.06)]"
+            style={{ color: P.textSecondary }}>
+            <FileText className="w-4 h-4 opacity-60" /> Save to Note to Self
+          </button>
+          {onMarkMoment && (
+            <button onClick={() => { onMarkMoment(message); setOpen(false); }}
+              className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-[13px] font-medium transition-colors hover:bg-[rgba(123,108,246,0.1)]"
+              style={{ color: P.accent }}>
+              <Sparkles className="w-4 h-4 opacity-60" /> Mark as Moment
+            </button>
+          )}
+          <div className="h-px mx-1 my-1" style={{ background: P.border }} />
+          {isOwn && (
+            <button onClick={() => { onDelete(message); setOpen(false); }}
+              className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-[13px] font-medium transition-colors hover:bg-[rgba(237,66,69,0.1)]"
+              style={{ color: P.danger }}>
+              <Trash2 className="w-4 h-4 opacity-60" /> Delete
+            </button>
+          )}
+          <button onClick={() => setOpen(false)}
+            className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-[13px] font-medium transition-colors hover:bg-[rgba(237,66,69,0.1)]"
+            style={{ color: P.danger }}>
+            <Flag className="w-4 h-4 opacity-60" /> Report
+          </button>
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -114,35 +216,100 @@ const SystemMessage = memo(function SystemMessage({ message }) {
   const isBoost = content.toLowerCase().includes('boost');
   const isJoin = content.toLowerCase().includes('joined') || content.toLowerCase().includes('welcome');
   const Icon = isBoost ? Zap : isJoin ? UserPlus : ArrowRight;
-  const accent = isBoost ? '#a855f7' : isJoin ? colors.success : colors.text.disabled;
+  const accent = isBoost ? '#a855f7' : isJoin ? '#3ba55c' : P.muted;
   return (
-    <div className="flex items-center gap-3 py-1 px-5">
-      <div className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: `${accent}15` }}>
-        <Icon className="w-3 h-3" style={{ color: accent }} />
-      </div>
-      <span className="text-[13px]" style={{ color: colors.text.muted }}>{content}</span>
-      <span className="text-[10px] tabular-nums ml-auto" style={{ color: colors.text.disabled }}>{ts(message.created_date)}</span>
+    <div className="flex items-center justify-center gap-2 py-2 px-4">
+      <Icon className="w-4 h-4 flex-shrink-0" style={{ color: accent }} />
+      <span className="text-[13px]" style={{ color: P.muted }}>{content}</span>
+      <span className="text-[11px] tabular-nums" style={{ color: P.muted, opacity: 0.5 }}>{ts(message.created_date)}</span>
     </div>
   );
 });
 
-  const MessageBubble = memo(function MessageBubble({ message, compact, isOwn, onReply, onEdit, onDelete, onReact, onPin, onStar, onForward, currentUserId, onProfileClick, isEditing, onEditSave, onEditCancel, onImageClick, onLinkClick, onHighlight, members, getProfile, roleColor }) {
+function LinkEmbed({ url }) {
+  const [meta, setMeta] = React.useState(null);
+  const [dismissed, setDismissed] = React.useState(false);
+  const [err, setErr] = React.useState(false);
+  React.useEffect(() => {
+    if (!url || dismissed || err) return;
+    let cancelled = false;
+    const timer = setTimeout(async () => {
+      try {
+        const res = await fetch(`https://api.microlink.io/?url=${encodeURIComponent(url)}`);
+        const data = await res.json();
+        if (!cancelled && data.status === 'success' && data.data) {
+          setMeta({ title: data.data.title, description: data.data.description, image: data.data.image?.url, publisher: data.data.publisher });
+        }
+      } catch { if (!cancelled) setErr(true); }
+    }, 300);
+    return () => { cancelled = true; clearTimeout(timer); };
+  }, [url, dismissed, err]);
+
+  if (dismissed || err || !meta?.title) return null;
+  return (
+    <div className="relative mt-2 max-w-[420px] rounded-lg overflow-hidden group/embed" style={{ background: P.surface, border: `1px solid ${P.border}`, borderLeft: `3px solid ${P.accent}` }}>
+      {meta.image && <img src={meta.image} alt="" className="w-full max-h-[180px] object-cover" loading="lazy" onError={e => { e.target.style.display = 'none'; }} />}
+      <div className="p-3">
+        {meta.publisher && <div className="text-[11px] font-semibold mb-1" style={{ color: P.muted }}>{meta.publisher}</div>}
+        <a href={url} target="_blank" rel="noopener noreferrer" className="text-[14px] font-semibold hover:underline block mb-1 leading-tight" style={{ color: P.link }}>{meta.title}</a>
+        {meta.description && <p className="text-[13px] leading-relaxed line-clamp-2" style={{ color: P.textSecondary }}>{meta.description}</p>}
+      </div>
+      <button onClick={() => setDismissed(true)} className="absolute top-2 right-2 w-6 h-6 rounded-full flex items-center justify-center opacity-0 group-hover/embed:opacity-100 transition-opacity" style={{ background: P.base }}>
+        <svg className="w-3 h-3" style={{ color: P.muted }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+  );
+}
+
+function extractNonCodeUrls(text) {
+  if (!text) return [];
+  const withoutCodeBlocks = text.replace(/```[\s\S]*?```/g, '').replace(/`[^`]+`/g, '');
+  const matches = withoutCodeBlocks.match(/https?:\/\/[^\s]+/g) || [];
+  return matches.filter(u => !isMediaUrl(u));
+}
+
+const MessageBubble = memo(function MessageBubble({
+  message, compact, isOwn, isSending, isFailed, onRetry, onDismiss,
+  onReply, onEdit, onDelete, onReact, onPin, onStar,
+  onForward, currentUserId, onProfileClick, isEditing, onEditSave, onEditCancel,
+  onImageClick, onLinkClick, onHighlight, onJumpToReply, members, getProfile, roleColor, onLongPress, onMarkMoment,
+  onOpenThread, isHighlighted,
+}) {
   if (message.type === 'system') return <SystemMessage message={message} />;
 
   const [hovered, setHovered] = useState(false);
   const [editText, setEditText] = useState(message.content || '');
   const [expanded, setExpanded] = useState(false);
-  const [showFullTs, setShowFullTs] = useState(false);
+  const editInputRef = useRef(null);
+
+  React.useEffect(() => {
+    if (isEditing) {
+      setEditText(message.content || '');
+      requestAnimationFrame(() => editInputRef.current?.focus());
+    }
+  }, [isEditing, message.content]);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const emojiPickerRef = useRef(null);
   const quickEmojis = ['👍', '❤️', '😂', '🔥', '👀'];
-  const saveFn = () => { if (editText.trim() && editText !== message.content) onEditSave(message.id, editText.trim()); else onEditCancel(); };
+
+  React.useEffect(() => {
+    if (!showEmojiPicker) return;
+    const handler = (e) => { if (emojiPickerRef.current && !emojiPickerRef.current.contains(e.target)) setShowEmojiPicker(false); };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [showEmojiPicker]);
+  const longPressTimer = useRef(null);
+  const handleTouchStart = useCallback(() => {
+    if (!onLongPress) return;
+    longPressTimer.current = setTimeout(() => { onLongPress(message); }, 500);
+  }, [onLongPress, message]);
+  const handleTouchEnd = useCallback(() => { clearTimeout(longPressTimer.current); }, []);
+  const saveFn = useCallback(() => { if (editText.trim() && editText !== message.content) onEditSave(message.id, editText.trim()); else onEditCancel(); }, [editText, message.content, message.id, onEditSave, onEditCancel]);
   const isLong = (message.content || '').split('\n').length > MAX_LINES || (message.content || '').length > 1500;
   const isDeleted = message.is_deleted;
   const authorName = isDeleted ? 'Deleted User' : (message.author_name || 'User');
   const mentioned = hasMention(message.content);
-  const mentionBg = mentioned ? 'rgba(88,101,242,0.06)' : undefined;
-  const mentionBorder = mentioned ? `2px solid rgba(88,101,242,0.25)` : undefined;
 
-  // Resolve a @username mention to a user profile click
   const handleMentionClick = (username) => {
     if (!members || !onProfileClick) return;
     const found = members.find(m => {
@@ -156,173 +323,263 @@ const SystemMessage = memo(function SystemMessage({ message }) {
   return (
     <ContextMenu>
       <ContextMenuTrigger>
-        <div className="relative group flex items-start gap-4 py-[3px] px-4 hover:bg-[rgba(255,255,255,0.02)]"
+        <div className="relative group transition-colors duration-75"
           data-msg-id={message.id}
           onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}
-          style={{ marginTop: compact ? 0 : '1.125rem', background: mentionBg, borderLeft: mentionBorder }}>
+          onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd} onTouchMove={handleTouchEnd}
+          style={{
+            paddingTop: compact ? 1 : 0,
+            paddingBottom: 1,
+            marginTop: compact ? 0 : 20,
+            background: hovered ? 'var(--surface-glass)' : mentioned ? 'var(--accent-dim)' : 'transparent',
+            borderLeft: isHighlighted ? '3px solid #f0b232' : isEditing ? '3px solid var(--warning)' : mentioned ? '2px solid var(--accent-primary)' : '2px solid transparent',
+            boxShadow: isHighlighted ? '0 0 20px rgba(240,178,50,0.3)' : 'none',
+            transition: 'border-color 0.2s, box-shadow 0.2s',
+          }}>
 
-          {/* Avatar or compact timestamp */}
-          {compact ? (
-            <div className="w-10 flex-shrink-0 flex items-center justify-end pt-0.5">
-              <span className="text-[10px] opacity-0 group-hover:opacity-100 tabular-nums select-none" style={{ color: colors.text.disabled }}>{ts(message.created_date)}</span>
+          <div className="flex items-start gap-[30px]">
+            {/* Avatar or compact timestamp — 42px avatars, 54px indent for grouped */}
+            {compact ? (
+              <div className="w-[54px] flex-shrink-0 flex items-center justify-end pt-0.5">
+                <span className="text-[10px] opacity-0 group-hover:opacity-100 tabular-nums select-none transition-opacity"
+                  style={{ color: 'var(--text-faint)' }}>{ts(message.created_date)}</span>
+              </div>
+            ) : (
+              <button onClick={() => !isDeleted && onProfileClick?.(message.author_id)}
+                className="w-[42px] h-[42px] rounded-full flex items-center justify-center text-sm font-semibold flex-shrink-0 overflow-hidden hover:opacity-80 mt-0.5"
+                style={{ background: P.surface, color: P.muted }}>
+                {isDeleted ? '👻' : message.author_avatar
+                  ? <img src={message.author_avatar} className="w-full h-full object-cover" alt="" onError={(e) => { e.target.style.display = 'none'; }} />
+                  : authorName.charAt(0).toUpperCase()}
+              </button>
+            )}
+
+            <div className="flex-1 min-w-0 overflow-hidden">
+              {/* Header: name + badges + timestamp */}
+              {!compact && (
+                <div className="flex items-baseline gap-1.5 mb-[2px] flex-wrap">
+                  <button onClick={() => !isDeleted && onProfileClick?.(message.author_id)}
+                    className="text-[15px] font-semibold hover:underline truncate max-w-[240px] leading-tight"
+                    style={{ color: roleColor || P.textPrimary }}>{authorName}</button>
+                  {!isDeleted && <InlineBadges badges={message.author_badges} />}
+                  <span className="text-[11px] tabular-nums select-none ml-1"
+                    style={{ color: P.muted }}
+                    title={fullTs(message.created_date)}>
+                    {ts(message.created_date)}
+                  </span>
+                  {message.is_edited && <span className="text-[11px]" style={{ color: P.muted }}>(edited)</span>}
+                </div>
+              )}
+
+              {/* Reply preview — click to jump to original */}
+              {message.reply_preview && (
+                <button type="button" onClick={() => onJumpToReply?.(message.reply_to_id)} className="flex items-center gap-2 mb-1 cursor-pointer hover:opacity-80 min-w-0 w-full text-left text-[12px]"
+                  style={{ color: P.muted }}>
+                  <div className="w-0.5 h-4 rounded-full flex-shrink-0" style={{ background: P.accent }} />
+                  <span className="truncate min-w-0" style={{ color: P.muted }}>
+                    <span className="font-semibold" style={{ color: P.accent }}>{message.reply_preview.author_name}</span>
+                    {' '}{message.reply_preview.content?.split('\n').slice(0, 2).join(' ').slice(0, 120)}
+                  </span>
+                </button>
+              )}
+
+              {/* Forwarded label */}
+              {message.is_forwarded && (
+                <div className="flex items-center gap-1 mb-1">
+                  <Forward className="w-3 h-3" style={{ color: P.muted }} />
+                  <span className="text-[11px] font-medium" style={{ color: P.muted }}>Forwarded</span>
+                </div>
+              )}
+
+              {/* Content */}
+              {isDeleted ? (
+                <div className="text-[14px] italic" style={{ color: P.muted }}>This message was deleted.</div>
+              ) : isEditing ? (
+                <div>
+                  <div className="flex items-center gap-2 mb-1.5 px-3 py-1.5 rounded-t-lg" style={{ background: `${P.warning}15`, borderLeft: `3px solid ${P.warning}` }}>
+                    <Pencil className="w-3 h-3" style={{ color: P.warning }} />
+                    <span className="text-[12px] font-semibold" style={{ color: P.warning }}>Editing Message</span>
+                    <button onClick={onEditCancel} className="ml-auto text-[11px] hover:underline" style={{ color: P.muted }}>Cancel</button>
+                  </div>
+                  <textarea ref={editInputRef} value={editText} onChange={e => setEditText(e.target.value)}
+                    onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); saveFn(); } if (e.key === 'Escape') { e.preventDefault(); onEditCancel(); } }}
+                    onBlur={saveFn}
+                    className="w-full text-[14px] rounded-lg px-3 py-2 outline-none resize-none"
+                    style={{ background: P.base, color: P.textPrimary, border: `1px solid ${P.accent}` }}
+                    rows={2} />
+                  <div className="text-[11px] mt-1" style={{ color: P.muted }}>
+                    Escape to cancel · Enter to save
+                  </div>
+                </div>
+              ) : (
+                <div className="relative">
+                  <div className={`whitespace-pre-wrap break-words [overflow-wrap:anywhere] ${isEmojiOnly(message.content) ? 'text-[42px] leading-[1.2]' : 'text-[15px] leading-[1.375]'}`}
+                    style={{ color: P.textSecondary, maxHeight: isLong && !expanded ? '300px' : 'none', overflow: isLong && !expanded ? 'hidden' : 'visible' }}>
+                    {renderText(message.content, onLinkClick, handleMentionClick)}
+                  </div>
+                  {isLong && !expanded && (
+                    <button onClick={() => setExpanded(true)} className="flex items-center gap-1 text-[13px] font-medium hover:underline mt-0.5" style={{ color: P.link }}>
+                      <ChevronDown className="w-3.5 h-3.5" /> Read more
+                    </button>
+                  )}
+                  {isLong && expanded && (
+                    <button onClick={() => setExpanded(false)} className="flex items-center gap-1 text-[13px] font-medium hover:underline mt-0.5" style={{ color: P.link }}>
+                      <ChevronUp className="w-3.5 h-3.5" /> Show less
+                    </button>
+                  )}
+                  {isFailed && (
+                    <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                      <div className="flex items-center gap-1.5 px-2 py-1 rounded-[6px]" style={{ background: 'rgba(240,71,71,0.12)', color: P.danger }}>
+                        <AlertCircle className="w-3.5 h-3.5 flex-shrink-0" />
+                        <span className="text-[12px] font-medium">Failed to send</span>
+                      </div>
+                      <button onClick={onRetry} className="flex items-center gap-1 px-2 py-1 rounded-[6px] text-[12px] font-medium transition-colors hover:bg-[var(--accent-dim)]" style={{ color: P.accent }}>
+                        <RotateCcw className="w-3 h-3" /> Retry
+                      </button>
+                      <button onClick={onDismiss} className="text-[11px] hover:underline" style={{ color: P.muted }}>Dismiss</button>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Attachments */}
+              {!isDeleted && message.attachments?.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-1.5">
+                  {message.attachments.map((a, i) => {
+                    const isGif = a.content_type === 'image/gif' || a.filename?.toLowerCase().endsWith('.gif');
+                    if (a.content_type?.startsWith('image/') || isGif) {
+                      return <ImageWithFallback key={i} src={a.url} alt={a.filename || 'image'} className="max-w-[400px] max-h-[300px] rounded-lg cursor-pointer hover:brightness-110" style={{ border: `1px solid ${P.border}` }} onClick={() => onImageClick?.(a.url, a.filename)} loading="lazy" />;
+                    }
+                    if (a.content_type?.startsWith('video/') || a.url?.match(/\.(mp4|webm|mov)(\?|$)/i)) {
+                      return <VideoPlayer key={i} src={a.url} filename={a.filename} />;
+                    }
+                    if (a.content_type?.startsWith('audio/')) {
+                      return <audio key={i} src={a.url} controls className="max-w-[300px]" />;
+                    }
+                    return (
+                      <a key={i} href={a.url} target="_blank" rel="noopener noreferrer"
+                        className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg transition-colors hover:brightness-110"
+                        style={{ background: P.surface, border: `1px solid ${P.border}`, color: P.textSecondary }}>
+                        <FileText className="w-5 h-5 flex-shrink-0" style={{ color: P.muted }} />
+                        <div className="min-w-0">
+                          <div className="text-[13px] font-medium truncate" style={{ color: P.link }}>{a.filename || 'File'}</div>
+                          {a.size && <div className="text-[11px]" style={{ color: P.muted }}>{(a.size / 1024).toFixed(0)} KB</div>}
+                        </div>
+                      </a>
+                    );
+                  })}
+                </div>
+              )}
+
+              {/* Reactions */}
+              {!isDeleted && message.reactions?.length > 0 && (
+                <div className="flex flex-wrap gap-1.5 mt-2">
+                  {message.reactions.map((r, i) => {
+                    const mine = r.users?.includes(currentUserId);
+                    return (
+                      <ReactionTooltip key={i} reaction={r}>
+                        <button onClick={() => onReact(message, r.emoji)}
+                          className="flex items-center gap-1.5 px-2 py-1 rounded-lg text-[13px] transition-all hover:brightness-110"
+                          style={{
+                            background: mine ? `${P.accent}15` : P.surface,
+                            color: mine ? P.accent : P.textSecondary,
+                            border: `1px solid ${mine ? `${P.accent}40` : P.border}`,
+                          }}>
+                          <span className="text-[14px]">{r.emoji}</span>
+                          <span className="font-semibold tabular-nums text-[12px]">{r.count}</span>
+                        </button>
+                      </ReactionTooltip>
+                    );
+                  })}
+                </div>
+              )}
             </div>
-          ) : (
-            <button onClick={() => !isDeleted && onProfileClick?.(message.author_id)}
-              className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold flex-shrink-0 overflow-hidden hover:opacity-80 mt-0.5"
-              style={{ background: colors.bg.overlay, color: colors.text.muted }}>
-              {isDeleted ? '👻' : message.author_avatar
-                ? <img src={message.author_avatar} className="w-full h-full object-cover" alt="" />
-                : authorName.charAt(0).toUpperCase()}
+          </div>
+
+          {/* Rich link embeds for non-media URLs */}
+          {!isDeleted && extractNonCodeUrls(message.content).slice(0, 3).map((url, i) => (
+            <LinkEmbed key={url + i} url={url} />
+          ))}
+
+          {/* Thread reply count */}
+          {!isDeleted && message.thread_count > 0 && (
+            <button onClick={() => onOpenThread?.(message)}
+              className="flex items-center gap-1.5 mt-2 px-2 py-1 rounded-md text-[12px] font-medium hover:bg-[rgba(255,255,255,0.04)] transition-colors"
+              style={{ color: P.accent }}>
+              <MessageSquare className="w-3.5 h-3.5" />
+              {message.thread_count} {message.thread_count === 1 ? 'reply' : 'replies'}
+              {message.thread_last_reply_author && (
+                <span className="text-[11px] ml-1" style={{ color: P.muted }}>— last by {message.thread_last_reply_author}</span>
+              )}
             </button>
           )}
 
-          <div className="flex-1 min-w-0 overflow-hidden">
-            {/* Header: name + badges + timestamp */}
-            {!compact && (
-              <div className="flex items-center gap-1 mb-[2px] flex-wrap">
-                <button onClick={() => !isDeleted && onProfileClick?.(message.author_id)}
-                  className="text-[15px] font-semibold hover:underline truncate max-w-[200px] leading-tight"
-                  style={{ color: roleColor }}>{authorName}</button>
-                {!isDeleted && <InlineBadges badges={message.author_badges} />}
-                {!isDeleted && <YouTubeIcon url={message.author_youtube_url} show={message.author_youtube_show_icon} />}
-                <span className="text-[11px] tabular-nums select-none flex-shrink-0 ml-1"
-                  style={{ color: colors.text.disabled }}
-                  title={fullTs(message.created_date)}>
-                  {dateStr(message.created_date)} {ts(message.created_date)}
-                </span>
-                {message.is_edited && <span className="text-[11px] flex-shrink-0" style={{ color: colors.text.disabled }}>(edited)</span>}
-              </div>
-            )}
-
-            {/* Pinned indicator */}
-            {message.is_pinned && !compact && (
-              <div className="flex items-center gap-1 mb-0.5">
-                <Pin className="w-3 h-3" style={{ color: colors.warning }} />
-                <span className="text-[10px] font-medium" style={{ color: colors.warning, opacity: 0.7 }}>Pinned</span>
-              </div>
-            )}
-
-            {/* Reply preview */}
-            {message.reply_preview && (
-              <div className="flex items-center gap-2 mb-1 cursor-pointer hover:opacity-80">
-                <div className="w-0.5 h-4 rounded-full flex-shrink-0" style={{ background: colors.accent.primary }} />
-                <span className="text-[12px] truncate" style={{ color: colors.text.muted }}>
-                  <span className="font-semibold" style={{ color: colors.accent.primary }}>{message.reply_preview.author_name}</span>
-                  {' '}{message.reply_preview.content?.slice(0, 80)}
-                </span>
-              </div>
-            )}
-
-            {/* Content */}
-            {isDeleted ? (
-              <div className="text-[14px] italic" style={{ color: colors.text.disabled }}>This message was deleted.</div>
-            ) : isEditing ? (
-              <div>
-                <textarea value={editText} onChange={e => setEditText(e.target.value)}
-                  onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); saveFn(); } if (e.key === 'Escape') onEditCancel(); }}
-                  className="w-full text-[14px] rounded-lg px-3 py-2 outline-none resize-none"
-                  style={{ background: colors.bg.overlay, color: colors.text.primary, border: `1px solid ${colors.accent.primary}` }}
-                  rows={2} autoFocus />
-                <div className="text-[11px] mt-1" style={{ color: colors.text.disabled }}>
-                  Escape to <button onClick={onEditCancel} className="underline" style={{ color: colors.text.link }}>cancel</button> · Enter to <button onClick={saveFn} className="underline" style={{ color: colors.text.link }}>save</button>
-                </div>
-              </div>
-            ) : (
-              <div className="relative">
-                <div className={`whitespace-pre-wrap break-words ${isEmojiOnly(message.content) ? 'text-[42px] leading-[1.2]' : 'text-[15px] leading-[1.375]'}`}
-                  style={{ color: colors.text.secondary, maxHeight: isLong && !expanded ? '300px' : 'none' }}>
-                  {renderText(message.content, onLinkClick, handleMentionClick)}
-                </div>
-                {isLong && !expanded && (
-                  <button onClick={() => setExpanded(true)} className="flex items-center gap-1 text-[13px] font-medium hover:underline mt-0.5" style={{ color: colors.text.link }}>
-                    <ChevronDown className="w-3.5 h-3.5" /> Read more
-                  </button>
-                )}
-                {isLong && expanded && (
-                  <button onClick={() => setExpanded(false)} className="flex items-center gap-1 text-[13px] font-medium hover:underline mt-0.5" style={{ color: colors.text.link }}>
-                    <ChevronUp className="w-3.5 h-3.5" /> Show less
-                  </button>
-                )}
-              </div>
-            )}
-
-            {/* Attachments */}
-            {!isDeleted && message.attachments?.length > 0 && (
-              <div className="flex flex-wrap gap-2 mt-1.5">
-                {message.attachments.map((a, i) => {
-                  const isGif = a.content_type === 'image/gif' || a.filename?.toLowerCase().endsWith('.gif') || a.url?.toLowerCase().includes('.gif');
-                  if (a.content_type?.startsWith('image/') || isGif) return <ImageWithFallback key={i} src={a.url} alt={a.filename || 'image'} className="max-w-[400px] max-h-[300px] rounded-lg cursor-pointer hover:brightness-110" style={{ border: `1px solid ${colors.border.default}` }} onClick={() => onImageClick?.(a.url, a.filename)} loading="lazy" decoding="async" />;
-                  if (a.content_type?.startsWith('video/') || a.url?.match(/\.(mp4|webm|mov|avi|mkv)(\?|$)/i)) return <VideoPlayer key={i} src={a.url} filename={a.filename} />;
-                  if (a.content_type?.startsWith('audio/') || a.url?.match(/\.(mp3|wav|ogg|flac|aac)(\?|$)/i)) return <audio key={i} src={a.url} controls className="max-w-[300px]" />;
-                  return <a key={i} href={a.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-[13px] px-3 py-2 rounded-lg" style={{ color: colors.text.secondary, background: colors.bg.overlay }}>📎 {a.filename || 'File'}</a>;
-                })}
-              </div>
-            )}
-
-            {/* Reactions */}
-            {!isDeleted && message.reactions?.length > 0 && (
-              <div className="flex flex-wrap gap-1.5 mt-2">
-                {message.reactions.map((r, i) => {
-                  const mine = r.users?.includes(currentUserId);
-                  return (
-                    <ReactionTooltip key={i} reaction={r}>
-                      <button onClick={() => onReact(message, r.emoji)}
-                        className="flex items-center gap-1.5 px-2 py-1 rounded-lg text-[13px] transition-all hover:brightness-110"
-                        style={{
-                          background: mine ? colors.accent.subtle : colors.bg.overlay,
-                          color: mine ? colors.accent.primary : colors.text.secondary,
-                          border: `1px solid ${mine ? colors.accent.muted : colors.border.default}`,
-                        }}>
-                        <span className="text-[14px]">{r.emoji}</span>
-                        <span className="font-semibold tabular-nums text-[12px]">{r.count}</span>
-                      </button>
-                    </ReactionTooltip>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-
-          {/* Hover action toolbar */}
+          {/* Pill-shaped hover action bar */}
           {hovered && !isEditing && !isDeleted && (
-            <div className="absolute -top-3 right-4 flex items-center p-0.5 rounded-lg gap-0.5 z-10 k-fade-in"
-              style={{ background: colors.bg.overlay, border: `1px solid ${colors.border.strong}`, boxShadow: '0 4px 16px rgba(0,0,0,0.5)' }}
+            <div className="absolute -top-4 right-4 flex items-center p-0.5 rounded-lg gap-0.5 z-10"
+              style={{
+                background: P.floating, border: `1px solid ${P.border}`,
+                boxShadow: '0 4px 16px rgba(0,0,0,0.5)',
+                animation: 'slideInRight 150ms ease-out',
+              }}
               role="toolbar" aria-label="Message actions">
-              {quickEmojis.map(e => <button key={e} onClick={() => onReact(message, e)} className="w-7 h-7 flex items-center justify-center rounded-md text-sm hover:bg-[rgba(255,255,255,0.06)]">{e}</button>)}
-              <div className="w-px h-5 mx-0.5" style={{ background: colors.border.default }} />
-              <button onClick={() => onReply(message)} className="w-7 h-7 flex items-center justify-center rounded-md hover:bg-[rgba(255,255,255,0.06)]" title="Reply"><Reply className="w-4 h-4" style={{ color: colors.text.muted }} /></button>
-              {onStar && <button onClick={() => onStar(message)} className="w-7 h-7 flex items-center justify-center rounded-md hover:bg-[rgba(255,255,255,0.06)]" title="Star"><Star className="w-3.5 h-3.5" style={{ color: '#faa61a' }} /></button>}
-              {onForward && <button onClick={() => onForward(message)} className="w-7 h-7 flex items-center justify-center rounded-md hover:bg-[rgba(255,255,255,0.06)]" title="Forward"><Forward className="w-3.5 h-3.5" style={{ color: colors.text.muted }} /></button>}
-              {onPin && <button onClick={() => onPin(message)} className="w-7 h-7 flex items-center justify-center rounded-md hover:bg-[rgba(255,255,255,0.06)]" title={message.is_pinned ? 'Unpin' : 'Pin'}>{message.is_pinned ? <PinOff className="w-3.5 h-3.5" style={{ color: colors.warning }} /> : <Pin className="w-3.5 h-3.5" style={{ color: colors.text.muted }} />}</button>}
-              {isOwn && <>
-                <button onClick={() => onEdit(message)} className="w-7 h-7 flex items-center justify-center rounded-md hover:bg-[rgba(255,255,255,0.06)]" title="Edit"><Pencil className="w-3.5 h-3.5" style={{ color: colors.text.muted }} /></button>
-                <button onClick={() => onDelete(message)} className="w-7 h-7 flex items-center justify-center rounded-md hover:bg-[rgba(255,255,255,0.06)]" title="Delete"><Trash2 className="w-3.5 h-3.5" style={{ color: colors.danger }} /></button>
-              </>}
+              <div className="relative" ref={emojiPickerRef}>
+                <button onClick={() => setShowEmojiPicker(!showEmojiPicker)} className="w-7 h-7 flex items-center justify-center rounded-md hover:bg-[rgba(255,255,255,0.08)]" title="Add Reaction">
+                  <Smile className="w-4 h-4" style={{ color: showEmojiPicker ? P.textPrimary : P.muted }} />
+                </button>
+                {showEmojiPicker && (
+                  <div className="absolute right-0 top-full mt-1 z-50" onClick={e => e.stopPropagation()}>
+                    <EmojiPicker onSelect={(emoji) => { onReact(message, emoji); setShowEmojiPicker(false); }} onClose={() => setShowEmojiPicker(false)} />
+                  </div>
+                )}
+              </div>
+              <button onClick={() => onReply(message)} className="w-7 h-7 flex items-center justify-center rounded-md hover:bg-[rgba(255,255,255,0.08)]" title="Reply">
+                <Reply className="w-4 h-4" style={{ color: P.muted }} />
+              </button>
+              {onOpenThread && (
+                <button onClick={() => onOpenThread(message)} className="w-7 h-7 flex items-center justify-center rounded-md hover:bg-[rgba(255,255,255,0.08)]" title="Thread">
+                  <MessageSquare className="w-4 h-4" style={{ color: P.muted }} />
+                </button>
+              )}
+              {isOwn && (
+                <button onClick={() => onEdit(message)} className="w-7 h-7 flex items-center justify-center rounded-md hover:bg-[rgba(255,255,255,0.08)]" title="Edit">
+                  <Pencil className="w-4 h-4" style={{ color: P.muted }} />
+                </button>
+              )}
+              {onPin && (
+                <button onClick={() => onPin(message)} className="w-7 h-7 flex items-center justify-center rounded-md hover:bg-[rgba(255,255,255,0.08)]" title={message.is_pinned ? 'Unpin' : 'Pin'}>
+                  {message.is_pinned ? <PinOff className="w-4 h-4" style={{ color: P.warning }} /> : <Pin className="w-4 h-4" style={{ color: P.muted }} />}
+                </button>
+              )}
+              {onStar && (
+                <button onClick={() => onStar(message)} className="w-7 h-7 flex items-center justify-center rounded-md hover:bg-[rgba(255,255,255,0.08)]" title="Bookmark">
+                  <Bookmark className="w-4 h-4" style={{ color: P.muted }} />
+                </button>
+              )}
+              <MoreDropdown message={message} isOwn={isOwn} onReply={onReply} onPin={onPin} onStar={onStar} onForward={onForward} onDelete={onDelete} onEdit={onEdit} onMarkMoment={onMarkMoment} />
             </div>
           )}
         </div>
       </ContextMenuTrigger>
 
-      <ContextMenuContent className="w-52 p-1 rounded-lg" style={{ background: colors.bg.float, border: `1px solid ${colors.border.strong}`, boxShadow: '0 8px 32px rgba(0,0,0,0.6)' }}>
+      <ContextMenuContent className="w-52 p-1.5 rounded-xl" style={{ background: P.floating, border: `1px solid ${P.border}`, boxShadow: '0 8px 32px rgba(0,0,0,0.6)' }}>
         {!isDeleted && <>
           <div className="flex items-center gap-0.5 px-1 py-1 mb-1">
             {['👍', '❤️', '😂', '🔥', '👀', '✨'].map(e => (
               <button key={e} onClick={() => onReact(message, e)} className="w-7 h-7 flex items-center justify-center rounded-md text-base hover:bg-[rgba(255,255,255,0.1)]">{e}</button>
             ))}
           </div>
-          <ContextMenuSeparator style={{ background: 'rgba(255,255,255,0.06)', margin: '4px 0' }} />
-          <ContextMenuItem onClick={() => onReply(message)} className="text-[13px] gap-2 rounded-md px-2 py-1.5" style={{ color: colors.text.secondary }}><Reply className="w-4 h-4 opacity-50" /> Reply</ContextMenuItem>
-          <ContextMenuItem onClick={() => navigator.clipboard.writeText(message.content || '')} className="text-[13px] gap-2 rounded-md px-2 py-1.5" style={{ color: colors.text.secondary }}><Copy className="w-4 h-4 opacity-50" /> Copy Text</ContextMenuItem>
+          <ContextMenuSeparator style={{ background: P.border, margin: '4px 0' }} />
+          <ContextMenuItem onClick={() => onReply(message)} className="text-[13px] gap-2.5 rounded-lg px-2.5 py-2" style={{ color: P.textSecondary }}><Reply className="w-4 h-4 opacity-50" /> Reply</ContextMenuItem>
+          <ContextMenuItem onClick={() => navigator.clipboard.writeText(message.content || '')} className="text-[13px] gap-2.5 rounded-lg px-2.5 py-2" style={{ color: P.textSecondary }}><Copy className="w-4 h-4 opacity-50" /> Copy Text</ContextMenuItem>
         </>}
-        <ContextMenuItem onClick={() => navigator.clipboard.writeText(message.id)} className="text-[13px] gap-2 rounded-md px-2 py-1.5" style={{ color: colors.text.secondary }}><Link className="w-4 h-4 opacity-50" /> Copy Message ID</ContextMenuItem>
-        {!isDeleted && onPin && <ContextMenuItem onClick={() => onPin(message)} className="text-[13px] gap-2 rounded-md px-2 py-1.5" style={{ color: colors.text.secondary }}><Pin className="w-4 h-4 opacity-50" /> {message.is_pinned ? 'Unpin' : 'Pin'}</ContextMenuItem>}
-        {!isDeleted && onStar && <ContextMenuItem onClick={() => onStar(message)} className="text-[13px] gap-2 rounded-md px-2 py-1.5" style={{ color: '#faa61a' }}><Star className="w-4 h-4 opacity-50" /> Star Message</ContextMenuItem>}
-        {!isDeleted && onForward && <ContextMenuItem onClick={() => onForward(message)} className="text-[13px] gap-2 rounded-md px-2 py-1.5" style={{ color: colors.text.secondary }}><Forward className="w-4 h-4 opacity-50" /> Forward</ContextMenuItem>}
-        {!isDeleted && <ContextMenuItem onClick={() => onHighlight?.(message)} className="text-[13px] gap-2 rounded-md px-2 py-1.5" style={{ color: colors.text.secondary }}><Bookmark className="w-4 h-4 opacity-50" /> Save as Highlight</ContextMenuItem>}
+        <ContextMenuItem onClick={() => navigator.clipboard.writeText(message.id)} className="text-[13px] gap-2.5 rounded-lg px-2.5 py-2" style={{ color: P.textSecondary }}><Link className="w-4 h-4 opacity-50" /> Copy Message Link</ContextMenuItem>
+        {!isDeleted && onPin && <ContextMenuItem onClick={() => onPin(message)} className="text-[13px] gap-2.5 rounded-lg px-2.5 py-2" style={{ color: P.textSecondary }}><Pin className="w-4 h-4 opacity-50" /> {message.is_pinned ? 'Unpin' : 'Pin'}</ContextMenuItem>}
+        {!isDeleted && onForward && <ContextMenuItem onClick={() => onForward(message)} className="text-[13px] gap-2.5 rounded-lg px-2.5 py-2" style={{ color: P.textSecondary }}><Forward className="w-4 h-4 opacity-50" /> Forward</ContextMenuItem>}
         {isOwn && !isDeleted && <>
-          <ContextMenuSeparator style={{ background: 'rgba(255,255,255,0.06)', margin: '4px 0' }} />
-          <ContextMenuItem onClick={() => onEdit(message)} className="text-[13px] gap-2 rounded-md px-2 py-1.5" style={{ color: colors.text.secondary }}><Pencil className="w-4 h-4 opacity-50" /> Edit</ContextMenuItem>
-          <ContextMenuItem onClick={() => onDelete(message)} className="text-[13px] gap-2 rounded-md px-2 py-1.5" style={{ color: colors.danger }}><Trash2 className="w-4 h-4 opacity-50" /> Delete</ContextMenuItem>
+          <ContextMenuSeparator style={{ background: P.border, margin: '4px 0' }} />
+          <ContextMenuItem onClick={() => onEdit(message)} className="text-[13px] gap-2.5 rounded-lg px-2.5 py-2" style={{ color: P.textSecondary }}><Pencil className="w-4 h-4 opacity-50" /> Edit</ContextMenuItem>
+          <ContextMenuItem onClick={() => onDelete(message)} className="text-[13px] gap-2.5 rounded-lg px-2.5 py-2" style={{ color: P.danger }}><Trash2 className="w-4 h-4 opacity-50" /> Delete</ContextMenuItem>
         </>}
       </ContextMenuContent>
     </ContextMenu>

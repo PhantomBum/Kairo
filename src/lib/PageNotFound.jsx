@@ -1,7 +1,8 @@
 import { useLocation } from 'react-router-dom';
+import { Crown } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
-import { colors, shadows } from '@/components/app/design/tokens';
+import { colors } from '@/components/app/design/tokens';
 
 export default function PageNotFound() {
   const location = useLocation();
@@ -22,14 +23,13 @@ export default function PageNotFound() {
   return (
     <div className="min-h-screen flex items-center justify-center p-6" style={{ background: colors.bg.base }}>
       <div className="max-w-md w-full text-center k-fade-in">
-        <div className="w-20 h-20 rounded-3xl mx-auto mb-8 flex items-center justify-center" style={{ background: colors.bg.elevated }}>
-          <span className="text-4xl font-bold" style={{ color: colors.text.disabled }}>?</span>
+        <div className="w-20 h-20 rounded-3xl mx-auto mb-8 flex items-center justify-center" style={{ background: `${colors.accent.primary}15`, border: `1px solid ${colors.accent.primary}30` }}>
+          <Crown className="w-10 h-10" style={{ color: colors.accent.primary }} />
         </div>
 
-        <h1 className="text-[48px] font-bold mb-2" style={{ color: colors.text.disabled }}>404</h1>
-        <h2 className="text-[20px] font-semibold mb-2" style={{ color: colors.text.primary }}>Page not found</h2>
-        <p className="text-[14px] leading-relaxed mb-8" style={{ color: colors.text.muted }}>
-          We looked everywhere for <span className="font-semibold" style={{ color: colors.text.secondary }}>"{pageName || 'this page'}"</span> but it doesn't seem to exist.
+        <h1 className="text-[28px] font-bold mb-2" style={{ color: colors.text.primary }}>We couldn't find that page</h1>
+        <p className="text-[15px] leading-relaxed mb-8" style={{ color: colors.text.muted }}>
+          The page you're looking for might have moved or doesn't exist. No worries — we'll get you back on track.
         </p>
 
         {isFetched && authData?.isAuthenticated && authData?.user?.role === 'admin' && (
@@ -41,11 +41,11 @@ export default function PageNotFound() {
           </div>
         )}
 
-        <button onClick={() => window.location.href = '/'}
-          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-[14px] font-semibold"
-          style={{ background: colors.accent.primary, color: '#fff' }}>
+        <a href="/"
+          className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-[14px] font-semibold transition-all hover:brightness-110"
+          style={{ background: colors.accent.primary, color: '#0d1117' }}>
           Go Home
-        </button>
+        </a>
       </div>
     </div>
   );

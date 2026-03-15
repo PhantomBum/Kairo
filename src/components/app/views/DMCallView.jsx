@@ -96,7 +96,7 @@ export default function DMCallView({ call, conversation, currentUser, onEndCall,
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-[12px] font-medium truncate" style={{ color: colors.text.primary }}>{otherName}</p>
-            <p className="text-[10px]" style={{ color: colors.status.online }}>{formatDuration(callDuration)}</p>
+            <p className="text-[11px]" style={{ color: colors.status.online }}>{formatDuration(callDuration)}</p>
           </div>
           <button onClick={() => setIsPip(false)} className="p-1 rounded hover:bg-[rgba(255,255,255,0.06)]">
             <Maximize2 className="w-3.5 h-3.5" style={{ color: colors.text.muted }} />

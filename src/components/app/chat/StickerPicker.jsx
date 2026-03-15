@@ -55,7 +55,7 @@ export default function StickerPicker({ onSelect, onClose, serverId }) {
             className="flex flex-col items-center gap-1 p-3 rounded-xl transition-colors hover:bg-[rgba(255,255,255,0.04)]"
             style={{ background: colors.bg.elevated }}>
             <span className="text-3xl">{s.emoji}</span>
-            <span className="text-[10px] truncate w-full text-center" style={{ color: colors.text.muted }}>{s.name}</span>
+            <span className="text-[11px] truncate w-full text-center" style={{ color: colors.text.muted }}>{s.name}</span>
           </button>
         ))}
         {tab === 'server' && (serverStickers.length > 0 ? serverStickers.map(s => (
@@ -63,7 +63,7 @@ export default function StickerPicker({ onSelect, onClose, serverId }) {
             className="flex flex-col items-center gap-1 p-2 rounded-xl transition-colors hover:bg-[rgba(255,255,255,0.04)]"
             style={{ background: colors.bg.elevated }}>
             {s.image_url ? <img src={s.image_url} className="w-14 h-14 object-contain" alt={s.name} /> : <span className="text-3xl">📎</span>}
-            <span className="text-[10px] truncate w-full text-center" style={{ color: colors.text.muted }}>{s.name}</span>
+            <span className="text-[11px] truncate w-full text-center" style={{ color: colors.text.muted }}>{s.name}</span>
           </button>
         )) : (
           <div className="col-span-4 text-center py-8">

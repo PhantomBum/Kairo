@@ -32,7 +32,7 @@ export default function DMMediaGallery({ messages, onClose }) {
       </div>
       <div className="flex gap-0.5 px-2 pt-2">
         {TABS.map(t => (
-          <button key={t.id} onClick={() => setTab(t.id)} className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 rounded-lg text-[10px] transition-colors"
+          <button key={t.id} onClick={() => setTab(t.id)} className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 rounded-lg text-[11px] transition-colors"
             style={{ background: tab === t.id ? 'var(--bg-glass-active)' : 'transparent', color: tab === t.id ? 'var(--text-cream)' : 'var(--text-muted)' }}>
             <t.icon className="w-3 h-3" /> {t.label}
             <span className="text-[8px]">({media[t.id].length})</span>
@@ -64,7 +64,7 @@ export default function DMMediaGallery({ messages, onClose }) {
                 <FileText className="w-3.5 h-3.5 flex-shrink-0 opacity-50" />
                 <div className="flex-1 min-w-0">
                   <p className="truncate">{a.filename}</p>
-                  <p className="text-[9px]" style={{ color: 'var(--text-muted)' }}>{a.author} · {new Date(a.date).toLocaleDateString()}</p>
+                  <p className="text-[11px]" style={{ color: 'var(--text-muted)' }}>{a.author} · {new Date(a.date).toLocaleDateString()}</p>
                 </div>
               </a>
             ))}

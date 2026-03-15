@@ -52,7 +52,8 @@ export function useChannels(serverId) {
   useEffect(() => {
     if (!serverId) return;
     const unsub = base44.entities.Channel.subscribe((event) => {
-      if (event.data?.server_id === serverId || !event.data?.server_id) {
+      const rec = event.record || event.old_record;
+      if (rec?.server_id === serverId || !rec?.server_id) {
         qc.invalidateQueries({ queryKey: ['channels', serverId] });
       }
     });
@@ -72,7 +73,8 @@ export function useMembers(serverId) {
   useEffect(() => {
     if (!serverId) return;
     const unsub = base44.entities.ServerMember.subscribe((event) => {
-      if (event.data?.server_id === serverId || !event.data?.server_id) {
+      const rec = event.record || event.old_record;
+      if (rec?.server_id === serverId || !rec?.server_id) {
         qc.invalidateQueries({ queryKey: ['members', serverId] });
       }
     });
@@ -109,10 +111,9 @@ export function useMessages(channelId) {
     // Reset seen events on channel change
     seenEventsRef.current = new Set();
     const unsub = base44.entities.Message.subscribe((event) => {
-      // Only invalidate if this event is for our channel
-      if (event.data?.channel_id && event.data.channel_id !== channelId) return;
-      // Deduplicate events (handles reconnection replay)
-      const eventKey = `${event.type}_${event.id}_${event.data?.updated_date || event.data?.created_date || ''}`;
+      const rec = event.record || event.old_record;
+      if (rec?.channel_id && rec.channel_id !== channelId) return;
+      const eventKey = `${event.type}_${rec?.id || ''}_${rec?.updated_date || rec?.created_date || ''}`;
       if (seenEventsRef.current.has(eventKey)) return;
       seenEventsRef.current.add(eventKey);
       // Keep seen set bounded
@@ -139,6 +140,7 @@ export function useMessages(channelId) {
     },
     enabled: !!channelId,
     staleTime: 5000,
+    placeholderData: (prev) => prev,
   });
 }
 
@@ -151,8 +153,9 @@ export function useDMMessages(conversationId) {
     if (!conversationId) return;
     seenEventsRef.current = new Set();
     const unsub = base44.entities.DirectMessage.subscribe((event) => {
-      if (event.data?.conversation_id && event.data.conversation_id !== conversationId) return;
-      const eventKey = `${event.type}_${event.id}_${event.data?.updated_date || event.data?.created_date || ''}`;
+      const rec = event.record || event.old_record;
+      if (rec?.conversation_id && rec.conversation_id !== conversationId) return;
+      const eventKey = `${event.type}_${rec?.id || ''}_${rec?.updated_date || rec?.created_date || ''}`;
       if (seenEventsRef.current.has(eventKey)) return;
       seenEventsRef.current.add(eventKey);
       if (seenEventsRef.current.size > 500) {
@@ -178,6 +181,7 @@ export function useDMMessages(conversationId) {
     },
     enabled: !!conversationId,
     staleTime: 5000,
+    placeholderData: (prev) => prev,
   });
 }
 
@@ -317,7 +321,8 @@ export function useMyProfile(email) {
   useEffect(() => {
     if (!email) return;
     const unsub = base44.entities.UserProfile.subscribe((event) => {
-      if (event.data?.user_email === email) {
+      const rec = event.record || event.old_record;
+      if (rec?.user_email === email) {
         qc.invalidateQueries({ queryKey: ['myProfile', email] });
       }
     });

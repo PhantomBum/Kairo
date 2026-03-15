@@ -106,9 +106,9 @@ export default function ServerAnalyticsDashboard({ server }) {
       <div className="p-6 space-y-6">
         <div className="text-center py-16">
           <BarChart3 className="w-16 h-16 text-zinc-700 mx-auto mb-4" />
-          <h3 className="text-xl font-semibold text-white mb-2">Analytics Coming Soon</h3>
+          <h3 className="text-xl font-semibold text-white mb-2">Server Analytics</h3>
           <p className="text-zinc-500 max-w-md mx-auto">
-            Server analytics will start tracking once there's activity. Check back later to see insights about your community.
+            Analytics will appear here once your server has some activity.
           </p>
         </div>
 

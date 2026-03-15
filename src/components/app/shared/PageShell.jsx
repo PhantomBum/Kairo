@@ -1,74 +1,89 @@
 import React from 'react';
-import { ArrowLeft, HelpCircle, Crown, MessageSquare, Bot, FileQuestion } from 'lucide-react';
-import { createPageUrl } from '@/utils';
+import { ArrowLeft, Crown, Heart } from 'lucide-react';
 
-const NAV_LINKS = [
-  { label: 'FAQ', href: createPageUrl('FAQ'), icon: FileQuestion },
-  { label: 'Elite', href: createPageUrl('Elite'), icon: Crown },
-  { label: 'Support', href: createPageUrl('Support'), icon: MessageSquare },
-  { label: 'Bots', href: createPageUrl('BotMarketplace'), icon: Bot },
-  { label: 'Developers', href: createPageUrl('Developers'), icon: HelpCircle },
+const C = {
+  bg: '#18181c', surface: '#1e1e23', elevated: '#26262d',
+  accent: '#2dd4bf', text: '#e8edf5', textSec: '#9aaabb',
+  muted: '#68677a', border: '#33333d',
+};
+
+const NAV = [
+  { label: 'Features', href: '/#features' },
+  { label: 'Pricing', href: '/Pricing' },
+  { label: 'Elite', href: '/Elite' },
+  { label: 'FAQ', href: '/FAQ' },
+  { label: 'Support', href: '/Support' },
 ];
 
 export default function PageShell({ title, children, showBack = true }) {
   return (
-    <div className="min-h-screen" style={{ background: 'var(--bg-deep, #050505)', color: 'var(--text-primary, #d4d0c5)' }}>
-      <header className="sticky top-0 z-30 glass" style={{ borderBottom: '1px solid var(--border, rgba(255,255,255,0.04))' }}>
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
+    <div className="min-h-screen flex flex-col" style={{ background: C.bg, color: C.text, fontFamily: 'Inter, system-ui, sans-serif' }}>
+      <header className="sticky top-0 z-30" style={{ background: 'rgba(24,24,28,0.85)', backdropFilter: 'blur(20px) saturate(180%)', borderBottom: `1px solid ${C.border}` }}>
+        <div className="max-w-[1200px] mx-auto px-6 h-14 flex items-center justify-between">
           <div className="flex items-center gap-3">
             {showBack && (
-              <a href={createPageUrl('Kairo')} className="p-1.5 rounded-lg hover:bg-[rgba(255,255,255,0.05)] transition-colors">
-                <ArrowLeft className="w-4 h-4" style={{ color: 'var(--text-muted, #555248)' }} />
+              <a href="/" className="p-1.5 rounded-lg hover:bg-[rgba(255,255,255,0.06)] transition-colors">
+                <ArrowLeft className="w-4 h-4" style={{ color: C.muted }} />
               </a>
             )}
-            <a href={createPageUrl('Kairo')} className="text-lg font-bold" style={{ color: 'var(--text-cream, #e8e4d9)', fontFamily: 'monospace' }}>Kairo</a>
-            {title && <><div className="w-px h-4" style={{ background: 'var(--border-light, rgba(255,255,255,0.07))' }} /><span className="text-sm font-medium" style={{ color: 'var(--text-secondary, #8a8778)' }}>{title}</span></>}
+            <a href="/" className="flex items-center gap-2">
+              <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: C.accent }}>
+                <Crown className="w-4 h-4 text-white" />
+              </div>
+              <span className="text-[16px] font-bold" style={{ color: C.text }}>Kairo</span>
+            </a>
+            {title && (
+              <>
+                <div className="w-px h-4" style={{ background: C.border }} />
+                <span className="text-[13px] font-medium" style={{ color: C.muted }}>{title}</span>
+              </>
+            )}
           </div>
           <nav className="hidden md:flex items-center gap-1">
-            {NAV_LINKS.map(l => (
-              <a key={l.label} href={l.href} className="px-3 py-1.5 rounded-lg text-[11px] font-medium transition-colors hover:bg-[rgba(255,255,255,0.05)]"
-                style={{ color: 'var(--text-secondary, #8a8778)' }}>{l.label}</a>
+            {NAV.map(l => (
+              <a key={l.label} href={l.href} className="px-3 py-1.5 rounded-lg text-[13px] font-medium transition-colors hover:bg-[rgba(255,255,255,0.06)]"
+                style={{ color: C.textSec }}>{l.label}</a>
             ))}
           </nav>
         </div>
       </header>
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12">{children}</main>
-      <footer style={{ borderTop: '1px solid var(--border, rgba(255,255,255,0.04))' }}>
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 mb-8">
-            <div>
-              <h4 className="text-[10px] font-semibold uppercase tracking-[0.1em] mb-3" style={{ color: 'var(--text-muted, #555248)', fontFamily: 'monospace' }}>Product</h4>
-              <div className="space-y-2">
-                <a href={createPageUrl('Kairo')} className="block text-[12px] hover:underline" style={{ color: 'var(--text-secondary, #8a8778)' }}>App</a>
-                <a href={createPageUrl('Elite')} className="block text-[12px] hover:underline" style={{ color: 'var(--text-secondary, #8a8778)' }}>Elite</a>
-                <a href={createPageUrl('BotMarketplace')} className="block text-[12px] hover:underline" style={{ color: 'var(--text-secondary, #8a8778)' }}>Bot Marketplace</a>
+
+      <main className="flex-1 max-w-[1200px] mx-auto px-6 py-10 md:py-16 w-full">{children}</main>
+
+      <footer style={{ borderTop: `1px solid ${C.border}` }}>
+        <div className="max-w-[1200px] mx-auto px-6 py-10">
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-8 mb-8">
+            <div className="col-span-2 sm:col-span-1">
+              <div className="flex items-center gap-2 mb-3">
+                <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: C.accent }}>
+                  <Crown className="w-4 h-4 text-white" />
+                </div>
+                <span className="text-[14px] font-bold">Kairo</span>
               </div>
+              <p className="text-[12px] leading-relaxed" style={{ color: C.muted }}>A better place to talk.</p>
             </div>
-            <div>
-              <h4 className="text-[10px] font-semibold uppercase tracking-[0.1em] mb-3" style={{ color: 'var(--text-muted, #555248)', fontFamily: 'monospace' }}>Developers</h4>
-              <div className="space-y-2">
-                <a href={createPageUrl('Developers')} className="block text-[12px] hover:underline" style={{ color: 'var(--text-secondary, #8a8778)' }}>Developer Portal</a>
-                <a href={createPageUrl('BotMarketplace')} className="block text-[12px] hover:underline" style={{ color: 'var(--text-secondary, #8a8778)' }}>Bot Marketplace</a>
+            {[
+              { title: 'Product', links: [['App', '/'], ['Elite', '/Elite'], ['Changelog', '/Changelog'], ['Status', '/Status']] },
+              { title: 'Developers', links: [['Developer Portal', '/Developers'], ['Bot Marketplace', '/BotMarketplace']] },
+              { title: 'Support', links: [['FAQ', '/FAQ'], ['Help Center', '/Support'], ['About', '/About']] },
+              { title: 'Legal', links: [['Terms of Service', '/Support?tab=terms'], ['Privacy Policy', '/Support?tab=privacy'], ['Guidelines', '/Support?tab=guidelines']] },
+            ].map((s, i) => (
+              <div key={i}>
+                <p className="text-[11px] font-bold uppercase tracking-wider mb-3" style={{ color: C.muted }}>{s.title}</p>
+                <div className="space-y-2">
+                  {s.links.map(([label, href], j) => (
+                    <a key={j} href={href} className="block text-[12px] hover:opacity-100 transition-opacity" style={{ color: C.textSec, opacity: 0.7 }}>{label}</a>
+                  ))}
+                </div>
               </div>
-            </div>
-            <div>
-              <h4 className="text-[10px] font-semibold uppercase tracking-[0.1em] mb-3" style={{ color: 'var(--text-muted, #555248)', fontFamily: 'monospace' }}>Support</h4>
-              <div className="space-y-2">
-                <a href={createPageUrl('FAQ')} className="block text-[12px] hover:underline" style={{ color: 'var(--text-secondary, #8a8778)' }}>FAQ</a>
-                <a href={createPageUrl('Support')} className="block text-[12px] hover:underline" style={{ color: 'var(--text-secondary, #8a8778)' }}>Help Center</a>
-                <a href={createPageUrl('Status')} className="block text-[12px] hover:underline" style={{ color: 'var(--text-secondary, #8a8778)' }}>System Status</a>
-              </div>
-            </div>
-            <div>
-              <h4 className="text-[10px] font-semibold uppercase tracking-[0.1em] mb-3" style={{ color: 'var(--text-muted, #555248)', fontFamily: 'monospace' }}>Legal</h4>
-              <div className="space-y-2">
-                <a href={createPageUrl('Support') + '?tab=terms'} className="block text-[12px] hover:underline" style={{ color: 'var(--text-secondary, #8a8778)' }}>Terms of Service</a>
-                <a href={createPageUrl('Support') + '?tab=privacy'} className="block text-[12px] hover:underline" style={{ color: 'var(--text-secondary, #8a8778)' }}>Privacy Policy</a>
-                <a href={createPageUrl('Support') + '?tab=guidelines'} className="block text-[12px] hover:underline" style={{ color: 'var(--text-secondary, #8a8778)' }}>Community Guidelines</a>
-              </div>
+            ))}
+          </div>
+          <div className="flex flex-col md:flex-row items-center justify-between pt-6 gap-3" style={{ borderTop: `1px solid ${C.border}` }}>
+            <p className="text-[11px]" style={{ color: C.muted }}>© 2026 Kairo. All rights reserved.</p>
+            <div className="flex items-center gap-1 text-[11px]" style={{ color: C.muted }}>
+              Made with <Heart className="w-3 h-3 mx-0.5" style={{ color: '#ed4245' }} /> by the Kairo team
             </div>
           </div>
-          <div className="text-center text-[10px]" style={{ color: 'var(--text-faint, #3a3832)' }}>© {new Date().getFullYear()} Kairo. All rights reserved.</div>
         </div>
       </footer>
     </div>

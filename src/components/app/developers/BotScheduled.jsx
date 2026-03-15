@@ -32,13 +32,13 @@ export default function BotScheduled({ bot, onSave }) {
             <button onClick={() => remove(s.id)} className="p-1 rounded-lg hover:bg-[rgba(201,123,123,0.1)]"><Trash2 className="w-3.5 h-3.5" style={{ color: 'var(--accent-red)' }} /></button>
           </div>
           <div>
-            <label className="text-[9px] font-semibold uppercase tracking-[0.08em] block mb-1" style={{ color: 'var(--text-muted)', fontFamily: 'monospace' }}>Message</label>
+            <label className="text-[11px] font-semibold uppercase tracking-[0.08em] block mb-1" style={{ color: 'var(--text-muted)', fontFamily: 'monospace' }}>Message</label>
             <textarea value={s.content} onChange={e => update(s.id, { content: e.target.value })} rows={2} placeholder="Good morning everyone! ☀️"
               className="w-full px-2.5 py-1.5 rounded-lg text-[12px] outline-none resize-none" style={{ background: 'var(--bg-glass-strong)', color: 'var(--text-primary)', border: '1px solid var(--border)' }} />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-[9px] font-semibold uppercase tracking-[0.08em] block mb-1" style={{ color: 'var(--text-muted)', fontFamily: 'monospace' }}>Schedule</label>
+              <label className="text-[11px] font-semibold uppercase tracking-[0.08em] block mb-1" style={{ color: 'var(--text-muted)', fontFamily: 'monospace' }}>Schedule</label>
               <select value={s.schedule} onChange={e => update(s.id, { schedule: e.target.value })}
                 className="w-full px-2.5 py-1.5 rounded-lg text-[12px] outline-none" style={{ background: 'var(--bg-glass-strong)', color: 'var(--text-primary)', border: '1px solid var(--border)' }}>
                 <option value="hourly">Hourly</option><option value="daily">Daily</option><option value="weekly">Weekly</option><option value="custom">Custom Cron</option>
@@ -46,7 +46,7 @@ export default function BotScheduled({ bot, onSave }) {
             </div>
             {s.schedule === 'custom' && (
               <div>
-                <label className="text-[9px] font-semibold uppercase tracking-[0.08em] block mb-1" style={{ color: 'var(--text-muted)', fontFamily: 'monospace' }}>Cron Expression</label>
+                <label className="text-[11px] font-semibold uppercase tracking-[0.08em] block mb-1" style={{ color: 'var(--text-muted)', fontFamily: 'monospace' }}>Cron Expression</label>
                 <input value={s.cron} onChange={e => update(s.id, { cron: e.target.value })} placeholder="0 9 * * *"
                   className="w-full px-2.5 py-1.5 rounded-lg text-[12px] outline-none font-mono" style={{ background: 'var(--bg-glass-strong)', color: 'var(--text-primary)', border: '1px solid var(--border)' }} />
               </div>

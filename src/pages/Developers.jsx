@@ -54,7 +54,7 @@ export default function Developers() {
   };
 
   const deleteBot = async (bot) => {
-    if (!confirm(`Delete "${bot.name}"? This cannot be undone.`)) return;
+    if (!confirm(`Delete "${bot.name}"? This can't be undone.`)) return;
     await base44.entities.Bot.delete(bot.id);
     await fetchBots(user);
     if (editingBot?.id === bot.id) setEditingBot(null);
