@@ -75,6 +75,7 @@ export default function EmptyView({ onCreateServer, onJoinServer, emptyServer, s
 
         <div className="flex gap-5 flex-wrap">
           {[
+            { href: createPageUrl('Discover'), label: 'Discover', accent: true },
             { href: createPageUrl('BotMarketplace'), label: 'Bots' },
             { href: createPageUrl('Elite'), label: 'Elite', accent: true },
             { href: createPageUrl('FAQ'), label: 'Help' },

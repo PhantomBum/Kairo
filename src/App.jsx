@@ -4,7 +4,7 @@ import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
 import NavigationTracker from '@/lib/NavigationTracker'
 import { pagesConfig } from './pages.config'
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
@@ -12,6 +12,7 @@ import Login from '@/pages/Login';
 import Register from '@/pages/Register';
 import Invite from '@/pages/Invite';
 import Wrapped from '@/pages/Wrapped';
+import ServerWidget from '@/pages/ServerWidget';
 import KairoLoadingScreen from '@/components/app/KairoLoadingScreen';
 
 const { Pages, Layout, mainPage } = pagesConfig;
@@ -23,12 +24,22 @@ const LayoutWrapper = ({ children, currentPageName }) => Layout ?
   : <>{children}</>;
 
 const AuthenticatedApp = () => {
+  const { pathname } = useLocation();
   const { isLoadingAuth, isLoadingPublicSettings, authError, user } = useAuth();
   const [loadingDismissed, setLoadingDismissed] = useState(false);
   const loadingRef = useRef(false);
 
   const isLoading = isLoadingAuth || isLoadingPublicSettings;
   const username = user?.full_name || user?.email?.split('@')[0] || '';
+
+  // Public embed route — no auth required
+  if (pathname.startsWith('/embed/')) {
+    return (
+      <Routes>
+        <Route path="/embed/:serverId" element={<ServerWidget />} />
+      </Routes>
+    );
+  }
 
   if (isLoading || !loadingDismissed) {
     return (

@@ -8,6 +8,7 @@ const C = {
 };
 
 const NAV = [
+  { label: 'Discover', href: '/Discover' },
   { label: 'Features', href: '/#features' },
   { label: 'Pricing', href: '/Pricing' },
   { label: 'Elite', href: '/Elite' },

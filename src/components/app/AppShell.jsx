@@ -182,6 +182,19 @@ export default function AppShell({ currentUser }) {
   const availableBoosts = getAvailableBoosts(profile, currentUser.email);
 
   useEffect(() => { if (activeServer && channels.length > 0 && !activeChannel) { const first = channels.sort((a, b) => (a.position || 0) - (b.position || 0)).find(c => c.type === 'text'); if (first) setActiveChannel(first); } }, [activeServer, channels]);
+
+  // When returning from Discover page after joining, select the server
+  useEffect(() => {
+    if (servers.length === 0) return;
+    try {
+      const joinId = sessionStorage.getItem('kairo-join-server');
+      if (joinId) {
+        sessionStorage.removeItem('kairo-join-server');
+        const s = servers.find(x => x.id === joinId);
+        if (s) { setActiveServer(s); setActiveChannel(null); setActiveConv(null); setView('server'); }
+      }
+    } catch {}
+  }, [servers]);
   // Apply pending jump (channel + message) after server/channels load
   useEffect(() => {
     const p = pendingJumpRef.current;

@@ -117,6 +117,17 @@ function rowToEntity(row) {
 
 function createEntityProxy(entityType) {
   return {
+    async get(id) {
+      const { data, error } = await supabase
+        .from('entities')
+        .select('*')
+        .eq('entity_type', entityType)
+        .eq('id', id)
+        .single();
+      if (error || !data) return null;
+      return rowToEntity(data);
+    },
+
     async filter(criteria, orderBy, limit) {
       let query = buildQuery(entityType);
 

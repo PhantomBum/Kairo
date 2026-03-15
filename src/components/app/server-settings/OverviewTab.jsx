@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { Check, Camera } from 'lucide-react';
+import { Check, Camera, Copy, LayoutTemplate, Code2 } from 'lucide-react';
 
 const P = {
   base: '#18181c', surface: '#1e1e23', elevated: '#26262d',
@@ -8,7 +8,7 @@ const P = {
   accent: '#2dd4bf', danger: '#ed4245', success: '#3ba55c',
 };
 
-export default function OverviewTab({ server, name, setName, desc, setDesc, isPublic, setIsPublic, serverSettings, setServerSettings, onSave, onUploadImg, saving }) {
+export default function OverviewTab({ server, name, setName, desc, setDesc, isPublic, setIsPublic, serverSettings, setServerSettings, onSave, onUploadImg, saving, channels, categories, onSaveAsTemplate }) {
   const [saveStatus, setSaveStatus] = useState(null);
   const [accentColor, setAccentColor] = useState(server?.banner_color || '#2dd4bf');
   const saveTimer = useRef(null);
@@ -138,11 +138,60 @@ export default function OverviewTab({ server, name, setName, desc, setDesc, isPu
         </div>
       </div>
 
+      {/* Widget Embed */}
+      <div className="p-4 rounded-xl" style={{ background: P.elevated, border: `1px solid ${P.border}` }}>
+        <div className="flex items-center gap-2 mb-2">
+          <Code2 className="w-4 h-4" style={{ color: P.accent }} />
+          <p className="text-[11px] font-semibold uppercase tracking-wider" style={{ color: P.muted }}>Widget Embed</p>
+        </div>
+        <p className="text-[12px] mb-3" style={{ color: P.textSecondary }}>Embed your server on any website. Visitors see your server info and a Join button.</p>
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            <code className="flex-1 text-[11px] font-mono px-3 py-2.5 rounded-lg truncate block" style={{ background: P.base, color: P.textPrimary, border: `1px solid ${P.border}` }}>
+              {`<iframe src="${typeof window !== 'undefined' ? window.location.origin : ''}/embed/${server?.id}" width="340" height="200" frameborder="0"></iframe>`}
+            </code>
+            <WidgetCopyButton text={`<iframe src="${typeof window !== 'undefined' ? window.location.origin : ''}/embed/${server?.id}" width="340" height="200" frameborder="0"></iframe>`} />
+          </div>
+          <div className="flex items-center gap-2">
+            <code className="flex-1 text-[11px] font-mono px-3 py-2.5 rounded-lg truncate block" style={{ background: P.base, color: P.textPrimary, border: `1px solid ${P.border}` }}>
+              {typeof window !== 'undefined' ? `${window.location.origin}/embed/${server?.id}` : ''}
+            </code>
+            <WidgetCopyButton text={typeof window !== 'undefined' ? `${window.location.origin}/embed/${server?.id}` : ''} />
+          </div>
+        </div>
+      </div>
+
+      {/* Save as Template */}
+      {onSaveAsTemplate && (
+        <div className="p-4 rounded-xl" style={{ background: P.elevated, border: `1px solid ${P.border}` }}>
+          <div className="flex items-center gap-2 mb-2">
+            <LayoutTemplate className="w-4 h-4" style={{ color: P.accent }} />
+            <p className="text-[11px] font-semibold uppercase tracking-wider" style={{ color: P.muted }}>Server Template</p>
+          </div>
+          <p className="text-[12px] mb-3" style={{ color: P.textSecondary }}>Save this server as a template so others can create servers with the same channels and structure.</p>
+          <button onClick={() => onSaveAsTemplate(server, channels || [], categories || [])}
+            className="px-4 py-2.5 rounded-xl text-[13px] font-semibold flex items-center gap-2 transition-all hover:brightness-110 active:scale-95"
+            style={{ background: P.accent, color: '#0d1117' }}>
+            <LayoutTemplate className="w-4 h-4" /> Save as Template
+          </button>
+        </div>
+      )}
+
       <button onClick={async () => { setSaveStatus('saving'); await onSave(); setSaveStatus('saved'); setTimeout(() => setSaveStatus(null), 2000); }} disabled={saving}
         className="px-6 py-2.5 rounded-xl text-[13px] font-semibold disabled:opacity-30 flex items-center gap-2 transition-all hover:brightness-110 active:scale-95"
         style={{ background: P.accent, color: '#0d1117' }}>
         {saving ? 'Saving...' : <><Check className="w-4 h-4" /> Save Changes</>}
       </button>
     </div>
+  );
+}
+
+function WidgetCopyButton({ text }) {
+  const [copied, setCopied] = useState(false);
+  const handleCopy = () => { navigator.clipboard.writeText(text); setCopied(true); setTimeout(() => setCopied(false), 2000); };
+  return (
+    <button onClick={handleCopy} className="px-3 py-2.5 rounded-lg flex items-center gap-1.5 transition-all" style={{ background: copied ? P.success : P.accent, color: '#fff' }}>
+      {copied ? <><Check className="w-3.5 h-3.5" /> Copied</> : <><Copy className="w-3.5 h-3.5" /> Copy</>}
+    </button>
   );
 }

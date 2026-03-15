@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { X, Hash, Copy, Check } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
+import { useToast } from '@/components/ui/use-toast';
 import { base44 } from '@/api/base44Client';
 import { uploadServerIcon, uploadBanner } from '@/lib/uploadUtils';
 const P = {
@@ -78,6 +79,7 @@ function InvitesSection({ server }) {
 
 export default function ServerSettingsModal({ onClose, server, currentUserId }) {
   const qc = useQueryClient();
+  const { toast } = useToast();
   const [tab, setTab] = useState('overview');
   const [name, setName] = useState(server?.name || '');
   const [desc, setDesc] = useState(server?.description || '');
@@ -100,6 +102,35 @@ export default function ServerSettingsModal({ onClose, server, currentUserId }) 
     base44.entities.Channel.filter({ server_id: server.id }).then(setChannels);
     base44.entities.Category.filter({ server_id: server.id }).then(setServerCategories);
   }, [server?.id]);
+
+  const saveAsTemplate = async (srv, chs, cats) => {
+    if (!srv?.id) return;
+    setSaving(true);
+    try {
+      const sortedCats = (cats || []).sort((a, b) => (a.position ?? 0) - (b.position ?? 0));
+      const categories = sortedCats.map(cat => ({
+        name: cat.name,
+        channels: (chs || [])
+          .filter(ch => ch.category_id === cat.id)
+          .sort((a, b) => (a.position ?? 0) - (b.position ?? 0))
+          .map(ch => ({ name: ch.name, type: ch.type || 'text' })),
+      }));
+      await base44.entities.ServerTemplate.create({
+        name: `${srv.name} Template`,
+        description: srv.description || `Template based on ${srv.name}`,
+        icon_url: srv.icon_url,
+        server_id: srv.id,
+        created_by: currentUserId,
+        categories,
+      });
+      toast({ title: 'Template saved', description: 'Others can now use this template when creating servers.', variant: 'default' });
+    } catch (err) {
+      console.error('Save as template failed:', err);
+      toast({ title: 'Could not save template', description: err?.message || 'Please try again.', variant: 'error' });
+    } finally {
+      setSaving(false);
+    }
+  };
 
   const saveOverview = async () => {
     if (!server?.id) return;
@@ -176,7 +207,7 @@ export default function ServerSettingsModal({ onClose, server, currentUserId }) 
 
   const renderContent = () => {
     switch (tab) {
-      case 'overview': return <OverviewTab server={{ ...server, icon_url: localIconUrl, banner_url: localBannerUrl }} name={name} setName={setName} desc={desc} setDesc={setDesc} isPublic={isPublic} setIsPublic={setIsPublic} serverSettings={serverSettings} setServerSettings={setServerSettings} onSave={saveOverview} onUploadImg={uploadImg} saving={saving} />;
+      case 'overview': return <OverviewTab server={{ ...server, icon_url: localIconUrl, banner_url: localBannerUrl }} name={name} setName={setName} desc={desc} setDesc={setDesc} isPublic={isPublic} setIsPublic={setIsPublic} serverSettings={serverSettings} setServerSettings={setServerSettings} onSave={saveOverview} onUploadImg={uploadImg} saving={saving} channels={channels} categories={serverCategories} onSaveAsTemplate={saveAsTemplate} />;
       case 'appearance': return <AppearanceSection bannerColor={bannerColor} setBannerColor={setBannerColor} uploadImg={uploadImg} saveOverview={saveOverview} saving={saving} server={{ ...server, icon_url: localIconUrl, banner_url: localBannerUrl }} />;
       case 'invites': return <InvitesSection server={server} />;
       case 'automod': return <AutoModTab serverId={server?.id} />;

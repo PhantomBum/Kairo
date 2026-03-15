@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Upload, Users, Gamepad2, BookOpen, Heart, Mic, Wrench, Hash, Volume2, Megaphone, HelpCircle, Image, MessageSquare } from 'lucide-react';
+import { Upload, Users, Gamepad2, BookOpen, Heart, Mic, Wrench, Hash, Volume2, Megaphone, HelpCircle, Image, MessageSquare, LayoutTemplate } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import ModalWrapper from './ModalWrapper';
 import { colors } from '@/components/app/design/tokens';
@@ -64,7 +65,24 @@ export default function CreateServerModal({ onClose, onCreate, isCreating }) {
   const [iconUrl, setIconUrl] = useState('');
   const [uploading, setUploading] = useState(false);
 
-  const selectedTemplate = TEMPLATES.find(t => t.id === template) || TEMPLATES[5];
+  const { data: communityTemplates = [] } = useQuery({
+    queryKey: ['serverTemplates'],
+    queryFn: () => base44.entities.ServerTemplate.list(),
+  });
+
+  const allTemplates = [
+    ...communityTemplates.map(t => ({
+      id: t.id,
+      label: t.name,
+      desc: t.description || 'Community template',
+      color: '#2dd4bf',
+      icon: LayoutTemplate,
+      categories: t.categories || [],
+    })),
+    ...TEMPLATES,
+  ];
+
+  const selectedTemplate = allTemplates.find(t => t.id === template) || TEMPLATES.find(t => t.id === 'community') || TEMPLATES[5];
 
   const handleIcon = async (e) => {
     const f = e.target.files?.[0]; if (!f) return;
@@ -101,7 +119,7 @@ export default function CreateServerModal({ onClose, onCreate, isCreating }) {
         <div>
           <p className="text-[11px] font-semibold uppercase tracking-wider mb-3" style={{ color: colors.text.disabled }}>Choose a template</p>
           <div className="grid grid-cols-3 gap-2">
-            {TEMPLATES.map(t => {
+            {allTemplates.map(t => {
               const active = template === t.id;
               return (
                 <button key={t.id} onClick={() => setTemplate(t.id)}

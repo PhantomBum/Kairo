@@ -50,6 +50,7 @@
 import About from './pages/About';
 import BotMarketplace from './pages/BotMarketplace';
 import Changelog from './pages/Changelog';
+import Discover from './pages/Discover';
 import Developers from './pages/Developers';
 import Elite from './pages/Elite';
 import FAQ from './pages/FAQ';
@@ -66,6 +67,7 @@ export const PAGES = {
     "About": About,
     "BotMarketplace": BotMarketplace,
     "Changelog": Changelog,
+    "Discover": Discover,
     "Developers": Developers,
     "Elite": Elite,
     "FAQ": FAQ,
