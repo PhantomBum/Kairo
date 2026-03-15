@@ -4,7 +4,6 @@ import {
   Hash, Volume2, Megaphone, Radio, MessageSquare, Lock, ChevronDown, ChevronRight,
   Plus, Settings, GripVertical, LayoutGrid, ShieldAlert, CalendarDays, Search, BellOff, Clock3,
 } from 'lucide-react';
-import VoiceChannelUsers from '@/components/app/layout/VoiceChannelUsers';
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuSeparator, ContextMenuTrigger } from '@/components/ui/context-menu';
 import { base44 } from '@/api/base44Client';
 import ServerBannerHeader from './ServerBannerHeader';
@@ -41,16 +40,16 @@ function ChannelItem({ channel, active, unread, muted, onClick, onSettings, onJu
                   background: snapshot.isDragging
                     ? 'var(--surface-glass)'
                     : active ? 'var(--accent-dim)' : 'transparent',
-                  color: active ? P.textPrimary : hasUnread ? P.textPrimary : isMuted ? 'var(--text-faint)' : P.textSecondary,
+                  color: active ? P.textPrimary : hasUnread ? '#ffffff' : isMuted ? 'var(--text-faint)' : P.textSecondary,
                   fontWeight: active || hasUnread ? 500 : 400,
                 }}
                 onMouseEnter={e => { if (!active) e.currentTarget.style.background = 'var(--bg-raised)'; }}
                 onMouseLeave={e => { if (!active) e.currentTarget.style.background = 'transparent'; }}
               >
-                {/* Active left indicator — 2px accent border */}
+                {/* Active left indicator — 2px full height */}
                 {active && (
-                  <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[2px] rounded-r-full"
-                    style={{ height: 20, background: P.accent }} />
+                  <div className="absolute left-0 top-0 bottom-0 w-[2px] rounded-r-full"
+                    style={{ background: P.accent }} />
                 )}
 
                 {isOwner && (
@@ -58,10 +57,8 @@ function ChannelItem({ channel, active, unread, muted, onClick, onSettings, onJu
                 )}
                 <Icon className="w-[18px] h-[18px] flex-shrink-0"
                   style={{ color: active ? P.textSecondary : isMuted ? 'var(--text-faint)' : P.muted, transition: 'color 150ms ease' }} />
-                <span className="truncate flex-1 text-left text-[14px]">{channel.name}</span>
-                {hasUnread && !active && (
-                  <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: P.accent }} />
-                )}
+                <span className="truncate flex-1 min-w-0 text-left text-[14px]">{channel.name}</span>
+                {hasUnread && !active && null}
                 {channel.is_nsfw && (
                   <ShieldAlert className="w-3.5 h-3.5 flex-shrink-0" style={{ color: 'var(--color-danger)', opacity: 0.5 }} />
                 )}
@@ -73,6 +70,12 @@ function ChannelItem({ channel, active, unread, muted, onClick, onSettings, onJu
                 )}
                 {isMuted && (
                   <BellOff className="w-3 h-3 flex-shrink-0" style={{ color: P.muted, opacity: 0.5 }} />
+                )}
+                {(channel.type === 'voice' || channel.type === 'stage') && voiceStates && voiceStates.length > 0 && (
+                  <div className="flex items-center gap-1.5 flex-shrink-0">
+                    <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: '#3ba55d' }} />
+                    <span className="text-[11px] tabular-nums" style={{ color: P.muted }}>{voiceStates.length}</span>
+                  </div>
                 )}
                 {isOwner && (
                   <button onClick={e => { e.stopPropagation(); onSettings?.(channel); }}
@@ -101,10 +104,6 @@ function ChannelItem({ channel, active, unread, muted, onClick, onSettings, onJu
               )}
             </ContextMenuContent>
           </ContextMenu>
-
-          {(channel.type === 'voice' || channel.type === 'stage') && voiceStates && voiceStates.length > 0 && (
-            <VoiceChannelUsers voiceStates={voiceStates} />
-          )}
         </div>
       )}
     </Draggable>
@@ -123,12 +122,12 @@ function CategoryGroup({ category, channels, activeId, onSelect, onAdd, onSettin
         <div ref={provided.innerRef} {...provided.draggableProps} className="mb-0.5">
           <div {...provided.dragHandleProps}>
             <button onClick={() => setOpen(!open)}
-              className="w-full flex items-center gap-1 px-1 pt-6 pb-2 group min-h-[40px]">
+              className="w-full flex items-center gap-1 px-1 pt-6 pb-2 group min-h-[40px] relative">
               {open
                 ? <ChevronDown className="w-3 h-3 flex-shrink-0 transition-transform" style={{ color: P.muted }} />
                 : <ChevronRight className="w-3 h-3 flex-shrink-0 transition-transform" style={{ color: P.muted }} />
               }
-              <span className="text-[10px] font-bold flex-1 text-left truncate"
+              <span className="text-[10px] font-bold flex-1 text-left truncate min-w-0"
                 style={{
                   color: P.textSecondary,
                   textTransform: 'uppercase',
@@ -137,9 +136,11 @@ function CategoryGroup({ category, channels, activeId, onSelect, onAdd, onSettin
                 {category.name}
               </span>
               {isOwner && (
-                <Plus onClick={e => { e.stopPropagation(); onAdd(category.id); }}
-                  className="w-4 h-4 opacity-0 group-hover:opacity-50 hover:!opacity-100 cursor-pointer flex-shrink-0 transition-opacity"
-                  style={{ color: P.muted }} />
+                <button onClick={e => { e.stopPropagation(); onAdd(category.id); }}
+                  className="absolute right-1 top-1/2 -translate-y-1/2 w-6 h-6 flex items-center justify-center rounded opacity-0 group-hover:opacity-100 hover:bg-[rgba(255,255,255,0.06)] transition-opacity flex-shrink-0"
+                  style={{ color: P.muted }}>
+                  <Plus className="w-4 h-4" />
+                </button>
               )}
             </button>
           </div>

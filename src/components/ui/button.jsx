@@ -1,5 +1,6 @@
 import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
+import { Loader2 } from "lucide-react"
 import { cva } from "class-variance-authority";
 
 import { cn } from "@/lib/utils"
@@ -10,15 +11,15 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          "bg-primary text-primary-foreground shadow hover:bg-primary/90",
+          "bg-[var(--accent-primary)] text-[#0d1117] shadow hover:opacity-90",
         destructive:
-          "bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90",
+          "bg-[var(--color-danger)] text-white shadow-sm hover:opacity-90",
         outline:
-          "border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground",
+          "border border-[var(--border-medium)] bg-transparent hover:bg-[rgba(255,255,255,0.06)]",
         secondary:
-          "bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80",
-        ghost: "hover:bg-accent hover:text-accent-foreground",
-        link: "text-primary underline-offset-4 hover:underline",
+          "bg-[var(--bg-elevated)] text-[var(--text-primary)] border border-[var(--border-subtle)] hover:bg-[rgba(255,255,255,0.06)]",
+        ghost: "hover:bg-[rgba(255,255,255,0.06)]",
+        link: "text-[var(--accent-primary)] underline-offset-4 hover:underline",
       },
       size: {
         default: "h-10 px-4 py-2.5",
@@ -34,13 +35,21 @@ const buttonVariants = cva(
   }
 )
 
-const Button = React.forwardRef(({ className, variant, size, asChild = false, ...props }, ref) => {
+const Button = React.forwardRef(({ className, variant, size, asChild = false, loading = false, children, disabled, ...props }, ref) => {
   const Comp = asChild ? Slot : "button"
+  const isDisabled = disabled || loading
   return (
-    (<Comp
+    <Comp
       className={cn(buttonVariants({ variant, size, className }))}
       ref={ref}
-      {...props} />)
+      disabled={isDisabled}
+      {...props}>
+      {loading ? (
+        <Loader2 className="h-4 w-4 animate-spin" />
+      ) : (
+        children
+      )}
+    </Comp>
   );
 })
 Button.displayName = "Button"

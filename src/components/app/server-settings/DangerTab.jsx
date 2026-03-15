@@ -1,9 +1,21 @@
 import React, { useState } from 'react';
 import { AlertTriangle } from 'lucide-react';
 import { colors } from '@/components/app/design/tokens';
+import { Button } from '@/components/ui/button';
 
 export default function DangerTab({ server, onDelete }) {
   const [confirmText, setConfirmText] = useState('');
+  const [deleting, setDeleting] = useState(false);
+
+  const handleDelete = async () => {
+    if (confirmText !== server?.name) return;
+    setDeleting(true);
+    try {
+      await onDelete?.();
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   return (
     <div className="space-y-4">
@@ -21,11 +33,10 @@ export default function DangerTab({ server, onDelete }) {
         <input value={confirmText} onChange={e => setConfirmText(e.target.value)} placeholder={server?.name}
           className="w-full px-3 py-2.5 rounded-xl text-[14px] outline-none font-mono mb-3"
           style={{ background: colors.bg.elevated, color: colors.danger, border: '1px solid rgba(239,68,68,0.2)' }} />
-        <button onClick={() => confirmText === server?.name && onDelete()} disabled={confirmText !== server?.name}
-          className="w-full py-3 rounded-xl text-[14px] font-bold disabled:opacity-20 transition-opacity"
-          style={{ background: colors.danger, color: '#fff' }}>
+        <Button variant="destructive" className="w-full py-3 rounded-xl text-[14px] font-bold"
+          disabled={confirmText !== server?.name} loading={deleting} onClick={handleDelete}>
           Delete Server Forever
-        </button>
+        </Button>
       </div>
     </div>
   );

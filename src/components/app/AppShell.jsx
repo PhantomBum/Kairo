@@ -980,6 +980,7 @@ export default function AppShell({ currentUser }) {
                       slowModeRemaining={slowModeRemaining}
                       onTyping={() => emitTyping(activeChannel?.id)}
                       onSchedule={() => setModal('schedule-message')}
+                      editingMessage={editingMsg} onEditSave={editMsg} onEditCancel={() => setEditingMsg(null)}
                       onEditLast={() => {
                         const myMsgs = currentMsgs.filter(m => m.author_id === currentUser.id && !m.is_deleted);
                         if (myMsgs.length > 0) setEditingMsg(myMsgs[myMsgs.length - 1]);
@@ -1067,6 +1068,7 @@ export default function AppShell({ currentUser }) {
                   slowModeRemaining={isDM ? 0 : slowModeRemaining}
                   onTyping={() => emitTyping(activeChannel?.id || activeConv?.id)}
                   onSchedule={!isDM ? () => setModal('schedule-message') : undefined}
+                  editingMessage={editingMsg} onEditSave={editMsg} onEditCancel={() => setEditingMsg(null)}
                   onEditLast={() => {
                     const myMsgs = currentMsgs.filter(m => m.author_id === currentUser.id && !m.is_deleted);
                     if (myMsgs.length > 0) setEditingMsg(myMsgs[myMsgs.length - 1]);

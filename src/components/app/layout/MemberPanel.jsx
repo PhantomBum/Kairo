@@ -83,13 +83,13 @@ const MemberRow = memo(function MemberRow({ member, profile, isOwner, roleColor,
         onMouseEnter={openHover}
         onMouseLeave={closeHover}
         className="w-full flex items-center gap-3 px-2 rounded-md transition-all duration-[120ms] ease-out hover:bg-[var(--bg-overlay)] group active:scale-[0.99]"
-        style={{ opacity: isOnline ? 1 : 0.45, height: 44 }}>
+        style={{ opacity: isOnline ? 1 : 0.45, height: 44, background: 'transparent' }}>
         <div className="relative flex-shrink-0">
           <div className="w-[34px] h-[34px] rounded-full flex items-center justify-center text-xs font-semibold overflow-hidden"
             style={{ background: colors.bg.overlay, color: colors.text.primary }}>
             {avatar ? <img src={avatar} className="w-full h-full object-cover" alt="" onError={(e) => { e.target.style.display = 'none'; }} /> : name.charAt(0).toUpperCase()}
           </div>
-          <div className="absolute -bottom-px -right-px w-[10px] h-[10px] rounded-full border-2"
+          <div className="absolute -bottom-px -right-px w-[10px] h-[10px] rounded-full border-2 box-border"
             style={{ background: statusColor, borderColor: colors.bg.surface }} />
         </div>
 
@@ -97,9 +97,9 @@ const MemberRow = memo(function MemberRow({ member, profile, isOwner, roleColor,
           <div className="flex items-center gap-1.5">
             <span className="text-[14px] truncate text-left" style={{ color: roleColor || colors.text.secondary, fontWeight: 500 }}>{name}</span>
             {isStaff && (
-              <span className="flex items-center gap-0.5 px-1 py-px rounded text-[11px] font-bold uppercase flex-shrink-0"
+              <span className="flex items-center gap-0.5 px-1 py-px rounded text-[11px] font-bold uppercase flex-shrink-0 max-w-[80px] truncate"
                 style={{ background: 'var(--accent-dim)', color: 'var(--accent-primary)' }}>
-                <Shield className="w-2.5 h-2.5" /> Admin
+                <Shield className="w-2.5 h-2.5 flex-shrink-0" /> <span className="truncate">Admin</span>
               </span>
             )}
           </div>
@@ -128,12 +128,13 @@ const MemberGroup = memo(function MemberGroup({ group, ownerId, onProfileClick }
 
   return (
     <div className="mb-1">
-      <button onClick={() => setCollapsed(!collapsed)} className="w-full flex items-center gap-1.5 px-2 pt-4 pb-1 hover:opacity-80">
+      <button onClick={() => setCollapsed(!collapsed)} className="w-full flex items-center gap-1.5 px-2 pt-4 pb-1 hover:opacity-80 transition-opacity"
+        style={{ background: 'transparent' }}>
         {group.color && <div className="w-[2px] h-3.5 rounded-full flex-shrink-0" style={{ background: group.color }} />}
         <span className="text-[10px] font-bold uppercase tracking-[0.1em] flex-1 text-left truncate min-w-0" style={{ color: group.color || colors.text.muted }}>
           {group.label} — {group.count}
         </span>
-        <Icon className="w-3 h-3" style={{ color: colors.text.disabled }} />
+        <Icon className="w-3 h-3 flex-shrink-0" style={{ color: colors.text.disabled }} />
       </button>
       {!collapsed && group.members.map(m => (
         <MemberRow key={m.id} member={m} profile={m.profile} isOwner={m.user_id === ownerId}

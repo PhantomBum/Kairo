@@ -1,5 +1,5 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
-import { Plus, Send, X, Smile, Image, FileText, Film, Type, Stamp, Clock } from 'lucide-react';
+import { Plus, Send, X, Smile, Image, FileText, Film, Type, Stamp, Clock, Link, BarChart3 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { colors } from '@/components/app/design/tokens';
 import FormattingToolbar from '@/components/app/features/FormattingToolbar';
@@ -8,6 +8,7 @@ import StickerPicker from '@/components/app/chat/StickerPicker';
 import SlashCommandPicker from '@/components/app/chat/SlashCommandPicker';
 import MentionPicker from '@/components/app/chat/MentionPicker';
 import EmojiPicker from '@/components/app/chat/EmojiPicker';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { checkRateLimit } from '@/lib/security/rateLimiter';
 import { sanitizeMessageContent } from '@/lib/security/sanitizer';
 import { formatFileSize, getFileSizeLimit } from '@/lib/security/fileValidator';
@@ -20,7 +21,10 @@ const P = {
   accent: colors.accent.primary, danger: colors.danger, warning: colors.warning,
 };
 
-export default function ChatInput({ channelName, channelId, replyTo, onCancelReply, onSend, onTyping, onEditLast, onSchedule, serverId, members, getProfile, maxChars = 2000, slowModeRemaining = 0, hasElite = false, hasLite = false }) {
+const LINE_HEIGHT = 22;
+const MAX_INPUT_HEIGHT = 160;
+
+export default function ChatInput({ channelName, channelId, replyTo, onCancelReply, onSend, onTyping, onEditLast, onSchedule, serverId, members, getProfile, maxChars = 2000, slowModeRemaining = 0, hasElite = false, hasLite = false, editingMessage, onEditSave, onEditCancel }) {
   const storageKey = `kairo-draft-${channelId || channelName || 'default'}`;
   const [content, setContent] = useState(() => {
     try { return localStorage.getItem(storageKey) || ''; } catch { return ''; }
@@ -40,8 +44,8 @@ export default function ChatInput({ channelName, channelId, replyTo, onCancelRep
   const [mentionFilter, setMentionFilter] = useState('');
   const fileRef = useRef(null);
   const inputRef = useRef(null);
+  const inputWrapperRef = useRef(null);
   const typingRef = useRef(0);
-  const maxInputHeight = 200;
   const historyKey = `kairo-input-history-${channelId || channelName || 'default'}`;
   const [history, setHistory] = useState(() => {
     try { return JSON.parse(localStorage.getItem(historyKey) || '[]'); } catch { return []; }
@@ -49,10 +53,11 @@ export default function ChatInput({ channelName, channelId, replyTo, onCancelRep
   const historyIndexRef = useRef(-1);
 
   useEffect(() => {
+    if (editingMessage) return;
     if (!content) { try { localStorage.removeItem(storageKey); } catch {} return; }
     const t = setTimeout(() => { try { localStorage.setItem(storageKey, content); } catch {} }, 500);
     return () => clearTimeout(t);
-  }, [content, storageKey]);
+  }, [content, storageKey, editingMessage]);
 
   useEffect(() => {
     try { setContent(localStorage.getItem(storageKey) || ''); } catch { setContent(''); }
@@ -69,9 +74,13 @@ export default function ChatInput({ channelName, channelId, replyTo, onCancelRep
   }, [channelId]);
 
   useEffect(() => {
+    if (editingMessage) setContent(editingMessage.content || '');
+  }, [editingMessage?.id]);
+
+  useEffect(() => {
     if (!inputRef.current) return;
     inputRef.current.style.height = 'auto';
-    const next = Math.min(maxInputHeight, Math.max(22, inputRef.current.scrollHeight));
+    const next = Math.min(MAX_INPUT_HEIGHT, Math.max(LINE_HEIGHT, inputRef.current.scrollHeight));
     inputRef.current.style.height = `${next}px`;
   }, [content]);
 
@@ -112,7 +121,9 @@ export default function ChatInput({ channelName, channelId, replyTo, onCancelRep
 
   const handleSend = async () => {
     const trimmed = content.trim();
-    if ((!trimmed && files.length === 0) || sending || remaining < 0 || slowModeRemaining > 0) return;
+    const isEditing = !!editingMessage;
+    if ((!trimmed && files.length === 0 && !isEditing) || sending || remaining < 0 || slowModeRemaining > 0) return;
+    if (isEditing && !trimmed) return;
     setSendError('');
 
     const rateCheck = checkRateLimit('message', 'user');
@@ -125,21 +136,25 @@ export default function ChatInput({ channelName, channelId, replyTo, onCancelRep
     sendLockRef.current = { content: trimmed, ts: Date.now() };
 
     const sanitized = sanitizeMessageContent(trimmed);
-    const payload = {
-      content: sanitized,
-      attachments: files.length > 0 ? files : undefined,
-      replyToId: replyTo?.id,
-      replyPreview: replyTo ? { author_name: replyTo.author_name, content: replyTo.content?.slice(0, 80) } : undefined,
-    };
-
     const backupContent = trimmed;
     const backupFiles = [...files];
     setContent(''); setFiles([]); closePickers();
-    try { localStorage.removeItem(storageKey); } catch {}
+    if (!isEditing) try { localStorage.removeItem(storageKey); } catch {}
     inputRef.current?.focus();
     setSending(true);
     try {
-      await onSend?.(payload);
+      if (isEditing) {
+        await onEditSave?.(editingMessage.id, sanitized);
+        onEditCancel?.();
+      } else {
+        const payload = {
+          content: sanitized,
+          attachments: files.length > 0 ? files : undefined,
+          replyToId: replyTo?.id,
+          replyPreview: replyTo ? { author_name: replyTo.author_name, content: replyTo.content?.slice(0, 80) } : undefined,
+        };
+        await onSend?.(payload);
+      }
     } catch (err) {
       setContent(backupContent);
       setFiles(backupFiles);
@@ -148,7 +163,7 @@ export default function ChatInput({ channelName, channelId, replyTo, onCancelRep
       setSending(false);
       sendLockRef.current = null;
     }
-    if (trimmed) {
+    if (trimmed && !isEditing) {
       setHistory(prev => {
         const next = [trimmed, ...prev.filter(t => t !== trimmed)].slice(0, 10);
         try { localStorage.setItem(historyKey, JSON.stringify(next)); } catch {}
@@ -159,7 +174,7 @@ export default function ChatInput({ channelName, channelId, replyTo, onCancelRep
   };
 
   const handleKeyDown = useCallback((e) => {
-    if (e.key === 'Escape') { closePickers(); if (replyTo) onCancelReply(); return; }
+    if (e.key === 'Escape') { closePickers(); if (editingMessage) onEditCancel?.(); else if (replyTo) onCancelReply(); return; }
     if (showEmoji || showGif || showSticker || showSlash || showMention) return;
     if (e.key === 'Enter' && !e.shiftKey && !showSlash && !showMention) { e.preventDefault(); handleSend(); return; }
     if (e.key === 'ArrowUp' && !e.shiftKey) {
@@ -193,7 +208,7 @@ export default function ChatInput({ channelName, channelId, replyTo, onCancelRep
     if ((e.ctrlKey || e.metaKey) && e.key === 'i') wrap('*', '*');
     if ((e.ctrlKey || e.metaKey) && e.key === 'u') wrap('__', '__');
     if ((e.ctrlKey || e.metaKey) && e.key === 'e') wrap('`', '`');
-  }, [content, history, showEmoji, showGif, showSticker, showSlash, showMention, replyTo, onCancelReply, onEditLast]);
+  }, [content, history, showEmoji, showGif, showSticker, showSlash, showMention, replyTo, onCancelReply, onEditLast, editingMessage, onEditCancel]);
 
   const handleContentChange = (val) => {
     if (historyIndexRef.current >= 0) historyIndexRef.current = -1;
@@ -257,6 +272,7 @@ export default function ChatInput({ channelName, channelId, replyTo, onCancelRep
   const placeholderIdx = Math.abs((channelName || '').length) % placeholders.length;
   const placeholder = replyTo ? `Reply to ${replyTo.author_name}...` : (channelName ? `Message #${channelName}` : placeholders[placeholderIdx]);
 
+  const hasContent = !!(content.trim() || files.length > 0 || editingMessage);
   return (
     <div className="px-5 pb-4 pt-0 mt-2 relative"
       onDragOver={e => { e.preventDefault(); setDragging(true); }}
@@ -301,9 +317,9 @@ export default function ChatInput({ channelName, channelId, replyTo, onCancelRep
         </div>
       )}
 
-      {/* Reply bar */}
+      {/* Reply bar — slides down 150ms */}
       {replyTo && (
-        <div className="flex items-center gap-3 px-4 py-2.5 mb-1" style={{ background: P.floating, borderRadius: '12px 12px 0 0', borderLeft: `3px solid ${P.accent}` }}>
+        <div className="flex items-center gap-3 px-4 py-2.5 mb-1 animate-in slide-in-from-top-2 duration-150" style={{ background: P.floating, borderRadius: '12px 12px 0 0', borderLeft: `3px solid ${P.accent}` }}>
           <span className="text-[13px] flex-1 min-w-0 truncate" style={{ color: P.muted }}>
             Replying to <span className="font-semibold" style={{ color: P.textPrimary }}>{replyTo.author_name}</span>
             {replyTo.content && <span className="ml-1.5 truncate" style={{ color: P.muted }}>— {replyTo.content.slice(0, 80)}</span>}
@@ -311,6 +327,16 @@ export default function ChatInput({ channelName, channelId, replyTo, onCancelRep
           <button onClick={onCancelReply} className="w-6 h-6 flex items-center justify-center rounded hover:bg-[rgba(237,66,69,0.12)] transition-colors" title="Cancel reply">
             <X className="w-3.5 h-3.5" style={{ color: P.danger }} />
           </button>
+        </div>
+      )}
+
+      {/* Edit mode label */}
+      {editingMessage && (
+        <div className="flex items-center gap-2 px-4 py-1.5 mb-1 text-[12px] font-medium" style={{ color: P.warning }}>
+          <span>Editing</span>
+          {onEditCancel && (
+            <button onClick={onEditCancel} className="text-[11px] underline hover:no-underline" style={{ color: P.muted }}>Cancel</button>
+          )}
         </div>
       )}
 
@@ -339,28 +365,48 @@ export default function ChatInput({ channelName, channelId, replyTo, onCancelRep
         </div>
       )}
 
-      {/* Emoji picker */}
+      {/* Emoji picker — anchored above input, never off screen */}
       {showEmoji && (
-        <EmojiPicker
-          onSelect={(e) => { setContent(p => p + e); inputRef.current?.focus(); }}
-          onClose={() => setShowEmoji(false)}
-        />
+        <div className="absolute bottom-full left-5 right-5 mb-2 z-30 flex justify-center">
+          <EmojiPicker
+            onSelect={(e) => { setContent(p => p + e); inputRef.current?.focus(); }}
+            onClose={() => setShowEmoji(false)}
+          />
+        </div>
       )}
 
       {/* Formatting toolbar */}
       {showFormatting && <FormattingToolbar inputRef={inputRef} content={content} setContent={setContent} />}
 
       {/* Main input — bg-raised, 12px radius, border-medium, focus glow */}
-      <div className="k-input-wrapper flex items-end gap-2 px-[14px] py-3 transition-all min-h-[44px]"
+      <div ref={inputWrapperRef} className="k-input-wrapper relative flex items-end gap-2 px-[14px] py-3 transition-all min-h-[44px]"
         style={{
           background: 'var(--bg-raised)',
           border: '1px solid var(--border-medium)',
           borderRadius: 12,
           boxShadow: 'inset 0 1px 0 rgba(0,0,0,0.05)',
+          borderLeft: editingMessage ? `3px solid ${P.warning}` : undefined,
         }}>
-        <button onClick={() => fileRef.current?.click()}
-          className="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-[rgba(255,255,255,0.08)] flex-shrink-0 mb-0.5"
-          title="Upload file"><Plus className="w-5 h-5" style={{ color: P.muted }} /></button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button
+              className="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-[rgba(255,255,255,0.08)] flex-shrink-0 mb-0.5"
+              title="Attach">
+              <Plus className="w-5 h-5" style={{ color: P.muted }} />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" side="top" sideOffset={4}>
+            <DropdownMenuItem onClick={() => fileRef.current?.click()}>
+              <Image className="w-4 h-4" /> Upload File
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => { /* TODO: open URL modal */ }}>
+              <Link className="w-4 h-4" /> Upload from URL
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => { /* TODO: open poll modal */ }}>
+              <BarChart3 className="w-4 h-4" /> Create Poll
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
         <input ref={fileRef} type="file" accept="image/*,video/*,audio/*,.gif,.mp4,.webm,.mov,.mp3,.wav,.ogg,.pdf,.txt,.zip,.rar,.doc,.docx,.xls,.xlsx" onChange={e => { if (e.target.files?.length) uploadFiles(e.target.files); if (fileRef.current) fileRef.current.value = ''; }} className="hidden" multiple />
         <textarea ref={inputRef} value={content}
           onChange={e => handleContentChange(e.target.value)}
@@ -378,8 +424,8 @@ export default function ChatInput({ channelName, channelId, replyTo, onCancelRep
             }
           }}
           placeholder={placeholder}
-          className="k-input flex-1 bg-transparent text-[15px] outline-none resize-none max-h-[200px] placeholder:text-[13px]"
-          style={{ color: P.textPrimary, lineHeight: '22px', caretColor: P.accent, overflowY: 'auto' }} rows={1} />
+          className="k-input flex-1 bg-transparent text-[15px] outline-none resize-none placeholder:text-[13px]"
+          style={{ color: P.textPrimary, lineHeight: `${LINE_HEIGHT}px`, minHeight: LINE_HEIGHT, maxHeight: MAX_INPUT_HEIGHT, caretColor: P.accent, overflowY: 'auto', transition: 'height 80ms ease-out' }} rows={1} />
         {nearLimit && (
           <span className="text-[11px] mb-1 flex-shrink-0 tabular-nums"
             style={{ color: remaining <= 0 ? P.danger : remaining <= 50 ? P.danger : remaining <= 100 ? P.warning : P.textPrimary }}>
@@ -395,9 +441,15 @@ export default function ChatInput({ channelName, channelId, replyTo, onCancelRep
         <button onClick={() => { closePickers(); setShowEmoji(!showEmoji); }}
           className="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-[rgba(255,255,255,0.08)] flex-shrink-0 mb-0.5"
           title="Emoji"><Smile className="w-5 h-5" style={{ color: showEmoji ? P.textPrimary : P.muted }} /></button>
-        <button onClick={handleSend} disabled={(!content.trim() && files.length === 0) || sending || remaining < 0 || slowModeRemaining > 0}
-          className="w-8 h-8 flex items-center justify-center rounded-lg flex-shrink-0 mb-0.5 disabled:opacity-20 transition-colors"
-          style={{ background: content.trim() || files.length > 0 ? P.accent : 'transparent', color: content.trim() || files.length > 0 ? '#0d1117' : P.muted }}
+        <button onClick={handleSend} disabled={!hasContent || sending || remaining < 0 || slowModeRemaining > 0}
+          className="w-8 h-8 flex items-center justify-center rounded-lg flex-shrink-0 mb-0.5 disabled:opacity-20 transition-all duration-[120ms] ease-out"
+          style={{
+            background: hasContent ? P.accent : 'transparent',
+            color: hasContent ? '#0d1117' : P.muted,
+            opacity: hasContent ? 1 : 0,
+            transform: hasContent ? 'translateX(0)' : 'translateX(8px)',
+            pointerEvents: hasContent ? 'auto' : 'none',
+          }}
           title="Send">
           {sending ? (
             <div className="w-4 h-4 border-2 rounded-full animate-spin" style={{ borderColor: 'rgba(255,255,255,0.3)', borderTopColor: '#fff' }} />
