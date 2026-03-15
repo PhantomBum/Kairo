@@ -50,16 +50,22 @@ export default function AnalyticsDashboardModal({ onClose, server }) {
       base44.entities.Message.filter({ server_id: server.id }),
       base44.entities.ServerMember.filter({ server_id: server.id }),
       base44.entities.Channel.filter({ server_id: server.id }),
-    ]).then(([m, mem, ch]) => { setMessages(m); setMembers(mem); setChannels(ch); setLoading(false); });
+    ]).then(([m, mem, ch]) => {
+      setMessages(Array.isArray(m) ? m : []);
+      setMembers(Array.isArray(mem) ? mem : []);
+      setChannels(Array.isArray(ch) ? ch : []);
+      setLoading(false);
+    });
   }, [server?.id]);
 
   // Member growth over last 30 days
   const memberGrowth = useMemo(() => {
     const days = [];
+    const mems = Array.isArray(members) ? members : [];
     for (let i = 29; i >= 0; i--) {
       const d = new Date(); d.setDate(d.getDate() - i);
       const key = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-      const count = members.filter(m => new Date(m.joined_at || m.created_date) <= d).length;
+      const count = mems.filter(m => new Date(m.joined_at || m.created_date) <= d).length;
       days.push({ date: key, members: count });
     }
     return days;
@@ -68,11 +74,12 @@ export default function AnalyticsDashboardModal({ onClose, server }) {
   // Message volume by day (last 14 days)
   const messageVolume = useMemo(() => {
     const days = [];
+    const msgs = Array.isArray(messages) ? messages : [];
     for (let i = 13; i >= 0; i--) {
       const d = new Date(); d.setDate(d.getDate() - i);
       const ds = d.toDateString();
       const key = d.toLocaleDateString('en-US', { weekday: 'short', day: 'numeric' });
-      const count = messages.filter(m => new Date(m.created_date).toDateString() === ds).length;
+      const count = msgs.filter(m => new Date(m.created_date).toDateString() === ds).length;
       days.push({ date: key, messages: count });
     }
     return days;
@@ -81,23 +88,24 @@ export default function AnalyticsDashboardModal({ onClose, server }) {
   // Active hours (hour of day distribution)
   const activeHours = useMemo(() => {
     const hours = Array.from({ length: 24 }, (_, i) => ({ hour: `${i}:00`, messages: 0 }));
-    messages.forEach(m => { const h = new Date(m.created_date).getHours(); hours[h].messages++; });
+    (Array.isArray(messages) ? messages : []).forEach(m => { const h = new Date(m.created_date).getHours(); hours[h].messages++; });
     return hours;
   }, [messages]);
 
   // Top channels by message count
   const topChannels = useMemo(() => {
     const counts = {};
-    messages.forEach(m => { counts[m.channel_id] = (counts[m.channel_id] || 0) + 1; });
+    (Array.isArray(messages) ? messages : []).forEach(m => { counts[m.channel_id] = (counts[m.channel_id] || 0) + 1; });
+    const chList = Array.isArray(channels) ? channels : [];
     return Object.entries(counts)
-      .map(([id, count]) => ({ name: channels.find(c => c.id === id)?.name || 'unknown', messages: count }))
+      .map(([id, count]) => ({ name: chList.find(c => c.id === id)?.name || 'unknown', messages: count }))
       .sort((a, b) => b.messages - a.messages).slice(0, 8);
   }, [messages, channels]);
 
   // Emoji usage
   const emojiUsage = useMemo(() => {
     const counts = {};
-    messages.forEach(m => {
+    (Array.isArray(messages) ? messages : []).forEach(m => {
       (m.reactions || []).forEach(r => { counts[r.emoji] = (counts[r.emoji] || 0) + (r.count || 1); });
       const emojis = (m.content || '').match(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F1E0}-\u{1F1FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu);
       if (emojis) emojis.forEach(e => { counts[e] = (counts[e] || 0) + 1; });
@@ -108,17 +116,18 @@ export default function AnalyticsDashboardModal({ onClose, server }) {
   // Top posters
   const topPosters = useMemo(() => {
     const counts = {};
-    messages.forEach(m => {
+    (Array.isArray(messages) ? messages : []).forEach(m => {
       const key = m.author_name || m.author_id;
       counts[key] = (counts[key] || 0) + 1;
     });
     return Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([name, count]) => ({ name, count }));
   }, [messages]);
 
-  const totalMsgs = messages.length;
-  const todayMsgs = messages.filter(m => new Date(m.created_date).toDateString() === new Date().toDateString()).length;
-  const weekMsgs = messages.filter(m => Date.now() - new Date(m.created_date).getTime() < 7 * 86400000).length;
-  const prevWeekMsgs = messages.filter(m => { const t = Date.now() - new Date(m.created_date).getTime(); return t >= 7 * 86400000 && t < 14 * 86400000; }).length;
+  const msgsArr = Array.isArray(messages) ? messages : [];
+  const totalMsgs = msgsArr.length;
+  const todayMsgs = msgsArr.filter(m => new Date(m.created_date).toDateString() === new Date().toDateString()).length;
+  const weekMsgs = msgsArr.filter(m => Date.now() - new Date(m.created_date).getTime() < 7 * 86400000).length;
+  const prevWeekMsgs = msgsArr.filter(m => { const t = Date.now() - new Date(m.created_date).getTime(); return t >= 7 * 86400000 && t < 14 * 86400000; }).length;
   const msgChange = prevWeekMsgs > 0 ? Math.round(((weekMsgs - prevWeekMsgs) / prevWeekMsgs) * 100) : 0;
 
   const TABS = ['overview', 'members', 'messages', 'engagement'];

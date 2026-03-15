@@ -67,12 +67,12 @@ export default function AdminPanelModal({ onClose }) {
         base44.entities.Message.list('-created_date', 50),
         base44.entities.Conversation.list(),
       ]);
-      setRealUsers(users);
-      setAllProfiles(profiles);
-      setAllServers(servers);
-      setAllMembers(members);
-      setAllMessages(messages);
-      setAllConversations(convos);
+      setRealUsers(Array.isArray(users) ? users : []);
+      setAllProfiles(Array.isArray(profiles) ? profiles : []);
+      setAllServers(Array.isArray(servers) ? servers : []);
+      setAllMembers(Array.isArray(members) ? members : []);
+      setAllMessages(Array.isArray(messages) ? messages : []);
+      setAllConversations(Array.isArray(convos) ? convos : []);
 
       try {
         const allMsgs = await base44.entities.Message.list();
@@ -91,16 +91,16 @@ export default function AdminPanelModal({ onClose }) {
 
   const profileMap = useMemo(() => {
     const m = {};
-    allProfiles.forEach(p => { if (p.user_email) m[p.user_email.toLowerCase()] = p; if (p.user_id) m[p.user_id] = p; });
+    (Array.isArray(allProfiles) ? allProfiles : []).forEach(p => { if (p.user_email) m[p.user_email.toLowerCase()] = p; if (p.user_id) m[p.user_id] = p; });
     return m;
   }, [allProfiles]);
 
   const enrichedUsers = useMemo(() => {
-    return realUsers.map(u => {
+    return (Array.isArray(realUsers) ? realUsers : []).map(u => {
       const profile = profileMap[u.email?.toLowerCase()] || profileMap[u.id] || null;
-      const memberships = allMembers.filter(m => m.user_id === u.id || m.user_email === u.email);
+      const memberships = (Array.isArray(allMembers) ? allMembers : []).filter(m => m.user_id === u.id || m.user_email === u.email);
       const serverIds = memberships.map(m => m.server_id);
-      const userServers = allServers.filter(s => serverIds.includes(s.id));
+      const userServers = (Array.isArray(allServers) ? allServers : []).filter(s => serverIds.includes(s.id));
       return {
         ...u, profile, serverCount: userServers.length, servers: userServers,
         isOnline: profile?.is_online || false, displayName: profile?.display_name || u.full_name || u.email,

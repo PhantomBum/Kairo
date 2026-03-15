@@ -177,13 +177,14 @@ export default function AdvancedSearch({ onClose, servers, currentUserId, onJump
       const serverMap = {};
       (servers || []).forEach(s => { serverMap[s.id] = s.name; });
 
-      setAllMessages(msgs.filter(m => !m.is_deleted).map(m => ({
+      const msgList = Array.isArray(msgs) ? msgs : [];
+      setAllMessages(msgList.filter(m => !m.is_deleted).map(m => ({
         ...m,
         _server_name: serverMap[m.server_id],
         _channel_name: m.channel_name || channelMap[m.channel_id],
       })));
-      setAllProfiles(profiles);
-      setAllServers(srvrs);
+      setAllProfiles(Array.isArray(profiles) ? profiles : []);
+      setAllServers(Array.isArray(srvrs) ? srvrs : []);
     } catch {}
     setSearching(false);
   }, [query, serverFilter, servers]);
@@ -224,7 +225,7 @@ export default function AdvancedSearch({ onClose, servers, currentUserId, onJump
   const fileResults = useMemo(() => {
     if (!q) return [];
     const files = [];
-    allMessages.forEach(m => {
+    (Array.isArray(allMessages) ? allMessages : []).forEach(m => {
       (m.attachments || []).forEach(a => {
         if (a.filename?.toLowerCase().includes(q) || m.content?.toLowerCase().includes(q)) {
           files.push({ attachment: a, msg: m });

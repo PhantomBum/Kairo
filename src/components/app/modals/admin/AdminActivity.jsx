@@ -13,8 +13,11 @@ const ICON_MAP = {
 export default function AdminActivity({ enrichedUsers, allServers, allMessages }) {
   const feed = useMemo(() => {
     const events = [];
+    const users = Array.isArray(enrichedUsers) ? enrichedUsers : [];
+    const servers = Array.isArray(allServers) ? allServers : [];
+    const messages = Array.isArray(allMessages) ? allMessages : [];
 
-    enrichedUsers.forEach(u => {
+    users.forEach(u => {
       if (u.created_date) {
         events.push({ type: 'signup', text: `${u.displayName || u.email} signed up`, time: u.created_date });
       }
@@ -23,13 +26,13 @@ export default function AdminActivity({ enrichedUsers, allServers, allMessages }
       }
     });
 
-    allServers.forEach(s => {
+    servers.forEach(s => {
       if (s.created_date) {
         events.push({ type: 'server', text: `${s.name} server created`, time: s.created_date });
       }
     });
 
-    allMessages.slice(0, 20).forEach(m => {
+    messages.slice(0, 20).forEach(m => {
       events.push({ type: 'message', text: `${m.author_name || 'Unknown'} sent a message`, time: m.created_date });
     });
 

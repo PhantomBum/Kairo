@@ -401,7 +401,7 @@ function KairoAppContent() {
   // Profile map for members
   const profilesMap = useMemo(() => {
     const map = new Map();
-    profiles?.forEach(p => map.set(p.user_id, p));
+    (Array.isArray(profiles) ? profiles : []).forEach(p => map.set(p.user_id, p));
     return map;
   }, [profiles]);
   

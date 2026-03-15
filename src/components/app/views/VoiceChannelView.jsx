@@ -236,7 +236,7 @@ export default function VoiceChannelView({ channel, currentUser, isMuted, isDeaf
     const ids = [];
     if (agora.speakingUids.includes(0) || agora.speakingUids.includes(agora.localUid)) ids.push(currentUser.id);
     if (agora.speakingUids.some(uid => uid !== 0 && uid !== agora.localUid && uid < 100000)) {
-      voiceStates.forEach(s => { if (s.user_id !== currentUser.id) ids.push(s.user_id); });
+      (Array.isArray(voiceStates) ? voiceStates : []).forEach(s => { if (s.user_id !== currentUser.id) ids.push(s.user_id); });
     }
     return ids;
   }, [agora.speakingUids, agora.localUid, currentUser.id, voiceStates]);
@@ -254,7 +254,7 @@ export default function VoiceChannelView({ channel, currentUser, isMuted, isDeaf
       const sId = serverIdRef.current;
       if (uId && sId) {
         base44.entities.VoiceState.filter({ user_id: uId, server_id: sId }).then(states => {
-          states.forEach(s => base44.entities.VoiceState.delete(s.id));
+          (Array.isArray(states) ? states : []).forEach(s => base44.entities.VoiceState.delete(s.id));
         }).catch(() => {});
       }
     };

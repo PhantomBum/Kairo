@@ -10,12 +10,12 @@ export default function ServerLeaderboard({ server, members }) {
 
   useEffect(() => {
     if (!server?.id) return;
-    base44.entities.Message.filter({ server_id: server.id }).then(m => { setMessages(m); setLoading(false); });
+    base44.entities.Message.filter({ server_id: server.id }).then(m => { setMessages(Array.isArray(m) ? m : []); setLoading(false); });
   }, [server?.id]);
 
   const leaderboard = useMemo(() => {
     const scores = {};
-    messages.forEach(m => {
+    (Array.isArray(messages) ? messages : []).forEach(m => {
       if (!m.author_id) return;
       if (!scores[m.author_id]) scores[m.author_id] = { id: m.author_id, name: m.author_name, avatar: m.author_avatar, xp: 0, messages: 0, reactions: 0 };
       scores[m.author_id].messages++;
