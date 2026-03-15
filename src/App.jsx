@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, useEffect, useCallback } from 'react'
 import { Toaster } from "@/components/ui/toaster"
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
@@ -31,6 +31,7 @@ const AuthenticatedApp = () => {
 
   const isLoading = isLoadingAuth || isLoadingPublicSettings;
   const username = user?.full_name || user?.email?.split('@')[0] || '';
+  const onReady = useCallback(() => setLoadingDismissed(true), []);
 
   // Public embed route — no auth required
   if (pathname.startsWith('/embed/')) {
@@ -46,7 +47,7 @@ const AuthenticatedApp = () => {
       <KairoLoadingScreen
         isLoading={isLoading}
         username={username}
-        onReady={() => setLoadingDismissed(true)}
+        onReady={onReady}
       />
     );
   }
