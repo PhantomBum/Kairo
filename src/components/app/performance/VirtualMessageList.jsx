@@ -45,12 +45,13 @@ const DateDivider = memo(function DateDivider({ date }) {
 });
 
 export default function VirtualMessageList({
-  messages, currentUserId, channelName, isLoading, isDM,
+  messages: messagesProp, currentUserId, channelName, isLoading, isDM,
   onReply, onEdit, onDelete, onDeleteBatch, onReact, onPin, onStar, onForward, onProfileClick,
   editingMessage, onEditSave, onEditCancel, optimisticIds, failedIds, onRetryFailed, onDismissFailed,
   members, getProfile, onLongPress, onHighlight, onMarkMoment, onOpenThread,
   isAdmin, highlightTargetId,
 }) {
+  const messages = Array.isArray(messagesProp) ? messagesProp : [];
   const containerRef = useRef(null);
   const bottomRef = useRef(null);
   const [atBottom, setAtBottom] = useState(true);

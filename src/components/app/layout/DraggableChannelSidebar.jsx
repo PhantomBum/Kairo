@@ -161,7 +161,7 @@ function CategoryGroup({ category, channels, activeId, onSelect, onAdd, onSettin
                       {textLikeChannels.map((ch, i) => (
                         <ChannelItem key={ch.id} channel={ch} active={activeId === ch.id} onClick={onSelect}
                           onSettings={onSettings} onJumpToDate={onJumpToDate} isOwner={isOwner} index={i}
-                          voiceStates={(voiceStates || []).filter(s => s.channel_id === ch.id)} />
+                                voiceStates={(Array.isArray(voiceStates) ? voiceStates : []).filter(s => s.channel_id === ch.id)} />
                       ))}
                     </>
                   )}
@@ -174,7 +174,7 @@ function CategoryGroup({ category, channels, activeId, onSelect, onAdd, onSettin
                       {voiceLikeChannels.map((ch, i) => (
                         <ChannelItem key={ch.id} channel={ch} active={activeId === ch.id} onClick={onSelect}
                           onSettings={onSettings} onJumpToDate={onJumpToDate} isOwner={isOwner} index={textLikeChannels.length + i}
-                          voiceStates={(voiceStates || []).filter(s => s.channel_id === ch.id)} />
+                                voiceStates={(Array.isArray(voiceStates) ? voiceStates : []).filter(s => s.channel_id === ch.id)} />
                       ))}
                     </>
                   )}
@@ -195,9 +195,12 @@ export default function DraggableChannelSidebar({
   onChannelSettings, onJumpToDate, voiceStates, isOwner, onLeaveServer,
   boostCount, boostLevel, isBoosted, onBoost, onShop, shopEnabled, memberCount, onlineCount,
 }) {
-  const sorted = [...(categories || [])].sort((a, b) => (a.position || 0) - (b.position || 0));
+  const categoriesArr = Array.isArray(categories) ? categories : [];
+  const channelsArr = Array.isArray(channels) ? channels : [];
+  const voiceStatesArr = Array.isArray(voiceStates) ? voiceStates : [];
+  const sorted = [...categoriesArr].sort((a, b) => (a.position || 0) - (b.position || 0));
   const catIds = new Set(sorted.map(c => c.id));
-  const uncategorized = (channels || []).filter(ch => !ch.category_id || !catIds.has(ch.category_id));
+  const uncategorized = channelsArr.filter(ch => !ch.category_id || !catIds.has(ch.category_id));
   const scrollRef = useRef(null);
   const [search, setSearch] = useState('');
   const [scrollY, setScrollY] = useState(0);
@@ -207,7 +210,7 @@ export default function DraggableChannelSidebar({
   }, []);
 
   const filteredChannels = search
-    ? (channels || []).filter(ch => ch.name?.toLowerCase().includes(search.toLowerCase()))
+    ? channelsArr.filter(ch => ch.name?.toLowerCase().includes(search.toLowerCase()))
     : null;
 
   const onDragEnd = useCallback(async (result) => {
@@ -228,7 +231,7 @@ export default function DraggableChannelSidebar({
     const newCategoryId = dstCatRaw === 'uncategorized' ? '' : dstCatRaw;
     const dstChannels = dstCatRaw === 'uncategorized'
       ? uncategorized.filter(c => c.id !== chId)
-      : (channels || []).filter(ch => ch.category_id === dstCatRaw && ch.id !== chId);
+      : channelsArr.filter(ch => ch.category_id === dstCatRaw && ch.id !== chId);
     const sortedDst = [...dstChannels].sort((a, b) => (a.position || 0) - (b.position || 0));
     sortedDst.splice(destination.index, 0, { id: chId });
     const updates = sortedDst.map((ch, i) => ch.id === chId
@@ -237,12 +240,12 @@ export default function DraggableChannelSidebar({
     if (srcCatRaw !== dstCatRaw) {
       const srcChannels = srcCatRaw === 'uncategorized'
         ? uncategorized.filter(c => c.id !== chId)
-        : (channels || []).filter(ch => ch.category_id === srcCatRaw && ch.id !== chId);
+        : channelsArr.filter(ch => ch.category_id === srcCatRaw && ch.id !== chId);
       srcChannels.sort((a, b) => (a.position || 0) - (b.position || 0)).forEach((ch, i) =>
         updates.push(base44.entities.Channel.update(ch.id, { position: i })));
     }
     await Promise.all(updates);
-  }, [isOwner, sorted, channels, uncategorized]);
+  }, [isOwner, sorted, channelsArr, uncategorized]);
 
   return (
     <div className="flex-1 flex flex-col min-h-0" style={{ background: P.surface }}>
@@ -314,7 +317,7 @@ export default function DraggableChannelSidebar({
                         {uncategorized.filter(ch => ch.type !== 'voice' && ch.type !== 'stage').sort((a, b) => (a.position || 0) - (b.position || 0)).map((ch, i) => (
                           <ChannelItem key={ch.id} channel={ch} active={activeId === ch.id} onClick={onSelect}
                             onSettings={onChannelSettings} onJumpToDate={onJumpToDate} isOwner={isOwner} index={i}
-                            voiceStates={(voiceStates || []).filter(s => s.channel_id === ch.id)} />
+                            voiceStates={voiceStatesArr.filter(s => s?.channel_id === ch.id)} />
                         ))}
                         {uncategorized.some(ch => ch.type === 'voice' || ch.type === 'stage') && (
                           <>
@@ -325,7 +328,7 @@ export default function DraggableChannelSidebar({
                             {uncategorized.filter(ch => ch.type === 'voice' || ch.type === 'stage').sort((a, b) => (a.position || 0) - (b.position || 0)).map((ch, i) => (
                               <ChannelItem key={ch.id} channel={ch} active={activeId === ch.id} onClick={onSelect}
                                 onSettings={onChannelSettings} onJumpToDate={onJumpToDate} isOwner={isOwner} index={100 + i}
-                                voiceStates={(voiceStates || []).filter(s => s.channel_id === ch.id)} />
+                                voiceStates={voiceStatesArr.filter(s => s?.channel_id === ch.id)} />
                             ))}
                           </>
                         )}
@@ -337,9 +340,9 @@ export default function DraggableChannelSidebar({
 
                 {sorted.map((cat, i) => (
                   <CategoryGroup key={cat.id} category={cat} index={i}
-                    channels={(channels || []).filter(ch => ch.category_id === cat.id)}
+                    channels={channelsArr.filter(ch => ch.category_id === cat.id)}
                     activeId={activeId} onSelect={onSelect} onAdd={onAdd} onSettings={onChannelSettings}
-                    onJumpToDate={onJumpToDate} isOwner={isOwner} voiceStates={voiceStates} />
+                    onJumpToDate={onJumpToDate} isOwner={isOwner} voiceStates={voiceStatesArr} />
                 ))}
 
                 {isOwner && (

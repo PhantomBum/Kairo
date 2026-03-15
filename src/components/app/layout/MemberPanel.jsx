@@ -146,13 +146,15 @@ const MemberGroup = memo(function MemberGroup({ group, ownerId, onProfileClick }
 
 export default memo(function MemberPanel({ members, roles, ownerId, onProfileClick }) {
   const { getProfile } = useProfiles();
+  const membersArr = Array.isArray(members) ? members : [];
+  const rolesArr = Array.isArray(roles) ? roles : [];
 
-  const enriched = useMemo(() => (members || []).map(m => {
+  const enriched = useMemo(() => membersArr.map(m => {
     const p = getProfile(m.user_id) || getProfile(m.user_email);
     return { ...m, profile: p || { status: 'offline', is_online: false } };
-  }), [members, getProfile]);
+  }), [membersArr, getProfile]);
 
-  const sortedRoles = useMemo(() => (roles || []).filter(r => !r.is_default).sort((a, b) => (b.position || 0) - (a.position || 0)), [roles]);
+  const sortedRoles = useMemo(() => rolesArr.filter(r => !r.is_default).sort((a, b) => (b.position || 0) - (a.position || 0)), [rolesArr]);
   const hoistedRoles = useMemo(() => sortedRoles.filter(r => r.hoist), [sortedRoles]);
 
   const grouped = useMemo(() => {
@@ -172,7 +174,7 @@ export default memo(function MemberPanel({ members, roles, ownerId, onProfileCli
     return groups;
   }, [enriched, hoistedRoles]);
 
-  if (!members || members.length === 0) {
+  if (!membersArr.length) {
     return (
       <div className="app-member-panel w-[240px] flex-shrink-0 overflow-y-auto scrollbar-none p-3 hidden md:block" style={{ background: colors.bg.surface }}>
         {Array.from({ length: 8 }).map((_, i) => (
