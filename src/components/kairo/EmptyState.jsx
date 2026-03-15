@@ -2,15 +2,11 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import {
   MessageCircle, Users, Hash, Inbox, Search, Mic,
-  Bot, Calendar, Bookmark, Pin, Bell,
+  Bot, Calendar, Bookmark, Pin, Bell, AlertTriangle,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-
-const P = {
-  elevated: '#26262d', floating: '#2e2e37',
-  textPrimary: '#f0eff4', textSecondary: '#a09fad', muted: '#68677a',
-  accent: '#2dd4bf',
-};
+import { colors, typography } from '@/components/app/design/tokens';
+import { Button } from '@/components/ui/button';
 
 const configs = {
   noMessages: {
@@ -73,6 +69,11 @@ const configs = {
     title: 'No channels.',
     description: 'Create a channel to start conversations.',
   },
+  inviteError: {
+    icon: AlertTriangle,
+    title: "This Invite Isn't Valid",
+    description: 'This invite may be invalid, expired, or you may not have permission to join.',
+  },
 };
 
 export default function EmptyState({
@@ -100,33 +101,29 @@ export default function EmptyState({
       style={{ gap: 24 }}>
 
       <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
-        style={{ color: P.muted }}>
+        style={{ color: colors.text.muted }}>
         <Icon className="w-12 h-12" />
       </div>
 
-      <h3 className="text-[16px] font-semibold" style={{ color: P.textPrimary }}>
+      <h3 style={{ fontSize: typography.lg.size, fontWeight: typography.weight.semibold, color: colors.text.primary }}>
         {displayTitle}
       </h3>
 
-      <p className="text-[14px] max-w-[280px] leading-relaxed" style={{ color: P.muted }}>
+      <p className="max-w-[280px] leading-relaxed" style={{ fontSize: typography.base.size, color: colors.text.muted }}>
         {displayDesc}
       </p>
 
       {(action || secondaryAction) && (
         <div className="flex gap-3">
           {action && (
-            <button onClick={action}
-              className="h-10 px-4 py-2.5 rounded-md text-[13px] font-medium transition-all duration-[120ms] ease-out hover:opacity-90 active:scale-[0.97]"
-              style={{ background: P.accent, color: '#0d1117' }}>
+            <Button onClick={action} variant="default">
               {actionLabel || 'Get Started'}
-            </button>
+            </Button>
           )}
           {secondaryAction && (
-            <button onClick={secondaryAction}
-              className="h-10 px-4 py-2.5 rounded-md text-[13px] font-medium transition-all duration-[120ms] ease-out hover:bg-[rgba(255,255,255,0.06)] active:scale-[0.97]"
-              style={{ background: P.elevated, color: P.textSecondary, border: '1px solid rgba(255,255,255,0.08)' }}>
+            <Button onClick={secondaryAction} variant="outline">
               {secondaryActionLabel || 'Learn More'}
-            </button>
+            </Button>
           )}
         </div>
       )}

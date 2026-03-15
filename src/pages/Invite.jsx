@@ -2,23 +2,20 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { Users, Calendar, Zap, AlertTriangle, Hash, Volume2, Shield, Check } from 'lucide-react';
-
-const P = {
-  base: '#18181c', surface: '#1e1e23', elevated: '#26262d',
-  floating: '#2e2e37', border: '#33333d',
-  textPrimary: '#f0eff4', textSecondary: '#a09fad', muted: '#68677a',
-  accent: '#2dd4bf', danger: '#f87171', success: '#34d399',
-};
+import { colors, typography, radius, shadows } from '@/components/app/design/tokens';
+import EmptyState from '@/components/kairo/EmptyState';
+import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 
 function StatPill({ icon: Icon, label, value, color, dot }) {
   return (
-    <div className="flex items-center gap-2 px-3 py-2 rounded-lg" style={{ background: P.elevated, border: `1px solid ${P.border}` }}>
+    <div className="flex items-center gap-2 px-3 py-2 rounded-full" style={{ background: colors.bg.raised, border: `1px solid ${colors.border.subtle}` }}>
       {dot
-        ? <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ background: color || P.success }} />
-        : <Icon className="w-4 h-4 flex-shrink-0" style={{ color: color || P.muted }} />}
+        ? <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ background: color || colors.success }} />
+        : <Icon className="w-4 h-4 flex-shrink-0" style={{ color: color || colors.text.muted }} />}
       <div>
-        <div className="text-[13px] font-semibold" style={{ color: P.textPrimary }}>{value}</div>
-        <div className="text-[11px]" style={{ color: P.muted }}>{label}</div>
+        <div style={{ fontSize: typography.compact.size, fontWeight: typography.weight.semibold, color: colors.text.primary }}>{value}</div>
+        <div style={{ fontSize: typography.caption.size, color: colors.text.muted }}>{label}</div>
       </div>
     </div>
   );
@@ -111,52 +108,55 @@ export default function Invite() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: P.base }}>
-        <div className="text-center k-fade-in">
-          <div className="w-6 h-6 border-2 rounded-full animate-spin mx-auto" style={{ borderColor: P.border, borderTopColor: P.accent }} />
-          <p className="text-[13px] mt-4" style={{ color: P.muted }}>Loading invite...</p>
+      <div className="min-h-screen flex items-center justify-center p-6" style={{ background: colors.bg.void }}>
+        <div className="w-full max-w-[440px] rounded-2xl overflow-hidden" style={{ background: colors.bg.float, border: `1px solid ${colors.border.medium}` }}>
+          <Skeleton className="h-[180px] w-full" />
+          <div className="p-6 space-y-4">
+            <Skeleton className="h-6 w-3/4" />
+            <Skeleton className="h-4 w-full" />
+            <div className="grid grid-cols-2 gap-2">
+              {[1, 2, 3, 4].map(i => <Skeleton key={i} className="h-14 rounded-full" />)}
+            </div>
+          </div>
         </div>
       </div>
     );
   }
 
   if (error) {
-    const errorMessages = {
-      expired: { title: 'This Invite Has Expired', desc: 'The person who shared this invite may need to send a new one.' },
-      maxed: { title: 'This Invite Has Reached Its Limit', desc: 'This invite has been used the maximum number of times.' },
-      invalid: { title: "This Invite Isn't Valid Anymore", desc: 'This invite may be invalid, expired, or you may not have permission to join.' },
+    const errorConfig = {
+      expired: { title: 'This Invite Has Expired', description: 'The person who shared this invite may need to send a new one.' },
+      maxed: { title: 'This Invite Has Reached Its Limit', description: 'This invite has been used the maximum number of times.' },
+      invalid: { title: "This Invite Isn't Valid Anymore", description: 'This invite may be invalid, expired, or you may not have permission to join.' },
     };
-    const msg = errorMessages[error] || errorMessages.invalid;
+    const cfg = errorConfig[error] || errorConfig.invalid;
     return (
-      <div className="min-h-screen flex items-center justify-center p-6" style={{ background: P.base }}>
-        <div className="text-center max-w-sm k-fade-in">
-          <div className="w-16 h-16 rounded-2xl mx-auto mb-6 flex items-center justify-center" style={{ background: `${P.danger}15` }}>
-            <AlertTriangle className="w-8 h-8" style={{ color: P.danger }} />
-          </div>
-          <h1 className="text-xl font-bold mb-2" style={{ color: P.textPrimary }}>{msg.title}</h1>
-          <p className="text-[14px] mb-8" style={{ color: P.muted }}>{msg.desc}</p>
-          <a href="/" className="inline-flex px-6 py-3 rounded-xl text-[14px] font-semibold" style={{ background: P.accent, color: '#0d1117' }}>
-            Open Kairo
-          </a>
-        </div>
+      <div className="min-h-screen flex items-center justify-center p-6" style={{ background: colors.bg.void }}>
+        <EmptyState
+          type="inviteError"
+          title={cfg.title}
+          description={cfg.description}
+          action={() => window.location.href = '/'}
+          actionLabel="Open Kairo"
+        />
       </div>
     );
   }
 
   const bannerBg = server.banner_url
     ? `url(${server.banner_url})`
-    : `linear-gradient(135deg, ${server.banner_color || P.accent}, ${server.banner_color || P.accent}88)`;
+    : `linear-gradient(135deg, ${server.banner_color || colors.accent.primary}, ${server.banner_color || colors.accent.primary}88)`;
   const initials = server.name?.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
   const createdDate = server.created_date ? new Date(server.created_date).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : 'N/A';
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6" style={{ background: P.base }}>
-      <div className="w-full max-w-md rounded-2xl overflow-hidden k-fade-in" style={{ background: P.surface, border: `1px solid ${P.border}`, boxShadow: '0 20px 60px rgba(0,0,0,0.5)' }}>
+    <div className="min-h-screen flex items-center justify-center p-6" style={{ background: colors.bg.void }}>
+      <div className="w-full max-w-[440px] overflow-hidden" style={{ borderRadius: radius['2xl'], background: colors.bg.float, border: `1px solid ${colors.border.medium}`, boxShadow: shadows.xl }}>
         {/* Banner */}
-        <div className="h-[140px] relative" style={{ background: bannerBg, backgroundSize: 'cover', backgroundPosition: 'center' }}>
+        <div className="h-[180px] relative" style={{ background: bannerBg, backgroundSize: 'cover', backgroundPosition: 'center', borderRadius: `${radius['2xl']} ${radius['2xl']} 0 0` }}>
           <div className="absolute inset-0" style={{ background: 'linear-gradient(transparent 40%, rgba(0,0,0,0.6))' }} />
-          <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full text-[11px] font-semibold flex items-center gap-1"
-            style={{ background: 'rgba(0,0,0,0.5)', color: P.textPrimary, backdropFilter: 'blur(8px)' }}>
+          <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full flex items-center gap-1"
+            style={{ background: 'rgba(0,0,0,0.5)', color: colors.text.primary, backdropFilter: 'blur(8px)', fontSize: typography.caption.size, fontWeight: typography.weight.semibold }}>
             <Shield className="w-3 h-3" /> Server Invite
           </div>
         </div>
@@ -164,34 +164,34 @@ export default function Invite() {
         {/* Server Icon */}
         <div className="px-6 -mt-8 relative z-10">
           <div className="w-16 h-16 rounded-2xl overflow-hidden flex items-center justify-center text-xl font-bold"
-            style={{ background: server.icon_url ? 'transparent' : P.elevated, color: P.textPrimary, border: `4px solid ${P.surface}` }}>
+            style={{ background: server.icon_url ? 'transparent' : colors.bg.elevated, color: colors.text.primary, border: `4px solid ${colors.bg.float}` }}>
             {server.icon_url ? <img src={server.icon_url} className="w-full h-full object-cover" alt="" onError={(e) => { e.target.style.display = 'none'; }} /> : initials}
           </div>
         </div>
 
         <div className="px-6 pt-3 pb-6">
-          <h1 className="text-[22px] font-bold" style={{ color: P.textPrimary }}>{server.name}</h1>
+          <h1 style={{ fontSize: typography.xl.size, fontWeight: typography.weight.bold, color: colors.text.primary }}>{server.name}</h1>
           {server.description && (
-            <p className="text-[14px] mt-1 leading-relaxed" style={{ color: P.muted }}>{server.description}</p>
+            <p className="mt-1 leading-relaxed" style={{ fontSize: typography.base.size, color: colors.text.muted }}>{server.description}</p>
           )}
 
           <div className="grid grid-cols-2 gap-2 mt-4">
             <StatPill icon={Users} label="Members" value={server.member_count || 1} />
-            <StatPill icon={Users} label="Online" value="—" color={P.success} dot />
+            <StatPill icon={Users} label="Online" value="—" color={colors.success} dot />
             <StatPill icon={Calendar} label="Created" value={createdDate} />
             <StatPill icon={Zap} label="Boost Level" value={server.boost_level || '0'} color="#f472b6" />
           </div>
 
           {channels.length > 0 && (
             <div className="mt-4">
-              <h3 className="text-[11px] font-semibold uppercase tracking-wider mb-2" style={{ color: P.muted }}>Channels</h3>
+              <h3 className="mb-2" style={{ fontSize: typography.label.size, fontWeight: typography.weight.semibold, letterSpacing: '0.08em', textTransform: 'uppercase', color: colors.text.muted }}>Channels</h3>
               <div className="space-y-1">
                 {channels.map(ch => (
-                  <div key={ch.id} className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg" style={{ background: P.elevated }}>
+                  <div key={ch.id} className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg" style={{ background: colors.bg.elevated }}>
                     {ch.type === 'voice'
-                      ? <Volume2 className="w-3.5 h-3.5" style={{ color: P.muted }} />
-                      : <Hash className="w-3.5 h-3.5" style={{ color: P.muted }} />}
-                    <span className="text-[13px]" style={{ color: P.textSecondary }}>{ch.name}</span>
+                      ? <Volume2 className="w-3.5 h-3.5" style={{ color: colors.text.muted }} />
+                      : <Hash className="w-3.5 h-3.5" style={{ color: colors.text.muted }} />}
+                    <span style={{ fontSize: typography.compact.size, color: colors.text.secondary }}>{ch.name}</span>
                   </div>
                 ))}
               </div>
@@ -201,26 +201,21 @@ export default function Invite() {
           {/* Actions */}
           <div className="flex gap-3 mt-6">
             {joined ? (
-              <div className="flex-1 h-12 rounded-xl text-[15px] font-semibold flex items-center justify-center gap-2" style={{ background: P.success, color: '#fff' }}>
+              <div className="flex-1 h-11 rounded-xl flex items-center justify-center gap-2" style={{ background: colors.success, color: '#fff', fontSize: typography.body.size, fontWeight: typography.weight.semibold }}>
                 <Check className="w-5 h-5" /> Joined! Redirecting...
               </div>
             ) : isMember ? (
-              <a href="/" className="flex-1 h-12 rounded-xl text-[15px] font-semibold flex items-center justify-center"
-                style={{ background: P.accent, color: '#0d1117' }}>
-                Open Server
-              </a>
+              <Button asChild className="flex-1 h-11 rounded-xl">
+                <a href="/">Open Server</a>
+              </Button>
             ) : (
               <>
-                <button onClick={handleJoin} disabled={joining}
-                  className="flex-1 h-12 rounded-xl text-[15px] font-semibold disabled:opacity-50 transition-colors"
-                  style={{ background: P.success, color: '#fff' }}>
+                <Button onClick={handleJoin} disabled={joining} loading={joining} className="flex-1 h-11 rounded-xl">
                   {joining ? 'Joining...' : isAuth ? 'Join Server' : 'Sign In & Join'}
-                </button>
-                <a href="/"
-                  className="h-12 px-6 rounded-xl text-[15px] font-semibold flex items-center justify-center"
-                  style={{ background: P.elevated, color: P.textSecondary, border: `1px solid ${P.border}` }}>
-                  No Thanks
-                </a>
+                </Button>
+                <Button variant="outline" asChild className="h-11 px-6 rounded-xl">
+                  <a href="/">No Thanks</a>
+                </Button>
               </>
             )}
           </div>

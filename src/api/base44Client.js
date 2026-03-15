@@ -156,7 +156,8 @@ function createEntityProxy(entityType) {
         console.error(`[entities.${entityType}.filter]`, error);
         return [];
       }
-      return (data || []).map(rowToEntity);
+      const arr = Array.isArray(data) ? data : [];
+      return arr.map(rowToEntity);
     },
 
     async list(orderBy, limit) {

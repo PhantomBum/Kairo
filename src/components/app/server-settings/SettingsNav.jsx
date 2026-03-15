@@ -54,7 +54,7 @@ const NAV = [
 ];
 
 const LABEL_MAP = {};
-NAV.forEach(g => g.items.forEach(i => { LABEL_MAP[i.id] = i.label; }));
+NAV.forEach(g => { (Array.isArray(g.items) ? g.items : []).forEach(i => { LABEL_MAP[i.id] = i.label; }); });
 
 export default function SettingsNav({ active, onSelect, serverName }) {
   return (

@@ -5,12 +5,13 @@ import { base44 } from '@/api/base44Client';
 const Ctx = createContext(null);
 
 export function ProfileProvider({ children }) {
-  const { data: profiles = [], refetch } = useQuery({
+  const { data: rawProfiles, refetch } = useQuery({
     queryKey: ['profiles'],
     queryFn: () => base44.entities.UserProfile.list(),
     staleTime: 60000,
     refetchInterval: 120000,
   });
+  const profiles = Array.isArray(rawProfiles) ? rawProfiles : [];
 
   const map = useMemo(() => {
     const m = {};

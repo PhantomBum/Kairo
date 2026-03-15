@@ -21,10 +21,12 @@ export function useServers(userId, userEmail) {
   return useQuery({
     queryKey: ['servers', userId],
     queryFn: async () => {
-      const [servers, memberships] = await Promise.all([
+      const [serversRaw, membershipsRaw] = await Promise.all([
         base44.entities.Server.list(),
         base44.entities.ServerMember.list(),
       ]);
+      const servers = Array.isArray(serversRaw) ? serversRaw : [];
+      const memberships = Array.isArray(membershipsRaw) ? membershipsRaw : [];
       const myIds = new Set(
         memberships
           .filter(m => m.user_id === userId || m.user_email === userEmail || m.created_by === userEmail)

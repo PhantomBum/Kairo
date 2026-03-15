@@ -195,7 +195,7 @@ function SuggestedFriends({ friends, onAddFriend, onProfileClick, getProfile }) 
     const allProfiles = [];
     (friends || []).forEach(f => {
       const p = getProfile(f.friend_id);
-      if (p?.mutual_servers) {
+      if (p?.mutual_servers && Array.isArray(p.mutual_servers)) {
         p.mutual_servers.forEach(s => {
           if (!friendIds.has(s.user_id) && !dismissed.has(s.user_id)) {
             allProfiles.push({ user_id: s.user_id, name: s.display_name || s.user_name, avatar: s.avatar_url, mutual: f.friend_name });
@@ -260,7 +260,10 @@ export default function FriendsView({
     try { return JSON.parse(localStorage.getItem('kairo-friend-categories') || '{}'); } catch { return {}; }
   });
   const [categories, setCategories] = useState(() => {
-    try { return JSON.parse(localStorage.getItem('kairo-friend-cat-list') || '["Close Friends","Gaming","Work"]'); } catch { return ['Close Friends', 'Gaming', 'Work']; }
+    try {
+      const parsed = JSON.parse(localStorage.getItem('kairo-friend-cat-list') || '["Close Friends","Gaming","Work"]');
+      return Array.isArray(parsed) ? parsed : ['Close Friends', 'Gaming', 'Work'];
+    } catch { return ['Close Friends', 'Gaming', 'Work']; }
   });
   const [expandedCats, setExpandedCats] = useState(() => new Set(categories));
   const [newCatName, setNewCatName] = useState('');
