@@ -16,33 +16,33 @@ export default function Layout({ children }) {
         :root { ${cssVariables} }
 
         body {
-          background: var(--bg-base);
-          color: var(--text-primary);
+          background: #0a0a0b;
+          color: var(--k-text-primary, #ffffff);
           font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-          font-size: 15px;
+          font-size: 14px;
           line-height: 1.5;
           -webkit-font-smoothing: antialiased;
           -moz-osx-font-smoothing: grayscale;
           text-rendering: optimizeLegibility;
         }
 
-        * { border-color: var(--border-subtle); }
-        ::selection { background: var(--accent-dim); color: var(--text-primary); }
+        * { border-color: var(--k-border, rgba(255,255,255,0.06)); }
+        ::selection { background: var(--accent-dim); color: var(--k-text-primary, #ffffff); }
 
-        /* Scrollbars — 4px, transparent track, fade after scroll */
+        /* Scrollbars — minimal Kloak */
         ::-webkit-scrollbar { width: 4px; height: 4px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb {
-          background: var(--border-medium);
-          border-radius: var(--radius-full);
-          transition: background 0.3s ease;
+          background: rgba(255,255,255,0.12);
+          border-radius: 4px;
+          transition: background 0.2s ease;
         }
-        ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
         .scrollbar-none::-webkit-scrollbar { display: none; }
         .scrollbar-none { -ms-overflow-style: none; scrollbar-width: none; }
 
         :focus-visible {
-          outline: 2px solid var(--accent-primary);
+          outline: 2px solid var(--k-accent, #2dd4bf);
           outline-offset: 2px;
           border-radius: inherit;
         }
@@ -83,7 +83,7 @@ export default function Layout({ children }) {
         /* Context menus & dropdowns */
         [data-radix-popper-content-wrapper] [role="menu"],
         [data-radix-popper-content-wrapper] [data-radix-menu-content] {
-          background: var(--k-bg-float) !important;
+          background: #111114 !important;
           border: 1px solid rgba(255,255,255,0.08) !important;
           border-radius: 8px !important;
           padding: 6px !important;
@@ -96,7 +96,7 @@ export default function Layout({ children }) {
         }
         [data-radix-popper-content-wrapper] [role="menuitem"]:hover,
         [data-radix-popper-content-wrapper] [role="menuitem"][data-highlighted] {
-          background: rgba(108,122,219,0.2) !important;
+          background: rgba(45,212,191,0.12) !important;
           color: #fff !important;
         }
         [data-radix-popper-content-wrapper] [role="menuitem"]:active { transform: scale(0.98) !important; }
